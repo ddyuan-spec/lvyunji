@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>绿韵家 - 权益用户管理</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif; background: #f5f7fa; }
+        
+        /* 侧边栏 */
+        .sidebar { position: fixed; left: 0; top: 0; width: 200px; height: 100vh; background: #1a1a2e; color: #fff; overflow-y: auto; }
+        .sidebar-header { padding: 20px; font-size: 20px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-menu { padding: 10px 0; }
+        .menu-item { padding: 12px 20px; cursor: pointer; transition: all 0.3s; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+        .menu-item:hover { background: rgba(255,255,255,0.05); }
+        .menu-item.active { background: #ff4757; }
+        .menu-item i { width: 16px; text-align: center; }
+        .menu-group { margin: 5px 0; }
+        .menu-group-title { padding: 10px 20px; font-size: 14px; color: #fff; background: rgba(255,71,87,0.8); display: flex; align-items: center; gap: 10px; }
+        .menu-sub { padding: 10px 20px 10px 50px; font-size: 13px; color: #aaa; cursor: pointer; transition: all 0.3s; }
+        .menu-sub:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .menu-sub.active { color: #fff; background: rgba(255,71,87,0.5); }
+        
+        /* 主内容区 */
+        .main { margin-left: 200px; padding: 20px; }
+        .header { background: #fff; padding: 15px 20px; border-radius: 4px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 20px; color: #333; }
+        
+        /* 标签页 */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; background: #fff; border-radius: 4px; cursor: pointer; font-size: 14px; color: #666; }
+        .tab.active { background: #ff4757; color: #fff; }
+        
+        /* 筛选栏 */
+        .filter-bar { background: #fff; padding: 15px 20px; border-radius: 4px; margin-bottom: 20px; display: flex; gap: 10px; align-items: center; }
+        .filter-bar input, .filter-bar select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
+        .btn-primary { background: #67c23a; color: #fff; }
+        .btn-primary:hover { background: #5daf34; }
+        .btn-default { background: #fff; color: #666; border: 1px solid #ddd; }
+        
+        /* 表格 */
+        .table-container { background: #fff; border-radius: 4px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #f5f7fa; padding: 12px; text-align: left; font-weight: 600; color: #666; border-bottom: 1px solid #ebeef5; }
+        td { padding: 12px; border-bottom: 1px solid #ebeef5; color: #333; }
+        tr:nth-child(even) { background: #f0f9eb; }
+        tr:hover { background: #f5f7fa; }
+        
+        /* 客服备注列 */
+        .remark-cell { max-width: 200px; color: #409eff; }
+        .remark-empty { color: #999; }
+        
+        /* 操作按钮 */
+        .action-btns { display: flex; gap: 8px; }
+        .action-btn { color: #409eff; cursor: pointer; font-size: 13px; }
+        .action-btn:hover { text-decoration: underline; }
+        
+        /* 弹窗遮罩 */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-overlay.active { display: flex; }
+        
+        /* 弹窗 */
+        .modal { background: #fff; border-radius: 8px; width: 500px; max-width: 90%; box-shadow: 0 4px 20px rgba(0,0,0,0.15); animation: modalSlide 0.3s ease; }
+        @keyframes modalSlide { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .modal-header { padding: 20px; border-bottom: 1px solid #ebeef5; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-size: 18px; color: #333; }
+        .modal-close { width: 30px; height: 30px; border: none; background: none; font-size: 20px; color: #999; cursor: pointer; border-radius: 4px; }
+        .modal-close:hover { background: #f5f7fa; color: #666; }
+        
+        .modal-body { padding: 20px; }
+        .form-item { margin-bottom: 20px; }
+        .form-item label { display: block; margin-bottom: 8px; font-size: 14px; color: #666; }
+        .form-item .required::before { content: '*'; color: #ff4757; margin-right: 4px; }
+        .form-item input[readonly] { background: #f5f7fa; color: #999; }
+        .form-item input, .form-item textarea { width: 100%; padding: 10px 12px; border: 1px solid #dcdfe6; border-radius: 4px; font-size: 14px; transition: border-color 0.3s; }
+        .form-item input:focus, .form-item textarea:focus { outline: none; border-color: #409eff; }
+        .form-item textarea { resize: vertical; min-height: 100px; font-family: inherit; }
+        .char-count { text-align: right; font-size: 12px; color: #999; margin-top: 5px; }
+        .char-count.warning { color: #ff4757; }
+        
+
+        .modal-footer { padding: 15px 20px; border-top: 1px solid #ebeef5; display: flex; justify-content: flex-end; gap: 10px; }
+        .btn-confirm { background: #ff6b6b; color: #fff; }
+        .btn-confirm:hover { background: #ff5252; }
+        
+        /* 提示消息 */
+        .toast { position: fixed; top: 20px; right: 20px; padding: 12px 20px; background: #67c23a; color: #fff; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: none; animation: toastSlide 0.3s ease; z-index: 2000; }
+        @keyframes toastSlide { from { opacity: 0; transform: translateX(100px); } to { opacity: 1; transform: translateX(0); } }
+        .toast.show { display: block; }
+        .toast.error { background: #ff4757; }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+        <div class="sidebar-header">享刷</div>
+        <div class="sidebar-menu">
+            <div class="menu-item">📍 签到打卡</div>
+            <div class="menu-item">🎫 优惠券管理</div>
+            <div class="menu-group">
+                <div class="menu-group-title">▼ 享刷</div>
+                <div class="menu-sub">水粉权益</div>
+                <div class="menu-sub active">权益用户</div>
+            </div>
+            <div class="menu-item">📢 平台消息</div>
+            <div class="menu-item">🏆 排行榜</div>
+            <div class="menu-item">🛒 商品抢购</div>
+        </div>
+    </div>
+    
+    <!-- 主内容 -->
+    <div class="main">
+        <div class="header">
+            <h1>权益用户</h1>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab">取水权益用户</div>
+            <div class="tab active">领卡权益用户</div>
+        </div>
+        
+        <div class="filter-bar">
+            <input type="text" placeholder="用户ID" style="width: 150px;">
+            <input type="text" placeholder="昵称/手机号">
+            <select>
+                <option>全部权益类型</option>
+                <option>日结权益</option>
+                <option>直播权益</option>
+            </select>
+            <button class="btn btn-default">查询</button>
+            <button class="btn btn-default">重置</button>
+            <button class="btn btn-primary">新增权益</button>
+            <button class="btn btn-default">导出</button>
+        </div>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>权益编号</th>
+                        <th>会员信息</th>
+                        <th>绑定工作站</th>
+                        <th>总水量</th>
+                        <th>已发放水量</th>
+                        <th>本月待发</th>
+                        <th>已取水量</th>
+                        <th>权益类型</th>
+                        <th>权益时间</th>
+                        <th>描述</th>
+                        <th>客服备注</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="userTable">
+                    <!-- 数据由JS生成 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- 备注弹窗 -->
+    <div class="modal-overlay" id="remarkModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>客服备注</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-item">
+                    <label>权益编号</label>
+                    <input type="text" id="modalBenefitId" readonly>
+                </div>
+                <div class="form-item">
+                    <label>会员信息</label>
+                    <input type="text" id="modalUserInfo" readonly>
+                </div>
+                <div class="form-item">
+                    <label class="required">备注内容</label>
+                    <textarea id="remarkContent" placeholder="请输入备注内容..." maxlength="200"></textarea>
+                    <div class="char-count"><span id="charCount">0</span>/200</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeModal()">取消</button>
+                <button class="btn btn-confirm" onclick="saveRemark()">确定</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 提示消息 -->
+    <div class="toast" id="toast"></div>
+    
+    <script>
+        // 模拟数据
+        let users = [
+            { id: 42268, name: '测试线下数据', phone: '15373329961', station: '—', total: 7, issued: 0, monthly: 6, taken: 1, type: '直播权益', time: '2025-05-09', desc: '日结直播权益', remark: '已操作撤回已重新补卡', remarkTime: '2025-05-10 14:30' },
+            { id: 42203, name: '春卷12123', phone: '18307448442', station: '—', total: 450, issued: 0, monthly: 20, taken: 0, type: '日结权益', time: '2025-04-14', desc: '1', remark: '', remarkTime: '' },
+            { id: 42202, name: '李丽萍', phone: '13320342187', station: '—', total: 450, issued: 0, monthly: 30, taken: 0, type: '日结权益', time: '2025-04-14', desc: '—', remark: '已电话确认', remarkTime: '2025-05-08 09:15' },
+            { id: 42200, name: 'George Tan', phone: '18585596873', station: '—', total: 450, issued: 0, monthly: 20, taken: 0, type: '日结权益', time: '2025-04-14', desc: '1', remark: '', remarkTime: '' },
+        ];
+        
+        let currentUserId = null;
+        
+        // 渲染表格
+        function renderTable() {
+            const tbody = document.getElementById('userTable');
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td>${user.id}</td>
+                    <td>${user.name}<br><small style="color:#999">${user.phone}</small></td>
+                    <td>${user.station}</td>
+                    <td>${user.total}</td>
+                    <td>${user.issued}</td>
+                    <td>${user.monthly}</td>
+                    <td>${user.taken}</td>
+                    <td>${user.type}</td>
+                    <td>${user.time}</td>
+                    <td>${user.desc}</td>
+                    <td class="remark-cell ${user.remark ? '' : 'remark-empty'}">${user.remark || '—'}</td>
+                    <td>
+                        <div class="action-btns">
+                            <span class="action-btn">取水明细</span>
+                            <span class="action-btn" onclick="openModal(${user.id})">备注</span>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // 打开弹窗
+        function openModal(userId) {
+            currentUserId = userId;
+            const user = users.find(u => u.id === userId);
+            
+            document.getElementById('modalBenefitId').value = user.id;
+            document.getElementById('modalUserInfo').value = `${user.name} ${user.phone}`;
+            
+            // 备注内容：有则显示已有备注，无则空
+            const remarkContent = user.remark || '';
+            document.getElementById('remarkContent').value = remarkContent;
+            document.getElementById('charCount').textContent = remarkContent.length;
+            document.getElementById('charCount').classList.toggle('warning', remarkContent.length >= 180);
+            
+            document.getElementById('remarkModal').classList.add('active');
+        }
+        
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('remarkModal').classList.remove('active');
+            currentUserId = null;
+        }
+        
+        // 保存备注
+        function saveRemark() {
+            const content = document.getElementById('remarkContent').value.trim();
+            
+            if (!content) {
+                showToast('请输入备注内容', 'error');
+                return;
+            }
+            
+            const user = users.find(u => u.id === currentUserId);
+            user.remark = content;
+            user.remarkTime = new Date().toLocaleString('zh-CN', { 
+                year: 'numeric', month: '2-digit', day: '2-digit', 
+                hour: '2-digit', minute: '2-digit' 
+            }).replace(/\//g, '-');
+            
+            renderTable();
+            closeModal();
+            showToast('备注保存成功');
+        }
+        
+        // 显示提示
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast show' + (type === 'error' ? ' error' : '');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        
+        // 字数统计
+        document.getElementById('remarkContent').addEventListener('input', function() {
+            const count = this.value.length;
+            const countEl = document.getElementById('charCount');
+            countEl.textContent = count;
+            countEl.classList.toggle('warning', count >= 180);
+        });
+        
+        // 点击遮罩关闭
+        document.getElementById('remarkModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+        
+        // 初始化
+        renderTable();
+    </script>
+</body>
+</html>

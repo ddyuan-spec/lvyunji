@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>绿韵家 - 权益用户客服备注功能 PRD</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif; 
+            background: #f5f7fa; 
+            line-height: 1.6;
+            color: #333;
+        }
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        
+        .header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: #fff; 
+            padding: 40px; 
+            border-radius: 12px; 
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        
+        .section { 
+            background: #fff; 
+            padding: 30px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .section h2 { 
+            font-size: 20px; 
+            color: #333; 
+            margin-bottom: 20px; 
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        .section h3 {
+            font-size: 16px;
+            color: #555;
+            margin: 20px 0 10px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 12px;
+            font-size: 14px;
+        }
+        .info-grid .label { color: #666; font-weight: 500; }
+        .info-grid .value { color: #333; }
+        
+        .feature-list {
+            list-style: none;
+        }
+        .feature-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .feature-list li:last-child { border-bottom: none; }
+        .feature-list .num {
+            width: 24px;
+            height: 24px;
+            background: #667eea;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+        .feature-list .content { flex: 1; }
+        .feature-list .title { font-weight: 500; color: #333; margin-bottom: 4px; }
+        .feature-list .desc { color: #666; font-size: 13px; }
+        
+        .highlight-box {
+            background: #f0f5ff;
+            border-left: 4px solid #667eea;
+            padding: 15px 20px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        
+        .preview-btn {
+            display: inline-block;
+            background: #667eea;
+            color: #fff;
+            padding: 12px 30px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .preview-btn:hover { background: #5a67d8; transform: translateY(-2px); }
+        
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>权益用户客服备注功能</h1>
+            <p>产品需求文档 PRD | 绿韵家（有享猫）</p>
+        </div>
+        
+        <div class="section">
+            <h2>📋 基本信息</h2>
+            <div class="info-grid">
+                <div class="label">需求编号</div>
+                <div class="value">LYJ-REQ-004</div>
+                <div class="label">功能名称</div>
+                <div class="value">权益用户客服备注</div>
+                <div class="label">所属模块</div>
+                <div class="value">后管系统 > 享刷 > 水粉权益 > 领卡权益用户</div>
+                <div class="label">优先级</div>
+                <div class="value">中</div>
+                <div class="label">更新日期</div>
+                <div class="value">2025-05-19</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🎯 功能说明</h2>
+            <div class="highlight-box">
+                在权益用户列表中，客服人员可对用户记录添加备注信息。备注仅保存最新一条，用于记录用户处理状态。
+            </div>
+            
+            <h3>核心功能点</h3>
+            <ul class="feature-list">
+                <li>
+                    <span class="num">1</span>
+                    <div class="content">
+                        <div class="title">列表展示备注</div>
+                        <div class="desc">权益用户列表新增「客服备注」列，显示最新备注内容（蓝色文字）</div>
+                    </div>
+                </li>
+                <li>
+                    <span class="num">2</span>
+                    <div class="content">
+                        <div class="title">备注弹窗操作</div>
+                        <div class="desc">点击「备注」按钮打开弹窗，显示权益编号、会员信息、当前备注（如有）</div>
+                    </div>
+                </li>
+                <li>
+                    <span class="num">3</span>
+                    <div class="content">
+                        <div class="title">填写备注内容</div>
+                        <div class="desc">文本域输入，最多200字，仅支持纯文本。必填项，保存后覆盖原有备注</div>
+                    </div>
+                </li>
+                <li>
+                    <span class="num">4</span>
+                    <div class="content">
+                        <div class="title">权限控制</div>
+                        <div class="desc">仅客服角色及以上权限可操作，运营角色仅可查看</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>📝 使用场景</h2>
+            <ul class="feature-list">
+                <li>
+                    <span class="num">1</span>
+                    <div class="content">
+                        <div class="title">已操作撤回已重新补卡</div>
+                        <div class="desc">客服处理用户补卡申请后，记录处理结果</div>
+                    </div>
+                </li>
+                <li>
+                    <span class="num">2</span>
+                    <div class="content">
+                        <div class="title">已电话确认</div>
+                        <div class="desc">电话沟通后记录确认状态</div>
+                    </div>
+                </li>
+                <li>
+                    <span class="num">3</span>
+                    <div class="content">
+                        <div class="title">用户反馈未收到卡</div>
+                        <div class="desc">记录用户问题，便于后续跟进</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>🔧 技术要点</h2>
+            <div class="info-grid">
+                <div class="label">数据存储</div>
+                <div class="value">权益用户表新增 remark 字段（VARCHAR 200）</div>
+                <div class="label">更新逻辑</div>
+                <div class="value">每次保存覆盖原有备注，仅保留最新一条</div>
+                <div class="label">接口</div>
+                <div class="value">POST /api/remark/add (benefit_id, content)</div>
+                <div class="label">组件库</div>
+                <div class="value">Element UI，遵循项目UI规范</div>
+            </div>
+        </div>
+        
+        <div class="section" style="text-align: center;">
+            <h2>👁️ 交互原型预览</h2>
+            <p style="color: #666; margin-bottom: 20px;">点击下方按钮查看完整交互效果</p>
+            <a href="index.html" class="preview-btn">查看原型预览</a>
+        </div>
+        
+        <div class="footer">
+            <p>绿韵家（有享猫）私域电商系统 | 产品需求文档</p>
+        </div>
+    </div>
+</body>
+</html>
