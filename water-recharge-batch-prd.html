@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>补水管理 - 批量审核功能 PRD</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.8;
+        }
+        .container { max-width: 960px; margin: 0 auto; padding: 40px 20px; }
+
+        /* 导航 */
+        .top-nav {
+            display: flex;
+            gap: 24px;
+            padding: 20px 0 40px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 40px;
+        }
+        .top-nav a {
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .top-nav a:hover { color: #ff4d7d; }
+        .top-nav span { color: #999; font-size: 14px; }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1a1a2e;
+        }
+        .meta {
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 40px;
+               h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 40px 0 16px;
+            padding-left: 12px;
+            border-left: 4px solid #ff4d7d;
+            color: #1a1a2e;
+        }
+        h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 24px 0 12px;
+            color: #333;
+        }
+        p { font-size: 14px; color: #555; margin-bottom: 8px; }
+        ul, ol { font-size: 14px; color: #555; padding-left: 24px; margin-bottom: 16px; }
+        li { margin-bottom: 6px; }
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #e83e8c;
+        }
+        .info-box {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 16px 0;
+            font-size: 14px;
+            color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid #e8e8e8;
+            padding: 10px 14px;
+            text-align: left;
+        }
+        th { background: #fafafa; color: #333; font-weight: 600; }
+        tr:nth-child(even) { background: #fafafa; }
+        .tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-right: 6px;
+        }
+        .tag-primary { background: #fff0f3; color: #ff4d7d; }
+        .tag-success { background: #f0f9eb; color: #67c23a; }
+        .tag-warning { background: #fdf6ec; color: #e6a23c; }
+        .divider { border: none; border-top: 1px solid #eee; margin: 32px 0; }
+
+        /* 原型预览区 */
+        .prototype-section {
+            margin: 40px 0;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .prototype-header {
+            background: #2d2d3a;
+            color: #fff;
+            padding: 12px 20px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .prototype-header span { color: #a0a0b0; }
+        .prototype-header .title { font-weight: 600; }
+        .prototype-header .btn-open {
+            background: #ff4d7d;
+            color: #fff;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .prototype-header .btn-open:hover { background: #ff3366; }
+        .prototype-frame {
+            width: 100%;
+            height: 700px;
+            border: none;
+            background: #fff;
+            display: block;
+        }
+
+        /* 弹窗预览 */
+        .modal-preview {
+            position: relative;
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            max-width: 700px;
+            margin: 20px auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .modal-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .modal-preview-title { font-size: 16px; font-weight: 600; }
+        .modal-preview-close { color: #999; font-size: 22px; cursor: pointer; }
+        .modal-preview-body { padding: 20px; }
+        .modal-preview-footer { padding: 14px 20px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 12px; }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+        .flow-step-num {
+            width: 28px;
+            height: 28px;
+            background: #ff4d7d;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .flow-step-arrow { color: #ccc; font-size: 18px; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- 导航 -->
+    <div class="top-nav">
+        <a href="water-recharge-batch.html">原型预览</a>
+        <span>></span>
+        <span>PRD 文档</span>
+    </div>
+
+    <h1>补水管理 - 批量审核功能 PRD</h1>
+    <div class="meta">版本：v1.0 &nbsp;|&nbsp; 日期：2026-05-20 &nbsp;|&nbsp; 模块：水机权益 → 补水管理</div>
+
+    <!-- 一、产品概述 -->
+    <h2>一、产品概述</h2>
+    <div class="info-box">
+        <strong>功能名称：</strong>批量审核<br>
+        <strong>功能类型：</strong>后台管理功能（管理员操作）<br>
+        <strong>所属模块：</strong>营销中心 → 水机权益 → 补水管理<br>
+        <strong>功能定位：</strong>管理员可一次性对多条补水申请记录进行统一审核，提高审批效率。
+    </div>
+
+    <!-- 二、功能说明 -->
+    <h2>二、功能说明</h2>
+
+    <h3>2.1 入口与操作流程</h3>
+    <div class="flow-step">
+        <div class="flow-step-num">1</div>
+        <div>管理员进入 <strong>补水管理</strong> 列表页，默认展示"待审核"状态</div>
+    </div>
+    <div class="flow-step">
+        <div class="flow-step-num">2</div>
+        <div>通过左上角 <strong>站点下拉选择</strong>，搜索并选择目标工作站</div>
+    </div>
+    <div class="flow-step">
+        <div class="flow-step-num">3</div>
+        <div>点击右侧 <strong>批量审核</strong> 按钮，打开批量审核弹窗</div>
+    </div>
+    <div class="flow-step">
+        <div class="flow-step-num">4</div>
+        <div>在弹窗中选择 <strong>通过 / 驳回</strong>，填写说明/驳回理由（必填）</div>
+    </div>
+    <div class="flow-step">
+        <div class="flow-step-num">5</div>
+        <div>点击 <strong>确认</strong> 提交审核结果，或点击 <strong>取消</strong> 放弃操作</div>
+    </div>
+
+    <h3>2.2 字段说明</h3>
+    <table>
+        <tr><th style="width:160px;">字段</th><th>说明</th></tr>
+        <tr><td>工作站名称</td><td>当前选中站点名称（只读）</td></tr>
+        <tr><td>申请记录数</td><td>该站点下待审核的申请记录总数</td></tr>
+        <tr><td>申请时间</td><td>多条申请时间以顿号（、）分隔全部展示，如：2026-03-17 15:51、2026-03-16 21:25</td></tr>
+        <tr><td>水袋明细</td><td>所有申请的水袋明细集中合并展示，表格列：核销时间、用户昵称、用户手机号、数量(袋)、来源</td></tr>
+        <tr><td>申请数量</td><td>所有申请的袋数累加求和，如：选中共2条记录，分别申请6袋、21袋，则显示"申请数量：27袋"</td></tr>
+        <tr><td>审核结果</td><td>单选按钮：<span class="tag tag-success">通过</span> 或 <span class="tag tag-warning">驳回</span>，默认为"通过"</td></tr>
+        <tr><td>说明/驳回理由</td><td>文本输入框，最多200字，<strong>必填</strong></td></tr>
+    </table>
+
+    <h3>2.3 交互规则</h3>
+    <ul>
+        <li><strong>批量审核按钮：</strong>当站点下拉已选择且有待审核记录时，批量审核按钮方可点击；未选择站点或无待审核记录时，按钮置灰禁用</li>
+        <li><strong>申请时间合并：</strong>多条申请时间用中文顿号（、）按时间顺序连接展示</li>
+        <li><strong>水袋明细合并：</strong>将多条申请的水袋明细按申请时间倒序排列，统一合并展示为一个表格</li>
+        <li><strong>数量汇总：</strong>所有申请袋数自动累加，显示总申请数量</li>
+        <li><strong>说明必填：</strong>审核提交前必须填写说明/驳回理由，否则禁止提交</li>
+        <li><strong>审核结果：</strong>默认选择"通过"，支持切换为"驳回"</li>
+        <li><strong>确认提交：</strong>验证说明不为空后，批量更新所选记录的审核状态、操作人、操作时间、说明字段</li>
+        <li><strong>取消不提交：</strong>点击取消或遮罩关闭弹窗，不做任何数据变更</li>
+    </ul>
+
+    <!-- 三、PRD 原型 -->
+    <h2>三、PRD 原型</h2>
+    <p style="color:#999;font-size:13px;margin-bottom:16px;">
+        👇 点击下方按钮可打开完整可交互原型（推荐在新窗口中查看）
+    </p>
+
+    <!-- 列表页原型 -->
+    <div class="prototype-section">
+        <div class="prototype-header">
+            <div>
+                <span class="title">原型 1：补水管理列表页 + 批量审核</span>
+                <span> — 列表页、站点选择、批量审核按钮</span>
+            </div>
+            <a class="btn-open" href="water-recharge-batch.html" target="_blank">在新窗口打开 →</a>
+        </div>
+        <iframe class="prototype-frame" src="water-recharge-batch.html" title="批量审核原型"></iframe>
+    </div>
+
+    <!-- 弹窗说明 -->
+    <h3>批量审核弹窗交互说明</h3>
+    <div class="info-box">
+        <strong>弹窗标题：</strong>批量审核<br><br>
+        <strong>内容区块：</strong><br>
+        ① <strong>申请信息区：</strong>展示工作站名称、申请记录数、申请时间（多值顿号分隔）<br>
+        ② <strong>水袋明细区：</strong>展示所有水袋明细合并表格，含汇总行"申请数量：X袋"<br>
+        ③ <strong>审核操作区：</strong>单选通过/驳回 + 说明/驳回理由文本框（必填）<br><br>
+        <strong>操作按钮：</strong>取消（关闭弹窗）+ 确定（验证后提交审核）<br><br>
+        <strong>数据更新：</strong>审核成功后，所选记录状态更新为"已通过"或"已驳回"，审核时间、操作人、说明字段同步更新
+    </div>
+
+    <!-- 四、状态与异常 -->
+    <h2>四、状态与异常处理</h2>
+    <table>
+        <tr><th style="width:160px;">场景</th><th>处理方式</th></tr>
+        <tr><td>未选择站点</td><td>批量审核按钮禁用（置灰），提示"请先选择工作站"</td></tr>
+        <tr><td>该站点无待审核记录</td><td>批量审核按钮禁用（置灰），按钮文字可保持不变或变为灰色</td></tr>
+        <tr><td>说明未填写就点确定</td><td>输入框下方红色提示"请填写说明/驳回理由"，阻止提交</td></tr>
+        <tr><td>说明超过200字</td><td>超出部分不可输入（maxlength=200）</td></tr>
+        <tr><td>点击取消/遮罩</td><td>关闭弹窗，不提交任何数据</td></tr>
+        <tr><td>审核成功</td><td>关闭弹窗，列表页刷新，显示成功 Toast 提示</td></tr>
+    </table>
+
+    <!-- 五、验收标准 -->
+    <h2>五、验收标准</h2>
+    <ul>
+        <li>✅ 站点下拉选择后可正常搜索过滤列表数据</li>
+        <li>✅ 选择了站点且有待审核记录时，批量审核按钮可用</li>
+        <li>✅ 未选择站点或无待审核记录时，批量审核按钮置灰禁用</li>
+        <li>✅ 批量审核弹窗正确展示申请时间（多值顿号分隔）</li>
+        <li>✅ 水袋明细正确合并汇总，申请数量累加正确</li>
+        <li>✅ 说明/驳回理由为空时，禁止提交并显示提示</li>
+        <li>✅ 审核提交后列表数据正确更新为已通过/已驳回</li>
+        <li>✅ 点击取消或遮罩层关闭弹窗，不产生数据变更</li>
+    </ul>
+
+    <hr class="divider">
+    <p style="color:#999;font-size:13px;text-align:center;">绿韵家管理系统 · 补水管理批量审核功能 PRD · v1.0</p>
+
+</div>
+</body>
+</html>
