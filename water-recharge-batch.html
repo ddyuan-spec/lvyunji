@@ -104,6 +104,8 @@
         .btn-batch:hover { background: #ff3366; }
         .selected-info { font-size: 13px; color: #999; }
         .selected-info .num { color: #ff4d4f; font-weight: 600; }
+        .apply-qty { font-size: 13px; color: #333; margin-right: 12px; }
+        .apply-qty .num { color: #ff4d7d; font-weight: 600; }
 
         .data-table { width: 100%; border-collapse: collapse; }
         .data-table th, .data-table td { padding: 11px 14px; text-align: left; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
@@ -279,6 +281,7 @@
         <!-- 工具栏：批量审核按钮 + 选中提示 -->
         <div class="table-toolbar">
             <div class="table-toolbar-left">
+                <span class="apply-qty" id="applyQty"></span>
                 <span class="selected-info" id="selectedInfo"></span>
             </div>
             <button class="btn-batch" onclick="openBatchAudit()">批量审核</button>
@@ -630,6 +633,22 @@ function updateSelectAllState() {
 }
 
 function updateSelectedInfo() {
+    // 申请数量计算
+    let totalQty = 0;
+    if (selectedIds.size > 0) {
+        // 选中时：统计选中的记录
+        selectedIds.forEach(id => {
+            const r = allRecords.find(x => x.id === id);
+            if (r) totalQty += r.qty;
+        });
+    } else {
+        // 未选中时：统计本页的申请袋数
+        const pageData = getPageData();
+        pageData.forEach(r => { totalQty += r.qty; });
+    }
+    document.getElementById('applyQty').innerHTML = '申请数量：<span class="num">' + totalQty + '</span>袋';
+
+    // 选中条数
     const el = document.getElementById('selectedInfo');
     const count = selectedIds.size;
     if (count > 0) {
