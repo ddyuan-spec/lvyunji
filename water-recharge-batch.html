@@ -8,16 +8,13 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            background: #f5f5f5;
-            color: #333;
-            font-size: 14px;
+            background: #f5f5f5; color: #333; font-size: 14px;
         }
 
         /* 顶部导航 */
         .top-header {
             position: fixed; top: 0; left: 0; right: 0; height: 56px;
-            background: #2b2d42;
-            display: flex; align-items: center; justify-content: space-between;
+            background: #2b2d42; display: flex; align-items: center; justify-content: space-between;
             padding: 0 20px; z-index: 1000;
         }
         .logo { color: #fff; font-size: 17px; font-weight: 600; }
@@ -25,14 +22,12 @@
         .top-nav-item { color: #a0a0b0; font-size: 14px; cursor: pointer; padding: 6px 0; border-bottom: 2px solid transparent; transition: all .2s; }
         .top-nav-item:hover { color: #fff; }
         .top-nav-item.active { color: #ff4d4f; border-bottom-color: #ff4d4f; }
-        .top-right { display: flex; align-items: center; gap: 12px; }
         .top-right .icon { color: #a0a0b0; cursor: pointer; font-size: 18px; }
 
         /* 侧边栏 */
         .sidebar {
             position: fixed; top: 56px; left: 0; bottom: 0; width: 210px;
-            background: #fafafa; border-right: 1px solid #e8e8e8;
-            overflow-y: auto; padding: 12px 0;
+            background: #fafafa; border-right: 1px solid #e8e8e8; overflow-y: auto; padding: 12px 0;
         }
         .menu-group { margin-bottom: 4px; }
         .menu-title { padding: 8px 20px; color: #aaa; font-size: 12px; font-weight: 500; }
@@ -41,15 +36,7 @@
             padding: 9px 20px; color: #555; font-size: 13px; cursor: pointer; transition: all .2s;
         }
         .menu-item:hover { background: #f0f0f2; color: #333; }
-        .menu-item.active {
-            background: #fff0f0; color: #ff4d4f;
-            border-left: 3px solid #ff4d4f; padding-left: 17px;
-        }
-        .sub-menu { background: #f4f4f6; }
-        .sub-menu .menu-item { padding-left: 32px; font-size: 13px; }
-        .sub-menu .menu-item.active { padding-left: 29px; }
-        .menu-toggle { font-size: 10px; color: #aaa; transition: transform .2s; }
-        .menu-item.expanded .menu-toggle { transform: rotate(90deg); }
+        .menu-item.active { background: #fff0f0; color: #ff4d4f; border-left: 3px solid #ff4d4f; padding-left: 17px; }
 
         /* 主内容 */
         .main { margin-left: 210px; margin-top: 56px; padding: 20px; min-height: calc(100vh - 56px); }
@@ -65,15 +52,7 @@
             display: flex; align-items: center; justify-content: space-between;
             background: #fff; padding: 14px 16px; border-radius: 6px; margin-bottom: 14px;
         }
-        .page-head-left { display: flex; align-items: center; gap: 16px; }
         .page-title { font-size: 17px; font-weight: 600; color: #1a1a2e; }
-        .btn-batch {
-            height: 32px; padding: 0 18px; background: #fff; border: 1px solid #d9d9d9;
-            border-radius: 4px; font-size: 13px; color: #555; cursor: pointer;
-            transition: all .2s; display: flex; align-items: center; gap: 6px;
-        }
-        .btn-batch:hover:not(:disabled) { border-color: #ff4d4f; color: #ff4d4f; }
-        .btn-batch:disabled { opacity: 0.45; cursor: not-allowed; }
 
         /* 状态标签 */
         .status-tabs {
@@ -82,7 +61,7 @@
         }
         .status-tab {
             padding: 12px 20px; font-size: 14px; color: #666; cursor: pointer;
-            border-bottom: 2px solid transparent; transition: all .2s; position: relative;
+            border-bottom: 2px solid transparent; transition: all .2s;
         }
         .status-tab:hover { color: #333; }
         .status-tab.active { color: #ff4d4f; border-bottom-color: #ff4d4f; }
@@ -96,51 +75,53 @@
         .filter-select {
             width: 220px; height: 34px; padding: 0 10px;
             border: 1px solid #d9d9d9; border-radius: 4px; font-size: 13px;
-            background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%23999' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E") no-repeat right 10px center;
-            appearance: none; -webkit-appearance: none; cursor: pointer; outline: none;
+            background: #fff; appearance: none; -webkit-appearance: none; cursor: pointer; outline: none;
         }
         .filter-select:focus { border-color: #ff4d4f; }
         .filter-input {
             width: 180px; height: 34px; padding: 0 10px;
             border: 1px solid #d9d9d9; border-radius: 4px; font-size: 13px; outline: none;
-            transition: border-color .2s;
         }
         .filter-input:focus { border-color: #ff4d4f; }
         .filter-input::placeholder { color: #bbb; }
-        .btn { height: 34px; padding: 0 18px; border-radius: 4px; font-size: 13px; cursor: pointer; transition: all .2s; }
-        .btn-primary { background: #ff4d4f; color: #fff; border: none; }
+        .btn { height: 34px; padding: 0 18px; border-radius: 4px; font-size: 13px; cursor: pointer; transition: all .2s; border: none; }
+        .btn-primary { background: #ff4d4f; color: #fff; }
         .btn-primary:hover { background: #e63; }
         .btn-default { background: #fff; border: 1px solid #d9d9d9; color: #555; }
         .btn-default:hover { border-color: #ff4d4f; color: #ff4d4f; }
 
         /* 表格 */
         .table-box { background: #fff; border-radius: 6px; overflow: hidden; }
+        .table-toolbar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 16px; border-bottom: 1px solid #f0f0f0;
+        }
+        .table-toolbar-left { display: flex; align-items: center; gap: 12px; }
+        .btn-batch {
+            height: 32px; padding: 0 16px; background: #ff4d4f; color: #fff;
+            border: none; border-radius: 4px; font-size: 13px; cursor: pointer; transition: all .2s;
+        }
+        .btn-batch:hover { background: #e63; }
+        .selected-info { font-size: 13px; color: #999; }
+        .selected-info .num { color: #ff4d4f; font-weight: 600; }
+
         .data-table { width: 100%; border-collapse: collapse; }
         .data-table th, .data-table td { padding: 11px 14px; text-align: left; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
         .data-table th { background: #fafafa; color: #666; font-weight: 500; font-size: 13px; white-space: nowrap; }
         .data-table tr:last-child td { border-bottom: none; }
         .data-table tr:hover td { background: #fafafa; }
-        .data-table .center { text-align: center; }
         .data-table .checkbox-cell { width: 40px; text-align: center; }
         .data-table .checkbox-cell input { width: 15px; height: 15px; cursor: pointer; accent-color: #ff4d4f; }
-        .status-badge {
-            display: inline-block; padding: 1px 8px; border-radius: 10px;
-            font-size: 12px; line-height: 20px;
-        }
+        .status-badge { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; line-height: 20px; }
         .status-pending { background: #fff7e6; color: #fa8c16; }
         .status-approved { background: #f6ffed; color: #52c41a; }
         .status-rejected { background: #fff1f0; color: #f5222d; }
         .action-link { color: #ff4d4f; cursor: pointer; font-size: 13px; }
         .action-link:hover { text-decoration: underline; }
-
-        /* 空状态 */
         .empty-state { text-align: center; padding: 60px 20px; color: #bbb; font-size: 14px; }
 
         /* 分页 */
-        .pagination {
-            display: flex; align-items: center; justify-content: flex-end;
-            padding: 14px 16px; gap: 8px;
-        }
+        .pagination { display: flex; align-items: center; justify-content: flex-end; padding: 14px 16px; gap: 8px; }
         .pagination-info { color: #999; font-size: 13px; margin-right: 12px; }
         .pg-btn {
             width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
@@ -151,14 +132,12 @@
         .pg-btn.active { background: #ff4d4f; border-color: #ff4d4f; color: #fff; }
         .pg-btn.disabled { color: #d9d9d9; cursor: not-allowed; }
 
-        /* 弹窗遮罩 */
+        /* 弹窗 */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,.45); z-index: 2000; align-items: center; justify-content: center;
         }
         .modal-overlay.show { display: flex; }
-
-        /* 单条审核弹窗 */
         .modal {
             background: #fff; border-radius: 8px; width: 640px; max-width: 95%;
             max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,.15);
@@ -168,12 +147,12 @@
             padding: 14px 20px; border-bottom: 1px solid #eee;
         }
         .modal-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
-        .modal-close { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #999; font-size: 20px; border-radius: 4px; transition: all .2s; }
+        .modal-close { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #999; font-size: 20px; border-radius: 4px; }
         .modal-close:hover { background: #f5f5f5; color: #666; }
         .modal-body { padding: 0; }
         .modal-foot { padding: 14px 20px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 10px; }
 
-        /* 申请信息区块 */
+        /* 申请信息 */
         .info-section { padding: 16px 20px; border-bottom: 1px solid #f0f0f0; }
         .info-title { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px; }
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; }
@@ -182,18 +161,18 @@
         .info-value { color: #333; }
         .info-value.status-pending { color: #fa8c16; }
 
-        /* 水袋明细区块 */
+        /* 水袋明细 */
         .detail-section { padding: 16px 20px; border-bottom: 1px solid #f0f0f0; }
         .detail-title { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
         .detail-title .qty-badge { font-size: 13px; color: #ff4d4f; font-weight: 500; }
-        .detail-table { width: 100%; border-collapse: collapse; font-size: 12px; border: 1px solid #f0f0f0; border-radius: 4px; overflow: hidden; }
+        .detail-table { width: 100%; border-collapse: collapse; font-size: 12px; border: 1px solid #f0f0f0; }
         .detail-table th, .detail-table td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #f0f0f0; }
-        .detail-table th { background: #fafafa; color: #888; font-weight: 500; font-size: 12px; }
+        .detail-table th { background: #fafafa; color: #888; font-weight: 500; }
         .detail-table tr:last-child td { border-bottom: none; }
         .detail-table tr:nth-child(even) td { background: #fafafa; }
         .detail-table .num { text-align: center; }
 
-        /* 审核操作区块 */
+        /* 审核操作 */
         .audit-section { padding: 16px 20px; }
         .audit-row { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 14px; }
         .audit-label { font-size: 13px; color: #666; width: 80px; flex-shrink: 0; padding-top: 8px; }
@@ -203,8 +182,7 @@
         .remark-wrap { flex: 1; }
         .remark-input {
             width: 100%; height: 80px; padding: 8px 10px; border: 1px solid #d9d9d9;
-            border-radius: 4px; font-size: 13px; resize: none; outline: none;
-            font-family: inherit; transition: border-color .2s;
+            border-radius: 4px; font-size: 13px; resize: none; outline: none; font-family: inherit;
         }
         .remark-input:focus { border-color: #ff4d4f; }
         .remark-hint { font-size: 12px; color: #bbb; margin-top: 4px; }
@@ -216,7 +194,7 @@
         .batch-info { background: #fafafa; border-radius: 6px; padding: 14px 16px; margin-bottom: 12px; font-size: 13px; }
         .batch-info-item { display: flex; gap: 8px; margin-bottom: 6px; }
         .batch-info-item:last-child { margin-bottom: 0; }
-        .batch-info-label { color: #999; width: 70px; flex-shrink: 0; }
+        .batch-info-label { color: #999; width: 80px; flex-shrink: 0; }
         .batch-info-value { color: #333; }
         .batch-info-value.red { color: #ff4d4f; font-weight: 600; }
 
@@ -229,31 +207,7 @@
         .toast.show { opacity: 1; }
         .toast.success { background: #52c41a; }
         .toast.error { background: #f5222d; }
-
-        /* 站点下拉面板 */
-        .station-dropdown {
-            position: relative;
-        }
-        .station-panel {
-            display: none; position: absolute; top: calc(100% + 4px); left: 0;
-            width: 260px; background: #fff; border: 1px solid #e8e8e8;
-            border-radius: 6px; box-shadow: 0 4px 16px rgba(0,0,0,.12); z-index: 100;
-        }
-        .station-panel.show { display: block; }
-        .station-panel-search { padding: 10px; border-bottom: 1px solid #f0f0f0; }
-        .station-panel-search input {
-            width: 100%; height: 32px; padding: 0 10px; border: 1px solid #d9d9d9;
-            border-radius: 4px; font-size: 13px; outline: none;
-        }
-        .station-panel-search input:focus { border-color: #ff4d4f; }
-        .station-panel-list { max-height: 240px; overflow-y: auto; }
-        .station-option {
-            padding: 8px 12px; font-size: 13px; color: #333; cursor: pointer;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background .15s;
-        }
-        .station-option:hover { background: #fff5f5; color: #ff4d4f; }
-        .station-option.selected { background: #fff0f0; color: #ff4d4f; }
-        .station-empty { padding: 20px; text-align: center; color: #bbb; font-size: 13px; }
+        .toast.warning { background: #fa8c16; }
     </style>
 </head>
 <body>
@@ -267,9 +221,7 @@
         <div class="top-nav-item active">营销中心</div>
         <div class="top-nav-item">结算中心</div>
     </div>
-    <div class="top-right">
-        <span class="icon">⚙</span>
-    </div>
+    <div class="top-right"><span class="icon">⚙</span></div>
 </div>
 
 <!-- 侧边栏 -->
@@ -294,7 +246,6 @@
 
 <!-- 主内容 -->
 <div class="main">
-    <!-- 面包屑 -->
     <div class="breadcrumb">
         <a href="#">首页报表</a><span>></span>
         <a href="#">基础设置</a><span>></span>
@@ -302,46 +253,36 @@
         补水管理
     </div>
 
-    <!-- 页面头部 -->
     <div class="page-head">
-        <div class="page-head-left">
-            <div class="page-title">补水管理</div>
-        </div>
+        <div class="page-title">补水管理</div>
     </div>
 
-    <!-- 状态标签 -->
     <div class="status-tabs">
-        <div class="status-tab" data-status="all">全部<span class="count" id="cntAll">(0)</span></div>
-        <div class="status-tab active" data-status="pending">待审核<span class="count" id="cntPending">(0)</span></div>
-        <div class="status-tab" data-status="approved">已通过<span class="count" id="cntApproved">(0)</span></div>
-        <div class="status-tab" data-status="rejected">已驳回<span class="count" id="cntRejected">(0)</span></div>
+        <div class="status-tab" data-status="all" onclick="switchTab(this)">全部<span class="count" id="cntAll">(0)</span></div>
+        <div class="status-tab active" data-status="pending" onclick="switchTab(this)">待审核<span class="count" id="cntPending">(0)</span></div>
+        <div class="status-tab" data-status="approved" onclick="switchTab(this)">已通过<span class="count" id="cntApproved">(0)</span></div>
+        <div class="status-tab" data-status="rejected" onclick="switchTab(this)">已驳回<span class="count" id="cntRejected">(0)</span></div>
     </div>
 
-    <!-- 搜索栏 -->
     <div class="filter-bar">
-        <!-- 站点下拉 -->
-        <div class="station-dropdown">
-            <select class="filter-select" id="stationSelect" onchange="onStationChange()">
-                <option value="">请选择工作站</option>
-            </select>
-        </div>
+        <select class="filter-select" id="stationSelect" onchange="doFilter()">
+            <option value="">请选择工作站</option>
+        </select>
         <input type="text" class="filter-input" id="filterAccount" placeholder="请输入用户账号">
         <input type="text" class="filter-input" id="filterPhone" placeholder="请输入联系人手机号">
-        <button class="btn btn-primary" onclick="doSearch()">搜索</button>
+        <button class="btn btn-primary" onclick="doFilter()">搜索</button>
         <button class="btn btn-default" onclick="doReset()">重置</button>
     </div>
 
-    <!-- 批量操作栏 -->
-    <div class="filter-bar" style="background:#fff0f0;border:1px solid #ffcdd3;margin-bottom:14px;">
-        <button class="btn btn-batch-action" id="batchBtn" onclick="openBatchAudit()" disabled style="
-            height:34px;padding:0 18px;background:#fff;border:1px solid #d9d9d9;
-            border-radius:4px;font-size:13px;cursor:not-allowed;color:#bbb;
-            opacity:0.5;display:flex;align-items:center;gap:6px;
-        ">⚖ 批量审核</button>
-    </div>
-
-    <!-- 表格 -->
+    <!-- 表格区域 -->
     <div class="table-box">
+        <!-- 工具栏：批量审核按钮 + 选中提示 -->
+        <div class="table-toolbar">
+            <div class="table-toolbar-left">
+                <button class="btn-batch" onclick="openBatchAudit()">批量审核</button>
+                <span class="selected-info" id="selectedInfo"></span>
+            </div>
+        </div>
         <table class="data-table">
             <thead>
                 <tr>
@@ -360,16 +301,11 @@
             </thead>
             <tbody id="tableBody"></tbody>
         </table>
-        <div class="pagination">
-            <span class="pagination-info" id="pgInfo">共 0 条</span>
-            <div class="pg-btn disabled">‹</div>
-            <div class="pg-btn active">1</div>
-            <div class="pg-btn disabled">›</div>
-        </div>
+        <div class="pagination" id="pagination"></div>
     </div>
 </div>
 
-<!-- ===================== 单条审核弹窗 ===================== -->
+<!-- 单条审核弹窗 -->
 <div class="modal-overlay" id="singleModal">
     <div class="modal">
         <div class="modal-head">
@@ -377,7 +313,6 @@
             <div class="modal-close" onclick="closeSingleModal()">×</div>
         </div>
         <div class="modal-body">
-            <!-- 申请信息 -->
             <div class="info-section">
                 <div class="info-title">申请信息</div>
                 <div class="info-grid">
@@ -391,23 +326,13 @@
                     <div class="info-item"><span class="info-label">申请状态</span><span class="info-value status-pending" id="sInfoStatus">-</span></div>
                 </div>
             </div>
-            <!-- 水袋明细 -->
             <div class="detail-section">
-                <div class="detail-title">
-                    水袋明细
-                    <span class="qty-badge" id="sDetailQtyBadge">申请数量：0袋</span>
-                </div>
+                <div class="detail-title">水袋明细 <span class="qty-badge" id="sDetailQtyBadge">申请数量：0袋</span></div>
                 <table class="detail-table">
-                    <thead>
-                        <tr>
-                            <th>核销时间</th><th>用户昵称</th><th>用户手机号</th>
-                            <th class="num">数量(袋)</th><th>来源</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>核销时间</th><th>用户昵称</th><th>用户手机号</th><th class="num">数量(袋)</th><th>来源</th></tr></thead>
                     <tbody id="sDetailBody"></tbody>
                 </table>
             </div>
-            <!-- 审核操作 -->
             <div class="audit-section">
                 <div class="audit-row">
                     <div class="audit-label">审核结果</div>
@@ -419,7 +344,7 @@
                 <div class="audit-row">
                     <div class="audit-label">说明</div>
                     <div class="remark-wrap">
-                        <textarea class="remark-input" id="sRemark" placeholder="请输入说明" maxlength="200"></textarea>
+                        <textarea class="remark-input" id="sRemark" placeholder="请输入说明" maxlength="200" oninput="document.getElementById('sHint').textContent=this.value.length+' / 200';document.getElementById('sError').classList.remove('show')"></textarea>
                         <div class="remark-hint" id="sHint">0 / 200</div>
                         <div class="remark-error" id="sError">请填写说明</div>
                     </div>
@@ -433,7 +358,7 @@
     </div>
 </div>
 
-<!-- ===================== 批量审核弹窗 ===================== -->
+<!-- 批量审核弹窗 -->
 <div class="modal-overlay" id="batchModal">
     <div class="modal batch-modal">
         <div class="modal-head">
@@ -441,38 +366,18 @@
             <div class="modal-close" onclick="closeBatchModal()">×</div>
         </div>
         <div class="modal-body">
-            <!-- 汇总信息 -->
             <div class="batch-info">
-                <div class="batch-info-item">
-                    <span class="batch-info-label">工作站名称</span>
-                    <span class="batch-info-value" id="bStationName">-</span>
-                </div>
-                <div class="batch-info-item">
-                    <span class="batch-info-label">申请记录数</span>
-                    <span class="batch-info-value red" id="bRecordCount">0</span>
-                </div>
-                <div class="batch-info-item">
-                    <span class="batch-info-label">申请时间</span>
-                    <span class="batch-info-value" id="bApplyTimes">-</span>
-                </div>
+                <div class="batch-info-item"><span class="batch-info-label">工作站名称</span><span class="batch-info-value" id="bStationName">-</span></div>
+                <div class="batch-info-item"><span class="batch-info-label">申请记录数</span><span class="batch-info-value red" id="bRecordCount">0</span></div>
+                <div class="batch-info-item"><span class="batch-info-label">申请时间</span><span class="batch-info-value" id="bApplyTimes">-</span></div>
             </div>
-            <!-- 水袋明细 -->
             <div class="detail-section">
-                <div class="detail-title">
-                    水袋明细
-                    <span class="qty-badge" id="bDetailQtyBadge">申请数量：0袋</span>
-                </div>
+                <div class="detail-title">水袋明细 <span class="qty-badge" id="bDetailQtyBadge">申请数量：0袋</span></div>
                 <table class="detail-table">
-                    <thead>
-                        <tr>
-                            <th>核销时间</th><th>用户昵称</th><th>用户手机号</th>
-                            <th class="num">数量(袋)</th><th>来源</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>核销时间</th><th>用户昵称</th><th>用户手机号</th><th class="num">数量(袋)</th><th>来源</th></tr></thead>
                     <tbody id="bDetailBody"></tbody>
                 </table>
             </div>
-            <!-- 审核操作 -->
             <div class="audit-section">
                 <div class="audit-row">
                     <div class="audit-label">审核结果</div>
@@ -484,7 +389,7 @@
                 <div class="audit-row">
                     <div class="audit-label" id="bRemarkLabel">说明</div>
                     <div class="remark-wrap">
-                        <textarea class="remark-input" id="bRemark" placeholder="请输入说明" maxlength="200" oninput="updateBHint()"></textarea>
+                        <textarea class="remark-input" id="bRemark" placeholder="请输入说明" maxlength="200" oninput="document.getElementById('bHint').textContent=this.value.length+' / 200';document.getElementById('bError').classList.remove('show')"></textarea>
                         <div class="remark-hint" id="bHint">0 / 200</div>
                         <div class="remark-error" id="bError">请填写说明/驳回理由</div>
                     </div>
@@ -498,7 +403,6 @@
     </div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
@@ -511,9 +415,7 @@ const stations = [
     { id: 5, name: '绿韵家工作室', street: '金水区街道', address: '郑州市金水区花园路', contact: '赵六(13476861744)', account: '13476861744', yqId: '364651076' },
 ];
 
-// 申请记录
 let allRecords = [
-    // 站点1 - 待审核
     { id: 101, stationId: 1, stationName: '绿韵健康服务中心郑州市中原区站工作室', account: '15639916119', yqId: '615198875', qty: 6, status: 'pending', applyTime: '2026-03-17 15:51', auditTime: '-', operator: '-', remark: '-', bags: [
         { time: '2026-03-17 15:48', nick: '陈宝阳', phone: '18638573217', qty: 1, source: '20260311日解锁直播权益包' },
         { time: '2026-03-17 13:03', nick: '周丽芬', phone: '15937141899', qty: 1, source: '20260311日解锁直播权益包' },
@@ -541,7 +443,6 @@ let allRecords = [
         { time: '2026-03-13 21:00', nick: '吴婷', phone: '15203909012', qty: 5, source: '20260311日解锁直播权益包' },
         { time: '2026-03-13 20:30', nick: '郑云', phone: '15303900123', qty: 5, source: '20260311日解锁直播权益包' },
     ]},
-    // 站点2 - 待审核
     { id: 201, stationId: 2, stationName: '绿韵家体验中心正阳店工作室', account: '18363879653', yqId: '775008171', qty: 10, status: 'pending', applyTime: '2026-03-23 18:51', auditTime: '-', operator: '-', remark: '-', bags: [
         { time: '2026-03-23 18:00', nick: '张明', phone: '13800138002', qty: 3, source: '20260311日解锁直播权益包' },
         { time: '2026-03-23 17:00', nick: '李红', phone: '13800138003', qty: 3, source: '20260311日解锁直播权益包' },
@@ -552,36 +453,27 @@ let allRecords = [
         { time: '2026-03-05 11:00', nick: '陈军', phone: '13800138010', qty: 2, source: '20260311日解锁直播权益包' },
         { time: '2026-03-05 10:00', nick: '杨丽', phone: '13800138011', qty: 3, source: '20260311日解锁直播权益包' },
     ]},
-    // 站点3 - 待审核
     { id: 301, stationId: 3, stationName: '洛阳胡晓彦工作室', account: '18933118081', yqId: '572339558', qty: 1, status: 'pending', applyTime: '2026-03-10 09:07', auditTime: '-', operator: '-', remark: '-', bags: [
         { time: '2026-03-10 09:00', nick: '周敏', phone: '18933118001', qty: 1, source: '20260311日解锁直播权益包' },
     ]},
     { id: 302, stationId: 3, stationName: '洛阳胡晓彦工作室', account: '18933118081', yqId: '572339558', qty: 1, status: 'pending', applyTime: '2026-03-06 15:07', auditTime: '-', operator: '-', remark: '-', bags: [
         { time: '2026-03-06 15:00', nick: '吴涛', phone: '18933118002', qty: 1, source: '20260311日解锁直播权益包' },
     ]},
-    // 站点4 - 待审核
     { id: 401, stationId: 4, stationName: '太和县法尔加头疗美发美容店工作室', account: '96363', yqId: '277957952', qty: 1, status: 'pending', applyTime: '2026-03-16 17:43', auditTime: '-', operator: '-', remark: '-', bags: [
         { time: '2026-03-16 17:40', nick: '郑海', phone: '13800000001', qty: 1, source: '20260311日解锁直播权益包' },
     ]},
-    // 站点5 - 已驳回
     { id: 501, stationId: 5, stationName: '绿韵家工作室', account: '13476861744', yqId: '364651076', qty: 43, status: 'rejected', applyTime: '2026-03-13 08:11', auditTime: '2026-03-13 10:20', operator: '管理员', remark: '信息不完整', bags: []},
 ];
 
 let currentTab = 'pending';
-let selectedStation = '';
 let filtered = [];
+let selectedIds = new Set(); // 跨页记住选中ID
+let currentPage = 1;
+const pageSize = 5;
 let currentSingleId = null;
 
 // ===================== 初始化 =====================
 function init() {
-    buildStationSelect();
-    filterAndRender();
-    updateCounts();
-    initSingleRemarkInput();
-}
-
-// 构建站点下拉选项
-function buildStationSelect() {
     const sel = document.getElementById('stationSelect');
     sel.innerHTML = '<option value="">请选择工作站</option>';
     stations.forEach(s => {
@@ -590,160 +482,160 @@ function buildStationSelect() {
         opt.textContent = s.name;
         sel.appendChild(opt);
     });
+    doFilter();
+    updateCounts();
 }
 
-function onStationChange() {
-    selectedStation = document.getElementById('stationSelect').value;
-    filterAndRender();
-    updateBatchBtn();
-}
-
-function initSingleRemarkInput() {
-    const ta = document.getElementById('sRemark');
-    const hint = document.getElementById('sHint');
-    ta.addEventListener('input', () => {
-        hint.textContent = ta.value.length + ' / 200';
-        document.getElementById('sError').classList.remove('show');
-    });
-}
-
-function updateBHint() {
-    const v = document.getElementById('bRemark').value;
-    document.getElementById('bHint').textContent = v.length + ' / 200';
-    document.getElementById('bError').classList.remove('show');
-}
-
-function updateRemarkLabel() {
-    const result = document.querySelector('input[name="bResult"]:checked').value;
-    document.getElementById('bRemarkLabel').textContent = result === 'rejected' ? '驳回理由' : '说明';
-    document.getElementById('bRemark').placeholder = result === 'rejected' ? '请输入驳回理由' : '请输入说明';
-    document.getElementById('bError').classList.remove('show');
-}
-
-// ===================== 筛选 & 渲染 =====================
-function filterAndRender() {
+// ===================== 筛选 =====================
+function doFilter() {
+    const stationVal = document.getElementById('stationSelect').value;
     const accountVal = document.getElementById('filterAccount').value.trim().toLowerCase();
     const phoneVal = document.getElementById('filterPhone').value.trim().toLowerCase();
 
     filtered = allRecords.filter(r => {
         if (currentTab !== 'all' && r.status !== currentTab) return false;
-        if (selectedStation && r.stationId != selectedStation) return false;
+        if (stationVal && r.stationId != stationVal) return false;
         if (accountVal && !r.account.toLowerCase().includes(accountVal)) return false;
-        if (phoneVal && !r.stationName.toLowerCase().includes(phoneVal) && !r.account.includes(phoneVal)) return false;
+        if (phoneVal && !r.account.includes(phoneVal) && !r.stationName.toLowerCase().includes(phoneVal)) return false;
         return true;
     });
 
-    renderTable();
-    updateBatchBtn();
+    // 切换筛选条件时清空选择
+    selectedIds.clear();
+    currentPage = 1;
+    renderPage();
 }
 
-function renderTable() {
-    const tbody = document.getElementById('tableBody');
-    if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="11" class="empty-state">暂无数据</td></tr>';
-        document.getElementById('pgInfo').textContent = '共 0 条';
-        return;
-    }
-
-    const statusMap = { pending: '待审核', approved: '已通过', rejected: '已驳回' };
-    const statusClass = { pending: 'status-pending', approved: 'status-approved', rejected: 'status-rejected' };
-
-    tbody.innerHTML = filtered.map(r => {
-        const isPending = r.status === 'pending';
-        const actionHtml = isPending
-            ? '<span class="action-link" onclick="openSingleAudit(' + r.id + ')">审核</span>'
-            : '-';
-        return '<tr data-id="' + r.id + '" data-status="' + r.status + '">' +
-            '<td class="checkbox-cell"><input type="checkbox" class="row-cb" data-id="' + r.id + '" ' + (isPending ? '' : 'disabled') + ' onchange="onCheckChange()"></td>' +
-            '<td><div>' + r.stationName + '</div></td>' +
-            '<td>' + r.account + '</td>' +
-            '<td>' + r.yqId + '</td>' +
-            '<td>' + r.qty + '</td>' +
-            '<td><span class="status-badge ' + statusClass[r.status] + '">' + statusMap[r.status] + '</span></td>' +
-            '<td>' + r.applyTime + '</td>' +
-            '<td>' + r.auditTime + '</td>' +
-            '<td>' + r.operator + '</td>' +
-            '<td>' + r.remark + '</td>' +
-            '<td>' + actionHtml + '</td>' +
-            '</tr>';
-    }).join('');
-
-    document.getElementById('pgInfo').textContent = '共 ' + filtered.length + ' 条';
-    // 全选状态重置
-    document.getElementById('selectAll').checked = false;
-    document.getElementById('selectAll').indeterminate = false;
-}
-
-function updateCounts() {
-    const all = allRecords.length;
-    const pending = allRecords.filter(r => r.status === 'pending').length;
-    const approved = allRecords.filter(r => r.status === 'approved').length;
-    const rejected = allRecords.filter(r => r.status === 'rejected').length;
-    document.getElementById('cntAll').textContent = '(' + all + ')';
-    document.getElementById('cntPending').textContent = '(' + pending + ')';
-    document.getElementById('cntApproved').textContent = '(' + approved + ')';
-    document.getElementById('cntRejected').textContent = '(' + rejected + ')';
-}
-
-// ===================== 搜索 & 重置 & 状态切换 =====================
-function doSearch() { filterAndRender(); }
 function doReset() {
     document.getElementById('stationSelect').value = '';
     document.getElementById('filterAccount').value = '';
     document.getElementById('filterPhone').value = '';
-    selectedStation = '';
-    filterAndRender();
+    doFilter();
 }
 
-document.querySelectorAll('.status-tab').forEach(tab => {
-    tab.addEventListener('click', function () {
-        document.querySelectorAll('.status-tab').forEach(t => t.classList.remove('active'));
-        this.classList.add('active');
-        currentTab = this.dataset.status;
-        filterAndRender();
-    });
-});
+function switchTab(el) {
+    document.querySelectorAll('.status-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    currentTab = el.dataset.status;
+    doFilter();
+}
+
+function updateCounts() {
+    document.getElementById('cntAll').textContent = '(' + allRecords.length + ')';
+    document.getElementById('cntPending').textContent = '(' + allRecords.filter(r => r.status === 'pending').length + ')';
+    document.getElementById('cntApproved').textContent = '(' + allRecords.filter(r => r.status === 'approved').length + ')';
+    document.getElementById('cntRejected').textContent = '(' + allRecords.filter(r => r.status === 'rejected').length + ')';
+}
+
+// ===================== 分页 & 渲染 =====================
+function getPageData() {
+    const start = (currentPage - 1) * pageSize;
+    return filtered.slice(start, start + pageSize);
+}
+
+function getTotalPages() {
+    return Math.max(1, Math.ceil(filtered.length / pageSize));
+}
+
+function renderPage() {
+    const pageData = getPageData();
+    const tbody = document.getElementById('tableBody');
+
+    if (pageData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" class="empty-state">暂无数据</td></tr>';
+    } else {
+        const statusMap = { pending: '待审核', approved: '已通过', rejected: '已驳回' };
+        const statusClass = { pending: 'status-pending', approved: 'status-approved', rejected: 'status-rejected' };
+        tbody.innerHTML = pageData.map(r => {
+            const isPending = r.status === 'pending';
+            const checked = selectedIds.has(r.id) ? 'checked' : '';
+            const actionHtml = isPending
+                ? '<span class="action-link" onclick="openSingleAudit(' + r.id + ')">审核</span>'
+                : '-';
+            return '<tr data-id="' + r.id + '">' +
+                '<td class="checkbox-cell"><input type="checkbox" class="row-cb" data-id="' + r.id + '" ' + checked + ' ' + (isPending ? '' : 'disabled') + ' onchange="onCheckChange()"></td>' +
+                '<td><div>' + r.stationName + '</div></td>' +
+                '<td>' + r.account + '</td>' +
+                '<td>' + r.yqId + '</td>' +
+                '<td>' + r.qty + '</td>' +
+                '<td><span class="status-badge ' + statusClass[r.status] + '">' + statusMap[r.status] + '</span></td>' +
+                '<td>' + r.applyTime + '</td>' +
+                '<td>' + r.auditTime + '</td>' +
+                '<td>' + r.operator + '</td>' +
+                '<td>' + r.remark + '</td>' +
+                '<td>' + actionHtml + '</td></tr>';
+        }).join('');
+    }
+
+    renderPagination();
+    updateSelectedInfo();
+    updateSelectAllState();
+}
+
+function renderPagination() {
+    const total = filtered.length;
+    const totalPages = getTotalPages();
+    const el = document.getElementById('pagination');
+    let html = '<span class="pagination-info">共 ' + total + ' 条</span>';
+    html += '<div class="pg-btn ' + (currentPage <= 1 ? 'disabled' : '') + '" onclick="' + (currentPage > 1 ? 'goPage(' + (currentPage-1) + ')' : '') + '">‹</div>';
+    for (let i = 1; i <= totalPages; i++) {
+        html += '<div class="pg-btn ' + (i === currentPage ? 'active' : '') + '" onclick="goPage(' + i + ')">' + i + '</div>';
+    }
+    html += '<div class="pg-btn ' + (currentPage >= totalPages ? 'disabled' : '') + '" onclick="' + (currentPage < totalPages ? 'goPage(' + (currentPage+1) + ')' : '') + '">›</div>';
+    el.innerHTML = html;
+}
+
+function goPage(page) {
+    // 切换页面时清空选择
+    selectedIds.clear();
+    currentPage = page;
+    renderPage();
+}
 
 // ===================== 复选框 =====================
 function toggleSelectAll() {
     const checked = document.getElementById('selectAll').checked;
-    document.querySelectorAll('.row-cb:not([disabled])').forEach(cb => { cb.checked = checked; });
-    onCheckChange();
+    const pageData = getPageData();
+    pageData.forEach(r => {
+        if (r.status === 'pending') {
+            if (checked) selectedIds.add(r.id);
+            else selectedIds.delete(r.id);
+        }
+    });
+    renderPage();
 }
 
 function onCheckChange() {
-    const checked = document.querySelectorAll('.row-cb:checked');
-    const allEnabled = document.querySelectorAll('.row-cb:not([disabled])');
-    const selectAll = document.getElementById('selectAll');
-    selectAll.checked = checked.length > 0 && checked.length === allEnabled.length;
-    selectAll.indeterminate = checked.length > 0 && checked.length < allEnabled.length;
-    updateBatchBtn();
+    document.querySelectorAll('.row-cb').forEach(cb => {
+        const id = parseInt(cb.dataset.id);
+        if (cb.checked) selectedIds.add(id);
+        else selectedIds.delete(id);
+    });
+    updateSelectedInfo();
+    updateSelectAllState();
 }
 
-function updateBatchBtn() {
-    const btn = document.getElementById('batchBtn');
-    if (!selectedStation) {
-        btn.disabled = true;
-        btn.style.cursor = 'not-allowed';
-        btn.style.opacity = '0.5';
-        btn.style.borderColor = '#d9d9d9';
-        btn.style.color = '#bbb';
-        return;
-    }
-    // 选中站点后，检查该站点下有多少待审核记录（在当前筛选结果中）
-    const stationPending = filtered.filter(r => r.status === 'pending').length;
-    if (stationPending === 0) {
-        btn.disabled = true;
-        btn.style.cursor = 'not-allowed';
-        btn.style.opacity = '0.5';
-        btn.style.borderColor = '#d9d9d9';
-        btn.style.color = '#bbb';
+function updateSelectAllState() {
+    const pageData = getPageData();
+    const pendingOnPage = pageData.filter(r => r.status === 'pending');
+    const checkedOnPage = pendingOnPage.filter(r => selectedIds.has(r.id));
+    const selectAll = document.getElementById('selectAll');
+    if (pendingOnPage.length === 0) {
+        selectAll.checked = false;
+        selectAll.indeterminate = false;
     } else {
-        btn.disabled = false;
-        btn.style.cursor = 'pointer';
-        btn.style.opacity = '1';
-        btn.style.borderColor = '#ff4d4f';
-        btn.style.color = '#ff4d4f';
+        selectAll.checked = checkedOnPage.length === pendingOnPage.length;
+        selectAll.indeterminate = checkedOnPage.length > 0 && checkedOnPage.length < pendingOnPage.length;
+    }
+}
+
+function updateSelectedInfo() {
+    const el = document.getElementById('selectedInfo');
+    const count = selectedIds.size;
+    if (count > 0) {
+        el.innerHTML = '已选择 <span class="num">' + count + '</span> 条记录';
+    } else {
+        el.textContent = '';
     }
 }
 
@@ -771,50 +663,48 @@ function openSingleAudit(id) {
     document.getElementById('singleModal').classList.add('show');
 }
 
-function closeSingleModal() {
-    document.getElementById('singleModal').classList.remove('show');
-}
+function closeSingleModal() { document.getElementById('singleModal').classList.remove('show'); }
 
 function confirmSingle() {
     const remark = document.getElementById('sRemark').value.trim();
-    if (!remark) {
-        document.getElementById('sError').classList.add('show');
-        return;
-    }
+    if (!remark) { document.getElementById('sError').classList.add('show'); return; }
     const result = document.querySelector('input[name="sResult"]:checked').value;
     const r = allRecords.find(x => x.id == currentSingleId);
-    if (r) {
-        r.status = result;
-        r.auditTime = nowStr();
-        r.operator = '管理员';
-        r.remark = remark;
-    }
+    if (r) { r.status = result; r.auditTime = nowStr(); r.operator = '管理员'; r.remark = remark; }
     closeSingleModal();
     showToast('审核提交成功', 'success');
-    filterAndRender();
+    doFilter();
     updateCounts();
 }
 
 // ===================== 批量审核 =====================
 function openBatchAudit() {
-    if (!selectedStation) return;
-    const station = stations.find(s => s.id == selectedStation);
-    // 取当前筛选结果中所有待审核记录
-    const pendingRecords = filtered.filter(r => r.status === 'pending');
-    if (pendingRecords.length === 0) return;
+    if (selectedIds.size === 0) {
+        showToast('请选择需要批量审核的数据', 'warning');
+        return;
+    }
+    // 获取选中的待审核记录
+    const selectedRecords = allRecords.filter(r => selectedIds.has(r.id) && r.status === 'pending');
+    if (selectedRecords.length === 0) {
+        showToast('请选择需要批量审核的数据', 'warning');
+        return;
+    }
 
-    // 申请时间：多值顿号分隔
-    const applyTimes = pendingRecords.map(r => r.applyTime).join('、');
-    // 水袋明细合并 + 汇总数量
+    // 检查是否为同一站点
+    const stationIds = [...new Set(selectedRecords.map(r => r.stationId))];
+    if (stationIds.length > 1) {
+        showToast('请选择同一工作站的记录进行批量审核', 'warning');
+        return;
+    }
+
+    const station = stations.find(s => s.id == stationIds[0]);
+    const applyTimes = selectedRecords.map(r => r.applyTime).join('、');
     let totalQty = 0;
     let allBags = [];
-    pendingRecords.forEach(r => {
-        totalQty += r.qty;
-        allBags = allBags.concat(r.bags);
-    });
+    selectedRecords.forEach(r => { totalQty += r.qty; allBags = allBags.concat(r.bags); });
 
     document.getElementById('bStationName').textContent = station ? station.name : '-';
-    document.getElementById('bRecordCount').textContent = pendingRecords.length;
+    document.getElementById('bRecordCount').textContent = selectedRecords.length;
     document.getElementById('bApplyTimes').textContent = applyTimes;
     document.getElementById('bDetailQtyBadge').textContent = '申请数量：' + totalQty + '袋';
     document.getElementById('bDetailBody').innerHTML = allBags.map(b =>
@@ -830,27 +720,30 @@ function openBatchAudit() {
     document.getElementById('batchModal').classList.add('show');
 }
 
-function closeBatchModal() {
-    document.getElementById('batchModal').classList.remove('show');
+function closeBatchModal() { document.getElementById('batchModal').classList.remove('show'); }
+
+function updateRemarkLabel() {
+    const result = document.querySelector('input[name="bResult"]:checked').value;
+    document.getElementById('bRemarkLabel').textContent = result === 'rejected' ? '驳回理由' : '说明';
+    document.getElementById('bRemark').placeholder = result === 'rejected' ? '请输入驳回理由' : '请输入说明';
+    document.getElementById('bError').classList.remove('show');
 }
 
 function confirmBatch() {
     const remark = document.getElementById('bRemark').value.trim();
-    if (!remark) {
-        document.getElementById('bError').classList.add('show');
-        return;
-    }
+    if (!remark) { document.getElementById('bError').classList.add('show'); return; }
     const result = document.querySelector('input[name="bResult"]:checked').value;
-    const pendingRecords = filtered.filter(r => r.status === 'pending');
-    pendingRecords.forEach(r => {
+    const selectedRecords = allRecords.filter(r => selectedIds.has(r.id) && r.status === 'pending');
+    selectedRecords.forEach(r => {
         r.status = result;
         r.auditTime = nowStr();
         r.operator = '管理员';
         r.remark = remark;
     });
     closeBatchModal();
-    showToast('已成功审核 ' + pendingRecords.length + ' 条记录', 'success');
-    filterAndRender();
+    showToast('已成功审核 ' + selectedRecords.length + ' 条记录', 'success');
+    selectedIds.clear();
+    doFilter();
     updateCounts();
 }
 
@@ -868,7 +761,6 @@ function showToast(msg, type) {
     setTimeout(() => { t.classList.remove('show'); }, 2200);
 }
 
-// ===================== 启动 =====================
 init();
 </script>
 </body>
