@@ -54,18 +54,74 @@
         .page { display: none; }
         .page.active { display: block; }
 
-        /* 卡片 - 完全比照图片样式 */
+        /* ===== 标点气泡系统 ===== */
+        .dot-tip {
+            position: relative; display: inline-flex; align-items: center; justify-content: center;
+            width: 16px; height: 16px; background: #ff6b7a; color: #fff;
+            border-radius: 50%; font-size: 10px; cursor: pointer; flex-shrink: 0;
+            vertical-align: middle; margin-left: 4px; font-style: normal;
+            z-index: 10;
+        }
+        .dot-tip:hover { background: #ff5252; }
+        .dot-tip-popup {
+            display: none; position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+            background: #fff; border: 1px solid #e8e8e8; border-radius: 6px;
+            padding: 10px 14px; min-width: 220px; max-width: 320px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12); z-index: 2000;
+            font-size: 12px; color: #555; line-height: 1.6; text-align: left;
+        }
+        .dot-tip-popup::before {
+            content: ''; position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
+            border-left: 6px solid transparent; border-right: 6px solid transparent;
+            border-bottom: 6px solid #e8e8e8;
+        }
+        .dot-tip-popup::after {
+            content: ''; position: absolute; top: -5px; left: 50%; transform: translateX(-50%);
+            border-left: 5px solid transparent; border-right: 5px solid transparent;
+            border-bottom: 5px solid #fff;
+        }
+        .dot-tip-popup.show { display: block; }
+        .dot-tip-popup .popup-title { font-weight: 600; color: #333; margin-bottom: 4px; }
+        .dot-tip-popup .popup-desc { color: #666; }
+        .dot-tip-popup .popup-list { margin: 6px 0 0 0; padding: 0; list-style: none; }
+        .dot-tip-popup .popup-list li { padding: 2px 0; color: #666; }
+        .dot-tip-popup .popup-list li::before { content: '•'; color: #ff6b7a; margin-right: 6px; }
+
+        /* 表头标点 */
+        .th-with-tip { display: inline-flex; align-items: center; gap: 4px; }
+        .th-dot {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 14px; height: 14px; background: #ff6b7a; color: #fff;
+            border-radius: 50%; font-size: 9px; cursor: pointer; flex-shrink: 0;
+        }
+        .th-dot:hover { background: #ff5252; }
+        .th-dot-popup {
+            display: none; position: absolute; top: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+            background: #fff; border: 1px solid #e8e8e8; border-radius: 6px;
+            padding: 8px 12px; min-width: 180px; max-width: 280px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12); z-index: 2000;
+            font-size: 12px; color: #555; line-height: 1.5;
+        }
+        .th-dot-popup::before {
+            content: ''; position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
+            border-left: 6px solid transparent; border-right: 6px solid transparent;
+            border-bottom: 6px solid #e8e8e8;
+        }
+        .th-dot-popup::after {
+            content: ''; position: absolute; top: -5px; left: 50%; transform: translateX(-50%);
+            border-left: 5px solid transparent; border-right: 5px solid transparent;
+            border-bottom: 5px solid #fff;
+        }
+        .th-dot-popup.show { display: block; }
+
+        /* 卡片 */
         .card {
-            background: #fff;
-            border-radius: 4px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-            margin-bottom: 14px;
-            overflow: hidden;
+            background: #fff; border-radius: 4px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 14px; overflow: hidden;
         }
         .card-header {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 16px; border-bottom: 1px solid #f0f0f0;
-            background: #fff;
+            padding: 12px 16px; border-bottom: 1px solid #f0f0f0; background: #fff;
         }
         .card-title { font-size: 14px; font-weight: 600; color: #333; display: flex; align-items: center; gap: 8px; }
         .card-title::before { content: ''; width: 3px; height: 14px; background: #ff6b7a; border-radius: 2px; flex-shrink: 0; }
@@ -73,7 +129,7 @@
 
         /* 信息网格 */
         .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 20px; }
-        .info-item { display: flex; font-size: 13px; line-height: 1.8; }
+        .info-item { display: flex; font-size: 12px; line-height: 1.8; }
         .info-label { color: #999; width: 84px; flex-shrink: 0; }
         .info-value { color: #333; }
         .info-value.red { color: #ff6b7a; font-weight: 600; }
@@ -83,10 +139,7 @@
 
         /* 资产/业绩网格 */
         .asset-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-        .asset-item {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 12px; background: #fafafa; border-radius: 4px;
-        }
+        .asset-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: #fafafa; border-radius: 4px; }
         .asset-label { font-size: 12px; color: #666; }
         .asset-value { font-size: 14px; font-weight: 600; color: #333; }
         .btn-link { font-size: 12px; color: #ff6b7a; cursor: pointer; }
@@ -113,11 +166,11 @@
         .tab:hover { color: #333; }
         .tab.active { color: #ff6b7a; border-bottom-color: #ff6b7a; }
 
-        /* 搜索栏 - placeholder样式 */
+        /* 搜索栏 */
         .filter-bar {
             display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
             background: #fff; padding: 12px 16px; border-radius: 4px; margin-bottom: 14px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08); position: relative;
         }
         .filter-input {
             width: 120px; height: 30px; padding: 0 10px;
@@ -145,10 +198,60 @@
         .btn-default { background: #fff; border: 1px solid #d9d9d9; color: #555; }
         .btn-default:hover { border-color: #ff6b7a; color: #ff6b7a; }
 
+        /* 搜索栏右上角帮助标点 */
+        .filter-help-dot {
+            position: absolute; top: 10px; right: 14px;
+            width: 18px; height: 18px; background: #ff6b7a; color: #fff;
+            border-radius: 50%; font-size: 11px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 10;
+        }
+        .filter-help-dot:hover { background: #ff5252; }
+        .filter-help-popup {
+            display: none; position: absolute; top: 32px; right: 0;
+            background: #fff; border: 1px solid #e8e8e8; border-radius: 6px;
+            padding: 12px 16px; min-width: 260px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 2000;
+        }
+        .filter-help-popup::before {
+            content: ''; position: absolute; top: -6px; right: 14px;
+            border-left: 6px solid transparent; border-right: 6px solid transparent;
+            border-bottom: 6px solid #e8e8e8;
+        }
+        .filter-help-popup::after {
+            content: ''; position: absolute; top: -5px; right: 15px;
+            border-left: 5px solid transparent; border-right: 5px solid transparent;
+            border-bottom: 5px solid #fff;
+        }
+        .filter-help-popup.show { display: block; }
+        .filter-help-popup .help-title { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 8px; }
+        .filter-help-popup .help-item { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 6px; font-size: 12px; color: #666; }
+        .filter-help-popup .help-item:last-child { margin-bottom: 0; }
+        .filter-help-popup .help-num {
+            width: 16px; height: 16px; background: #f0f0f0; color: #666;
+            border-radius: 50%; font-size: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+        }
+
+        /* 往期自购页面样式 */
+        .past-page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .past-page-title { font-size: 16px; font-weight: 600; color: #333; }
+        .past-filter-bar { display: flex; align-items: center; gap: 10px; }
+
+        /* 表格交替行颜色 */
+        .past-table tr.alt-row td { background: #f6ffed; }
+        .past-table tr:hover td { background: #fff0f0 !important; }
+
+        /* 分页扩展样式 */
+        .page-size-select {
+            height: 28px; padding: 0 8px; border: 1px solid #d9d9d9; border-radius: 4px;
+            font-size: 12px; margin-left: 10px; background: #fff; cursor: pointer;
+        }
+        .go-to-page { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #666; margin-left: 10px; }
+        .go-input { width: 40px; height: 28px; border: 1px solid #d9d9d9; border-radius: 4px; text-align: center; font-size: 12px; }
+
         /* 表格 */
         .data-table { width: 100%; border-collapse: collapse; }
         .data-table th, .data-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #f0f0f0; font-size: 12px; }
-        .data-table th { background: #fafafa; color: #666; font-weight: 500; font-size: 12px; border-bottom: 1px solid #e8e8e8; }
+        .data-table th { background: #fafafa; color: #666; font-weight: 500; font-size: 12px; border-bottom: 1px solid #e8e8e8; position: relative; }
         .data-table tr:last-child td { border-bottom: none; }
         .data-table tr:hover td { background: #fafafa; }
         .data-table .num { text-align: right; }
@@ -159,22 +262,11 @@
         .order-no { color: #ff6b7a; cursor: pointer; font-size: 12px; }
         .order-no:hover { text-decoration: underline; }
 
-        /* 状态标签 - 图1样式 */
+        /* 状态标签 */
         .status-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
         .status-pending { background: #fff7e6; color: #fa8c16; }
         .status-settled { background: #f6ffed; color: #52c41a; }
         .status-cancelled { background: #fff1f0; color: #f5222d; }
-
-        /* 汇总卡片 */
-        .summary-card {
-            display: flex; align-items: center; gap: 40px;
-            background: #fff; padding: 14px 20px; border-radius: 4px; margin-bottom: 14px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-        }
-        .summary-item { display: flex; flex-direction: column; gap: 4px; }
-        .summary-label { font-size: 12px; color: #999; }
-        .summary-value { font-size: 18px; font-weight: 600; color: #333; }
-        .summary-value.highlight { color: #ff6b7a; }
 
         /* 商品信息 */
         .product-item { display: flex; align-items: center; gap: 14px; padding: 12px; background: #fafafa; border-radius: 4px; }
@@ -280,7 +372,24 @@
 
         <!-- TA的业绩 -->
         <div class="card">
-            <div class="card-header"><div class="card-title">TA的业绩</div></div>
+            <div class="card-header">
+                <div class="card-title" style="justify-content: flex-start; position: relative;">
+                    TA的业绩
+                    <button class="btn-detail" onclick="showPage('orderList')" style="margin-left: 12px;">查看明细业绩</button>
+                    <span class="dot-tip" onclick="toggleTip(event, 'tipEntryBtn')">?</span>
+                    <div class="dot-tip-popup" id="tipEntryBtn">
+                        <div class="popup-title">查看明细业绩</div>
+                        <div class="popup-desc">
+                            <ul class="popup-list">
+                                <li><b>按钮功能</b>：点击跳转至「业绩详情订单」列表页</li>
+                                <li><b>跳转目标</b>：业绩详情订单页面</li>
+                                <li><b>页面内容</b>：展示当前会员的所有业绩订单明细</li>
+                                <li><b>筛选支持</b>：可按业绩类型、订单编号、下单人筛选</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="card-body">
                 <!-- 自购PV -->
                 <div class="perf-section">
@@ -311,10 +420,6 @@
                         <div class="perf-item"><div><div class="perf-label">已结算</div><div class="perf-value">149076.78</div></div></div>
                         <div class="perf-item"><div><div class="perf-label"></div><div class="perf-value"></div></div></div>
                     </div>
-                </div>
-                <!-- 查看明细业绩按钮 -->
-                <div style="text-align:center; margin-top: 16px; padding-top: 16px; border-top: 1px dashed #eee;">
-                    <button class="btn-detail" style="padding: 6px 20px; font-size: 13px;" onclick="showPage('orderList')">查看明细业绩</button>
                 </div>
             </div>
         </div>
@@ -373,30 +478,81 @@
             <div class="tab active">业绩详情订单</div>
         </div>
 
-        <!-- 搜索栏 - placeholder样式 -->
-        <div class="filter-bar">
+        <!-- 搜索栏 -->
+        <div class="filter-bar" id="filterBar">
             <div class="owner-tag">
                 <span class="label">业绩归属人：</span>
                 <span>阳光 (18660265222)</span>
             </div>
-            <input type="text" class="filter-input" id="typeSelect" placeholder="业绩类型" style="width:120px;">
+            <select class="filter-select" id="typeSelect">
+                <option value="">全部</option>
+                <option value="自购-今日">自购-今日</option>
+                <option value="自购-待结算">自购-待结算</option>
+                <option value="自购-已结算">自购-已结算</option>
+                <option value="直推-今日">直推-今日</option>
+                <option value="直推-待结算">直推-待结算</option>
+                <option value="直推-已结算">直推-已结算</option>
+            </select>
             <input type="text" class="filter-input" id="orderNoInput" placeholder="订单编号">
             <input type="text" class="filter-input" id="buyerInput" placeholder="下单人账号">
+            <input type="date" class="filter-input" id="dateStart" style="width:130px;">
+            <span style="color:#999; font-size:12px;">至</span>
+            <input type="date" class="filter-input" id="dateEnd" style="width:130px;">
+            <select class="filter-select" id="settleStatusSelect">
+                <option value="">全部</option>
+                <option value="待结算">待结算</option>
+                <option value="已结算">已结算</option>
+            </select>
             <button class="btn btn-primary" onclick="renderOrderTable()">搜索</button>
             <button class="btn btn-default" onclick="resetOrderFilter()">重置</button>
+            <!-- 帮助标点放在重置后面 -->
+            <span class="dot-tip" style="margin-left: 4px;" onclick="toggleTip(event, 'filterHelpPopup')">?</span>
+            <div class="dot-tip-popup" id="filterHelpPopup" style="left: auto; right: 0; transform: none; min-width: 360px;">
+                <div class="popup-title">搜索栏功能说明</div>
+                <div class="popup-desc">
+                    <ul class="popup-list">
+                        <li><b>1. 业绩归属人</b><br>默认=当前会员 | 输入类型：只读（不可修改）<br>业务逻辑：固定显示入口页面传入的会员信息，标识查询谁的业绩</li>
+                        <li><b>2. 业绩类型</b><br>默认=全部 | 输入类型：下拉选择<br>业务逻辑：筛选订单业绩类型<br>选项说明：<br>　· 全部 - 不限制业绩类型<br>　· 自购-今日 - 会员本人今日下单产生的业绩<br>　· 自购-待结算 - 会员本人下单且未完成结算的业绩<br>　· 自购-已结算 - 会员本人下单且已完成结算的业绩<br>　· 直推-今日 - 会员直推的下级今日下单产生的业绩<br>　· 直推-待结算 - 会员直推的下级下单且未完成结算的业绩<br>　· 直推-已结算 - 会员直推的下级下单且已完成结算的业绩</li>
+                        <li><b>3. 订单编号</b><br>默认=空 | 输入类型：文本<br>业务逻辑：输入订单号进行精确匹配查询</li>
+                        <li><b>4. 下单人账号</b><br>默认=空 | 输入类型：文本<br>业务逻辑：输入下单人手机号或账号进行模糊查询</li>
+                        <li><b>5. 下单时间</b><br>默认=不限 | 输入类型：日期选择（时间段）<br>业务逻辑：选择起止日期，筛选该时间段内下单的订单</li>
+                        <li><b>6. 结算状态</b><br>默认=全部 | 输入类型：下拉选择<br>业务逻辑：筛选订单的结算状态<br>选项说明：<br>　· 全部 - 不限制结算状态<br>　· 待结算 - 订单业绩尚未完成结算<br>　· 已结算 - 订单业绩已完成结算</li>
+                        <li><b>7. 搜索</b><br>业务逻辑：根据以上筛选条件查询业绩订单列表</li>
+                        <li><b>8. 重置</b><br>业务逻辑：清空所有筛选条件，恢复默认状态</li>
+                    </ul>
+                </div>
+            </div>
         </div>
 
-        <!-- 表格 -->
+        <!-- 表格 - 表头带标点说明 -->
         <div class="card" style="padding: 0; overflow: hidden;">
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>订单编号</th>
-                        <th>下单时间</th>
-                        <th>下单人员</th>
-                        <th class="num">订单结算PV</th>
-                        <th>业绩类型</th>
-                        <th>状态</th>
+                        <th>
+                            <span class="th-with-tip">订单编号<span class="th-dot" onclick="toggleTip(event, 'thTip1')">?</span></span>
+                            <div class="th-dot-popup" id="thTip1">数据来源：订单系统主订单编号，唯一标识</div>
+                        </th>
+                        <th>
+                            <span class="th-with-tip">下单时间<span class="th-dot" onclick="toggleTip(event, 'thTip2')">?</span></span>
+                            <div class="th-dot-popup" id="thTip2">数据来源：订单创建时间，格式 yyyy-MM-dd HH:mm:ss</div>
+                        </th>
+                        <th>
+                            <span class="th-with-tip">下单人员<span class="th-dot" onclick="toggleTip(event, 'thTip3')">?</span></span>
+                            <div class="th-dot-popup" id="thTip3">数据来源：会员系统，显示姓名（手机号）</div>
+                        </th>
+                        <th class="num">
+                            <span class="th-with-tip">订单结算PV<span class="th-dot" onclick="toggleTip(event, 'thTip4')">?</span></span>
+                            <div class="th-dot-popup" id="thTip4">数据来源：结算系统，订单结算后的PV值</div>
+                        </th>
+                        <th>
+                            <span class="th-with-tip">业绩类型<span class="th-dot" onclick="toggleTip(event, 'thTip5')">?</span></span>
+                            <div class="th-dot-popup" id="thTip5">数据来源：业绩系统，自购-今日/待结算/已结算，直推-今日/待结算/已结算</div>
+                        </th>
+                        <th>
+                            <span class="th-with-tip">结算状态<span class="th-dot" onclick="toggleTip(event, 'thTip6')">?</span></span>
+                            <div class="th-dot-popup" id="thTip6">数据来源：结算系统，待结算/已结算</div>
+                        </th>
                     </tr>
                 </thead>
                 <tbody id="orderTableBody"></tbody>
@@ -410,48 +566,59 @@
         </div>
     </div>
 
-    <!-- ========== 页面3：往期自购 ========== -->
+    <!-- ========== 页面3：往期自购（复刻图1样式） ========== -->
     <div class="page" id="page-past">
         <div class="breadcrumb">
             <a onclick="showPage('entry')">首页</a><span>></span>
             <a onclick="showPage('entry')">店铺</a><span>></span>
             <a onclick="showPage('entry')">会员管理</a><span>></span>
             <a onclick="showPage('entry')">会员详情</a><span>></span>
-            往期自购业绩
+            <span style="color:#ff6b7a">TA的往期自购</span>
         </div>
 
-        <div class="tabs">
-            <div class="tab active">往期自购业绩</div>
+        <!-- 页面标题栏 -->
+        <div class="past-page-header">
+            <h2 class="past-page-title">往期自购</h2>
+            <div class="past-filter-bar">
+                <input type="text" class="filter-input" id="yearSelect" placeholder="年份" value="2025" style="width:100px;">
+                <input type="text" class="filter-input" id="monthSelect" placeholder="月份" style="width:100px;">
+                <button class="btn btn-default" onclick="resetPastFilter()">重置</button>
+                <button class="btn btn-primary" onclick="renderPastTable()">搜索</button>
+            </div>
         </div>
 
-        <!-- 汇总卡片 -->
-        <div class="summary-card">
-            <div class="summary-item"><span class="summary-label">业绩归属人</span><span class="summary-value">阳光 (18660265222)</span></div>
-            <div class="summary-item"><span class="summary-label">累计自购PV</span><span class="summary-value highlight">12,580.50</span></div>
-            <div class="summary-item"><span class="summary-label">累计订单数</span><span class="summary-value">156</span></div>
-        </div>
-
-        <!-- 搜索栏 -->
-        <div class="filter-bar">
-            <input type="text" class="filter-input" id="yearSelect" placeholder="年份" value="2025" style="width:100px;">
-            <input type="text" class="filter-input" id="monthSelect" placeholder="月份" style="width:100px;">
-            <button class="btn btn-primary" onclick="renderPastTable()">搜索</button>
-            <button class="btn btn-default" onclick="resetPastFilter()">重置</button>
-        </div>
-
-        <!-- 表格 -->
+        <!-- 表格 - 复刻图1样式 -->
         <div class="card" style="padding: 0; overflow: hidden;">
-            <table class="data-table">
+            <table class="data-table past-table">
                 <thead>
-                    <tr><th>月份</th><th class="num">自购PV</th><th class="num">订单数</th><th class="num">较上月</th><th>操作</th></tr>
+                    <tr>
+                        <th>
+                            <span class="th-with-tip">会员编号<span class="th-dot" onclick="toggleTip(event, 'thPast1')">?</span></span>
+                            <div class="th-dot-popup" id="thPast1">数据来源：会员系统，会员唯一编号</div>
+                        </th>
+                        <th>
+                            <span class="th-with-tip">月份信息<span class="th-dot" onclick="toggleTip(event, 'thPast2')">?</span></span>
+                            <div class="th-dot-popup" id="thPast2">数据来源：订单系统，按月汇总的年月（yyyyMM）</div>
+                        </th>
+                        <th class="num">
+                            <span class="th-with-tip">自购PV<span class="th-dot" onclick="toggleTip(event, 'thPast3')">?</span></span>
+                            <div class="th-dot-popup" id="thPast3">数据来源：结算系统，该月自购订单结算PV合计</div>
+                        </th>
+                    </tr>
                 </thead>
                 <tbody id="pastTableBody"></tbody>
             </table>
             <div class="pagination">
-                <span class="pagination-info">共 5 条</span>
+                <span class="pagination-info">共 9 条</span>
+                <select class="page-size-select">
+                    <option selected>10条/页</option>
+                    <option>20条/页</option>
+                    <option>50条/页</option>
+                </select>
                 <div class="pg-btn disabled">‹</div>
                 <div class="pg-btn active">1</div>
                 <div class="pg-btn disabled">›</div>
+                <span class="go-to-page">前往 <input type="text" class="go-input" value="1"> 页</span>
             </div>
         </div>
     </div>
@@ -474,7 +641,14 @@
         <!-- 基础信息 -->
         <div class="card">
             <div class="card-header">
-                <div class="card-title">基础信息</div>
+                <div class="card-title">
+                    基础信息
+                    <span class="dot-tip" onclick="toggleTip(event, 'tipBaseInfo')">?</span>
+                    <div class="dot-tip-popup" id="tipBaseInfo">
+                        <div class="popup-title">基础信息</div>
+                        <div class="popup-desc">展示订单的基础字段信息，数据来源于订单系统和支付系统</div>
+                    </div>
+                </div>
                 <span class="order-status-tag" id="detailStatus">已结算</span>
             </div>
             <div class="card-body">
@@ -509,7 +683,7 @@
         <div class="card">
             <div class="card-header"><div class="card-title">用户信息</div></div>
             <div class="card-body">
-                <div class="user-grid">
+                <div class="info-grid">
                     <div class="info-item"><span class="info-label">购买人</span><span class="info-value" id="detailBuyer">有享12123</span></div>
                     <div class="info-item"><span class="info-label">购买人员类型</span><span class="info-value">中级会员</span></div>
                     <div class="info-item"><span class="info-label">收货人</span><span class="info-value">宋健 (18307448442)</span></div>
@@ -538,7 +712,27 @@
 
         <!-- 业绩归属信息 -->
         <div class="card">
-            <div class="card-header"><div class="card-title">业绩归属信息</div></div>
+            <div class="card-header">
+                <div class="card-title">
+                    业绩归属信息
+                    <span class="dot-tip" onclick="toggleTip(event, 'tipPerfInfo')">?</span>
+                    <div class="dot-tip-popup" id="tipPerfInfo">
+                        <div class="popup-title">业绩归属信息 - 字段说明</div>
+                        <div class="popup-desc">
+                            <ul class="popup-list">
+                                <li><b>业绩归属人</b>：数据来源会员系统，标识该笔订单业绩归属的会员</li>
+                                <li><b>业绩类型</b>：数据来源业绩系统，格式为【自购/直推】-【今日/待结算/已结算】</li>
+                                <li><b>业绩PV</b>：数据来源结算系统，该订单产生的业绩PV值</li>
+                                <li><b>结算状态</b>：数据来源结算系统，待结算/已结算</li>
+                                <li><b>结算时间</b>：数据来源结算系统，订单完成结算的时间</li>
+                            </ul>
+                            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #eee; color: #999; font-size: 11px;">
+                                注：此栏目仅在从「业绩详情订单」页面跳转时显示
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="card-body">
                 <div class="info-grid">
                     <div class="info-item"><span class="info-label">业绩归属人</span><span class="info-value">阳光 (18660265222)</span></div>
@@ -563,25 +757,72 @@ const orderData = [
     { id: '202505190002', time: '2025-05-19 10:15:36', buyer: '阳光 (18660265222)', pv: '256.00', type: '自购-已结算', status: '已结算', statusClass: 'status-settled' },
     { id: '202505180003', time: '2025-05-18 16:45:12', buyer: '张三 (13800138001)', pv: '89.90', type: '直推-待结算', status: '待结算', statusClass: 'status-pending' },
     { id: '202505170004', time: '2025-05-17 09:20:48', buyer: '李四 (15639916119)', pv: '168.00', type: '直推-已结算', status: '已结算', statusClass: 'status-settled' },
-    { id: '202505160005', time: '2025-05-16 11:35:22', buyer: '阳光 (18660265222)', pv: '320.00', type: '自购-每月往期', status: '已结算', statusClass: 'status-settled' },
-    { id: '202505150006', time: '2025-05-15 08:12:30', buyer: '王五 (13900001111)', pv: '450.00', type: '直推-今日', status: '待结算', statusClass: 'status-pending' },
+    { id: '202505160005', time: '2025-05-16 11:35:22', buyer: '阳光 (18660265222)', pv: '450.00', type: '直推-今日', status: '待结算', statusClass: 'status-pending' },
+    { id: '202505150006', time: '2025-05-15 08:12:30', buyer: '王五 (13900001111)', pv: '320.00', type: '直推-待结算', status: '待结算', statusClass: 'status-pending' },
     { id: '202505140007', time: '2025-05-14 14:20:15', buyer: '赵六 (13700002222)', pv: '199.00', type: '自购-待结算', status: '待结算', statusClass: 'status-pending' },
     { id: '202505130008', time: '2025-05-13 09:30:45', buyer: '阳光 (18660265222)', pv: '88.00', type: '自购-已结算', status: '已结算', statusClass: 'status-settled' },
 ];
 
 const pastData = [
-    { month: '2025年5月', pv: '2,580.50', orders: 32, change: '+580.50', changeClass: 'red', direction: '↑' },
-    { month: '2025年4月', pv: '2,000.00', orders: 28, change: '+200.00', changeClass: 'red', direction: '↑' },
-    { month: '2025年3月', pv: '1,800.00', orders: 25, change: '+300.00', changeClass: 'red', direction: '↑' },
-    { month: '2025年2月', pv: '1,500.00', orders: 22, change: '-100.00', changeClass: 'green', direction: '↓' },
-    { month: '2025年1月', pv: '1,600.00', orders: 24, change: '-', changeClass: '', direction: '' },
+    { memberId: '181357', month: '202507', pv: '2090.27' },
+    { memberId: '181357', month: '202508', pv: '331.38' },
+    { memberId: '181357', month: '202509', pv: '1203.76' },
+    { memberId: '181357', month: '202510', pv: '2709.76' },
+    { memberId: '181357', month: '202511', pv: '900.00' },
+    { memberId: '181357', month: '202512', pv: '909.29' },
+    { memberId: '181357', month: '202601', pv: '1800.00' },
+    { memberId: '181357', month: '202602', pv: '903.47' },
+    { memberId: '181357', month: '202603', pv: '1631.64' },
 ];
+
+// ========== 标点气泡切换 ==========
+let currentOpenPopup = null;
+
+function toggleTip(event, popupId) {
+    event.stopPropagation();
+    const popup = document.getElementById(popupId);
+    if (!popup) return;
+
+    // 如果当前已打开的是同一个，则关闭
+    if (currentOpenPopup === popupId) {
+        popup.classList.remove('show');
+        currentOpenPopup = null;
+        return;
+    }
+
+    // 关闭之前打开的
+    if (currentOpenPopup) {
+        const prev = document.getElementById(currentOpenPopup);
+        if (prev) prev.classList.remove('show');
+    }
+
+    // 打开新的
+    popup.classList.add('show');
+    currentOpenPopup = popupId;
+}
+
+// 点击页面其他地方关闭所有气泡
+document.addEventListener('click', function(e) {
+    if (currentOpenPopup) {
+        const popup = document.getElementById(currentOpenPopup);
+        if (popup && !popup.contains(e.target)) {
+            popup.classList.remove('show');
+            currentOpenPopup = null;
+        }
+    }
+});
 
 // ========== 页面切换 ==========
 function showPage(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page-' + page).classList.add('active');
     window.scrollTo(0, 0);
+    // 关闭所有气泡
+    if (currentOpenPopup) {
+        const popup = document.getElementById(currentOpenPopup);
+        if (popup) popup.classList.remove('show');
+        currentOpenPopup = null;
+    }
     if (page === 'orderList') renderOrderTable();
     if (page === 'past') renderPastTable();
 }
@@ -590,9 +831,17 @@ function showPage(page) {
 function renderOrderTable() {
     const orderNo = document.getElementById('orderNoInput').value.trim().toLowerCase();
     const buyer = document.getElementById('buyerInput').value.trim().toLowerCase();
+    const typeSelect = document.getElementById('typeSelect').value;
+    const settleStatus = document.getElementById('settleStatusSelect').value;
+    const dateStart = document.getElementById('dateStart').value;
+    const dateEnd = document.getElementById('dateEnd').value;
     let filtered = orderData.filter(o => {
         if (orderNo && !o.id.toLowerCase().includes(orderNo)) return false;
         if (buyer && !o.buyer.toLowerCase().includes(buyer)) return false;
+        if (typeSelect && o.type !== typeSelect) return false;
+        if (settleStatus && o.status !== settleStatus) return false;
+        if (dateStart && o.time.slice(0, 10) < dateStart) return false;
+        if (dateEnd && o.time.slice(0, 10) > dateEnd) return false;
         return true;
     });
     document.getElementById('orderCount').textContent = '共 ' + filtered.length + ' 条';
@@ -611,6 +860,10 @@ function renderOrderTable() {
 function resetOrderFilter() {
     document.getElementById('orderNoInput').value = '';
     document.getElementById('buyerInput').value = '';
+    document.getElementById('typeSelect').value = '';
+    document.getElementById('settleStatusSelect').value = '';
+    document.getElementById('dateStart').value = '';
+    document.getElementById('dateEnd').value = '';
     renderOrderTable();
 }
 
@@ -632,13 +885,11 @@ function showOrderDetail(orderId) {
 
 // ========== 往期自购 ==========
 function renderPastTable() {
-    document.getElementById('pastTableBody').innerHTML = pastData.map(p =>
-        '<tr>' +
+    document.getElementById('pastTableBody').innerHTML = pastData.map((p, i) =>
+        '<tr class="' + (i % 2 === 1 ? 'alt-row' : '') + '">' +
+            '<td>' + p.memberId + '</td>' +
             '<td>' + p.month + '</td>' +
-            '<td class="num red">' + p.pv + '</td>' +
-            '<td class="num">' + p.orders + '</td>' +
-            '<td class="num ' + p.changeClass + '">' + (p.change === '-' ? '-' : p.change + ' ' + p.direction) + '</td>' +
-            '<td><span class="action-link" onclick="showPage(\'orderList\')">查看明细</span></td>' +
+            '<td class="num">' + p.pv + '</td>' +
         '</tr>'
     ).join('');
 }
