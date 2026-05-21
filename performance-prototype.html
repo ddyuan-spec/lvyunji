@@ -122,8 +122,9 @@
         .card-header {
             display: flex; align-items: center; justify-content: space-between;
             padding: 12px 16px; border-bottom: 1px solid #f0f0f0; background: #fff;
+            position: relative;
         }
-        .card-title { font-size: 14px; font-weight: 600; color: #333; display: flex; align-items: center; gap: 8px; }
+        .card-title { font-size: 14px; font-weight: 600; color: #333; display: flex; align-items: center; gap: 8px; position: relative; }
         .card-title::before { content: ''; width: 3px; height: 14px; background: #ff6b7a; border-radius: 2px; flex-shrink: 0; }
         .card-body { padding: 14px 16px; }
 
@@ -640,16 +641,16 @@
 
         <!-- 基础信息 -->
         <div class="card">
-            <div class="card-header">
+            <div class="card-header" style="flex-wrap: wrap;">
                 <div class="card-title">
                     基础信息
                     <span class="dot-tip" onclick="toggleTip(event, 'tipBaseInfo')">?</span>
-                    <div class="dot-tip-popup" id="tipBaseInfo">
-                        <div class="popup-title">基础信息</div>
-                        <div class="popup-desc">展示订单的基础字段信息，数据来源于订单系统和支付系统</div>
-                    </div>
                 </div>
                 <span class="order-status-tag" id="detailStatus">已结算</span>
+                <div class="dot-tip-popup" id="tipBaseInfo" style="position: relative; top: 8px; left: 0; transform: none; width: 100%; margin-top: 8px;">
+                    <div class="popup-title">基础信息</div>
+                    <div class="popup-desc">展示订单的基础字段信息，数据来源于订单系统和支付系统</div>
+                </div>
             </div>
             <div class="card-body">
                 <div class="info-grid">
@@ -712,23 +713,23 @@
 
         <!-- 业绩归属信息 -->
         <div class="card">
-            <div class="card-header">
+            <div class="card-header" style="flex-wrap: wrap;">
                 <div class="card-title">
                     业绩归属信息
                     <span class="dot-tip" onclick="toggleTip(event, 'tipPerfInfo')">?</span>
-                    <div class="dot-tip-popup" id="tipPerfInfo">
-                        <div class="popup-title">业绩归属信息 - 字段说明</div>
-                        <div class="popup-desc">
-                            <ul class="popup-list">
-                                <li><b>业绩归属人</b>：数据来源会员系统，标识该笔订单业绩归属的会员</li>
-                                <li><b>业绩类型</b>：数据来源业绩系统，格式为【自购/直推】-【今日/待结算/已结算】</li>
-                                <li><b>业绩PV</b>：数据来源结算系统，该订单产生的业绩PV值</li>
-                                <li><b>结算状态</b>：数据来源结算系统，待结算/已结算</li>
-                                <li><b>结算时间</b>：数据来源结算系统，订单完成结算的时间</li>
-                            </ul>
-                            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #eee; color: #999; font-size: 11px;">
-                                注：此栏目仅在从「业绩详情订单」页面跳转时显示
-                            </div>
+                </div>
+                <div class="dot-tip-popup" id="tipPerfInfo" style="position: relative; top: 8px; left: 0; transform: none; width: 100%; margin-top: 8px;">
+                    <div class="popup-title">业绩归属信息 - 字段说明</div>
+                    <div class="popup-desc">
+                        <ul class="popup-list">
+                            <li><b>业绩归属人</b>：数据来源会员系统，标识该笔订单业绩归属的会员</li>
+                            <li><b>业绩类型</b>：数据来源业绩系统，格式为【自购/直推】-【今日/待结算/已结算】</li>
+                            <li><b>业绩PV</b>：数据来源结算系统，该订单产生的业绩PV值</li>
+                            <li><b>结算状态</b>：数据来源结算系统，待结算/已结算</li>
+                            <li><b>结算时间</b>：数据来源结算系统，订单完成结算的时间</li>
+                        </ul>
+                        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #eee; color: #999; font-size: 11px;">
+                            注：此栏目仅在从「业绩详情订单」页面跳转时显示
                         </div>
                     </div>
                 </div>
