@@ -87,6 +87,19 @@
         .dot-tip-popup .popup-list li { padding: 2px 0; color: #666; }
         .dot-tip-popup .popup-list li::before { content: '•'; color: #ff6b7a; margin-right: 6px; }
 
+        /* 向上展开的气泡 - 不影响布局 */
+        .dot-tip-popup.popup-up {
+            top: auto; bottom: calc(100% + 8px);
+        }
+        .dot-tip-popup.popup-up::before {
+            top: auto; bottom: -6px;
+            border-bottom: none; border-top: 6px solid #e8e8e8;
+        }
+        .dot-tip-popup.popup-up::after {
+            top: auto; bottom: -5px;
+            border-bottom: none; border-top: 5px solid #fff;
+        }
+
         /* 表头标点 */
         .th-with-tip { display: inline-flex; align-items: center; gap: 4px; }
         .th-dot {
@@ -717,7 +730,7 @@
                 <div class="card-title" style="position: relative;">
                     业绩归属信息
                     <span class="dot-tip" onclick="toggleTip(event, 'tipPerfInfo')">?</span>
-                    <div class="dot-tip-popup" id="tipPerfInfo" style="left: 20px; transform: none; top: auto; bottom: calc(100% + 8px);">
+                    <div class="dot-tip-popup popup-up" id="tipPerfInfo" style="left: 20px; transform: none;">
                         <div class="popup-title">业绩归属信息 - 字段说明</div>
                         <div class="popup-desc">
                             <ul class="popup-list">
