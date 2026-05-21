@@ -90,7 +90,7 @@
         /* 向上展开的气泡 - 不影响布局，置顶显示 */
         .dot-tip-popup.popup-up {
             top: auto; bottom: calc(100% + 8px);
-            z-index: 9999;
+            z-index: 99999;
         }
         .dot-tip-popup.popup-up::before {
             top: auto; bottom: -6px;
@@ -100,6 +100,10 @@
             top: auto; bottom: -5px;
             border-bottom: none; border-top: 5px solid #fff;
         }
+        
+        /* 卡片移除overflow，避免气泡被截断 */
+        .card { overflow: visible; }
+        .card-body { overflow: visible; }
 
         /* 表头标点 */
         .th-with-tip { display: inline-flex; align-items: center; gap: 4px; }
