@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>往期自购业绩 - 会员管理</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f0f2f5; color: #333; font-size: 14px;
+        }
+
+        /* 顶部导航 */
+        .top-header {
+            position: fixed; top: 0; left: 0; right: 0; height: 56px;
+            background: #2b2d42; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; z-index: 1000;
+        }
+        .logo { color: #fff; font-size: 17px; font-weight: 600; }
+        .top-nav { display: flex; gap: 30px; }
+        .top-nav-item { color: #a0a0b0; font-size: 14px; cursor: pointer; padding: 6px 0; border-bottom: 2px solid transparent; transition: all .2s; }
+        .top-nav-item:hover { color: #fff; }
+        .top-nav-item.active { color: #ff4d4f; border-bottom-color: #ff4d4f; }
+
+        /* 侧边栏 */
+        .sidebar {
+            position: fixed; top: 56px; left: 0; bottom: 0; width: 200px;
+            background: #fff; border-right: 1px solid #e8e8e8; overflow-y: auto; padding: 8px 0;
+        }
+        .menu-group { margin-bottom: 4px; }
+        .menu-title { padding: 8px 16px; color: #999; font-size: 12px; font-weight: 500; }
+        .menu-item {
+            display: flex; align-items: center; padding: 10px 16px; color: #555; font-size: 13px;
+            cursor: pointer; transition: all .2s;
+        }
+        .menu-item:hover { background: #f5f5f5; color: #333; }
+        .menu-item.active { background: #fff0f0; color: #ff4d4f; border-left: 3px solid #ff4d4f; padding-left: 13px; }
+        .sub-menu { background: #fafafa; }
+        .sub-menu .menu-item { padding-left: 28px; font-size: 12px; }
+
+        /* 主内容 */
+        .main { margin-left: 200px; margin-top: 56px; padding: 16px; min-height: calc(100vh - 56px); }
+
+        /* 面包屑 */
+        .breadcrumb { font-size: 13px; color: #999; margin-bottom: 16px; }
+        .breadcrumb a { color: #666; text-decoration: none; }
+        .breadcrumb a:hover { color: #ff4d4f; }
+        .breadcrumb span { margin: 0 6px; }
+
+        /* 标签页 */
+        .tabs { display: flex; background: #fff; border-radius: 4px; margin-bottom: 16px; border-bottom: 1px solid #eee; }
+        .tab {
+            padding: 12px 24px; font-size: 14px; color: #666; cursor: pointer;
+            border-bottom: 2px solid transparent; transition: all .2s;
+        }
+        .tab:hover { color: #333; }
+        .tab.active { color: #ff4d4f; border-bottom-color: #ff4d4f; }
+
+        /* 汇总卡片 */
+        .summary-card {
+            display: flex; align-items: center; gap: 40px;
+            background: #fff; padding: 20px 24px; border-radius: 4px; margin-bottom: 16px;
+        }
+        .summary-item { display: flex; flex-direction: column; gap: 6px; }
+        .summary-label { font-size: 13px; color: #999; }
+        .summary-value { font-size: 20px; font-weight: 600; color: #333; }
+        .summary-value.highlight { color: #ff4d4f; }
+
+        /* 搜索栏 */
+        .filter-bar {
+            display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+            background: #fff; padding: 16px; border-radius: 4px; margin-bottom: 16px;
+        }
+        .filter-item { display: flex; align-items: center; gap: 8px; }
+        .filter-label { font-size: 13px; color: #666; white-space: nowrap; }
+        .filter-select {
+            width: 140px; height: 32px; padding: 0 10px;
+            border: 1px solid #d9d9d9; border-radius: 4px; font-size: 13px; outline: none;
+            background: #fff; cursor: pointer;
+        }
+        .filter-select:focus { border-color: #ff4d4f; }
+        .btn { height: 32px; padding: 0 16px; border-radius: 4px; font-size: 13px; cursor: pointer; transition: all .2s; border: none; }
+        .btn-primary { background: #ff4d4f; color: #fff; }
+        .btn-primary:hover { background: #e63; }
+        .btn-default { background: #fff; border: 1px solid #d9d9d9; color: #555; }
+        .btn-default:hover { border-color: #ff4d4f; color: #ff4d4f; }
+
+        /* 表格 */
+        .table-box { background: #fff; border-radius: 4px; overflow: hidden; }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th, .data-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+        .data-table th { background: #fafafa; color: #666; font-weight: 500; }
+        .data-table tr:hover td { background: #fafafa; }
+        .data-table .num { text-align: right; }
+        .data-table .num.positive { color: #ff4d4f; }
+        .data-table .num.negative { color: #52c41a; }
+
+        /* 分页 */
+        .pagination { display: flex; align-items: center; justify-content: flex-end; padding: 16px; gap: 8px; }
+        .pagination-info { color: #999; font-size: 13px; margin-right: 12px; }
+        .pg-btn {
+            width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+            border: 1px solid #d9d9d9; border-radius: 4px; background: #fff;
+            color: #666; font-size: 13px; cursor: pointer; transition: all .2s;
+        }
+        .pg-btn:hover { border-color: #ff4d4f; color: #ff4d4f; }
+        .pg-btn.active { background: #ff4d4f; border-color: #ff4d4f; color: #fff; }
+        .pg-btn.disabled { color: #d9d9d9; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<div class="top-header">
+    <div class="logo">绿韵家管理系统</div>
+    <div class="top-nav">
+        <div class="top-nav-item">首页</div>
+        <div class="top-nav-item active">店铺</div>
+        <div class="top-nav-item">营销中心</div>
+        <div class="top-nav-item">结算中心</div>
+    </div>
+</div>
+
+<!-- 侧边栏 -->
+<div class="sidebar">
+    <div class="menu-group">
+        <div class="menu-item">控制台</div>
+        <div class="menu-item">商品中心</div>
+        <div class="menu-item">商家管理</div>
+        <div class="menu-item active">会员中心</div>
+        <div class="sub-menu">
+            <div class="menu-item active">会员管理</div>
+            <div class="menu-item">第三方解绑</div>
+            <div class="menu-item">实名认证</div>
+            <div class="menu-item">黑名单</div>
+            <div class="menu-item">注销管理</div>
+            <div class="menu-item">用户反馈</div>
+            <div class="menu-item">会员设定</div>
+        </div>
+        <div class="menu-item">交易中心</div>
+        <div class="menu-item">售后中心</div>
+        <div class="menu-item">数据中心</div>
+        <div class="menu-item">运维中心</div>
+    </div>
+</div>
+
+<!-- 主内容 -->
+<div class="main">
+    <!-- 面包屑 -->
+    <div class="breadcrumb">
+        <a href="#">首页</a><span>></span>
+        <a href="#">店铺</a><span>></span>
+        <a href="member-performance.html">会员管理</a><span>></span>
+        <a href="member-performance.html">会员详情</a><span>></span>
+        往期自购业绩
+    </div>
+
+    <!-- 标签页 -->
+    <div class="tabs">
+        <div class="tab active">往期自购业绩</div>
+    </div>
+
+    <!-- 汇总卡片 -->
+    <div class="summary-card">
+        <div class="summary-item">
+            <span class="summary-label">业绩归属人</span>
+            <span class="summary-value">阳光 (18660265222)</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">累计自购PV</span>
+            <span class="summary-value highlight">12,580.50</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">累计订单数</span>
+            <span class="summary-value">156</span>
+        </div>
+    </div>
+
+    <!-- 搜索栏 -->
+    <div class="filter-bar">
+        <div class="filter-item">
+            <span class="filter-label">年份</span>
+            <select class="filter-select" id="yearSelect" onchange="doFilter()">
+                <option value="2025">2025年</option>
+                <option value="2024">2024年</option>
+                <option value="2023">2023年</option>
+            </select>
+        </div>
+        <div class="filter-item">
+            <span class="filter-label">月份</span>
+            <select class="filter-select" id="monthSelect" onchange="doFilter()">
+                <option value="">全部月份</option>
+                <option value="1">1月</option>
+                <option value="2">2月</option>
+                <option value="3">3月</option>
+                <option value="4">4月</option>
+                <option value="5">5月</option>
+                <option value="6">6月</option>
+                <option value="7">7月</option>
+                <option value="8">8月</option>
+                <option value="9">9月</option>
+                <option value="10">10月</option>
+                <option value="11">11月</option>
+                <option value="12">12月</option>
+            </select>
+        </div>
+        <button class="btn btn-primary" onclick="doFilter()">搜索</button>
+        <button class="btn btn-default" onclick="doReset()">重置</button>
+    </div>
+
+    <!-- 表格 -->
+    <div class="table-box">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>月份</th>
+                    <th class="num">自购PV</th>
+                    <th class="num">订单数</th>
+                    <th class="num">较上月</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr>
+                    <td>2025年5月</td>
+                    <td class="num positive">2,580.50</td>
+                    <td class="num">32</td>
+                    <td class="num positive">+580.50 ↑</td>
+                    <td><a href="performance-order-list.html?type=self-month" style="color:#ff4d4f;cursor:pointer;">查看明细</a></td>
+                </tr>
+                <tr>
+                    <td>2025年4月</td>
+                    <td class="num positive">2,000.00</td>
+                    <td class="num">28</td>
+                    <td class="num positive">+200.00 ↑</td>
+                    <td><a href="performance-order-list.html?type=self-month" style="color:#ff4d4f;cursor:pointer;">查看明细</a></td>
+                </tr>
+                <tr>
+                    <td>2025年3月</td>
+                    <td class="num positive">1,800.00</td>
+                    <td class="num">25</td>
+                    <td class="num positive">+300.00 ↑</td>
+                    <td><a href="performance-order-list.html?type=self-month" style="color:#ff4d4f;cursor:pointer;">查看明细</a></td>
+                </tr>
+                <tr>
+                    <td>2025年2月</td>
+                    <td class="num positive">1,500.00</td>
+                    <td class="num">22</td>
+                    <td class="num negative">-100.00 ↓</td>
+                    <td><a href="performance-order-list.html?type=self-month" style="color:#ff4d4f;cursor:pointer;">查看明细</a></td>
+                </tr>
+                <tr>
+                    <td>2025年1月</td>
+                    <td class="num positive">1,600.00</td>
+                    <td class="num">24</td>
+                    <td class="num">-</td>
+                    <td><a href="performance-order-list.html?type=self-month" style="color:#ff4d4f;cursor:pointer;">查看明细</a></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 分页 -->
+        <div class="pagination">
+            <span class="pagination-info">共 5 条</span>
+            <div class="pg-btn disabled">‹</div>
+            <div class="pg-btn active">1</div>
+            <div class="pg-btn disabled">›</div>
+        </div>
+    </div>
+</div>
+
+<script>
+function doFilter() {
+    console.log('筛选：', document.getElementById('yearSelect').value, document.getElementById('monthSelect').value);
+}
+
+function doReset() {
+    document.getElementById('yearSelect').value = '2025';
+    document.getElementById('monthSelect').value = '';
+    doFilter();
+}
+</script>
+
+</body>
+</html>

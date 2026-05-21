@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TA的业绩 - 会员管理</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f0f2f5; color: #333; font-size: 14px;
+        }
+
+        /* 顶部导航 */
+        .top-header {
+            position: fixed; top: 0; left: 0; right: 0; height: 56px;
+            background: #2b2d42; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; z-index: 1000;
+        }
+        .logo { color: #fff; font-size: 17px; font-weight: 600; }
+        .top-nav { display: flex; gap: 30px; }
+        .top-nav-item { color: #a0a0b0; font-size: 14px; cursor: pointer; padding: 6px 0; border-bottom: 2px solid transparent; transition: all .2s; }
+        .top-nav-item:hover { color: #fff; }
+        .top-nav-item.active { color: #ff4d4f; border-bottom-color: #ff4d4f; }
+
+        /* 侧边栏 */
+        .sidebar {
+            position: fixed; top: 56px; left: 0; bottom: 0; width: 200px;
+            background: #fff; border-right: 1px solid #e8e8e8; overflow-y: auto; padding: 8px 0;
+        }
+        .menu-group { margin-bottom: 4px; }
+        .menu-title { padding: 8px 16px; color: #999; font-size: 12px; font-weight: 500; }
+        .menu-item {
+            display: flex; align-items: center; padding: 10px 16px; color: #555; font-size: 13px;
+            cursor: pointer; transition: all .2s;
+        }
+        .menu-item:hover { background: #f5f5f5; color: #333; }
+        .menu-item.active { background: #fff0f0; color: #ff4d4f; border-left: 3px solid #ff4d4f; padding-left: 13px; }
+        .sub-menu { background: #fafafa; }
+        .sub-menu .menu-item { padding-left: 28px; font-size: 12px; }
+
+        /* 主内容 */
+        .main { margin-left: 200px; margin-top: 56px; padding: 16px; min-height: calc(100vh - 56px); }
+
+        /* 面包屑 */
+        .breadcrumb { font-size: 13px; color: #999; margin-bottom: 16px; }
+        .breadcrumb a { color: #666; text-decoration: none; }
+        .breadcrumb a:hover { color: #ff4d4f; }
+        .breadcrumb span { margin: 0 6px; }
+
+        /* 卡片 */
+        .card { background: #fff; border-radius: 4px; margin-bottom: 16px; }
+        .card-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 20px; border-bottom: 1px solid #f0f0f0;
+        }
+        .card-title { font-size: 16px; font-weight: 600; color: #333; display: flex; align-items: center; gap: 8px; }
+        .card-title::before { content: ''; width: 4px; height: 16px; background: #ff4d4f; border-radius: 2px; }
+        .card-body { padding: 20px; }
+
+        /* 基础信息 */
+        .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 24px; }
+        .info-item { display: flex; align-items: center; font-size: 13px; }
+        .info-label { color: #999; width: 80px; flex-shrink: 0; }
+        .info-value { color: #333; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+        .tag-primary { background: #fff0f0; color: #ff4d4f; border: 1px solid #ffcdd3; }
+
+        /* 资产网格 */
+        .asset-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .asset-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 16px; background: #fafafa; border-radius: 4px;
+        }
+        .asset-label { font-size: 13px; color: #666; }
+        .asset-value { font-size: 16px; font-weight: 600; color: #333; }
+        .btn-link { font-size: 12px; color: #ff4d4f; cursor: pointer; }
+        .btn-link:hover { text-decoration: underline; }
+
+        /* 业绩区块 */
+        .performance-section { margin-bottom: 20px; }
+        .performance-title { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px; }
+        .performance-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .performance-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 16px; background: #fafafa; border-radius: 4px;
+        }
+        .performance-label { font-size: 13px; color: #666; }
+        .performance-value { font-size: 16px; font-weight: 600; color: #333; }
+        .btn-detail {
+            padding: 4px 12px; background: #fff; border: 1px solid #ff4d4f;
+            color: #ff4d4f; border-radius: 4px; font-size: 12px; cursor: pointer;
+        }
+        .btn-detail:hover { background: #ff4d4f; color: #fff; }
+
+        /* 表格 */
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th, .data-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+        .data-table th { background: #fafafa; color: #666; font-weight: 500; }
+        .data-table tr:hover td { background: #fafafa; }
+        .action-link { color: #ff4d4f; cursor: pointer; font-size: 13px; }
+        .action-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<div class="top-header">
+    <div class="logo">绿韵家管理系统</div>
+    <div class="top-nav">
+        <div class="top-nav-item">首页</div>
+        <div class="top-nav-item active">店铺</div>
+        <div class="top-nav-item">营销中心</div>
+        <div class="top-nav-item">结算中心</div>
+    </div>
+</div>
+
+<!-- 侧边栏 -->
+<div class="sidebar">
+    <div class="menu-group">
+        <div class="menu-item">控制台</div>
+        <div class="menu-item">商品中心</div>
+        <div class="menu-item">商家管理</div>
+        <div class="menu-item active">会员中心</div>
+        <div class="sub-menu">
+            <div class="menu-item">会员管理</div>
+            <div class="menu-item active">第三方解绑</div>
+            <div class="menu-item">实名认证</div>
+            <div class="menu-item">黑名单</div>
+            <div class="menu-item">注销管理</div>
+            <div class="menu-item">用户反馈</div>
+            <div class="menu-item">会员设定</div>
+        </div>
+        <div class="menu-item">交易中心</div>
+        <div class="menu-item">售后中心</div>
+        <div class="menu-item">数据中心</div>
+        <div class="menu-item">运维中心</div>
+    </div>
+</div>
+
+<!-- 主内容 -->
+<div class="main">
+    <!-- 面包屑 -->
+    <div class="breadcrumb">
+        <a href="#">首页</a><span>></span>
+        <a href="#">店铺</a><span>></span>
+        <a href="#">会员管理</a><span>></span>
+        会员详情
+    </div>
+
+    <!-- 基础信息 -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">基础信息</div>
+        </div>
+        <div class="card-body">
+            <div class="info-grid">
+                <div class="info-item"><span class="info-label">昵称</span><span class="info-value">阳光</span></div>
+                <div class="info-item"><span class="info-label">手机号</span><span class="info-value">18660265222</span></div>
+                <div class="info-item"><span class="info-label">会员等级</span><span class="tag tag-primary">至尊达人</span></div>
+                <div class="info-item"><span class="info-label">用户生日</span><span class="info-value">2025-06-22</span></div>
+                <div class="info-item"><span class="info-label">用户性别</span><span class="info-value">其他</span></div>
+                <div class="info-item"><span class="info-label">会员临时等级</span><span class="tag tag-primary">至尊达人</span></div>
+                <div class="info-item"><span class="info-label">注册时间</span><span class="info-value">2025-06-22 01:25</span></div>
+                <div class="info-item"><span class="info-label">姓名</span><span class="info-value">zm0001</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TA的资产 -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">TA的资产</div>
+        </div>
+        <div class="card-body">
+            <div class="asset-grid">
+                <div class="asset-item">
+                    <div>
+                        <div class="asset-label">奖金累计收入</div>
+                        <div class="asset-value">3.09</div>
+                    </div>
+                    <span class="btn-link">查看明细</span>
+                </div>
+                <div class="asset-item">
+                    <div>
+                        <div class="asset-label">奖金钱包</div>
+                        <div class="asset-value">3.09</div>
+                    </div>
+                    <span class="btn-link">查看明细</span>
+                </div>
+                <div class="asset-item">
+                    <div>
+                        <div class="asset-label">待释放金额</div>
+                        <div class="asset-value">0</div>
+                    </div>
+                    <span class="btn-link">查看明细</span>
+                </div>
+                <div class="asset-item">
+                    <div>
+                        <div class="asset-label">已提现</div>
+                        <div class="asset-value">0</div>
+                    </div>
+                    <span class="btn-link">查看明细</span>
+                </div>
+                <div class="asset-item">
+                    <div>
+                        <div class="asset-label">提现申请中</div>
+                        <div class="asset-value">0</div>
+                    </div>
+                    <span class="btn-link">查看明细</span>
+                </div>
+                <div class="asset-item">
+                    <div>
+                        <div class="asset-label">优惠券余额</div>
+                        <div class="asset-value">815.1</div>
+                    </div>
+                    <span class="btn-link">查看明细</span>
+                </div>
+                <div class="asset-item">
+                    <div>
+                        <div class="asset-label">电子币钱包</div>
+                        <div class="asset-value">0</div>
+                    </div>
+                    <span class="btn-link">查看明细</span>
+                </div>
+                <div class="asset-item">
+                    <div>
+                        <div class="asset-label">待释放积分</div>
+                        <div class="asset-value">0</div>
+                    </div>
+                    <span class="btn-link">查看明细</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TA的业绩 -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">TA的业绩</div>
+        </div>
+        <div class="card-body">
+            <!-- 自购PV -->
+            <div class="performance-section">
+                <div class="performance-title">自购(PV)</div>
+                <div class="performance-grid">
+                    <div class="performance-item">
+                        <div>
+                            <div class="performance-label">今日</div>
+                            <div class="performance-value">0</div>
+                        </div>
+                    </div>
+                    <div class="performance-item">
+                        <div>
+                            <div class="performance-label">本月自购</div>
+                            <div class="performance-value">0</div>
+                        </div>
+                        <button class="btn-detail" onclick="location.href='performance-past.html'">查看往期</button>
+                    </div>
+                    <div class="performance-item">
+                        <div>
+                            <div class="performance-label">待结算</div>
+                            <div class="performance-value">0</div>
+                        </div>
+                    </div>
+                    <div class="performance-item">
+                        <div>
+                            <div class="performance-label">已结算</div>
+                            <div class="performance-value">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 直推PV -->
+            <div class="performance-section">
+                <div class="performance-title">直推(PV)</div>
+                <div class="performance-grid">
+                    <div class="performance-item">
+                        <div>
+                            <div class="performance-label">今日</div>
+                            <div class="performance-value">0</div>
+                        </div>
+                    </div>
+                    <div class="performance-item">
+                        <div>
+                            <div class="performance-label">待结算</div>
+                            <div class="performance-value">0</div>
+                        </div>
+                    </div>
+                    <div class="performance-item">
+                        <div>
+                            <div class="performance-label">已结算</div>
+                            <div class="performance-value">0</div>
+                        </div>
+                    </div>
+                    <div class="performance-item">
+                        <div>
+                            <div class="performance-label"></div>
+                            <div class="performance-value"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 推广PV -->
+            <div class="performance-section">
+                <div class="performance-title">推广(PV)</div>
+                <div class="performance-grid">
+                    <div class="performance-item">
+                        <div>
+                            <div class="performance-label">今日</div>
+                            <div class="performance-value">0</div>
+                        </div>
+                    </div>
+                    <div class="performance-item">
+                        <div>
+                            <div class="performance-label">待结算</div>
+                            <div class="performance-value">2476.31</div>
+                        </div>
+                    </div>
+                    <div class="performance-item">
+                        <div>
+                            <div class="performance-label">已结算</div>
+                            <div class="performance-value">149076.78</div>
+                        </div>
+                    </div>
+                    <div class="performance-item">
+                        <div>
+                            <div class="performance-label"></div>
+                            <div class="performance-value"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 查看明细业绩按钮 -->
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px dashed #e8e8e8; text-align: center;">
+                <button class="btn-detail" style="padding: 8px 24px; font-size: 14px;" onclick="location.href='performance-order-list.html'">查看明细业绩</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TA的团队 -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">TA的团队</div>
+        </div>
+        <div class="card-body">
+            <div class="performance-grid">
+                <div class="performance-item">
+                    <div>
+                        <div class="performance-label">下级团队</div>
+                        <div class="performance-value">-</div>
+                    </div>
+                    <span class="btn-link">查看明细</span>
+                </div>
+                <div class="performance-item">
+                    <div>
+                        <div class="performance-label">直推团队</div>
+                        <div class="performance-value">-</div>
+                    </div>
+                    <span class="btn-link">查看明细</span>
+                </div>
+                <div class="performance-item">
+                    <div>
+                        <div class="performance-label">直推团队</div>
+                        <div class="performance-value">-</div>
+                    </div>
+                    <span class="btn-link">查看明细</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 关系链 -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">关系链</div>
+        </div>
+        <div class="card-body">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>会员信息</th>
+                        <th>账号</th>
+                        <th>会员姓名</th>
+                        <th>微生态编号</th>
+                        <th>会员等级</th>
+                        <th>临时会员等级</th>
+                        <th>推荐人</th>
+                        <th>注册时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>阳光</td>
+                        <td>18660265222</td>
+                        <td>zm0001</td>
+                        <td>zm0001</td>
+                        <td>至尊达人</td>
+                        <td>至尊达人</td>
+                        <td>周鹏</td>
+                        <td>2025-06-22 01:25</td>
+                        <td><span class="action-link">查看</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

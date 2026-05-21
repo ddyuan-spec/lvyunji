@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>业绩订单详情 - 会员管理</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f0f2f5; color: #333; font-size: 14px;
+        }
+
+        /* 顶部导航 */
+        .top-header {
+            position: fixed; top: 0; left: 0; right: 0; height: 56px;
+            background: #2b2d42; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; z-index: 1000;
+        }
+        .logo { color: #fff; font-size: 17px; font-weight: 600; }
+        .top-nav { display: flex; gap: 30px; }
+        .top-nav-item { color: #a0a0b0; font-size: 14px; cursor: pointer; padding: 6px 0; border-bottom: 2px solid transparent; transition: all .2s; }
+        .top-nav-item:hover { color: #fff; }
+        .top-nav-item.active { color: #ff4d4f; border-bottom-color: #ff4d4f; }
+
+        /* 侧边栏 */
+        .sidebar {
+            position: fixed; top: 56px; left: 0; bottom: 0; width: 200px;
+            background: #fff; border-right: 1px solid #e8e8e8; overflow-y: auto; padding: 8px 0;
+        }
+        .menu-group { margin-bottom: 4px; }
+        .menu-title { padding: 8px 16px; color: #999; font-size: 12px; font-weight: 500; }
+        .menu-item {
+            display: flex; align-items: center; padding: 10px 16px; color: #555; font-size: 13px;
+            cursor: pointer; transition: all .2s;
+        }
+        .menu-item:hover { background: #f5f5f5; color: #333; }
+        .menu-item.active { background: #fff0f0; color: #ff4d4f; border-left: 3px solid #ff4d4f; padding-left: 13px; }
+        .sub-menu { background: #fafafa; }
+        .sub-menu .menu-item { padding-left: 28px; font-size: 12px; }
+
+        /* 主内容 */
+        .main { margin-left: 200px; margin-top: 56px; padding: 16px; min-height: calc(100vh - 56px); }
+
+        /* 面包屑 */
+        .breadcrumb { font-size: 13px; color: #999; margin-bottom: 16px; }
+        .breadcrumb a { color: #666; text-decoration: none; }
+        .breadcrumb a:hover { color: #ff4d4f; }
+        .breadcrumb span { margin: 0 6px; }
+
+        /* 标签页 */
+        .tabs { display: flex; background: #fff; border-radius: 4px; margin-bottom: 16px; border-bottom: 1px solid #eee; }
+        .tab {
+            padding: 12px 24px; font-size: 14px; color: #666; cursor: pointer;
+            border-bottom: 2px solid transparent; transition: all .2s;
+        }
+        .tab:hover { color: #333; }
+        .tab.active { color: #ff4d4f; border-bottom-color: #ff4d4f; }
+
+        /* 卡片 */
+        .card { background: #fff; border-radius: 4px; margin-bottom: 16px; }
+        .card-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 20px; border-bottom: 1px solid #f0f0f0;
+        }
+        .card-title { font-size: 15px; font-weight: 600; color: #333; }
+        .status-tag { padding: 4px 12px; background: #f6ffed; color: #52c41a; border-radius: 4px; font-size: 13px; }
+        .status-tag.cancelled { background: #fff1f0; color: #f5222d; }
+        .card-body { padding: 20px; }
+
+        /* 信息网格 */
+        .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 24px; }
+        .info-item { display: flex; font-size: 13px; }
+        .info-label { color: #999; width: 100px; flex-shrink: 0; }
+        .info-value { color: #333; }
+        .info-value.price { color: #ff4d4f; font-weight: 600; }
+
+        /* 商品信息 */
+        .product-item {
+            display: flex; align-items: center; gap: 16px;
+            padding: 16px; background: #fafafa; border-radius: 4px;
+        }
+        .product-img {
+            width: 80px; height: 80px; background: #e8e8e8; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center; color: #999; font-size: 12px;
+        }
+        .product-info { flex: 1; }
+        .product-name { font-size: 14px; color: #333; margin-bottom: 8px; }
+        .product-spec { font-size: 12px; color: #999; }
+        .product-price { text-align: right; }
+        .product-price .price { font-size: 16px; color: #ff4d4f; font-weight: 600; }
+        .product-price .qty { font-size: 13px; color: #999; margin-top: 4px; }
+
+        /* 用户信息 */
+        .user-section { margin-top: 16px; padding-top: 16px; border-top: 1px dashed #e8e8e8; }
+        .user-title { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px; }
+        .user-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 24px; }
+    </style>
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<div class="top-header">
+    <div class="logo">绿韵家管理系统</div>
+    <div class="top-nav">
+        <div class="top-nav-item">首页</div>
+        <div class="top-nav-item active">店铺</div>
+        <div class="top-nav-item">营销中心</div>
+        <div class="top-nav-item">结算中心</div>
+    </div>
+</div>
+
+<!-- 侧边栏 -->
+<div class="sidebar">
+    <div class="menu-group">
+        <div class="menu-item">控制台</div>
+        <div class="menu-item">商品中心</div>
+        <div class="menu-item">商家管理</div>
+        <div class="menu-item active">会员中心</div>
+        <div class="sub-menu">
+            <div class="menu-item active">会员管理</div>
+            <div class="menu-item">第三方解绑</div>
+            <div class="menu-item">实名认证</div>
+            <div class="menu-item">黑名单</div>
+            <div class="menu-item">注销管理</div>
+            <div class="menu-item">用户反馈</div>
+            <div class="menu-item">会员设定</div>
+        </div>
+        <div class="menu-item">交易中心</div>
+        <div class="menu-item">售后中心</div>
+        <div class="menu-item">数据中心</div>
+        <div class="menu-item">运维中心</div>
+    </div>
+</div>
+
+<!-- 主内容 -->
+<div class="main">
+    <!-- 面包屑 -->
+    <div class="breadcrumb">
+        <a href="#">首页</a><span>></span>
+        <a href="#">店铺</a><span>></span>
+        <a href="member-performance.html">会员管理</a><span>></span>
+        <a href="member-performance.html">会员详情</a><span>></span>
+        <a href="performance-order-list.html">业绩详情订单</a><span>></span>
+        业绩订单详情
+    </div>
+
+    <!-- 标签页 -->
+    <div class="tabs">
+        <div class="tab active">业绩订单详情</div>
+    </div>
+
+    <!-- 基础信息 -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">基础信息</div>
+            <span class="status-tag">已结算</span>
+        </div>
+        <div class="card-body">
+            <div class="info-grid">
+                <div class="info-item"><span class="info-label">主订单编号</span><span class="info-value">1260520384309466420</span></div>
+                <div class="info-item"><span class="info-label">子订单编号</span><span class="info-value">605155</span></div>
+                <div class="info-item"><span class="info-label">支付单号</span><span class="info-value">-</span></div>
+                <div class="info-item"><span class="info-label">微信支付单号</span><span class="info-value">-</span></div>
+                <div class="info-item"><span class="info-label">订单类型</span><span class="info-value">常规订单</span></div>
+                <div class="info-item"><span class="info-label">商品类型</span><span class="info-value">实体商品</span></div>
+                <div class="info-item"><span class="info-label">订单金额</span><span class="info-value price">¥0.11</span></div>
+                <div class="info-item"><span class="info-label">返还积分</span><span class="info-value">100</span></div>
+                <div class="info-item"><span class="info-label">PV值</span><span class="info-value">0.1</span></div>
+                <div class="info-item"><span class="info-label">优惠券抵扣</span><span class="info-value">0</span></div>
+                <div class="info-item"><span class="info-label">积分抵扣</span><span class="info-value">0</span></div>
+                <div class="info-item"><span class="info-label">余额抵扣</span><span class="info-value">0</span></div>
+                <div class="info-item"><span class="info-label">电子币抵扣</span><span class="info-value">0</span></div>
+                <div class="info-item"><span class="info-label">专享优惠</span><span class="info-value">0.02</span></div>
+                <div class="info-item"><span class="info-label">随机立减</span><span class="info-value">0.07</span></div>
+                <div class="info-item"><span class="info-label">实付总额</span><span class="info-value price">¥0.01</span></div>
+                <div class="info-item"><span class="info-label">下单时间</span><span class="info-value">2025-05-20 18:15</span></div>
+                <div class="info-item"><span class="info-label">最晚发货时间</span><span class="info-value">2025-05-23 18:15</span></div>
+                <div class="info-item"><span class="info-label">实际发货时间</span><span class="info-value">-</span></div>
+                <div class="info-item"><span class="info-label">确认收货时间</span><span class="info-value">-</span></div>
+                <div class="info-item"><span class="info-label">订单完结日期</span><span class="info-value">-</span></div>
+                <div class="info-item"><span class="info-label">客户备注</span><span class="info-value" style="color:#ff4d4f;">-9.10</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 用户信息 -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">用户信息</div>
+        </div>
+        <div class="card-body">
+            <div class="user-grid">
+                <div class="info-item"><span class="info-label">购买人</span><span class="info-value">有享12123</span></div>
+                <div class="info-item"><span class="info-label">购买人员类型</span><span class="info-value">中级会员</span></div>
+                <div class="info-item"><span class="info-label">收货人</span><span class="info-value">宋健 (18307448442)</span></div>
+                <div class="info-item"><span class="info-label">收货地址</span><span class="info-value">湖南省长沙市岳麓区中电科技园二期</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 商品信息 -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">商品信息</div>
+        </div>
+        <div class="card-body">
+            <div class="product-item">
+                <div class="product-img">商品图片</div>
+                <div class="product-info">
+                    <div class="product-name">赛隆瑙乐饮品</div>
+                    <div class="product-spec">规格：1盒</div>
+                </div>
+                <div class="product-price">
+                    <div class="price">¥0.1</div>
+                    <div class="qty">x1</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 业绩归属信息 -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">业绩归属信息</div>
+        </div>
+        <div class="card-body">
+            <div class="info-grid">
+                <div class="info-item"><span class="info-label">业绩归属人</span><span class="info-value">阳光 (18660265222)</span></div>
+                <div class="info-item"><span class="info-label">业绩类型</span><span class="info-value">自购-今日</span></div>
+                <div class="info-item"><span class="info-label">业绩PV</span><span class="info-value price">0.1</span></div>
+                <div class="info-item"><span class="info-label">结算状态</span><span class="info-value">已结算</span></div>
+                <div class="info-item"><span class="info-label">结算时间</span><span class="info-value">2025-05-20 20:00:00</span></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
