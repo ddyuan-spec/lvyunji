@@ -87,9 +87,10 @@
         .dot-tip-popup .popup-list li { padding: 2px 0; color: #666; }
         .dot-tip-popup .popup-list li::before { content: '•'; color: #ff6b7a; margin-right: 6px; }
 
-        /* 向上展开的气泡 - 不影响布局 */
+        /* 向上展开的气泡 - 不影响布局，置顶显示 */
         .dot-tip-popup.popup-up {
             top: auto; bottom: calc(100% + 8px);
+            z-index: 9999;
         }
         .dot-tip-popup.popup-up::before {
             top: auto; bottom: -6px;
