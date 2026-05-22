@@ -124,6 +124,38 @@
         .th-dot-popup .popup-title { font-weight: 600; color: #333; margin-bottom: 4px; }
         .th-dot-popup .popup-desc { color: #666; }
 
+        /* 导出按钮旁圆形提示 */
+        .export-tip-wrap { display: inline-flex; align-items: center; position: relative; }
+        .dot-tip {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 18px; height: 18px; background: #ff6b7a; color: #fff;
+            border-radius: 50%; font-size: 11px; cursor: pointer; flex-shrink: 0;
+            margin-left: 4px;
+        }
+        .dot-tip:hover { background: #ff5252; }
+        .dot-tip-popup {
+            display: none; position: absolute; top: calc(100% + 8px); right: 0;
+            background: #fff; border: 1px solid #e8e8e8; border-radius: 6px;
+            padding: 12px 16px; min-width: 320px; max-width: 400px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 2000;
+            font-size: 12px; color: #555; line-height: 1.8; text-align: left;
+        }
+        .dot-tip-popup::before {
+            content: ''; position: absolute; top: -6px; right: 20px;
+            border-left: 6px solid transparent; border-right: 6px solid transparent;
+            border-bottom: 6px solid #e8e8e8;
+        }
+        .dot-tip-popup::after {
+            content: ''; position: absolute; top: -5px; right: 21px;
+            border-left: 5px solid transparent; border-right: 5px solid transparent;
+            border-bottom: 5px solid #fff;
+        }
+        .dot-tip-popup.show { display: block; }
+        .dot-tip-popup .popup-title { font-weight: 600; color: #333; margin-bottom: 6px; font-size: 13px; }
+        .dot-tip-popup .popup-desc { color: #666; }
+        .dot-tip-popup .popup-list { padding-left: 16px; margin: 0; }
+        .dot-tip-popup .popup-list li { margin-bottom: 2px; }
+
         /* 会员信息列 */
         .member-info { display: flex; align-items: center; gap: 10px; }
         .member-avatar { width: 40px; height: 40px; border-radius: 50%; background: #e8e8e8; display: flex; align-items: center; justify-content: center; color: #999; font-size: 12px; overflow: hidden; }
@@ -263,20 +295,22 @@
         </select>
         <button class="btn btn-primary">搜索</button>
         <button class="btn btn-default">重置</button>
-        <button class="btn btn-default" onclick="exportData()">导出</button>
-        <span class="dot-tip" style="margin-left: 4px;" onclick="toggleTip(event, 'exportTip')">?</span>
-        <div class="dot-tip-popup" id="exportTip" style="left: auto; right: 0; transform: none; min-width: 320px;">
-            <div class="popup-title">导出功能说明</div>
-            <div class="popup-desc">
-                <ul class="popup-list">
-                    <li><b>导出格式</b>：CSV（兼容Excel）</li>
-                    <li><b>文件名</b>：会员保底导出_YYYYMMDD.csv</li>
-                    <li><b>内容包含</b>：筛选条件信息 + 表格数据</li>
-                    <li><b>数据字段</b>：会员编号、姓名、账号、微生态编号、等级、保底月份、三个是否字段、创建人、创建时间</li>
-                    <li><b>使用方式</b>：点击导出按钮，自动下载当前筛选条件下的数据</li>
-                </ul>
+        <span class="export-tip-wrap">
+            <button class="btn btn-default" onclick="exportData()">导出</button>
+            <span class="dot-tip" onclick="toggleTip(event, 'exportTip')">?</span>
+            <div class="dot-tip-popup" id="exportTip">
+                <div class="popup-title">导出功能说明</div>
+                <div class="popup-desc">
+                    <ul class="popup-list">
+                        <li><b>导出格式</b>：CSV（兼容Excel）</li>
+                        <li><b>文件名</b>：会员保底导出_YYYYMMDD.csv</li>
+                        <li><b>内容包含</b>：筛选条件信息 + 表格数据</li>
+                        <li><b>数据字段</b>：会员编号、姓名、账号、微生态编号、等级、保底月份、三个是否字段、创建人、创建时间</li>
+                        <li><b>使用方式</b>：点击导出按钮，自动下载当前筛选条件下的数据</li>
+                    </ul>
+                </div>
             </div>
-        </div>
+        </span>
         <button class="btn btn-primary" style="margin-left: auto;">新增</button>
     </div>
 
@@ -864,7 +898,7 @@ function exportData() {
 document.addEventListener('click', function(e) {
     if (currentTip) {
         const tip = document.getElementById(currentTip);
-        if (tip && !tip.contains(e.target) && !e.target.classList.contains('th-dot')) {
+        if (tip && !tip.contains(e.target) && !e.target.classList.contains('th-dot') && !e.target.classList.contains('dot-tip')) {
             tip.classList.remove('show');
             currentTip = null;
         }
