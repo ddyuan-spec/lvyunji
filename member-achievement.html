@@ -263,6 +263,7 @@
         </select>
         <button class="btn btn-primary">搜索</button>
         <button class="btn btn-default">重置</button>
+        <button class="btn btn-default" onclick="exportData()">导出</button>
         <button class="btn btn-primary" style="margin-left: auto;">新增</button>
     </div>
 
@@ -594,6 +595,76 @@ function toggleTip(event, tipId) {
 function switchTab(tabId) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     event.target.classList.add('active');
+}
+
+// 导出功能
+function exportData() {
+    // 获取筛选条件
+    const filters = {
+        '会员编号': document.querySelector('input[placeholder="会员编号"]')?.value || '',
+        '会员姓名/账号': document.querySelector('input[placeholder="会员姓名/账号"]')?.value || '',
+        '日期': document.querySelector('input[type="date"]')?.value || '',
+        '是否执行委1': document.querySelectorAll('.filter-select')[0]?.value || '',
+        '是否资深委': document.querySelectorAll('.filter-select')[1]?.value || '',
+        '是否执行委2': document.querySelectorAll('.filter-select')[2]?.value || ''
+    };
+    
+    // 获取表格数据
+    const rows = [];
+    document.querySelectorAll('.data-table tbody tr').forEach(tr => {
+        const cells = tr.querySelectorAll('td');
+        if (cells.length > 0) {
+            rows.push({
+                '会员编号': cells[0]?.textContent?.trim() || '',
+                '会员姓名': cells[1]?.querySelector('.member-name')?.textContent?.trim() || '',
+                '会员账号': cells[1]?.querySelector('.member-id')?.textContent?.trim() || '',
+                '微生态编号': cells[2]?.textContent?.trim() || '',
+                '会员等级': cells[3]?.textContent?.trim() || '',
+                '保底月份': cells[4]?.textContent?.trim() || '',
+                '是否执行委1': cells[5]?.textContent?.trim() || '',
+                '是否资深委': cells[6]?.textContent?.trim() || '',
+                '是否执行委2': cells[7]?.textContent?.trim() || '',
+                '创建人': cells[8]?.textContent?.trim() || '',
+                '创建时间': cells[9]?.textContent?.trim() || ''
+            });
+        }
+    });
+    
+    // 构建CSV内容
+    let csvContent = '\uFEFF'; // BOM for Excel Chinese support
+    
+    // 添加筛选条件信息
+    csvContent += '筛选条件\n';
+    for (const [key, value] of Object.entries(filters)) {
+        csvContent += `${key},${value}\n`;
+    }
+    csvContent += '\n导出数据\n';
+    
+    // 添加表头
+    const headers = ['会员编号', '会员姓名', '会员账号', '微生态编号', '会员等级', '保底月份', '是否执行委1', '是否资深委', '是否执行委2', '创建人', '创建时间'];
+    csvContent += headers.join(',') + '\n';
+    
+    // 添加数据行
+    rows.forEach(row => {
+        const values = headers.map(h => {
+            const val = row[h] || '';
+            // 处理包含逗号的值
+            if (val.includes(',') || val.includes('\n') || val.includes('"')) {
+                return `"${val.replace(/"/g, '""')}"`;
+            }
+            return val;
+        });
+        csvContent += values.join(',') + '\n';
+    });
+    
+    // 下载文件
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    link.href = URL.createObjectURL(blob);
+    link.download = `会员保底导出_${timestamp}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
 }
 
 document.addEventListener('click', function(e) {
