@@ -448,7 +448,7 @@
                 <div class="test-section">
                     <div class="test-section-title">验证码</div>
                     <div class="test-item">
-                        <div><span class="test-label">固定验证码：</span><span class="test-value">123456</span></div>
+                        <div><span class="test-label">固定验证码：</span><span class="test-value">1234</span></div>
                         <div class="test-hint">点击获取验证码后自动填充</div>
                     </div>
                 </div>
@@ -657,8 +657,8 @@
                                     <ul class="tip-list">
                                         <li>点击获取验证码后自动填充</li>
                                         <li>验证码有效期60秒</li>
-                                        <li>测试固定验证码：123456</li>
-                                        <li>输入6位验证码后启用确认按钮</li>
+                                        <li>测试固定验证码：1234（4位）</li>
+                                        <li>输入4位验证码后启用确认按钮</li>
                                     </ul>
                                 </div>
                             </div>
@@ -666,7 +666,7 @@
                     </label>
                     <div class="code-input-wrap">
                         <input type="text" class="input-field code-input" id="verifyCode"
-                               placeholder="请输入验证码" maxlength="6">
+                               placeholder="请输入验证码" maxlength="4">
                         <button class="code-btn" id="codeBtn" onclick="sendCode()">获取验证码</button>
                     </div>
                 </div>
@@ -927,7 +927,7 @@
 
             // 模拟发送验证码
             setTimeout(() => {
-                document.getElementById('verifyCode').value = '123456';
+                document.getElementById('verifyCode').value = '1234';
                 checkSubmitEnabled();
             }, 500);
         }
@@ -940,7 +940,7 @@
             const phone = document.getElementById('phoneVerify').value;
             const hasPhone = phone.length === 11 && phone === '13812345678';
             const code = document.getElementById('verifyCode').value;
-            const hasCode = code.length === 6;
+            const hasCode = code.length === 4;
 
             document.getElementById('transferSubmitBtn').disabled = !(hasUser && hasAmount && hasPhone && hasCode);
         }
