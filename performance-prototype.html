@@ -914,11 +914,9 @@ function showOrderDetail(orderId) {
     document.getElementById('detailSubOrder').textContent = orderId.slice(-6);
     document.getElementById('detailOrderTime').textContent = order.time;
     document.getElementById('detailBuyer').textContent = order.buyer;
-    document.getElementById('detailType').textContent = order.type;
     const isSettled = order.status === '已结算';
     document.getElementById('detailStatus').textContent = isSettled ? '已结算' : '待结算';
     document.getElementById('detailStatus').className = isSettled ? 'order-status-tag' : 'order-status-tag pending';
-    document.getElementById('detailSettleStatus').textContent = order.status;
     showPage('orderDetail');
 }
 
