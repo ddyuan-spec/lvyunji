@@ -734,48 +734,12 @@
                 </div>
             </div>
         </div>
-
-        <!-- 业绩归属信息 -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title" style="position: relative;">
-                    业绩归属信息
-                    <span class="dot-tip" onclick="showGlobalPopup(event, 'globalPerfInfo')">?</span>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="info-grid">
-                    <div class="info-item"><span class="info-label">业绩归属人</span><span class="info-value">阳光 (18660265222)</span></div>
-                    <div class="info-item"><span class="info-label">业绩类型</span><span class="info-value" id="detailType">自购-今日</span></div>
-                    <div class="info-item"><span class="info-label">业绩PV</span><span class="info-value red">0.1</span></div>
-                    <div class="info-item"><span class="info-label">结算状态</span><span class="info-value green" id="detailSettleStatus">已结算</span></div>
-                    <div class="info-item"><span class="info-label">结算时间</span><span class="info-value" id="detailSettleTime">2025-05-20 20:00:00</span></div>
-                </div>
-            </div>
-        </div>
     </div>
 
 </div>
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
-
-<!-- 全局气泡容器 - 业绩归属信息说明 -->
-<div class="global-popup dot-tip-popup" id="globalPerfInfo">
-    <div class="popup-title">业绩归属信息 - 字段说明</div>
-    <div class="popup-desc">
-        <ul class="popup-list">
-            <li><b>业绩归属人</b>：数据来源会员系统，标识该笔订单业绩归属的会员</li>
-            <li><b>业绩类型</b>：数据来源业绩系统，格式为【自购/直推】-【今日/待结算/已结算】</li>
-            <li><b>业绩PV</b>：数据来源结算系统，该订单产生的业绩PV值</li>
-            <li><b>结算状态</b>：数据来源结算系统，待结算/已结算</li>
-            <li><b>结算时间</b>：数据来源结算系统，订单完成结算的时间</li>
-        </ul>
-        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #eee; color: #999; font-size: 11px;">
-            注：此栏目仅在从「业绩详情订单」页面跳转时显示
-        </div>
-    </div>
-</div>
 
 <script>
 // ========== 数据 ==========
