@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我的储值</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5; color: #333; font-size: 14px; line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* 状态栏 */
+        .status-bar {
+            height: 44px; background: #fff; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 17px; font-weight: 600; position: relative;
+        }
+        .status-bar .back {
+            position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+            font-size: 20px; color: #333; cursor: pointer;
+        }
+
+        /* 储值卡片 */
+        .value-card {
+            margin: 16px; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-radius: 12px; padding: 24px 20px;
+            position: relative; overflow: hidden;
+        }
+        .value-card::after {
+            content: ''; position: absolute; right: -20px; top: -20px;
+            width: 120px; height: 120px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='%234caf50' opacity='0.2'/%3E%3Cpath d='M50 20 L55 40 L75 40 L60 55 L65 75 L50 60 L35 75 L40 55 L25 40 L45 40 Z' fill='%234caf50' opacity='0.3'/%3E%3C/svg%3E") no-repeat center;
+            background-size: contain;
+        }
+        .value-label { font-size: 14px; color: #666; margin-bottom: 8px; }
+        .value-amount { font-size: 48px; font-weight: 700; color: #4caf50; line-height: 1; }
+        .value-unit { font-size: 24px; margin-left: 4px; }
+
+        /* 可提现金额提示 */
+        .withdrawable-hint {
+            margin: 0 16px 16px; background: #fff; border-radius: 8px;
+            padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .withdrawable-text { font-size: 13px; color: #666; }
+        .withdrawable-amount { color: #ff6b35; font-weight: 500; }
+        .view-reason-btn {
+            font-size: 13px; color: #4caf50; cursor: pointer;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .view-reason-btn::after {
+            content: '›'; font-size: 16px;
+        }
+
+        /* 操作按钮区 */
+        .action-bar {
+            margin: 0 16px; background: #fff; border-radius: 12px;
+            display: flex; padding: 16px 0;
+        }
+        .action-item {
+            flex: 1; display: flex; flex-direction: column; align-items: center;
+            gap: 8px; cursor: pointer; position: relative;
+        }
+        .action-item:first-child::after {
+            content: ''; position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+            width: 1px; height: 40px; background: #e8e8e8;
+        }
+        .action-icon {
+            width: 44px; height: 44px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+        }
+        .action-item:first-child .action-icon { background: #e8f5e9; color: #4caf50; }
+        .action-item:last-child .action-icon { background: #fff3e0; color: #ff9800; }
+        .action-text { font-size: 14px; color: #333; }
+
+        /* 转账按钮 */
+        .transfer-btn {
+            margin: 16px; background: #4caf50; color: #fff;
+            border: none; border-radius: 8px; padding: 14px;
+            font-size: 16px; font-weight: 500; width: calc(100% - 32px);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            gap: 8px;
+        }
+        .transfer-btn:active { background: #45a049; }
+
+        /* 联系客服 */
+        .service-btn {
+            position: fixed; left: 16px; bottom: 100px;
+            width: 56px; height: 56px; border-radius: 50%;
+            background: #4caf50; color: #fff;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-size: 11px; box-shadow: 0 4px 12px rgba(76,175,80,0.4);
+            cursor: pointer;
+        }
+        .service-btn::before {
+            content: '💬'; font-size: 20px; margin-bottom: 2px;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            height: 56px; background: #fff; border-top: 1px solid #e8e8e8;
+            display: flex; padding-bottom: env(safe-area-inset-bottom);
+        }
+        .nav-item {
+            flex: 1; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; gap: 4px; cursor: pointer;
+        }
+        .nav-item.active { color: #4caf50; }
+        .nav-icon { font-size: 22px; }
+        .nav-text { font-size: 11px; }
+
+        /* 弹窗遮罩 */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 1000;
+            align-items: flex-end; justify-content: center;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-content {
+            background: #fff; border-radius: 16px 16px 0 0;
+            width: 100%; max-height: 90vh; overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .modal-header {
+            padding: 16px 20px; border-bottom: 1px solid #f0f0f0;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-title { font-size: 17px; font-weight: 600; }
+        .modal-close { font-size: 24px; color: #999; cursor: pointer; }
+        .modal-body { padding: 20px; }
+
+        /* 转账弹窗 */
+        .transfer-type-tabs {
+            display: flex; background: #f5f5f5; border-radius: 8px;
+            padding: 4px; margin-bottom: 20px;
+        }
+        .transfer-type-tab {
+            flex: 1; padding: 10px; text-align: center;
+            border-radius: 6px; cursor: pointer; font-size: 14px;
+            transition: all 0.2s;
+        }
+        .transfer-type-tab.active {
+            background: #fff; color: #4caf50; font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .input-group { margin-bottom: 16px; }
+        .input-label {
+            font-size: 14px; color: #333; margin-bottom: 8px; display: block;
+        }
+        .input-field {
+            width: 100%; height: 48px; padding: 0 16px;
+            border: 1px solid #e8e8e8; border-radius: 8px;
+            font-size: 15px; outline: none;
+        }
+        .input-field:focus { border-color: #4caf50; }
+        .input-hint {
+            font-size: 12px; color: #999; margin-top: 6px;
+        }
+        .input-hint.error { color: #f44336; }
+        .input-hint.success { color: #4caf50; }
+
+        /* 用户搜索结果 */
+        .user-result {
+            background: #f8f8f8; border-radius: 8px; padding: 16px;
+            margin-bottom: 16px; display: none;
+        }
+        .user-result.show { display: block; }
+        .user-result-header {
+            display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+        }
+        .user-avatar {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: #4caf50; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+        }
+        .user-info { flex: 1; }
+        .user-name { font-size: 16px; font-weight: 500; color: #333; }
+        .user-id { font-size: 13px; color: #999; margin-top: 2px; }
+        .user-level {
+            display: inline-block; padding: 2px 8px;
+            background: #e8f5e9; color: #4caf50;
+            border-radius: 4px; font-size: 12px;
+        }
+        .user-relation {
+            font-size: 13px; color: #4caf50; margin-top: 8px;
+            padding-top: 12px; border-top: 1px dashed #e0e0e0;
+        }
+
+        /* 金额输入 */
+        .amount-input-wrap {
+            display: flex; align-items: center;
+            border: 1px solid #e8e8e8; border-radius: 8px;
+            padding: 0 16px; height: 56px;
+        }
+        .amount-symbol { font-size: 24px; color: #333; margin-right: 8px; }
+        .amount-input {
+            flex: 1; border: none; font-size: 24px; font-weight: 600;
+            outline: none; color: #333;
+        }
+        .amount-input::placeholder { color: #ccc; }
+
+        /* 验证码输入 */
+        .code-input-wrap {
+            display: flex; gap: 12px;
+        }
+        .code-input { flex: 1; }
+        .code-btn {
+            width: 120px; height: 48px;
+            background: #4caf50; color: #fff;
+            border: none; border-radius: 8px;
+            font-size: 14px; cursor: pointer;
+        }
+        .code-btn:disabled {
+            background: #ccc; cursor: not-allowed;
+        }
+        .code-btn.countdown {
+            background: #999;
+        }
+
+        /* 提交按钮 */
+        .submit-btn {
+            width: 100%; height: 48px;
+            background: #4caf50; color: #fff;
+            border: none; border-radius: 8px;
+            font-size: 16px; font-weight: 500;
+            cursor: pointer; margin-top: 24px;
+        }
+        .submit-btn:disabled {
+            background: #ccc; cursor: not-allowed;
+        }
+        .submit-btn:active:not(:disabled) { background: #45a049; }
+
+        /* 确认弹窗 */
+        .confirm-modal .modal-content {
+            border-radius: 16px; margin: 20px;
+            width: calc(100% - 40px); max-height: none;
+        }
+        .confirm-icon {
+            width: 64px; height: 64px; border-radius: 50%;
+            background: #fff3e0; color: #ff9800;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 32px; margin: 0 auto 16px;
+        }
+        .confirm-title {
+            text-align: center; font-size: 18px; font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .confirm-content {
+            background: #f8f8f8; border-radius: 8px;
+            padding: 16px; margin-bottom: 20px;
+        }
+        .confirm-row {
+            display: flex; justify-content: space-between;
+            margin-bottom: 12px; font-size: 14px;
+        }
+        .confirm-row:last-child { margin-bottom: 0; }
+        .confirm-label { color: #666; }
+        .confirm-value { color: #333; font-weight: 500; }
+        .confirm-value.amount { color: #f44336; font-size: 18px; }
+        .confirm-warning {
+            background: #fff3e0; border-left: 3px solid #ff9800;
+            padding: 12px; font-size: 13px; color: #666;
+            margin-bottom: 20px; line-height: 1.6;
+        }
+        .confirm-actions {
+            display: flex; gap: 12px;
+        }
+        .confirm-btn {
+            flex: 1; height: 44px; border-radius: 8px;
+            font-size: 15px; cursor: pointer; border: none;
+        }
+        .confirm-btn.cancel {
+            background: #f5f5f5; color: #666;
+        }
+        .confirm-btn.confirm {
+            background: #f44336; color: #fff;
+        }
+
+        /* 成功提示 */
+        .success-toast {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: rgba(0,0,0,0.8); color: #fff;
+            padding: 24px 32px; border-radius: 12px;
+            text-align: center; z-index: 2000;
+            opacity: 0; visibility: hidden;
+            transition: all 0.3s;
+        }
+        .success-toast.show {
+            opacity: 1; visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .success-icon {
+            width: 56px; height: 56px; border-radius: 50%;
+            background: #4caf50; margin: 0 auto 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px;
+        }
+        .success-title { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+        .success-detail { font-size: 14px; line-height: 1.8; opacity: 0.9; }
+
+        /* 原因弹窗 */
+        .reason-list {
+            background: #f8f8f8; border-radius: 8px; padding: 16px;
+        }
+        .reason-item {
+            display: flex; justify-content: space-between;
+            padding: 12px 0; border-bottom: 1px solid #e8e8e8;
+        }
+        .reason-item:last-child { border-bottom: none; }
+        .reason-type { font-size: 14px; color: #333; }
+        .reason-amount { font-size: 14px; color: #999; }
+
+        /* 消费记录页面 */
+        .record-tabs {
+            display: flex; background: #fff;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .record-tab {
+            flex: 1; padding: 14px; text-align: center;
+            font-size: 14px; color: #666; cursor: pointer;
+            position: relative;
+        }
+        .record-tab.active {
+            color: #4caf50; font-weight: 500;
+        }
+        .record-tab.active::after {
+            content: ''; position: absolute; bottom: 0; left: 20%; right: 20%;
+            height: 2px; background: #4caf50;
+        }
+        .record-list { padding: 0 16px; }
+        .record-item {
+            background: #fff; border-radius: 8px;
+            margin-top: 12px; padding: 16px;
+        }
+        .record-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 12px;
+        }
+        .record-type {
+            display: flex; align-items: center; gap: 8px;
+        }
+        .type-icon {
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .type-icon.recharge { background: #e8f5e9; color: #4caf50; }
+        .type-icon.transfer { background: #e3f2fd; color: #2196f3; }
+        .type-icon.consume { background: #fff3e0; color: #ff9800; }
+        .type-text { font-size: 15px; font-weight: 500; }
+        .record-amount { font-size: 18px; font-weight: 600; }
+        .record-amount.in { color: #4caf50; }
+        .record-amount.out { color: #f44336; }
+        .record-detail {
+            font-size: 13px; color: #999; line-height: 1.8;
+        }
+        .record-time { font-size: 12px; color: #bbb; margin-top: 8px; }
+
+        /* 页面切换 */
+        .page { display: none; }
+        .page.active { display: block; }
+    </style>
+</head>
+<body>
+    <!-- 我的储值页面 -->
+    <div class="page active" id="homePage">
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <span class="back" onclick="goBack()">‹</span>
+            我的储值
+        </div>
+
+        <!-- 储值卡片 -->
+        <div class="value-card">
+            <div class="value-label">当前储值（元）</div>
+            <div class="value-amount">
+                <span id="totalAmount">2,580.00</span>
+                <span class="value-unit">元</span>
+            </div>
+        </div>
+
+        <!-- 可提现金额提示 -->
+        <div class="withdrawable-hint">
+            <span class="withdrawable-text">
+                可提现金额 <span class="withdrawable-amount" id="withdrawableAmount">¥1,580.00</span>
+            </span>
+            <span class="view-reason-btn" onclick="showReasonModal()">查看原因</span>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="action-bar">
+            <div class="action-item" onclick="goRecharge()">
+                <div class="action-icon">¥</div>
+                <span class="action-text">去储值</span>
+            </div>
+            <div class="action-item" onclick="showRecords()">
+                <div class="action-icon">📋</div>
+                <span class="action-text">消费记录</span>
+            </div>
+        </div>
+
+        <!-- 转账按钮 -->
+        <button class="transfer-btn" onclick="showTransferModal()">
+            <span>↗</span> 转账给下级
+        </button>
+
+        <!-- 联系客服 -->
+        <div class="service-btn" onclick="contactService()">
+            联系<br>客服
+        </div>
+    </div>
+
+    <!-- 消费记录页面 -->
+    <div class="page" id="recordPage">
+        <div class="status-bar">
+            <span class="back" onclick="showHome()">‹</span>
+            消费记录
+        </div>
+        <div class="record-tabs">
+            <div class="record-tab active" onclick="switchRecordTab('all')">全部</div>
+            <div class="record-tab" onclick="switchRecordTab('recharge')">储值</div>
+            <div class="record-tab" onclick="switchRecordTab('transfer')">转账</div>
+            <div class="record-tab" onclick="switchRecordTab('consume')">消费</div>
+        </div>
+        <div class="record-list" id="recordList">
+            <!-- 记录列表由JS生成 -->
+        </div>
+    </div>
+
+    <!-- 转账弹窗 -->
+    <div class="modal-overlay" id="transferModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">转账给下级</span>
+                <span class="modal-close" onclick="closeModal('transferModal')">×</span>
+            </div>
+            <div class="modal-body">
+                <!-- 转账类型切换 -->
+                <div class="transfer-type-tabs">
+                    <div class="transfer-type-tab active" onclick="switchTransferType('phone')">按手机号</div>
+                    <div class="transfer-type-tab" onclick="switchTransferType('id')">按会员ID</div>
+                </div>
+
+                <!-- 手机号/ID输入 -->
+                <div class="input-group">
+                    <label class="input-label" id="recipientLabel">对方手机号</label>
+                    <input type="text" class="input-field" id="recipientInput"
+                           placeholder="请输入对方手机号" maxlength="11"
+                           oninput="onRecipientInput()">
+                    <div class="input-hint" id="recipientHint">请输入11位手机号</div>
+                </div>
+
+                <!-- 用户搜索结果 -->
+                <div class="user-result" id="userResult">
+                    <div class="user-result-header">
+                        <div class="user-avatar" id="resultAvatar">张</div>
+                        <div class="user-info">
+                            <div class="user-name" id="resultName">张三</div>
+                            <div class="user-id" id="resultId">ID: 10086</div>
+                        </div>
+                        <span class="user-level" id="resultLevel">分享达人</span>
+                    </div>
+                    <div class="user-relation" id="resultRelation">
+                        ✓ 该用户是您的下级（跨2级）
+                    </div>
+                </div>
+
+                <!-- 转账金额 -->
+                <div class="input-group">
+                    <label class="input-label">转账金额</label>
+                    <div class="amount-input-wrap">
+                        <span class="amount-symbol">¥</span>
+                        <input type="number" class="amount-input" id="transferAmount"
+                               placeholder="0.00" oninput="onAmountInput()">
+                    </div>
+                    <div class="input-hint">可用余额：<span id="availableBalance">2580.00</span>元</div>
+                </div>
+
+                <!-- 手机号验证 -->
+                <div class="input-group">
+                    <label class="input-label">绑定手机号验证</label>
+                    <div class="code-input-wrap">
+                        <input type="tel" class="input-field code-input" id="phoneVerify"
+                               placeholder="请输入绑定手机号" maxlength="11"
+                               oninput="onPhoneVerifyInput()">
+                    </div>
+                    <div class="input-hint" id="phoneHint">请输入与账号绑定的11位手机号</div>
+                </div>
+
+                <!-- 验证码 -->
+                <div class="input-group">
+                    <label class="input-label">验证码</label>
+                    <div class="code-input-wrap">
+                        <input type="text" class="input-field code-input" id="verifyCode"
+                               placeholder="请输入验证码" maxlength="6">
+                        <button class="code-btn" id="codeBtn" onclick="sendCode()">获取验证码</button>
+                    </div>
+                </div>
+
+                <button class="submit-btn" id="transferSubmitBtn" onclick="submitTransfer()" disabled>
+                    确认转账
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 转账确认弹窗 -->
+    <div class="modal-overlay confirm-modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="confirm-icon">⚠️</div>
+                <div class="confirm-title">确认转账</div>
+                <div class="confirm-content">
+                    <div class="confirm-row">
+                        <span class="confirm-label">转账对象</span>
+                        <span class="confirm-value" id="confirmTarget">张三 (ID: 10086)</span>
+                    </div>
+                    <div class="confirm-row">
+                        <span class="confirm-label">转账金额</span>
+                        <span class="confirm-value amount" id="confirmAmount">¥500.00</span>
+                    </div>
+                    <div class="confirm-row">
+                        <span class="confirm-label">转账后余额</span>
+                        <span class="confirm-value" id="confirmBalance">¥2,080.00</span>
+                    </div>
+                </div>
+                <div class="confirm-warning">
+                    <strong>重要提示：</strong><br>
+                    储值金额转出后无法撤回，请仔细核对转账对象信息，确认无误后再进行操作。
+                </div>
+                <div class="confirm-actions">
+                    <button class="confirm-btn cancel" onclick="closeModal('confirmModal')">取消</button>
+                    <button class="confirm-btn confirm" onclick="confirmTransfer()">确认转账</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 查看原因弹窗 -->
+    <div class="modal-overlay confirm-modal" id="reasonModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">不可提现金额明细</span>
+                <span class="modal-close" onclick="closeModal('reasonModal')">×</span>
+            </div>
+            <div class="modal-body">
+                <div class="reason-list">
+                    <div class="reason-item">
+                        <span class="reason-type">转账储值（不可提现）</span>
+                        <span class="reason-amount">¥1,000.00</span>
+                    </div>
+                    <div class="reason-item">
+                        <span class="reason-type">活动赠送储值</span>
+                        <span class="reason-amount">¥0.00</span>
+                    </div>
+                </div>
+                <div class="input-hint" style="margin-top: 16px;">
+                    注：通过转账获得的储值金额不可提现，仅可用于消费。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 成功提示 -->
+    <div class="success-toast" id="successToast">
+        <div class="success-icon">✓</div>
+        <div class="success-title">储值转账成功</div>
+        <div class="success-detail" id="successDetail">
+            转账用户：张三<br>
+            转账金额：¥500.00<br>
+            转账时间：2025.05.22
+        </div>
+    </div>
+
+    <script>
+        // 模拟数据
+        const mockSubordinates = [
+            { id: '10086', name: '张三', phone: '13800138000', level: '分享达人', relation: '直接下级' },
+            { id: '10087', name: '李四', phone: '13800138001', level: '成长达人', relation: '跨1级' },
+            { id: '10088', name: '王五', phone: '13800138002', level: '潜力达人', relation: '跨2级' },
+            { id: '10089', name: '赵六', phone: '13800138003', level: '精英达人', relation: '直接下级' },
+        ];
+
+        const mockRecords = [
+            { type: 'recharge', title: '储值充值', amount: 1000, time: '2025-05-22 14:30:22', detail: '微信支付' },
+            { type: 'transfer', title: '储值转账', amount: -500, time: '2025-05-22 10:15:33', detail: '转给 张三(ID:10086)' },
+            { type: 'consume', title: '消费支出', amount: -128, time: '2025-05-21 16:45:12', detail: '购买商品' },
+            { type: 'transfer', title: '储值转账', amount: 500, time: '2025-05-20 09:20:15', detail: '来自 王经理(ID:20001)' },
+            { type: 'recharge', title: '储值充值', amount: 2000, time: '2025-05-18 11:30:00', detail: '支付宝支付' },
+            { type: 'consume', title: '消费支出', amount: -299, time: '2025-05-15 14:22:18', detail: '购买会员服务' },
+        ];
+
+        // 当前状态
+        let currentTransferType = 'phone';
+        let selectedUser = null;
+        let currentBalance = 2580.00;
+        let withdrawableBalance = 1580.00;
+
+        // 页面切换
+        function showHome() {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('homePage').classList.add('active');
+        }
+
+        function showRecords() {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('recordPage').classList.add('active');
+            renderRecords('all');
+        }
+
+        function goBack() {
+            showHome();
+        }
+
+        function goRecharge() {
+            alert('跳转至储值页面');
+        }
+
+        function contactService() {
+            alert('联系客服功能');
+        }
+
+        // 显示转账弹窗
+        function showTransferModal() {
+            document.getElementById('transferModal').classList.add('show');
+            resetTransferForm();
+        }
+
+        // 关闭弹窗
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // 切换转账类型
+        function switchTransferType(type) {
+            currentTransferType = type;
+            document.querySelectorAll('.transfer-type-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const label = document.getElementById('recipientLabel');
+            const input = document.getElementById('recipientInput');
+            const hint = document.getElementById('recipientHint');
+
+            if (type === 'phone') {
+                label.textContent = '对方手机号';
+                input.placeholder = '请输入对方手机号';
+                input.maxLength = 11;
+                hint.textContent = '请输入11位手机号';
+            } else {
+                label.textContent = '对方会员ID';
+                input.placeholder = '请输入对方会员ID';
+                input.maxLength = 10;
+                hint.textContent = '请输入会员ID';
+            }
+
+            input.value = '';
+            document.getElementById('userResult').classList.remove('show');
+            selectedUser = null;
+            checkSubmitEnabled();
+        }
+
+        // 接收人输入处理
+        function onRecipientInput() {
+            const input = document.getElementById('recipientInput');
+            const value = input.value.trim();
+            const hint = document.getElementById('recipientHint');
+
+            if (currentTransferType === 'phone') {
+                // 手机号验证
+                if (value.length === 11) {
+                    const phoneRegex = /^1[3-9]\d{9}$/;
+                    if (!phoneRegex.test(value)) {
+                        hint.textContent = '手机号格式不正确';
+                        hint.className = 'input-hint error';
+                        return;
+                    }
+                    searchUser(value, 'phone');
+                } else {
+                    hint.textContent = '请输入11位手机号';
+                    hint.className = 'input-hint';
+                    document.getElementById('userResult').classList.remove('show');
+                    selectedUser = null;
+                }
+            } else {
+                // ID验证
+                if (value.length >= 5) {
+                    searchUser(value, 'id');
+                } else {
+                    document.getElementById('userResult').classList.remove('show');
+                    selectedUser = null;
+                }
+            }
+            checkSubmitEnabled();
+        }
+
+        // 搜索用户
+        function searchUser(value, type) {
+            const hint = document.getElementById('recipientHint');
+            const resultDiv = document.getElementById('userResult');
+
+            // 模拟搜索
+            const user = mockSubordinates.find(u =>
+                (type === 'phone' && u.phone === value) ||
+                (type === 'id' && u.id === value)
+            );
+
+            if (user) {
+                // 验证是否为下级
+                selectedUser = user;
+                document.getElementById('resultAvatar').textContent = user.name.charAt(0);
+                document.getElementById('resultName').textContent = user.name;
+                document.getElementById('resultId').textContent = `ID: ${user.id}`;
+                document.getElementById('resultLevel').textContent = user.level;
+                document.getElementById('resultRelation').textContent = `✓ 该用户是您的下级（${user.relation}）`;
+                document.getElementById('resultRelation').style.color = '#4caf50';
+
+                hint.textContent = '已找到下级用户';
+                hint.className = 'input-hint success';
+                resultDiv.classList.add('show');
+            } else {
+                selectedUser = null;
+                resultDiv.classList.remove('show');
+                hint.textContent = '未找到该用户或该用户不是您的下级';
+                hint.className = 'input-hint error';
+            }
+            checkSubmitEnabled();
+        }
+
+        // 金额输入处理
+        function onAmountInput() {
+            const amount = parseFloat(document.getElementById('transferAmount').value) || 0;
+            if (amount > currentBalance) {
+                document.getElementById('transferAmount').value = currentBalance;
+            }
+            checkSubmitEnabled();
+        }
+
+        // 手机号验证输入
+        function onPhoneVerifyInput() {
+            const phone = document.getElementById('phoneVerify').value;
+            const hint = document.getElementById('phoneHint');
+            const btn = document.getElementById('codeBtn');
+
+            if (phone.length === 11) {
+                const phoneRegex = /^1[3-9]\d{9}$/;
+                if (phoneRegex.test(phone)) {
+                    // 模拟验证绑定手机号
+                    if (phone === '13812345678') {
+                        hint.textContent = '手机号验证通过';
+                        hint.className = 'input-hint success';
+                        btn.disabled = false;
+                    } else {
+                        hint.textContent = '该手机号未与当前账号绑定';
+                        hint.className = 'input-hint error';
+                        btn.disabled = true;
+                    }
+                } else {
+                    hint.textContent = '手机号格式不正确';
+                    hint.className = 'input-hint error';
+                    btn.disabled = true;
+                }
+            } else {
+                hint.textContent = '请输入与账号绑定的11位手机号';
+                hint.className = 'input-hint';
+                btn.disabled = true;
+            }
+            checkSubmitEnabled();
+        }
+
+        // 发送验证码
+        function sendCode() {
+            const btn = document.getElementById('codeBtn');
+            let countdown = 60;
+
+            btn.disabled = true;
+            btn.classList.add('countdown');
+            btn.textContent = `${countdown}s`;
+
+            const timer = setInterval(() => {
+                countdown--;
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                    btn.disabled = false;
+                    btn.classList.remove('countdown');
+                    btn.textContent = '获取验证码';
+                } else {
+                    btn.textContent = `${countdown}s`;
+                }
+            }, 1000);
+
+            // 模拟发送验证码
+            setTimeout(() => {
+                document.getElementById('verifyCode').value = '123456';
+                checkSubmitEnabled();
+            }, 500);
+        }
+
+        // 检查提交按钮是否可用
+        function checkSubmitEnabled() {
+            const hasUser = selectedUser !== null;
+            const amount = parseFloat(document.getElementById('transferAmount').value) || 0;
+            const hasAmount = amount > 0 && amount <= currentBalance;
+            const phone = document.getElementById('phoneVerify').value;
+            const hasPhone = phone.length === 11 && phone === '13812345678';
+            const code = document.getElementById('verifyCode').value;
+            const hasCode = code.length === 6;
+
+            document.getElementById('transferSubmitBtn').disabled = !(hasUser && hasAmount && hasPhone && hasCode);
+        }
+
+        // 提交转账
+        function submitTransfer() {
+            const amount = parseFloat(document.getElementById('transferAmount').value);
+
+            document.getElementById('confirmTarget').textContent =
+                `${selectedUser.name} (ID: ${selectedUser.id})`;
+            document.getElementById('confirmAmount').textContent = `¥${amount.toFixed(2)}`;
+            document.getElementById('confirmBalance').textContent =
+                `¥${(currentBalance - amount).toFixed(2)}`;
+
+            closeModal('transferModal');
+            setTimeout(() => {
+                document.getElementById('confirmModal').classList.add('show');
+            }, 100);
+        }
+
+        // 确认转账
+        function confirmTransfer() {
+            const amount = parseFloat(document.getElementById('transferAmount').value);
+
+            // 更新余额
+            currentBalance -= amount;
+            document.getElementById('totalAmount').textContent = currentBalance.toLocaleString('zh-CN', {minimumFractionDigits: 2});
+            document.getElementById('availableBalance').textContent = currentBalance.toFixed(2);
+
+            // 添加转账记录
+            const now = new Date();
+            mockRecords.unshift({
+                type: 'transfer',
+                title: '储值转账',
+                amount: -amount,
+                time: now.toISOString().slice(0, 19).replace('T', ' '),
+                detail: `转给 ${selectedUser.name}(ID:${selectedUser.id})`
+            });
+
+            closeModal('confirmModal');
+
+            // 显示成功提示
+            const toast = document.getElementById('successToast');
+            document.getElementById('successDetail').innerHTML =
+                `转账用户：${selectedUser.name}<br>` +
+                `转账金额：¥${amount.toFixed(2)}<br>` +
+                `转账时间：${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
+
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // 显示原因弹窗
+        function showReasonModal() {
+            document.getElementById('reasonModal').classList.add('show');
+        }
+
+        // 重置转账表单
+        function resetTransferForm() {
+            document.getElementById('recipientInput').value = '';
+            document.getElementById('transferAmount').value = '';
+            document.getElementById('phoneVerify').value = '';
+            document.getElementById('verifyCode').value = '';
+            document.getElementById('userResult').classList.remove('show');
+            document.getElementById('recipientHint').textContent = '请输入11位手机号';
+            document.getElementById('recipientHint').className = 'input-hint';
+            document.getElementById('phoneHint').textContent = '请输入与账号绑定的11位手机号';
+            document.getElementById('phoneHint').className = 'input-hint';
+            document.getElementById('codeBtn').disabled = true;
+            document.getElementById('codeBtn').textContent = '获取验证码';
+            selectedUser = null;
+            checkSubmitEnabled();
+        }
+
+        // 切换记录标签
+        function switchRecordTab(type) {
+            document.querySelectorAll('.record-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            renderRecords(type);
+        }
+
+        // 渲染记录列表
+        function renderRecords(type) {
+            const list = document.getElementById('recordList');
+            const filtered = type === 'all' ? mockRecords : mockRecords.filter(r => r.type === type);
+
+            list.innerHTML = filtered.map(record => {
+                const isIn = record.amount > 0;
+                const iconClass = record.type;
+                const iconMap = { recharge: '¥', transfer: '↗', consume: '¥' };
+
+                return `
+                    <div class="record-item">
+                        <div class="record-header">
+                            <div class="record-type">
+                                <div class="type-icon ${iconClass}">${iconMap[record.type]}</div>
+                                <span class="type-text">${record.title}</span>
+                            </div>
+                            <span class="record-amount ${isIn ? 'in' : 'out'}">
+                                ${isIn ? '+' : ''}${record.amount.toFixed(2)}
+                            </span>
+                        </div>
+                        <div class="record-detail">${record.detail}</div>
+                        <div class="record-time">${record.time}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 点击遮罩关闭弹窗
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay && !overlay.classList.contains('confirm-modal')) {
+                    overlay.classList.remove('show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
