@@ -289,7 +289,7 @@
             <option value="否">否</option>
         </select>
         <select class="filter-select">
-            <option value="">是否执行委</option>
+            <option value="">是否首席</option>
             <option value="是">是</option>
             <option value="否">否</option>
         </select>
@@ -305,7 +305,7 @@
                         <li><b>导出格式</b>：CSV（兼容Excel）</li>
                         <li><b>文件名</b>：会员保底导出_YYYYMMDD.csv</li>
                         <li><b>内容包含</b>：筛选条件信息 + 表格数据</li>
-                        <li><b>数据字段</b>：会员编号、姓名、账号、微生态编号、等级、保底月份、三个是否字段、创建人、创建时间</li>
+                        <li><b>数据字段</b>：会员编号、姓名、账号、微生态编号、等级、保底月份、是否执行委、是否资深委、是否首席、创建人、创建时间</li>
                         <li><b>使用方式</b>：点击导出按钮，自动下载当前筛选条件下的数据</li>
                     </ul>
                 </div>
@@ -370,11 +370,11 @@
                     </th>
                     <th>
                         <span class="th-with-tip">
-                            是否执行委
+                            是否首席
                             <span class="th-dot" onclick="toggleTip(event, 'tip5')">?</span>
                             <div class="th-dot-popup" id="tip5">
-                                <div class="popup-title">是否执行委</div>
-                                <div class="popup-desc">标识该会员是否为执行委成员，是/否</div>
+                                <div class="popup-title">是否首席</div>
+                                <div class="popup-desc">标识该会员是否为首席成员，是/否</div>
                             </div>
                         </span>
                     </th>
@@ -807,9 +807,9 @@ function exportData() {
         '会员编号': document.querySelector('input[placeholder="会员编号"]')?.value || '',
         '会员姓名/账号': document.querySelector('input[placeholder="会员姓名/账号"]')?.value || '',
         '日期': document.querySelector('input[type="date"]')?.value || '',
-        '是否执行委1': document.querySelectorAll('.filter-select')[0]?.value || '',
+        '是否执行委': document.querySelectorAll('.filter-select')[0]?.value || '',
         '是否资深委': document.querySelectorAll('.filter-select')[1]?.value || '',
-        '是否执行委2': document.querySelectorAll('.filter-select')[2]?.value || ''
+        '是否首席': document.querySelectorAll('.filter-select')[2]?.value || ''
     };
     
     // 获取表格数据
@@ -824,9 +824,9 @@ function exportData() {
                 '微生态编号': cells[2]?.textContent?.trim() || '',
                 '会员等级': cells[3]?.textContent?.trim() || '',
                 '保底月份': cells[4]?.textContent?.trim() || '',
-                '是否执行委1': cells[5]?.textContent?.trim() || '',
+                '是否执行委': cells[5]?.textContent?.trim() || '',
                 '是否资深委': cells[6]?.textContent?.trim() || '',
-                '是否执行委2': cells[7]?.textContent?.trim() || '',
+                '是否首席': cells[7]?.textContent?.trim() || '',
                 '创建人': cells[8]?.textContent?.trim() || '',
                 '创建时间': cells[9]?.textContent?.trim() || ''
             });
@@ -844,7 +844,7 @@ function exportData() {
     csvContent += '\n导出数据\n';
     
     // 添加表头
-    const headers = ['会员编号', '会员姓名', '会员账号', '微生态编号', '会员等级', '保底月份', '是否执行委1', '是否资深委', '是否执行委2', '创建人', '创建时间'];
+    const headers = ['会员编号', '会员姓名', '会员账号', '微生态编号', '会员等级', '保底月份', '是否执行委', '是否资深委', '是否首席', '创建人', '创建时间'];
     csvContent += headers.join(',') + '\n';
     
     // 添加数据行
