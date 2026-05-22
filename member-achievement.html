@@ -264,6 +264,19 @@
         <button class="btn btn-primary">搜索</button>
         <button class="btn btn-default">重置</button>
         <button class="btn btn-default" onclick="exportData()">导出</button>
+        <span class="dot-tip" style="margin-left: 4px;" onclick="toggleTip(event, 'exportTip')">?</span>
+        <div class="dot-tip-popup" id="exportTip" style="left: auto; right: 0; transform: none; min-width: 320px;">
+            <div class="popup-title">导出功能说明</div>
+            <div class="popup-desc">
+                <ul class="popup-list">
+                    <li><b>导出格式</b>：CSV（兼容Excel）</li>
+                    <li><b>文件名</b>：会员保底导出_YYYYMMDD.csv</li>
+                    <li><b>内容包含</b>：筛选条件信息 + 表格数据</li>
+                    <li><b>数据字段</b>：会员编号、姓名、账号、微生态编号、等级、保底月份、三个是否字段、创建人、创建时间</li>
+                    <li><b>使用方式</b>：点击导出按钮，自动下载当前筛选条件下的数据</li>
+                </ul>
+            </div>
+        </div>
         <button class="btn btn-primary" style="margin-left: auto;">新增</button>
     </div>
 
@@ -592,9 +605,190 @@ function toggleTip(event, tipId) {
     currentTip = tipId;
 }
 
+// Tab数据
+tab1Data: 会员保底数据（自购达成）
+- 1192052,春天,ygcj0407,ygcj5857,分享达人,202504,是,否,是,宋建,2025-04-27 16:21
+- 1158619,牛冠群,myp001315,myp001315,分享达人,202504,否,是,否,宋建,2025-04-27 16:21
+- 1143348,牛冠群,myp0540,myp0540,成长达人,202504,是,是,是,宋建,2025-04-27 16:21
+- 1079862,牛冠群,myp123456,myp123456,潜力达人,202504,否,否,否,宋建,2025-04-27 16:21
+- 509642,李云,13849412550,mbh062566,成长达人,202504,是,否,是,宋建,2025-04-27 16:20
+- 374520,阳瑞华,13849402066,zth746215,成长达人,202504,否,是,否,宋建,2025-04-27 16:20
+- 351482,潘净,wst556688,wst556688,潜力达人,202504,是,是,是,宋建,2025-04-27 16:20
+- 106621,赵海潮,13592115495,zhc195678,成长达人,202504,否,否,否,宋建,2025-04-27 16:20
+- 159664,张新爱,zxa195788,zxa195788,精英达人,202504,是,否,是,宋建,2025-04-27 16:20
+- 106621,赵海潮,13592115495,zhc195678,成长达人,202504,否,是,否,宋建,2025-04-27 16:20
+
+tab2Data: 后台手动调整数据
+- 2001001,王经理,wang001,wx001,至尊达人,202505,是,是,是,管理员,2025-05-20 09:30
+- 2001002,李主管,li002,wx002,高级达人,202505,否,是,否,管理员,2025-05-20 09:31
+- 2001003,张专员,zhang003,wx003,中级达人,202505,是,否,是,管理员,2025-05-20 09:32
+- 2001004,刘助理,liu004,wx004,初级达人,202505,否,否,否,管理员,2025-05-20 09:33
+- 2001005,陈顾问,chen005,wx005,至尊达人,202505,是,是,是,管理员,2025-05-20 09:34
+- 2001006,杨总监,yang006,wx006,高级达人,202505,否,是,否,管理员,2025-05-20 09:35
+- 2001007,黄经理,huang007,wx007,中级达人,202505,是,否,是,管理员,2025-05-20 09:36
+- 2001008,周主管,zhou008,wx008,初级达人,202505,否,否,否,管理员,2025-05-20 09:37
+- 2001009,吴专员,wu009,wx009,至尊达人,202505,是,是,是,管理员,2025-05-20 09:38
+- 2001010,徐助理,xu010,wx010,高级达人,202505,否,是,否,管理员,2025-05-20 09:39
+
 function switchTab(tabId) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     event.target.classList.add('active');
+    
+    // 切换表格数据
+    const tbody = document.querySelector('.data-table tbody');
+    if (tabId === 'tab1') {
+        tbody.innerHTML = getTab1HTML();
+        document.querySelector('.pagination-info').textContent = '共 20 条';
+    } else {
+        tbody.innerHTML = getTab2HTML();
+        document.querySelector('.pagination-info').textContent = '共 15 条';
+    }
+}
+
+function getTab1HTML() {
+    return `<tr>
+        <td>1192052</td>
+        <td><div class="member-info"><div class="member-avatar">头像</div><div class="member-detail"><span class="member-name">春天</span><span class="member-id">ygcj0407</span></div></div></td>
+        <td>ygcj5857</td><td>分享达人</td><td>202504</td>
+        <td><span class="status-tag status-yes">是</span></td><td><span class="status-tag status-no">否</span></td><td><span class="status-tag status-yes">是</span></td>
+        <td>宋建</td><td>2025-04-27 16:21</td><td><span class="action-link">移除</span></td>
+    </tr>
+    <tr>
+        <td>1158619</td>
+        <td><div class="member-info"><div class="member-avatar">头像</div><div class="member-detail"><span class="member-name">牛冠群</span><span class="member-id">myp001315</span></div></div></td>
+        <td>myp001315</td><td>分享达人</td><td>202504</td>
+        <td><span class="status-tag status-no">否</span></td><td><span class="status-tag status-yes">是</span></td><td><span class="status-tag status-no">否</span></td>
+        <td>宋建</td><td>2025-04-27 16:21</td><td><span class="action-link">移除</span></td>
+    </tr>
+    <tr>
+        <td>1143348</td>
+        <td><div class="member-info"><div class="member-avatar">头像</div><div class="member-detail"><span class="member-name">牛冠群</span><span class="member-id">myp0540</span></div></div></td>
+        <td>myp0540</td><td>成长达人</td><td>202504</td>
+        <td><span class="status-tag status-yes">是</span></td><td><span class="status-tag status-yes">是</span></td><td><span class="status-tag status-yes">是</span></td>
+        <td>宋建</td><td>2025-04-27 16:21</td><td><span class="action-link">移除</span></td>
+    </tr>
+    <tr>
+        <td>1079862</td>
+        <td><div class="member-info"><div class="member-avatar">头像</div><div class="member-detail"><span class="member-name">牛冠群</span><span class="member-id">myp123456</span></div></div></td>
+        <td>myp123456</td><td>潜力达人</td><td>202504</td>
+        <td><span class="status-tag status-no">否</span></td><td><span class="status-tag status-no">否</span></td><td><span class="status-tag status-no">否</span></td>
+        <td>宋建</td><td>2025-04-27 16:21</td><td><span class="action-link">移除</span></td>
+    </tr>
+    <tr>
+        <td>509642</td>
+        <td><div class="member-info"><div class="member-avatar">头像</div><div class="member-detail"><span class="member-name">李云</span><span class="member-id">13849412550</span></div></div></td>
+        <td>mbh062566</td><td>成长达人</td><td>202504</td>
+        <td><span class="status-tag status-yes">是</span></td><td><span class="status-tag status-no">否</span></td><td><span class="status-tag status-yes">是</span></td>
+        <td>宋建</td><td>2025-04-27 16:20</td><td><span class="action-link">移除</span></td>
+    </tr>
+    <tr>
+        <td>374520</td>
+        <td><div class="member-info"><div class="member-avatar">头像</div><div class="member-detail"><span class="member-name">阳瑞华</span><span class="member-id">13849402066</span></div></div></td>
+        <td>zth746215</td><td>成长达人</td><td>202504</td>
+        <td><span class="status-tag status-no">否</span></td><td><span class="status-tag status-yes">是</span></td><td><span class="status-tag status-no">否</span></td>
+        <td>宋建</td><td>2025-04-27 16:20</td><td><span class="action-link">移除</span></td>
+    </tr>
+    <tr>
+        <td>351482</td>
+        <td><div class="member-info"><div class="member-avatar">头像</div><div class="member-detail"><span class="member-name">潘净</span><span class="member-id">wst556688</span></div></div></td>
+        <td>wst556688</td><td>潜力达人</td><td>202504</td>
+        <td><span class="status-tag status-yes">是</span></td><td><span class="status-tag status-yes">是</span></td><td><span class="status-tag status-yes">是</span></td>
+        <td>宋建</td><td>2025-04-27 16:20</td><td><span class="action-link">移除</span></td>
+    </tr>
+    <tr>
+        <td>106621</td>
+        <td><div class="member-info"><div class="member-avatar">头像</div><div class="member-detail"><span class="member-name">赵海潮</span><span class="member-id">13592115495</span></div></div></td>
+        <td>zhc195678</td><td>成长达人</td><td>202504</td>
+        <td><span class="status-tag status-no">否</span></td><td><span class="status-tag status-no">否</span></td><td><span class="status-tag status-no">否</span></td>
+        <td>宋建</td><td>2025-04-27 16:20</td><td><span class="action-link">移除</span></td>
+    </tr>
+    <tr>
+        <td>159664</td>
+        <td><div class="member-info"><div class="member-avatar">头像</div><div class="member-detail"><span class="member-name">张新爱</span><span class="member-id">zxa195788</span></div></div></td>
+        <td>zxa195788</td><td>精英达人</td><td>202504</td>
+        <td><span class="status-tag status-yes">是</span></td><td><span class="status-tag status-no">否</span></td><td><span class="status-tag status-yes">是</span></td>
+        <td>宋建</td><td>2025-04-27 16:20</td><td><span class="action-link">移除</span></td>
+    </tr>
+    <tr>
+        <td>106621</td>
+        <td><div class="member-info"><div class="member-avatar">头像</div><div class="member-detail"><span class="member-name">赵海潮</span><span class="member-id">13592115495</span></div></div></td>
+        <td>zhc195678</td><td>成长达人</td><td>202504</td>
+        <td><span class="status-tag status-no">否</span></td><td><span class="status-tag status-yes">是</span></td><td><span class="status-tag status-no">否</span></td>
+        <td>宋建</td><td>2025-04-27 16:20</td><td><span class="action-link">移除</span></td>
+    </tr>`;
+}
+
+function getTab2HTML() {
+    return `<tr>
+        <td>2001001</td>
+        <td><div class="member-info"><div class="member-avatar">头像</div><div class="member-detail"><span class="member-name">王经理</span><span class="member-id">wang001</span></div></div></td>
+        <td>wx001</td><td>至尊达人</td><td>202505</td>
+        <td><span class="status-tag status-yes">是</span></td><td><span class="status-tag status-yes">是</span></td><td><span class="status-tag status-yes">是</span></td>
+        <td>管理员</td><td>2025-05-20 09:30</td><td><span class="action-link">编辑</span></td>
+    </tr>
+    <tr>
+        <td>2001002</td>
+        <td><div class="member-info"><div class="member-avatar">头像</div><div class="member-detail"><span class="member-name">李主管</span><span class="member-id">li002</span></div></div></td>
+        <td>wx002</td><td>高级达人</td><td>202505</td>
+        <td><span class="status-tag status-no">否</span></td><td><span class="status-tag status-yes">是</span></td><td><span class="status-tag status-no">否</span></td>
+        <td>管理员</td><td>2025-05-20 09:31</td><td><span class="action-link">编辑</span></td>
+    </tr>
+    <tr>
+        <td>2001003</td>
+        <td><div class="member-info"><div class="member-avatar">头像</div><div class="member-detail"><span class="member-name">张专员</span><span class="member-id">zhang003</span></div></div></td>
+        <td>wx003</td><td>中级达人</td><td>202505</td>
+        <td><span class="status-tag status-yes">是</span></td><td><span class="status-tag status-no">否</span></td><td><span class="status-tag status-yes">是</span></td>
+        <td>管理员</td><td>2025-05-20 09:32</td><td><span class="action-link">编辑</span></td>
+    </tr>
+    <tr>
+        <td>2001004</td>
+        <td><div class="member-info"><div class="member-avatar">头像</div><div class="member-detail"><span class="member-name">刘助理</span><span class="member-id">liu004</span></div></div></td>
+        <td>wx004</td><td>初级达人</td><td>202505</td>
+        <td><span class="status-tag status-no">否</span></td><td><span class="status-tag status-no">否</span></td><td><span class="status-tag status-no">否</span></td>
+        <td>管理员</td><td>2025-05-20 09:33</td><td><span class="action-link">编辑</span></td>
+    </tr>
+    <tr>
+        <td>2001005</td>
+        <td><div class="member-info"><div class="member-avatar">头像</div><div class="member-detail"><span class="member-name">陈顾问</span><span class="member-id">chen005</span></div></div></td>
+        <td>wx005</td><td>至尊达人</td><td>202505</td>
+        <td><span class="status-tag status-yes">是</span></td><td><span class="status-tag status-yes">是</span></td><td><span class="status-tag status-yes">是</span></td>
+        <td>管理员</td><td>2025-05-20 09:34</td><td><span class="action-link">编辑</span></td>
+    </tr>
+    <tr>
+        <td>2001006</td>
+        <td><div class="member-info"><div class="member-avatar">头像</div><div class="member-detail"><span class="member-name">杨总监</span><span class="member-id">yang006</span></div></div></td>
+        <td>wx006</td><td>高级达人</td><td>202505</td>
+        <td><span class="status-tag status-no">否</span></td><td><span class="status-tag status-yes">是</span></td><td><span class="status-tag status-no">否</span></td>
+        <td>管理员</td><td>2025-05-20 09:35</td><td><span class="action-link">编辑</span></td>
+    </tr>
+    <tr>
+        <td>2001007</td>
+        <td><div class="member-info"><div class="member-avatar">头像</div><div class="member-detail"><span class="member-name">黄经理</span><span class="member-id">huang007</span></div></div></td>
+        <td>wx007</td><td>中级达人</td><td>202505</td>
+        <td><span class="status-tag status-yes">是</span></td><td><span class="status-tag status-no">否</span></td><td><span class="status-tag status-yes">是</span></td>
+        <td>管理员</td><td>2025-05-20 09:36</td><td><span class="action-link">编辑</span></td>
+    </tr>
+    <tr>
+        <td>2001008</td>
+        <td><div class="member-info"><div class="member-avatar">头像</div><div class="member-detail"><span class="member-name">周主管</span><span class="member-id">zhou008</span></div></div></td>
+        <td>wx008</td><td>初级达人</td><td>202505</td>
+        <td><span class="status-tag status-no">否</span></td><td><span class="status-tag status-no">否</span></td><td><span class="status-tag status-no">否</span></td>
+        <td>管理员</td><td>2025-05-20 09:37</td><td><span class="action-link">编辑</span></td>
+    </tr>
+    <tr>
+        <td>2001009</td>
+        <td><div class="member-info"><div class="member-avatar">头像</div><div class="member-detail"><span class="member-name">吴专员</span><span class="member-id">wu009</span></div></div></td>
+        <td>wx009</td><td>至尊达人</td><td>202505</td>
+        <td><span class="status-tag status-yes">是</span></td><td><span class="status-tag status-yes">是</span></td><td><span class="status-tag status-yes">是</span></td>
+        <td>管理员</td><td>2025-05-20 09:38</td><td><span class="action-link">编辑</span></td>
+    </tr>
+    <tr>
+        <td>2001010</td>
+        <td><div class="member-info"><div class="member-avatar">头像</div><div class="member-detail"><span class="member-name">徐助理</span><span class="member-id">xu010</span></div></div></td>
+        <td>wx010</td><td>高级达人</td><td>202505</td>
+        <td><span class="status-tag status-no">否</span></td><td><span class="status-tag status-yes">是</span></td><td><span class="status-tag status-no">否</span></td>
+        <td>管理员</td><td>2025-05-20 09:39</td><td><span class="action-link">编辑</span></td>
+    </tr>`;
 }
 
 // 导出功能
