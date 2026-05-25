@@ -752,78 +752,78 @@
             <a onclick="showPage('entry')">店铺</a><span>></span>
             <a onclick="showPage('entry')">会员管理</a><span>></span>
             <a onclick="showPage('entry')">会员详情</a><span>></span>
-            <a onclick="showPage('orderList')">业绩详情订单</a><span>></span>
-            <span id="bonusOrderNo">202505200001</span>
+            会员奖金明细
         </div>
 
+        <!-- 标签页 -->
         <div class="tabs">
-            <div class="tab active">会员奖金明细</div>
+            <div class="tab active" onclick="switchBonusTab('all', this)">全部</div>
+            <div class="tab" onclick="switchBonusTab('available', this)">可用</div>
+            <div class="tab" onclick="switchBonusTab('pending', this)">待释放奖金</div>
+            <div class="tab" onclick="switchBonusTab('withdraw', this)">提现</div>
         </div>
 
-        <!-- 订单信息 -->
-        <div class="card">
-            <div class="card-header"><div class="card-title">订单信息</div></div>
-            <div class="card-body">
-                <div class="info-grid">
-                    <div class="info-item"><span class="info-label">订单编号</span><span class="info-value" id="bonusOrderId">202505200001</span></div>
-                    <div class="info-item"><span class="info-label">下单时间</span><span class="info-value">2025-05-20 14:30:25</span></div>
-                    <div class="info-item"><span class="info-label">购买人</span><span class="info-value">阳光 (18660265222)</span></div>
-                    <div class="info-item"><span class="info-label">订单金额</span><span class="info-value red">¥128.50</span></div>
-                    <div class="info-item"><span class="info-label">业绩PV</span><span class="info-value">128.50</span></div>
-                    <div class="info-item"><span class="info-label">是否分佣</span><span class="info-value" id="bonusCommission">是</span></div>
+        <!-- 搜索栏 -->
+        <div class="filter-bar">
+            <select class="filter-select" id="bonusRewardType">
+                <option value="">奖励类型</option>
+                <option value="分享奖">分享奖</option>
+                <option value="感恩奖">感恩奖</option>
+                <option value="分红">分红</option>
+            </select>
+            <select class="filter-select" id="bonusTradeType">
+                <option value="">交易类型</option>
+                <option value="自购分佣">自购分佣</option>
+                <option value="直推分佣">直推分佣</option>
+                <option value="间推分佣">间推分佣</option>
+            </select>
+            <input type="text" class="filter-input" id="bonusOrderNoInput" placeholder="订单编号" style="width: 160px;">
+            <input type="date" class="filter-input" id="bonusDateStart" style="width: 130px;">
+            <span>至</span>
+            <input type="date" class="filter-input" id="bonusDateEnd" style="width: 130px;">
+            <button class="btn btn-default" onclick="resetBonusFilter()">重置</button>
+            <button class="btn btn-primary" onclick="renderBonusTable()">搜索</button>
+        </div>
+
+        <!-- 合计 -->
+        <div style="padding: 0 20px; margin-bottom: 12px; font-size: 14px; color: #333;">
+            合计: <strong id="bonusCount">145</strong>
+        </div>
+
+        <!-- 表格 -->
+        <div class="card" style="margin: 0 20px;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>用户信息</th>
+                        <th>收益会员等级</th>
+                        <th>会员等级</th>
+                        <th>金额</th>
+                        <th>PV值</th>
+                        <th>来源用户</th>
+                        <th>奖励类型</th>
+                        <th>交易类型</th>
+                        <th>结算状态</th>
+                        <th>描述</th>
+                        <th>记录时间</th>
+                    </tr>
+                </thead>
+                <tbody id="bonusTableBody">
+                    <!-- 由JS生成 -->
+                </tbody>
+            </table>
+            <!-- 分页 -->
+            <div class="pagination-bar">
+                <span class="pagination-info">共 5 条</span>
+                <div class="pagination">
+                    <div class="pg-btn disabled">‹</div>
+                    <div class="pg-btn active">1</div>
+                    <div class="pg-btn">2</div>
+                    <div class="pg-btn">3</div>
+                    <div class="pg-btn">›</div>
                 </div>
-            </div>
-        </div>
-
-        <!-- 分佣明细 -->
-        <div class="card">
-            <div class="card-header"><div class="card-title">分佣明细</div></div>
-            <div class="card-body">
-                <table class="data-table" style="width: 100%;">
-                    <thead>
-                        <tr>
-                            <th>分佣层级</th>
-                            <th>会员姓名</th>
-                            <th>分佣比例</th>
-                            <th>分佣金额</th>
-                            <th>分佣状态</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>直接上级</td>
-                            <td>张三</td>
-                            <td>10%</td>
-                            <td class="num red">¥12.85</td>
-                            <td><span class="status-badge status-pending">待结算</span></td>
-                        </tr>
-                        <tr>
-                            <td>间接上级</td>
-                            <td>李四</td>
-                            <td>5%</td>
-                            <td class="num red">¥6.43</td>
-                            <td><span class="status-badge status-pending">待结算</span></td>
-                        </tr>
-                        <tr>
-                            <td>跨级上级</td>
-                            <td>王五</td>
-                            <td>3%</td>
-                            <td class="num red">¥3.86</td>
-                            <td><span class="status-badge status-pending">待结算</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- 结算信息 -->
-        <div class="card">
-            <div class="card-header"><div class="card-title">结算信息</div></div>
-            <div class="card-body">
-                <div class="info-grid">
-                    <div class="info-item"><span class="info-label">结算状态</span><span class="info-value"><span class="status-badge status-pending">待结算</span></span></div>
-                    <div class="info-item"><span class="info-label">预计结算时间</span><span class="info-value">2025-06-20</span></div>
-                    <div class="info-item"><span class="info-label">结算批次</span><span class="info-value">20250601</span></div>
+                <div class="go-to-page">
+                    前往 <input type="text" class="go-input" value="1"> 页
                 </div>
             </div>
         </div>
@@ -857,6 +857,15 @@ const pastData = [
     { memberId: '181357', month: '202601', pv: '1800.00' },
     { memberId: '181357', month: '202602', pv: '903.47' },
     { memberId: '181357', month: '202603', pv: '1631.64' },
+];
+
+// 会员奖金明细数据
+const bonusData = [
+    { user: '有享12123', phone: '18307448442', userLevel: '中级会员', level: '中级会员', amount: '10', pv: '200', source: '木子李12123213123(173888970728)', rewardType: '分享奖', tradeType: '自购分佣', status: '冻结中', statusClass: 'status-pending', desc: '下单的商品自购分享奖励冻结', time: '2025-05-19 14:46' },
+    { user: '有享12123', phone: '18307448442', userLevel: '中级会员', level: '中级会员', amount: '45', pv: '900', source: '木子李12123213123(173888970728)', rewardType: '分享奖', tradeType: '自购分佣', status: '冻结中', statusClass: 'status-pending', desc: '下单的商品自购分享奖励冻结', time: '2025-05-19 14:06' },
+    { user: '有享12123', phone: '18307448442', userLevel: '中级会员', level: '中级会员', amount: '30', pv: '200', source: '木子李12123213123(173888970728)', rewardType: '分享奖', tradeType: '自购分佣', status: '冻结中', statusClass: 'status-pending', desc: '下单的商品自购分享奖励冻结', time: '2025-04-23 15:26' },
+    { user: '有享12123', phone: '18307448442', userLevel: '中级会员', level: '中级会员', amount: '30', pv: '200', source: '木子李12123213123(173888970728)', rewardType: '分享奖', tradeType: '自购分佣', status: '冻结中', statusClass: 'status-pending', desc: '下单的商品自购分享奖励冻结', time: '2025-04-23 18:20' },
+    { user: '有享12123', phone: '18307448442', userLevel: '中级会员', level: '中级会员', amount: '30', pv: '200', source: '木子李12123213123(173888970728)', rewardType: '分享奖', tradeType: '自购分佣', status: '冻结中', statusClass: 'status-pending', desc: '下单的商品自购分享奖励冻结', time: '2025-04-23 17:42' },
 ];
 
 // ========== 标点气泡切换 ==========
@@ -1019,12 +1028,57 @@ function showOrderDetail(orderId) {
 
 // ========== 会员奖金明细 ==========
 function showBonusDetail(orderId) {
-    const order = orderData.find(o => o.id === orderId);
-    if (!order) return;
-    document.getElementById('bonusOrderNo').textContent = orderId;
-    document.getElementById('bonusOrderId').textContent = orderId;
-    document.getElementById('bonusCommission').textContent = order.commission || '-';
     showPage('bonusDetail');
+    renderBonusTable();
+}
+
+function renderBonusTable() {
+    const rewardType = document.getElementById('bonusRewardType').value;
+    const tradeType = document.getElementById('bonusTradeType').value;
+    const orderNo = document.getElementById('bonusOrderNoInput').value.trim();
+    const dateStart = document.getElementById('bonusDateStart').value;
+    const dateEnd = document.getElementById('bonusDateEnd').value;
+    
+    let filtered = bonusData.filter(b => {
+        if (rewardType && b.rewardType !== rewardType) return false;
+        if (tradeType && b.tradeType !== tradeType) return false;
+        if (orderNo && !b.source.includes(orderNo)) return false;
+        if (dateStart && b.time < dateStart) return false;
+        if (dateEnd && b.time > dateEnd + ' 23:59:59') return false;
+        return true;
+    });
+    
+    document.getElementById('bonusCount').textContent = filtered.length;
+    document.getElementById('bonusTableBody').innerHTML = filtered.map((b, i) =>
+        '<tr class="' + (i % 2 === 1 ? 'alt-row' : '') + '">' +
+            '<td><div style="display:flex;align-items:center;gap:8px;"><div style="width:32px;height:32px;border-radius:50%;background:#e8f5e9;color:#4caf50;display:flex;align-items:center;justify-content:center;font-size:12px;">' + b.user.charAt(0) + '</div><div>' + b.user + '<br><span style="color:#999;font-size:12px;">' + b.phone + '</span></div></div></td>' +
+            '<td>' + b.userLevel + '</td>' +
+            '<td>' + b.level + '</td>' +
+            '<td class="num red">' + b.amount + '</td>' +
+            '<td>' + b.pv + '</td>' +
+            '<td style="font-size:12px;max-width:150px;word-break:break-all;">' + b.source + '</td>' +
+            '<td>' + b.rewardType + '</td>' +
+            '<td>' + b.tradeType + '</td>' +
+            '<td><span class="status-badge ' + b.statusClass + '">' + b.status + '</span></td>' +
+            '<td style="font-size:12px;max-width:200px;">' + b.desc + '</td>' +
+            '<td style="font-size:12px;">' + b.time + '</td>' +
+        '</tr>'
+    ).join('');
+}
+
+function resetBonusFilter() {
+    document.getElementById('bonusRewardType').value = '';
+    document.getElementById('bonusTradeType').value = '';
+    document.getElementById('bonusOrderNoInput').value = '';
+    document.getElementById('bonusDateStart').value = '';
+    document.getElementById('bonusDateEnd').value = '';
+    renderBonusTable();
+}
+
+function switchBonusTab(tab, el) {
+    document.querySelectorAll('#page-bonusDetail .tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    renderBonusTable();
 }
 
 // ========== 往期自购 ==========
