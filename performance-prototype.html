@@ -528,6 +528,11 @@
                 <option value="待结算">待结算</option>
                 <option value="已结算">已结算</option>
             </select>
+            <select class="filter-select" id="commissionSelect">
+                <option value="">全部</option>
+                <option value="是">是</option>
+                <option value="否">否</option>
+            </select>
             <button class="btn btn-primary" onclick="renderOrderTable()">搜索</button>
             <button class="btn btn-default" onclick="resetOrderFilter()">重置</button>
             <!-- 帮助标点放在重置后面 -->
@@ -577,6 +582,10 @@
                         <th>
                             <span class="th-with-tip">结算状态<span class="th-dot" onclick="toggleTip(event, 'thTip6')">?</span></span>
                             <div class="th-dot-popup" id="thTip6">数据来源：结算系统，待结算/已结算</div>
+                        </th>
+                        <th>
+                            <span class="th-with-tip">是否分佣<span class="th-dot" onclick="toggleTip(event, 'thTip7')">?</span></span>
+                            <div class="th-dot-popup" id="thTip7">数据来源：系统返回，是/否</div>
                         </th>
                     </tr>
                 </thead>
@@ -736,6 +745,90 @@
         </div>
     </div>
 
+    <!-- ========== 页面5：会员奖金明细 ========== -->
+    <div class="page" id="page-bonusDetail">
+        <div class="breadcrumb">
+            <a onclick="showPage('entry')">首页</a><span>></span>
+            <a onclick="showPage('entry')">店铺</a><span>></span>
+            <a onclick="showPage('entry')">会员管理</a><span>></span>
+            <a onclick="showPage('entry')">会员详情</a><span>></span>
+            <a onclick="showPage('orderList')">业绩详情订单</a><span>></span>
+            <span id="bonusOrderNo">202505200001</span>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active">会员奖金明细</div>
+        </div>
+
+        <!-- 订单信息 -->
+        <div class="card">
+            <div class="card-header"><div class="card-title">订单信息</div></div>
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-item"><span class="info-label">订单编号</span><span class="info-value" id="bonusOrderId">202505200001</span></div>
+                    <div class="info-item"><span class="info-label">下单时间</span><span class="info-value">2025-05-20 14:30:25</span></div>
+                    <div class="info-item"><span class="info-label">购买人</span><span class="info-value">阳光 (18660265222)</span></div>
+                    <div class="info-item"><span class="info-label">订单金额</span><span class="info-value red">¥128.50</span></div>
+                    <div class="info-item"><span class="info-label">业绩PV</span><span class="info-value">128.50</span></div>
+                    <div class="info-item"><span class="info-label">是否分佣</span><span class="info-value" id="bonusCommission">是</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分佣明细 -->
+        <div class="card">
+            <div class="card-header"><div class="card-title">分佣明细</div></div>
+            <div class="card-body">
+                <table class="data-table" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>分佣层级</th>
+                            <th>会员姓名</th>
+                            <th>分佣比例</th>
+                            <th>分佣金额</th>
+                            <th>分佣状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>直接上级</td>
+                            <td>张三</td>
+                            <td>10%</td>
+                            <td class="num red">¥12.85</td>
+                            <td><span class="status-badge status-pending">待结算</span></td>
+                        </tr>
+                        <tr>
+                            <td>间接上级</td>
+                            <td>李四</td>
+                            <td>5%</td>
+                            <td class="num red">¥6.43</td>
+                            <td><span class="status-badge status-pending">待结算</span></td>
+                        </tr>
+                        <tr>
+                            <td>跨级上级</td>
+                            <td>王五</td>
+                            <td>3%</td>
+                            <td class="num red">¥3.86</td>
+                            <td><span class="status-badge status-pending">待结算</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 结算信息 -->
+        <div class="card">
+            <div class="card-header"><div class="card-title">结算信息</div></div>
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-item"><span class="info-label">结算状态</span><span class="info-value"><span class="status-badge status-pending">待结算</span></span></div>
+                    <div class="info-item"><span class="info-label">预计结算时间</span><span class="info-value">2025-06-20</span></div>
+                    <div class="info-item"><span class="info-label">结算批次</span><span class="info-value">20250601</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <!-- Toast -->
@@ -744,14 +837,14 @@
 <script>
 // ========== 数据 ==========
 const orderData = [
-    { id: '202505200001', time: '2025-05-20 14:30:25', buyer: '阳光 (18660265222)', pv: '128.50', type: '自购-今日', status: '待结算', statusClass: 'status-pending' },
-    { id: '202505190002', time: '2025-05-19 10:15:36', buyer: '阳光 (18660265222)', pv: '256.00', type: '自购-已结算', status: '已结算', statusClass: 'status-settled' },
-    { id: '202505180003', time: '2025-05-18 16:45:12', buyer: '张三 (13800138001)', pv: '89.90', type: '直推-待结算', status: '待结算', statusClass: 'status-pending' },
-    { id: '202505170004', time: '2025-05-17 09:20:48', buyer: '李四 (15639916119)', pv: '168.00', type: '直推-已结算', status: '已结算', statusClass: 'status-settled' },
-    { id: '202505160005', time: '2025-05-16 11:35:22', buyer: '阳光 (18660265222)', pv: '450.00', type: '直推-今日', status: '待结算', statusClass: 'status-pending' },
-    { id: '202505150006', time: '2025-05-15 08:12:30', buyer: '王五 (13900001111)', pv: '320.00', type: '直推-待结算', status: '待结算', statusClass: 'status-pending' },
-    { id: '202505140007', time: '2025-05-14 14:20:15', buyer: '赵六 (13700002222)', pv: '199.00', type: '自购-待结算', status: '待结算', statusClass: 'status-pending' },
-    { id: '202505130008', time: '2025-05-13 09:30:45', buyer: '阳光 (18660265222)', pv: '88.00', type: '自购-已结算', status: '已结算', statusClass: 'status-settled' },
+    { id: '202505200001', time: '2025-05-20 14:30:25', buyer: '阳光 (18660265222)', pv: '128.50', type: '自购-今日', status: '待结算', statusClass: 'status-pending', commission: '是' },
+    { id: '202505190002', time: '2025-05-19 10:15:36', buyer: '阳光 (18660265222)', pv: '256.00', type: '自购-已结算', status: '已结算', statusClass: 'status-settled', commission: '否' },
+    { id: '202505180003', time: '2025-05-18 16:45:12', buyer: '张三 (13800138001)', pv: '89.90', type: '直推-待结算', status: '待结算', statusClass: 'status-pending', commission: '是' },
+    { id: '202505170004', time: '2025-05-17 09:20:48', buyer: '李四 (15639916119)', pv: '168.00', type: '直推-已结算', status: '已结算', statusClass: 'status-settled', commission: '是' },
+    { id: '202505160005', time: '2025-05-16 11:35:22', buyer: '阳光 (18660265222)', pv: '450.00', type: '直推-今日', status: '待结算', statusClass: 'status-pending', commission: '否' },
+    { id: '202505150006', time: '2025-05-15 08:12:30', buyer: '王五 (13900001111)', pv: '320.00', type: '直推-待结算', status: '待结算', statusClass: 'status-pending', commission: '是' },
+    { id: '202505140007', time: '2025-05-14 14:20:15', buyer: '赵六 (13700002222)', pv: '199.00', type: '自购-待结算', status: '待结算', statusClass: 'status-pending', commission: '否' },
+    { id: '202505130008', time: '2025-05-13 09:30:45', buyer: '阳光 (18660265222)', pv: '88.00', type: '自购-已结算', status: '已结算', statusClass: 'status-settled', commission: '是' },
 ];
 
 const pastData = [
@@ -872,6 +965,7 @@ function renderOrderTable() {
     const buyer = document.getElementById('buyerInput').value.trim().toLowerCase();
     const typeSelect = document.getElementById('typeSelect').value;
     const settleStatus = document.getElementById('settleStatusSelect').value;
+    const commission = document.getElementById('commissionSelect').value;
     const dateStart = document.getElementById('dateStart').value;
     const dateEnd = document.getElementById('dateEnd').value;
     let filtered = orderData.filter(o => {
@@ -879,6 +973,7 @@ function renderOrderTable() {
         if (buyer && !o.buyer.toLowerCase().includes(buyer)) return false;
         if (typeSelect && o.type !== typeSelect) return false;
         if (settleStatus && o.status !== settleStatus) return false;
+        if (commission && o.commission !== commission) return false;
         if (dateStart && o.time.slice(0, 10) < dateStart) return false;
         if (dateEnd && o.time.slice(0, 10) > dateEnd) return false;
         return true;
@@ -886,12 +981,13 @@ function renderOrderTable() {
     document.getElementById('orderCount').textContent = '共 ' + filtered.length + ' 条';
     document.getElementById('orderTableBody').innerHTML = filtered.map(o =>
         '<tr>' +
-            '<td><span class="order-no" onclick="showOrderDetail(\'' + o.id + '\')">' + o.id + '</span></td>' +
+            '<td><span class="order-no" onclick="showBonusDetail(\'' + o.id + '\')">' + o.id + '</span></td>' +
             '<td>' + o.time + '</td>' +
             '<td>' + o.buyer + '</td>' +
             '<td class="num red">' + o.pv + '</td>' +
             '<td>' + o.type + '</td>' +
             '<td><span class="status-badge ' + o.statusClass + '">' + o.status + '</span></td>' +
+            '<td>' + o.commission + '</td>' +
         '</tr>'
     ).join('');
 }
@@ -901,6 +997,7 @@ function resetOrderFilter() {
     document.getElementById('buyerInput').value = '';
     document.getElementById('typeSelect').value = '';
     document.getElementById('settleStatusSelect').value = '';
+    document.getElementById('commissionSelect').value = '';
     document.getElementById('dateStart').value = '';
     document.getElementById('dateEnd').value = '';
     renderOrderTable();
@@ -918,6 +1015,16 @@ function showOrderDetail(orderId) {
     document.getElementById('detailStatus').textContent = isSettled ? '已结算' : '待结算';
     document.getElementById('detailStatus').className = isSettled ? 'order-status-tag' : 'order-status-tag pending';
     showPage('orderDetail');
+}
+
+// ========== 会员奖金明细 ==========
+function showBonusDetail(orderId) {
+    const order = orderData.find(o => o.id === orderId);
+    if (!order) return;
+    document.getElementById('bonusOrderNo').textContent = orderId;
+    document.getElementById('bonusOrderId').textContent = orderId;
+    document.getElementById('bonusCommission').textContent = order.commission || '-';
+    showPage('bonusDetail');
 }
 
 // ========== 往期自购 ==========
