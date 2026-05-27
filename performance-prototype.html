@@ -328,6 +328,14 @@
         }
         .toast.show { opacity: 1; }
         .toast.success { background: #52c41a; }
+        /* 自定义确认弹窗 */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 1001;
+            align-items: center; justify-content: center;
+        }
+        .modal-overlay.show { display: flex; }
+        .confirm-modal { display: none; }
     </style>
 </head>
 <body>
@@ -1065,11 +1073,11 @@ function recalcOrders() {
     pendingRecalcCount = checked.length;
     document.getElementById('confirmTitle').textContent = '确认重算';
     document.getElementById('confirmContent').textContent = '确认重算所选的 ' + checked.length + ' 条订单收益？\n重算后将把所选订单的收益重新计算。';
-    document.getElementById('confirmModal').style.display = 'flex';
+    document.getElementById('confirmModal').classList.add('show');
 }
 
 function closeConfirmModal() {
-    document.getElementById('confirmModal').style.display = 'none';
+    document.getElementById('confirmModal').classList.remove('show');
 }
 
 function doRecalc() {
