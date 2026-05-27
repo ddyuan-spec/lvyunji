@@ -556,9 +556,17 @@
 
         <!-- 表格 - 表头带标点说明 -->
         <div class="card" style="padding: 0; overflow: hidden;">
+            <div style="padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f0f0f0;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; color: #666;">
+                    <input type="checkbox" id="checkAllOrders" onchange="toggleAllOrders(this.checked)">
+                    全选
+                </label>
+                <button class="btn btn-primary" onclick="recalcOrders()" style="padding: 6px 16px; font-size: 13px;">重算</button>
+            </div>
             <table class="data-table">
                 <thead>
                     <tr>
+                        <th style="width: 40px; text-align: center;"><input type="checkbox" id="checkAllOrders2" onchange="toggleAllOrders(this.checked)"></th>
                         <th>
                             <span class="th-with-tip">订单编号<span class="th-dot" onclick="toggleTip(event, 'thTip1')">?</span></span>
                             <div class="th-dot-popup" id="thTip1">数据来源：订单系统主订单编号，唯一标识</div>
@@ -990,6 +998,7 @@ function renderOrderTable() {
     document.getElementById('orderCount').textContent = '共 ' + filtered.length + ' 条';
     document.getElementById('orderTableBody').innerHTML = filtered.map(o =>
         '<tr>' +
+            '<td style="text-align: center;"><input type="checkbox" class="order-checkbox" value="' + o.id + '" onchange="syncCheckAll()"></td>' +
             '<td><span class="order-no" onclick="showBonusDetail(\'' + o.id + '\')">' + o.id + '</span></td>' +
             '<td>' + o.time + '</td>' +
             '<td>' + o.buyer + '</td>' +
@@ -999,6 +1008,9 @@ function renderOrderTable() {
             '<td>' + o.commission + '</td>' +
         '</tr>'
     ).join('');
+    // 重置全选状态
+    document.getElementById('checkAllOrders').checked = false;
+    document.getElementById('checkAllOrders2').checked = false;
 }
 
 function resetOrderFilter() {
@@ -1010,6 +1022,34 @@ function resetOrderFilter() {
     document.getElementById('dateStart').value = '';
     document.getElementById('dateEnd').value = '';
     renderOrderTable();
+}
+
+// ========== 全选/重算 ==========
+function toggleAllOrders(checked) {
+    document.getElementById('checkAllOrders').checked = checked;
+    document.getElementById('checkAllOrders2').checked = checked;
+    document.querySelectorAll('.order-checkbox').forEach(cb => cb.checked = checked);
+}
+
+function syncCheckAll() {
+    const all = document.querySelectorAll('.order-checkbox');
+    const checked = document.querySelectorAll('.order-checkbox:checked');
+    const allChecked = all.length > 0 && all.length === checked.length;
+    document.getElementById('checkAllOrders').checked = allChecked;
+    document.getElementById('checkAllOrders2').checked = allChecked;
+}
+
+function recalcOrders() {
+    const checked = document.querySelectorAll('.order-checkbox:checked');
+    if (checked.length === 0) {
+        showToast('请选择需要重算的数据');
+        return;
+    }
+    if (confirm('确认重算所选的 ' + checked.length + ' 条订单收益？重算后将把所选订单的收益重新计算。')) {
+        showToast('重算成功，已重新计算 ' + checked.length + ' 条订单收益');
+        // 取消所有选中
+        toggleAllOrders(false);
+    }
 }
 
 // ========== 订单详情 ==========
