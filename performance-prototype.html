@@ -842,6 +842,21 @@
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
+<!-- 自定义确认弹窗 -->
+<div class="modal-overlay confirm-modal" id="confirmModal" style="display: none;">
+    <div class="modal-content" style="border-radius: 12px; margin: 60px 30px; width: calc(100% - 60px); max-width: 360px; padding: 24px;">
+        <div style="text-align: center; margin-bottom: 16px;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: #fff3e0; color: #ff9800; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 12px;">⚠️</div>
+            <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;" id="confirmTitle">确认重算</div>
+            <div style="font-size: 14px; color: #666; line-height: 1.6;" id="confirmContent">确认重算所选订单收益？</div>
+        </div>
+        <div style="display: flex; gap: 12px;">
+            <button onclick="closeConfirmModal()" style="flex: 1; height: 40px; border: 1px solid #e8e8e8; background: #fff; color: #666; border-radius: 6px; font-size: 14px; cursor: pointer;">取消</button>
+            <button onclick="doRecalc()" id="confirmBtn" style="flex: 1; height: 40px; border: none; background: #4caf50; color: #fff; border-radius: 6px; font-size: 14px; cursor: pointer;">确认</button>
+        </div>
+    </div>
+</div>
+
 <script>
 // ========== 数据 ==========
 const orderData = [
@@ -1039,17 +1054,28 @@ function syncCheckAll() {
     document.getElementById('checkAllOrders2').checked = allChecked;
 }
 
+let pendingRecalcCount = 0;
+
 function recalcOrders() {
     const checked = document.querySelectorAll('.order-checkbox:checked');
     if (checked.length === 0) {
         showToast('请选择需要重算的数据');
         return;
     }
-    if (confirm('确认重算所选的 ' + checked.length + ' 条订单收益？重算后将把所选订单的收益重新计算。')) {
-        showToast('重算成功，已重新计算 ' + checked.length + ' 条订单收益');
-        // 取消所有选中
-        toggleAllOrders(false);
-    }
+    pendingRecalcCount = checked.length;
+    document.getElementById('confirmTitle').textContent = '确认重算';
+    document.getElementById('confirmContent').textContent = '确认重算所选的 ' + checked.length + ' 条订单收益？\n重算后将把所选订单的收益重新计算。';
+    document.getElementById('confirmModal').style.display = 'flex';
+}
+
+function closeConfirmModal() {
+    document.getElementById('confirmModal').style.display = 'none';
+}
+
+function doRecalc() {
+    closeConfirmModal();
+    showToast('重算成功，已重新计算 ' + pendingRecalcCount + ' 条订单收益');
+    toggleAllOrders(false);
 }
 
 // ========== 订单详情 ==========
