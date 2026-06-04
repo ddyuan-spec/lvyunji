@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品管理 - 原型预览</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5; color: #333; font-size: 13px; line-height: 1.6;
+        }
+
+        /* ========== 顶部导航 ========== */
+        .top-header {
+            position: fixed; top: 0; left: 0; right: 0; height: 56px;
+            background: #2b2d42; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 16px; z-index: 1000;
+        }
+        .logo { color: #fff; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .logo::before { content: '🧮'; font-size: 20px; }
+        .top-nav { display: flex; gap: 20px; }
+        .top-nav-item {
+            color: #a0a0b0; font-size: 13px; cursor: pointer; padding: 8px 12px;
+            border-radius: 4px; transition: all .2s;
+        }
+        .top-nav-item:hover { color: #fff; background: rgba(255,255,255,0.08); }
+        .top-nav-item.active { color: #ff6b7a; background: rgba(255,107,122,0.1); }
+        .admin-info { color: #a0a0b0; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+        .admin-info::before { content: '👤'; }
+
+        /* ========== 侧边栏 ========== */
+        .sidebar {
+            position: fixed; top: 56px; left: 0; bottom: 0; width: 180px;
+            background: #fff; border-right: 1px solid #e8e8e8; overflow-y: auto;
+        }
+        .sidebar-menu { padding: 8px 0; }
+        .sidebar-group-title { padding: 10px 16px 6px; color: #999; font-size: 12px; font-weight: 600; }
+        .sidebar-item {
+            display: flex; align-items: center; padding: 10px 16px; color: #555;
+            font-size: 13px; cursor: pointer; transition: all .15s;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-item:hover { background: #f5f5f7; }
+        .sidebar-item.active {
+            background: #fff0f0; color: #ff6b7a; border-left-color: #ff6b7a; font-weight: 500;
+        }
+        .sidebar-item .icon { margin-right: 8px; font-size: 14px; }
+
+        /* ========== 主内容区 ========== */
+        .main {
+            margin-left: 180px; margin-top: 56px; padding: 16px;
+            min-height: calc(100vh - 56px);
+        }
+
+        .breadcrumb {
+            font-size: 12px; color: #999; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .breadcrumb a { color: #666; text-decoration: none; cursor: pointer; }
+        .breadcrumb a:hover { color: #ff6b7a; }
+        .breadcrumb span { color: #ccc; margin: 0 4px; }
+        .breadcrumb .current { color: #333; }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* ========== 卡片/区块 ========== */
+        .card {
+            background: #fff; border-radius: 6px; padding: 20px 24px; margin-bottom: 16px;
+        }
+        .section {
+            background: #fff; border-radius: 6px; padding: 20px 24px; margin-bottom: 12px;
+        }
+        .section-title {
+            font-size: 14px; font-weight: 600; color: #333; margin-bottom: 16px;
+            padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .required-star { color: #ff6b7a; margin-right: 2px; }
+
+        /* ========== 搜索/筛选区 ========== */
+        .search-bar {
+            background: #fff; border-radius: 6px; padding: 16px 20px; margin-bottom: 16px;
+            display: flex; align-items: center; flex-wrap: wrap; gap: 12px;
+        }
+        .search-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #666; }
+        .search-item input, .search-item select {
+            height: 32px; padding: 0 10px; border: 1px solid #e0e0e0; border-radius: 4px;
+            font-size: 13px; outline: none; min-width: 120px;
+        }
+        .search-item input:focus, .search-item select:focus { border-color: #ff6b7a; }
+
+        /* ========== 按钮 ========== */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            height: 32px; padding: 0 16px; border: 1px solid #e0e0e0;
+            border-radius: 4px; background: #fff; color: #666;
+            font-size: 13px; cursor: pointer; transition: all .15s;
+            gap: 4px; white-space: nowrap;
+        }
+        .btn:hover { border-color: #ff6b7a; color: #ff6b7a; }
+        .btn-primary { background: #ff6b7a; color: #fff; border-color: #ff6b7a; }
+        .btn-primary:hover { background: #ff5252; border-color: #ff5252; color: #fff; }
+        .btn-sm { height: 28px; padding: 0 10px; font-size: 12px; }
+        .btn-link {
+            background: none; border: none; color: #ff6b7a; padding: 0 4px; height: auto;
+            font-size: 12px; cursor: pointer;
+        }
+        .btn-link:hover { color: #ff5252; text-decoration: underline; }
+        .btn-add-spec {
+            background: #fafafa; border: 1px dashed #e0e0e0; color: #666;
+            width: 100%; height: 32px; margin-top: 8px;
+        }
+        .btn-add-spec:hover { border-color: #ff6b7a; color: #ff6b7a; background: #fff0f0; }
+
+        /* ========== 表格 ========== */
+        .data-table {
+            width: 100%; border-collapse: collapse; background: #fff; border-radius: 6px; overflow: hidden;
+        }
+        .data-table th, .data-table td {
+            padding: 12px; text-align: left; border-bottom: 1px solid #f0f0f0; font-size: 13px;
+        }
+        .data-table th {
+            background: #fafafa; color: #666; font-weight: 500; border-bottom: 1px solid #e8e8e8;
+        }
+        .data-table tr:hover td { background: #fafafa; }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table .col-center { text-align: center; }
+
+        /* ========== 表单 ========== */
+        .form-row {
+            display: flex; align-items: flex-start; margin-bottom: 18px; gap: 40px;
+            flex-wrap: wrap;
+        }
+        .form-item {
+            display: flex; align-items: center; gap: 8px; min-width: 320px;
+        }
+        .form-item .label {
+            min-width: 90px; text-align: right; color: #333; font-size: 13px; flex-shrink: 0;
+        }
+        .form-item input[type="text"], .form-item input[type="number"],
+        .form-item select, .form-item textarea {
+            height: 32px; padding: 0 10px; border: 1px solid #e0e0e0; border-radius: 4px;
+            font-size: 13px; outline: none; flex: 1; min-width: 200px;
+            background: #fff;
+        }
+        .form-item textarea {
+            height: 80px; padding: 8px 10px; resize: vertical;
+        }
+        .form-item input:focus, .form-item select:focus, .form-item textarea:focus {
+            border-color: #ff6b7a;
+        }
+        .form-item .input-suffix {
+            color: #999; font-size: 12px; white-space: nowrap;
+        }
+        .radio-group { display: flex; gap: 16px; flex-wrap: wrap; }
+        .radio-group label {
+            display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: 13px; color: #555;
+        }
+
+        /* ========== 图片上传 ========== */
+        .image-upload-area { display: flex; gap: 12px; flex-wrap: wrap; }
+        .image-upload-box {
+            width: 100px; height: 100px; border: 1px dashed #e0e0e0; border-radius: 4px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; background: #fafafa; color: #999; transition: all .15s;
+        }
+        .image-upload-box:hover { border-color: #ff6b7a; color: #ff6b7a; background: #fff0f0; }
+        .image-upload-box .plus { font-size: 24px; font-weight: 300; }
+        .image-upload-box .tip { font-size: 11px; margin-top: 4px; }
+        .image-item {
+            width: 100px; height: 100px; border: 1px solid #e0e0e0; border-radius: 4px;
+            position: relative; overflow: hidden; background: #fafafa;
+        }
+        .image-item .img-content {
+            width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+            font-size: 36px;
+        }
+        .image-item .img-remove {
+            position: absolute; top: 4px; right: 4px; width: 20px; height: 20px;
+            background: rgba(0,0,0,0.6); color: #fff; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 14px;
+            line-height: 1;
+        }
+        .image-item .img-label {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: rgba(0,0,0,0.5); color: #fff; font-size: 11px;
+            padding: 2px 4px; text-align: center;
+        }
+
+        /* ========== 规格表格 ========== */
+        .spec-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .spec-table th, .spec-table td {
+            padding: 8px 10px; border: 1px solid #f0f0f0; text-align: center;
+        }
+        .spec-table th { background: #fafafa; font-weight: 500; color: #666; }
+        .spec-table input[type="text"], .spec-table input[type="number"] {
+            width: 100%; height: 28px; padding: 0 8px; border: 1px solid #e8e8e8;
+            border-radius: 3px; text-align: center; font-size: 12px; outline: none;
+        }
+        .spec-table input:focus { border-color: #ff6b7a; }
+        .spec-group-input {
+            display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 12px;
+            background: #fafafa; border-radius: 4px;
+        }
+        .spec-group-input .spec-label {
+            display: flex; align-items: center; gap: 6px; min-width: 120px;
+        }
+        .spec-group-input input[type="text"] {
+            flex: 1; height: 28px; padding: 0 10px; border: 1px solid #e0e0e0;
+            border-radius: 4px; font-size: 12px; outline: none;
+        }
+        .spec-group-input input:focus { border-color: #ff6b7a; }
+        .spec-group-input .btn-del {
+            background: none; border: none; color: #999; cursor: pointer; font-size: 18px;
+        }
+        .spec-group-input .btn-del:hover { color: #ff6b7a; }
+
+        /* ========== 赠品列表 ========== */
+        .gift-empty {
+            padding: 30px; text-align: center; color: #999; font-size: 13px;
+            border: 1px dashed #f0f0f0; border-radius: 4px; background: #fff;
+        }
+        .gift-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 12px;
+        }
+        .gift-card {
+            background: #fff; border: 1px solid #f0f0f0; border-radius: 6px; padding: 12px;
+            display: flex; gap: 12px; transition: all .15s; position: relative;
+        }
+        .gift-card:hover { border-color: #ff6b7a; box-shadow: 0 2px 8px rgba(255,107,122,0.1); }
+        .gift-card-img {
+            width: 64px; height: 64px; background: #fafafa; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; flex-shrink: 0;
+        }
+        .gift-card-info { flex: 1; min-width: 0; }
+        .gift-card-name { font-size: 13px; color: #333; font-weight: 500; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .gift-card-spec { font-size: 12px; color: #999; margin-bottom: 6px; }
+        .gift-card-qty {
+            display: inline-flex; align-items: center; gap: 4px;
+            background: #fff0f0; color: #ff6b7a; padding: 2px 8px; border-radius: 10px;
+            font-size: 11px; font-weight: 500;
+        }
+
+        /* ========== 赠品标签 ========== */
+        .gift-tag {
+            display: inline-block; padding: 2px 8px; background: #fff0f0; color: #ff6b7a;
+            border-radius: 3px; font-size: 11px; font-weight: 500; margin-left: 4px;
+        }
+        .order-line-gift td { background: #fffafa !important; }
+
+        /* ========== 弹窗 ========== */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.45); z-index: 2000; align-items: center; justify-content: center;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal {
+            background: #fff; border-radius: 8px; width: 680px; max-width: 90vw;
+            max-height: 85vh; display: flex; flex-direction: column; overflow: hidden;
+        }
+        .modal-lg { width: 820px; }
+        .modal-header {
+            padding: 16px 20px; border-bottom: 1px solid #f0f0f0;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-title { font-size: 15px; font-weight: 600; color: #333; }
+        .modal-close {
+            background: none; border: none; font-size: 20px; color: #999;
+            cursor: pointer; width: 28px; height: 28px; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .modal-close:hover { background: #f5f5f5; color: #ff6b7a; }
+        .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+        .modal-footer {
+            padding: 12px 20px; border-top: 1px solid #f0f0f0;
+            display: flex; justify-content: flex-end; gap: 8px;
+        }
+
+        /* 步骤指示 */
+        .step-badge {
+            width: 26px; height: 26px; border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 600;
+            background: #f0f0f0; color: #999;
+        }
+        .step-badge.step-active { background: #ff6b7a; color: #fff; }
+
+        /* 弹窗内的商品选择 */
+        .modal-search {
+            display: flex; gap: 8px; margin-bottom: 16px; padding: 12px;
+            background: #fafafa; border-radius: 6px;
+        }
+        .modal-search input {
+            flex: 1; height: 32px; padding: 0 10px; border: 1px solid #e0e0e0;
+            border-radius: 4px; font-size: 13px; outline: none;
+        }
+        .modal-search input:focus { border-color: #ff6b7a; }
+        .product-select-list { max-height: 360px; overflow-y: auto; }
+        .product-select-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px;
+            border: 1px solid #f0f0f0; border-radius: 6px; margin-bottom: 8px;
+            cursor: pointer; transition: all .15s;
+        }
+        .product-select-item:hover { border-color: #ff6b7a; background: #fffafa; }
+        .product-select-item.selected {
+            border-color: #ff6b7a; background: #fff0f0;
+        }
+        .product-select-item .checkbox {
+            width: 16px; height: 16px; border: 2px solid #ddd; border-radius: 3px;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            font-size: 11px; color: transparent;
+        }
+        .product-select-item.selected .checkbox {
+            background: #ff6b7a; border-color: #ff6b7a; color: #fff;
+        }
+        .product-select-img {
+            width: 48px; height: 48px; background: #f5f5f5; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; flex-shrink: 0;
+        }
+        .product-select-info { flex: 1; min-width: 0; }
+        .product-select-name { font-size: 13px; color: #333; font-weight: 500; margin-bottom: 4px; }
+        .product-select-spec { font-size: 12px; color: #999; }
+        .product-select-price { font-size: 12px; color: #ff6b7a; font-weight: 500; flex-shrink: 0; }
+
+        /* 规格选择标签 */
+        .spec-select-list { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+        .spec-select-item {
+            padding: 6px 14px; border: 1px solid #e0e0e0; border-radius: 4px;
+            font-size: 12px; color: #666; cursor: pointer; transition: all .15s;
+            background: #fff;
+        }
+        .spec-select-item:hover { border-color: #ff6b7a; color: #ff6b7a; }
+        .spec-select-item.selected {
+            background: #ff6b7a; border-color: #ff6b7a; color: #fff;
+        }
+
+        /* ========== 状态标签 ========== */
+        .tag {
+            display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px;
+        }
+        .tag-green { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
+        .tag-red { background: #fff2f0; color: #ff4d4f; border: 1px solid #ffccc7; }
+        .tag-gray { background: #fafafa; color: #999; border: 1px solid #e8e8e8; }
+        .tag-blue { background: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; }
+
+        /* ========== Toast提示 ========== */
+        .toast {
+            position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); color: #fff; padding: 10px 20px;
+            border-radius: 4px; font-size: 13px; z-index: 3000;
+            display: none; animation: toastIn .3s;
+        }
+        .toast.show { display: block; }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        /* 底部操作栏 */
+        .bottom-bar {
+            position: sticky; bottom: 0; background: #fff; padding: 14px 24px;
+            border-top: 1px solid #f0f0f0; display: flex; justify-content: center;
+            gap: 12px; border-radius: 0 0 6px 6px;
+        }
+        .bottom-bar .btn { height: 36px; padding: 0 24px; font-size: 13px; }
+
+        /* 商品列表页 */
+        .product-img-cell {
+            width: 48px; height: 48px; background: #f5f5f5; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+        }
+        .product-name-cell { font-weight: 500; }
+        .product-gift-count { color: #ff6b7a; font-size: 12px; font-weight: 600; }
+
+        /* 订单详情 */
+        .order-card {
+            background: #fff; border-radius: 6px; padding: 16px 20px; margin-bottom: 12px;
+        }
+        .order-card-title {
+            font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px;
+            padding-bottom: 10px; border-bottom: 1px solid #f0f0f0;
+        }
+        .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .info-item { display: flex; font-size: 13px; }
+        .info-item .info-label { color: #999; min-width: 80px; }
+        .info-item .info-value { color: #333; flex: 1; }
+        .gift-row td { background: #fffafa !important; }
+
+        /* 分页 */
+        .pagination {
+            display: flex; justify-content: flex-end; align-items: center; gap: 4px;
+            padding: 16px 0; font-size: 13px; color: #666;
+        }
+        .page-btn {
+            min-width: 28px; height: 28px; padding: 0 8px; border: 1px solid #e0e0e0;
+            background: #fff; color: #666; border-radius: 3px; cursor: pointer;
+            font-size: 12px;
+        }
+        .page-btn:hover { border-color: #ff6b7a; color: #ff6b7a; }
+        .page-btn.active { background: #ff6b7a; border-color: #ff6b7a; color: #fff; }
+    </style>
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<div class="top-header">
+    <div class="logo">绿韵家管理系统</div>
+    <div class="top-nav">
+        <div class="top-nav-item">控制台</div>
+        <div class="top-nav-item active">商品管理</div>
+        <div class="top-nav-item">订单中心</div>
+        <div class="top-nav-item">会员中心</div>
+        <div class="top-nav-item">营销中心</div>
+        <div class="top-nav-item">数据中心</div>
+    </div>
+    <div class="admin-info">管理员 admin</div>
+</div>
+
+<!-- 侧边栏 -->
+<div class="sidebar">
+    <div class="sidebar-menu">
+        <div class="sidebar-group-title">商品管理</div>
+        <div class="sidebar-item active" onclick="switchPage('list')"><span class="icon">📋</span>商品列表</div>
+        <div class="sidebar-item" onclick="switchPage('add')"><span class="icon">➕</span>新增商品</div>
+        <div class="sidebar-item"><span class="icon">📁</span>分类管理</div>
+        <div class="sidebar-item"><span class="icon">🏷️</span>品牌管理</div>
+    </div>
+    <div class="sidebar-menu">
+        <div class="sidebar-group-title">订单中心</div>
+        <div class="sidebar-item" onclick="switchPage('order-detail')"><span class="icon">📦</span>订单管理</div>
+        <div class="sidebar-item"><span class="icon">↩️</span>售后管理</div>
+    </div>
+</div>
+
+<!-- 主内容区 -->
+<div class="main">
+
+    <!-- ====== 页面1：商品列表 ====== -->
+    <div class="page active" id="page-list">
+        <div class="breadcrumb">
+            <a>首页</a><span>/</span>
+            <a>商品管理</a><span>/</span>
+            <span class="current">商品列表</span>
+        </div>
+
+        <div class="search-bar">
+            <div class="search-item"><span>分类：</span><select><option>全部分类</option><option>草本</option><option>日用品</option></select></div>
+            <div class="search-item"><span>商品名称：</span><input type="text" placeholder="请输入商品名称"></div>
+            <div class="search-item"><span>商品类型：</span><select><option>全部类型</option><option>实物商品</option><option>赠品</option></select></div>
+            <button class="btn btn-primary" onclick="showToast('搜索完成')">搜索</button>
+            <button class="btn" onclick="showToast('已重置')">重置</button>
+            <div style="flex: 1;"></div>
+            <button class="btn btn-primary" onclick="switchPage('add')">+ 新增商品</button>
+        </div>
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width:80px;">图片</th>
+                    <th>商品名称</th>
+                    <th style="width:130px;">商品编号</th>
+                    <th style="width:80px;">价格</th>
+                    <th style="width:80px;">库存</th>
+                    <th style="width:90px;">商品类型</th>
+                    <th style="width:100px;">关联赠品</th>
+                    <th style="width:80px;">状态</th>
+                    <th style="width:200px;">操作</th>
+                </tr>
+            </thead>
+            <tbody id="product-list-body"></tbody>
+        </table>
+
+        <div class="pagination">
+            <span style="margin-right: 12px;">共 <b style="color:#ff6b7a">8</b> 条记录</span>
+            <button class="page-btn">&lt;</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">&gt;</button>
+        </div>
+    </div>
+
+    <!-- ====== 页面2：新增商品（含赠品功能） ====== -->
+    <div class="page" id="page-add">
+        <div class="breadcrumb">
+            <a onclick="switchPage('list')">首页</a><span>/</span>
+            <a onclick="switchPage('list')">商品管理</a><span>/</span>
+            <span class="current">新增商品</span>
+        </div>
+
+        <!-- 基础信息 -->
+        <div class="section">
+            <div class="section-title"><span class="title-text">基础信息</span></div>
+            <div class="form-row">
+                <div class="form-item"><span class="label"><span class="required-star">*</span>分类</span><select><option>草本/草本植物/植物科学</option><option>日用品</option></select></div>
+                <div class="form-item"><span class="required-star">*</span>商品名称</span><input type="text" value="绿韵草本精华礼盒套装"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-item"><span class="label">商品编号</span><input type="text" value="SP20260604001" readonly style="background:#fafafa;color:#999;"></div>
+                <div class="form-item"><span class="label">商家</span><select><option>绿韵家旗舰店</option></select></div>
+            </div>
+            <div class="form-row">
+                <div class="form-item"><span class="label">商品类型</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="ptype" checked>实物商品</label>
+                        <label><input type="radio" name="ptype">虚拟商品</label>
+                        <label><input type="radio" name="ptype">套餐商品</label>
+                        <label><input type="radio" name="ptype" onclick="showToast('设为赠品：售价自动为0，不参与售后')">赠品</label>
+                        <label><input type="radio" name="ptype">秒杀</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-item"><span class="label">商品库存</span><input type="number" value="500" style="min-width:100px;flex:0 0 120px;"></div>
+                <div class="form-item"><span class="label">状态</span>
+                    <div class="radio-group">
+                        <label><input type="radio" checked>上架</label>
+                        <label><input type="radio">下架</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 商品图片 -->
+        <div class="section">
+            <div class="section-title"><span class="title-text">商品主图 / 详情图</span></div>
+            <div class="image-upload-area">
+                <div class="image-item"><div class="img-content">🌿</div><div class="img-label">主图1</div><div class="img-remove" onclick="this.closest('.image-item').remove()">×</div></div>
+                <div class="image-item"><div class="img-content">🌸</div><div class="img-label">主图2</div><div class="img-remove" onclick="this.closest('.image-item').remove()">×</div></div>
+                <div class="image-upload-box" onclick="showToast('上传图片功能')"><div class="plus">+</div><div class="tip">上传图片</div></div>
+            </div>
+        </div>
+
+        <!-- 商品规格 + 价格 -->
+        <div class="section">
+            <div class="section-title"><span class="title-text">商品规格 & 价格/库存</span></div>
+            <div class="spec-group-input">
+                <span style="min-width:80px;color:#666;font-size:12px;">规格：</span>
+                <input type="text" value="规格" style="width:100px;flex:0 0 120px;">
+                <input type="text" value="120粒/瓶，240粒/瓶，360粒/瓶" style="flex:1;">
+            </div>
+            <table class="spec-table">
+                <thead><tr><th style="width:40px;"><input type="checkbox" checked></th><th>规格名</th><th>市场价</th><th>销售价</th><th>库存</th><th style="width:100px;">操作</th></tr></thead>
+                <tbody>
+                    <tr><td><input type="checkbox" checked></td><td>120粒/瓶</td><td><input type="number" value="198"></td><td><input type="number" value="98"></td><td><input type="number" value="200"></td><td><button class="btn-link" style="color:#ff4d4f;">删除</button></td></tr>
+                    <tr><td><input type="checkbox" checked></td><td>240粒/瓶</td><td><input type="number" value="298"></td><td><input type="number" value="298"></td><td><input type="number" value="500"></td><td><button class="btn-link" style="color:#ff4d4f;">删除</button></td></tr>
+                    <tr><td><input type="checkbox" checked></td><td>360粒/瓶</td><td><input type="number" value="398"></td><td><input type="number" value="398"></td><td><input type="number" value="300"></td><td><button class="btn-link" style="color:#ff4d4f;">删除</button></td></tr>
+                </tbody>
+            </table>
+            <button class="btn btn-add-spec" onclick="showToast('添加规格行')">+ 添加规格</button>
+        </div>
+
+        <!-- ★ 赠品关联（核心功能） -->
+        <div class="section" style="border: 2px dashed #ffd9d9; background: #fffafa;">
+            <div class="section-title">
+                <span class="title-text" style="color:#ff6b7a;">🎁 赠品列表（规格关联赠品）</span>
+                <button class="btn btn-primary btn-sm" onclick="openGiftModal()">+ 关联赠品</button>
+            </div>
+            <div id="gift-list-container"></div>
+            <div style="margin-top: 12px; padding: 12px 16px; background:#fff; border-radius:6px; border-left: 3px solid #ff6b7a; font-size:12px; color:#666; line-height:1.8;">
+                <b style="color:#ff6b7a;">赠品规则：</b><br>
+                ① 每个规格可关联多个赠品，不同规格可关联不同赠品；<br>
+                ② 赠品在订单中显示为「赠品」标签，售价 ¥0.00；<br>
+                ③ 赠品不参与售后（退货、换货流程仅针对主商品）。
+            </div>
+        </div>
+
+        <!-- 发货模板 -->
+        <div class="section">
+            <div class="section-title"><span class="title-text">发货模板设置</span></div>
+            <div class="form-row">
+                <div class="form-item"><span class="label">发货仓库</span><select><option>默认仓库</option></select></div>
+            </div>
+        </div>
+
+        <!-- 售后设置 -->
+        <div class="section">
+            <div class="section-title"><span class="title-text">售后设置</span></div>
+            <div class="form-row">
+                <div class="form-item"><span class="label">支持售后</span>
+                    <div class="radio-group">
+                        <label><input type="radio" checked>是</label>
+                        <label><input type="radio">否（赠品不可售后）</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部操作栏 -->
+        <div class="bottom-bar">
+            <button class="btn" onclick="switchPage('list')">取消</button>
+            <button class="btn btn-primary" onclick="saveProduct()">保存</button>
+        </div>
+    </div>
+
+    <!-- ====== 页面3：订单详情（含赠品标记） ====== -->
+    <div class="page" id="page-order-detail">
+        <div class="breadcrumb">
+            <a onclick="switchPage('list')">首页</a><span>/</span>
+            <a>订单中心</a><span>/</span>
+            <span class="current">订单详情</span>
+        </div>
+
+        <div class="order-card">
+            <div class="order-card-title">订单信息</div>
+            <div class="info-grid">
+                <div class="info-item"><span class="info-label">订单编号：</span><span class="info-value">ORD20260604001</span></div>
+                <div class="info-item"><span class="info-label">下单时间：</span><span class="info-value">2026-06-04 10:30:25</span></div>
+                <div class="info-item"><span class="info-label">订单状态：</span><span class="info-value"><span class="tag tag-green">已发货</span></span></div>
+                <div class="info-item"><span class="info-label">付款时间：</span><span class="info-value">2026-06-04 10:31:02</span></div>
+                <div class="info-item"><span class="info-label">物流单号：</span><span class="info-value">SF1234567890</span></div>
+            </div>
+        </div>
+
+        <div class="order-card">
+            <div class="order-card-title">收货信息</div>
+            <div class="info-grid">
+                <div class="info-item"><span class="info-label">收件人：</span><span class="info-value">张三</span></div>
+                <div class="info-item"><span class="info-label">联系电话：</span><span class="info-value">138****8000</span></div>
+                <div class="info-item"><span class="info-label">收货地址：</span><span class="info-value">广东省深圳市南山区科技园腾讯大厦</span></div>
+            </div>
+        </div>
+
+        <div class="order-card">
+            <div class="order-card-title">商品清单 <span style="font-size:12px;color:#999;font-weight:400;margin-left:8px;">（🎁 标记的为赠品）</span></div>
+            <table class="data-table">
+                <thead>
+                    <tr><th style="width:80px;">图片</th><th>商品名称 / 规格</th><th style="width:100px;">单价</th><th style="width:80px;">数量</th><th style="width:100px;">小计</th><th style="width:100px;">类型</th><th style="width:180px;">操作</th></tr>
+                </thead>
+                <tbody id="order-items-body"></tbody>
+                <tfoot>
+                    <tr><td colspan="4" style="text-align:right;color:#666;">商品金额：</td><td style="font-weight:500;">¥596.00</td><td colspan="2"></td></tr>
+                    <tr><td colspan="4" style="text-align:right;color:#666;">优惠金额：</td><td style="color:#ff6b7a;">-¥0.00</td><td colspan="2"></td></tr>
+                    <tr style="background:#fffafa;"><td colspan="4" style="text-align:right;font-weight:600;">应付金额：</td><td style="color:#ff6b7a;font-size:15px;font-weight:600;">¥596.00</td><td colspan="2" style="font-size:12px;color:#999;">含赠品价值 ¥158.00</td></tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="order-card" style="border-left: 4px solid #ff6b7a; background: #fffafa;">
+            <div style="display:flex; align-items:flex-start; gap:10px;">
+                <div style="font-size:22px;">📋</div>
+                <div style="flex:1;">
+                    <div style="font-size:14px;font-weight:600;color:#ff6b7a;margin-bottom:6px;">赠品说明</div>
+                    <div style="font-size:13px;color:#666;line-height:1.8;">
+                        本订单中包含 <b style="color:#ff6b7a;">2件赠品</b>，总价值 ¥158.00；<br>
+                        ① 赠品随主商品一同发货，不单独销售；<br>
+                        ② 赠品为促销赠送，<b style="color:#ff6b7a;">不支持单独退货/换货/退款</b>；<br>
+                        ③ 如需发起售后，仅可对主商品申请。
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-bar">
+            <button class="btn" onclick="switchPage('list')">返回列表</button>
+            <button class="btn btn-primary" onclick="showToast('打印订单')">打印订单</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- ========== 弹窗1：选择赠品商品 ========== -->
+<div class="modal-overlay" id="gift-modal">
+    <div class="modal modal-lg">
+        <div class="modal-header">
+            <div class="modal-title">关联赠品 - 第1步：选择赠品商品</div>
+            <button class="modal-close" onclick="document.getElementById('gift-modal').classList.remove('show')">×</button>
+        </div>
+        <div class="modal-body">
+            <div style="display:flex; align-items:center; margin-bottom:16px; gap:8px;">
+                <span class="step-badge step-active">1</span><span style="font-size:12px; color:#ff6b7a; font-weight:500;">选择赠品商品</span>
+                <div style="flex:1; height:1px; background:#f0f0f0; margin:0 8px;"></div>
+                <span class="step-badge step-active">2</span><span style="font-size:12px; color:#ff6b7a; font-weight:500;">选择规格 + 设置数量</span>
+            </div>
+            <div class="modal-search">
+                <input type="text" id="gift-search" placeholder="搜索商品名称/编号..." oninput="renderGiftProductList(this.value)">
+                <button class="btn btn-primary" onclick="renderGiftProductList()">搜索</button>
+            </div>
+            <div style="font-size:13px; color:#666; margin-bottom:8px;">
+                可选择的赠品商品（已选 <span id="selected-count" style="color:#ff6b7a;font-weight:600;">0</span> 个）
+            </div>
+            <div class="product-select-list" id="gift-product-list"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="document.getElementById('gift-modal').classList.remove('show')">取消</button>
+            <button class="btn btn-primary" onclick="goToStep2()">下一步：选择规格</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== 弹窗2：选择赠品规格 + 适用主商品规格 ========== -->
+<div class="modal-overlay" id="gift-spec-modal">
+    <div class="modal modal-lg">
+        <div class="modal-header">
+            <div class="modal-title">关联赠品 - 第2步：选择规格 + 设置数量</div>
+            <button class="modal-close" onclick="document.getElementById('gift-spec-modal').classList.remove('show')">×</button>
+        </div>
+        <div class="modal-body">
+            <div style="display:flex; align-items:center; margin-bottom:16px; gap:8px;">
+                <span class="step-badge step-active">1</span><span style="font-size:12px; color:#ff6b7a; font-weight:500;">选择赠品商品</span>
+                <div style="flex:1; height:1px; background:#f0f0f0; margin:0 8px;"></div>
+                <span class="step-badge step-active">2</span><span style="font-size:12px; color:#ff6b7a; font-weight:500;">选择规格 + 设置数量</span>
+            </div>
+            <div id="selected-gifts-spec"></div>
+            <div style="margin-top:18px; padding:14px; background:#fafafa; border-radius:6px; border:1px dashed #e8e8e8;">
+                <div style="font-size:13px; color:#333; font-weight:500; margin-bottom:8px;">📌 适用的主商品规格（以下规格购买时赠送上述赠品）</div>
+                <div id="main-spec-select" class="spec-select-list" style="margin:0;"></div>
+            </div>
+            <div style="margin-top:12px; padding:10px 14px; background:#fffafa; border-radius:4px; font-size:12px; color:#666; line-height:1.8;">
+                💡 提示：每个规格可单独设置赠送数量，默认赠送1件。
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="backToStep1()">上一步</button>
+            <button class="btn btn-primary" onclick="confirmGifts()">确认关联</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">操作成功</div>
+
+<script>
+// ============ 数据模拟 ============
+const productData = [
+    { id: 1, name: '绿韵草本精华礼盒套装', code: 'SP20260604001', price: 298, stock: 500, type: '实物商品', giftCount: 2, status: '上架', img: '🎁' },
+    { id: 2, name: '天然植物保湿喷雾', code: 'SP20260604002', price: 89, stock: 1200, type: '实物商品', giftCount: 1, status: '上架', img: '💧' },
+    { id: 3, name: '绿韵家经典套装（洁面+水+乳）', code: 'SP20260604003', price: 488, stock: 300, type: '套餐商品', giftCount: 3, status: '上架', img: '🧴' },
+    { id: 4, name: '草本护发精油（小样）', code: 'SP20260604004', price: 0, stock: 5000, type: '赠品', giftCount: 0, status: '上架', img: '🧴' },
+    { id: 5, name: '竹纤维洁面巾', code: 'SP20260604005', price: 39, stock: 800, type: '实物商品', giftCount: 0, status: '上架', img: '🧻' },
+    { id: 6, name: '植物手工皂', code: 'SP20260604006', price: 0, stock: 3000, type: '赠品', giftCount: 0, status: '上架', img: '🧼' },
+    { id: 7, name: '绿茶草本香薰蜡烛', code: 'SP20260604007', price: 68, stock: 450, type: '实物商品', giftCount: 1, status: '上架', img: '🕯️' },
+    { id: 8, name: '绿韵草本面膜（5片装）', code: 'SP20260604008', price: 0, stock: 2000, type: '赠品', giftCount: 0, status: '上架', img: '🧖' },
+];
+
+// 可选择的赠品商品池
+const giftProductPool = [
+    { id: 4, name: '草本护发精油（小样）', code: 'SP20260604004', img: '🧴', specs: ['10ml小样'], price: 58 },
+    { id: 6, name: '植物手工皂', code: 'SP20260604006', img: '🧼', specs: ['玫瑰', '薰衣草', '茶树'], price: 39 },
+    { id: 8, name: '绿韵草本面膜（5片装）', code: 'SP20260604008', img: '🧖', specs: ['补水', '美白'], price: 99 },
+    { id: 9, name: '精美定制手提袋', code: 'SP20260604009', img: '👜', specs: ['中号', '大号'], price: 20 },
+    { id: 10, name: '草本试用装（3件套）', code: 'SP20260604010', img: '📦', specs: ['旅行装'], price: 48 },
+    { id: 11, name: '品牌定制书签', code: 'SP20260604011', img: '🔖', specs: ['经典款'], price: 15 },
+];
+
+// 规格 -> 赠品 映射
+let currentGiftMap = {
+    '120粒/瓶': [{ productId: 4, productName: '草本护发精油（小样）', productCode: 'SP20260604004', spec: '10ml小样', qty: 1, img: '🧴' }],
+    '240粒/瓶': [
+        { productId: 4, productName: '草本护发精油（小样）', productCode: 'SP20260604004', spec: '10ml小样', qty: 1, img: '🧴' },
+        { productId: 6, productName: '植物手工皂', productCode: 'SP20260604006', spec: '薰衣草', qty: 1, img: '🧼' }
+    ],
+    '360粒/瓶': [
+        { productId: 8, productName: '绿韵草本面膜（5片装）', productCode: 'SP20260604008', spec: '补水', qty: 2, img: '🧖' },
+        { productId: 10, productName: '草本试用装（3件套）', productCode: 'SP20260604010', spec: '旅行装', qty: 1, img: '📦' },
+        { productId: 11, productName: '品牌定制书签', productCode: 'SP20260604011', spec: '经典款', qty: 1, img: '🔖' }
+    ],
+};
+
+// 主商品规格
+const mainProductSpecs = ['120粒/瓶', '240粒/瓶', '360粒/瓶'];
+
+// 订单明细
+const orderItems = [
+    { name: '绿韵草本精华礼盒套装', spec: '240粒/瓶', price: 298, qty: 2, subtotal: 596, img: '🎁', isGift: false },
+    { name: '草本护发精油（小样）', spec: '10ml小样', price: 0, qty: 2, subtotal: 0, img: '🧴', isGift: true, linkedSpec: '随240粒/瓶赠送' },
+    { name: '植物手工皂', spec: '薰衣草', price: 0, qty: 2, subtotal: 0, img: '🧼', isGift: true, linkedSpec: '随240粒/瓶赠送' },
+];
+
+// 临时状态
+let tempSelectedGifts = [];
+const tempGiftSpecs = {};
+const tempGiftQty = {};
+
+// ============ 页面切换 ============
+function switchPage(pageName) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + pageName).classList.add('active');
+    document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+    if (pageName === 'list') { document.querySelectorAll('.sidebar-item')[0].classList.add('active'); renderProductList(); }
+    if (pageName === 'add') { document.querySelectorAll('.sidebar-item')[1].classList.add('active'); renderGiftList(); }
+    if (pageName === 'order-detail') { document.querySelectorAll('.sidebar-item')[2].classList.add('active'); renderOrderItems(); }
+    window.scrollTo(0, 0);
+}
+
+// ============ 商品列表 ============
+function renderProductList() {
+    const tbody = document.getElementById('product-list-body');
+    tbody.innerHTML = productData.map(p => `
+        <tr>
+            <td><div class="product-img-cell">${p.img}</div></td>
+            <td><div class="product-name-cell">${p.name}</div></td>
+            <td>${p.code}</td>
+            <td style="color:${p.price === 0 ? '#999' : '#ff6b7a'};font-weight:500;">${p.price === 0 ? '¥0 (赠品)' : '¥' + p.price}</td>
+            <td>${p.stock}</td>
+            <td><span class="tag ${p.type === '赠品' ? 'tag-blue' : 'tag-gray'}">${p.type}</span></td>
+            <td>${p.giftCount > 0 ? `已关联 <span class="product-gift-count">${p.giftCount}</span> 个` : '—'}</td>
+            <td><span class="tag tag-green">${p.status}</span></td>
+            <td>
+                <button class="btn-link" onclick="switchPage('add')">编辑</button>
+                <button class="btn-link" onclick="switchPage('order-detail')">查看</button>
+                <button class="btn-link" style="color:#ff4d4f;">删除</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// ============ 赠品列表（新增商品页） ============
+function renderGiftList() {
+    const container = document.getElementById('gift-list-container');
+    const specs = Object.keys(currentGiftMap).filter(k => currentGiftMap[k].length > 0);
+    if (specs.length === 0) {
+        container.innerHTML = `<div class="gift-empty">还未配置任何赠品，点击右上角 <b style="color:#ff6b7a;">+ 关联赠品</b> 开始配置</div>`;
+        return;
+    }
+    let html = '';
+    for (const spec of specs) {
+        const gifts = currentGiftMap[spec];
+        const totalQty = gifts.reduce((s, g) => s + g.qty, 0);
+        html += `
+            <div style="margin-bottom: 16px; background:#fff; border-radius:6px; padding:14px; border:1px solid #f0f0f0;">
+                <div style="font-size:13px; color:#333; font-weight:500; margin-bottom:10px; padding-bottom:8px; border-bottom:1px dashed #f0f0f0; display:flex; align-items:center; justify-content:space-between;">
+                    <span><span style="background:#fff0f0; color:#ff6b7a; padding:3px 10px; border-radius:3px; font-size:12px;">规格：${spec}</span>
+                    <span style="margin-left:10px; font-size:12px; color:#999;">已关联 ${gifts.length} 种赠品，共 ${totalQty} 件</span></span>
+                    <button class="btn-link" style="color:#ff4d4f;" onclick="removeSpecGifts('${spec}')">移除规格下所有赠品</button>
+                </div>
+                <div class="gift-grid">
+                    ${gifts.map((g, i) => `
+                        <div class="gift-card">
+                            <div class="gift-card-img">${g.img}</div>
+                            <div class="gift-card-info">
+                                <div class="gift-card-name">${g.productName}</div>
+                                <div class="gift-card-spec">规格：${g.spec}</div>
+                                <div style="font-size:11px;color:#999;">编号：${g.productCode}</div>
+                                <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
+                                    <span class="gift-card-qty">× ${g.qty} 件/单</span>
+                                    <button class="btn-link" onclick="editGiftQty('${spec}', ${i})">改数量</button>
+                                    <button class="btn-link" style="color:#ff4d4f;" onclick="removeGift('${spec}', ${i})">移除</button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+    container.innerHTML = html;
+}
+
+function removeGift(spec, idx) {
+    currentGiftMap[spec].splice(idx, 1);
+    renderGiftList();
+    showToast('已移除赠品');
+}
+function removeSpecGifts(spec) {
+    if (!confirm('确认移除规格「' + spec + '」下所有赠品？')) return;
+    currentGiftMap[spec] = [];
+    renderGiftList();
+    showToast('已移除');
+}
+function editGiftQty(spec, idx) {
+    const newQty = prompt('请输入赠送数量（1-99）：', currentGiftMap[spec][idx].qty);
+    const q = parseInt(newQty);
+    if (q > 0 && q <= 99) {
+        currentGiftMap[spec][idx].qty = q;
+        renderGiftList();
+        showToast('数量已更新');
+    } else if (newQty !== null) {
+        showToast('请输入1-99之间的有效数字');
+    }
+}
+
+// ============ 选择赠品弹窗 ============
+function openGiftModal() {
+    tempSelectedGifts = [];
+    for (const k of Object.keys(tempGiftSpecs)) delete tempGiftSpecs[k];
+    for (const k of Object.keys(tempGiftQty)) delete tempGiftQty[k];
+    renderGiftProductList();
+    document.getElementById('gift-modal').classList.add('show');
+}
+
+function renderGiftProductList(keyword = '') {
+    const list = document.getElementById('gift-product-list');
+    const filtered = keyword ? giftProductPool.filter(g => g.name.includes(keyword) || g.code.includes(keyword)) : giftProductPool;
+    list.innerHTML = filtered.map(p => `
+        <div class="product-select-item ${tempSelectedGifts.includes(p.id) ? 'selected' : ''}" onclick="toggleGift(${p.id})">
+            <div class="checkbox">✓</div>
+            <div class="product-select-img">${p.img}</div>
+            <div class="product-select-info">
+                <div class="product-select-name">${p.name}</div>
+                <div class="product-select-spec">商品编号：${p.code} · 可选规格：${p.specs.join(' / ')}</div>
+            </div>
+            <div class="product-select-price">参考价 ¥${p.price}</div>
+        </div>
+    `).join('');
+    document.getElementById('selected-count').textContent = tempSelectedGifts.length;
+}
+
+function toggleGift(id) {
+    const idx = tempSelectedGifts.indexOf(id);
+    if (idx >= 0) tempSelectedGifts.splice(idx, 1);
+    else tempSelectedGifts.push(id);
+    renderGiftProductList(document.getElementById('gift-search').value);
+}
+
+function goToStep2() {
+    if (tempSelectedGifts.length === 0) { showToast('请至少选择1个赠品商品'); return; }
+    document.getElementById('gift-modal').classList.remove('show');
+    renderSpecStep();
+    document.getElementById('gift-spec-modal').classList.add('show');
+}
+
+function backToStep1() {
+    document.getElementById('gift-spec-modal').classList.remove('show');
+    document.getElementById('gift-modal').classList.add('show');
+}
+
+function renderSpecStep() {
+    // 已选赠品：选择赠品规格 + 数量
+    const giftsContainer = document.getElementById('selected-gifts-spec');
+    giftsContainer.innerHTML = tempSelectedGifts.map(id => {
+        const p = giftProductPool.find(x => x.id === id);
+        if (!p) return '';
+        const selectedSpecs = tempGiftSpecs[id] || [p.specs[0]];
+        const qty = tempGiftQty[id] || 1;
+        return `
+            <div style="padding:14px; background:#fafafa; border-radius:6px; margin-bottom:12px; border:1px solid #f0f0f0;">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+                    <div style="width:44px; height:44px; background:#fff; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:24px;">${p.img}</div>
+                    <div style="flex:1;">
+                        <div style="font-size:13px; font-weight:500; color:#333;">${p.name}</div>
+                        <div style="font-size:12px; color:#999;">商品编号：${p.code}</div>
+                    </div>
+                    <button class="btn-link" style="color:#ff4d4f;" onclick="removeTempGift(${p.id})">移除</button>
+                </div>
+                <div style="font-size:12px; color:#666; margin-bottom:6px;">📦 选择赠品规格（可多选）：</div>
+                <div class="spec-select-list" style="margin:0 0 10px 0;">
+                    ${p.specs.map(s => `<div class="spec-select-item ${selectedSpecs.includes(s) ? 'selected' : ''}" onclick="toggleGiftSpec(${p.id}, '${s}')">${s}</div>`).join('')}
+                </div>
+                <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:#666; padding-top:8px; border-top:1px dashed #e8e8e8;">
+                    🎁 每个主商品赠送数量：
+                    <input type="number" min="1" max="99" value="${qty}" id="qty-${p.id}" style="width:70px; height:28px; padding:0 8px; border:1px solid #e0e0e0; border-radius:3px; text-align:center; outline:none;">
+                    <span>件</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // 适用主商品规格选择（默认全选）
+    const allSpecs = mainProductSpecs;
+    let selectedMain;
+    if (tempSelectedSpecsGlobal.length === 0) tempSelectedSpecsGlobal = allSpecs.slice();
+    selectedMain = tempSelectedSpecsGlobal;
+    const specSel = document.getElementById('main-spec-select');
+    specSel.innerHTML = allSpecs.map(s => `<div class="spec-select-item ${selectedMain.includes(s) ? 'selected' : ''}" onclick="toggleMainSpec('${s}')">${s}</div>`).join('');
+}
+
+let tempSelectedSpecsGlobal = [];
+
+function toggleGiftSpec(productId, specName) {
+    if (!tempGiftSpecs[productId]) tempGiftSpecs[productId] = [giftProductPool.find(p => p.id === productId).specs[0]];
+    const arr = tempGiftSpecs[productId];
+    const idx = arr.indexOf(specName);
+    if (idx >= 0) arr.splice(idx, 1); else arr.push(specName);
+    renderSpecStep();
+}
+
+function toggleMainSpec(spec) {
+    const idx = tempSelectedSpecsGlobal.indexOf(spec);
+    if (idx >= 0) tempSelectedSpecsGlobal.splice(idx, 1); else tempSelectedSpecsGlobal.push(spec);
+    renderSpecStep();
+}
+
+function removeTempGift(id) {
+    tempSelectedGifts = tempSelectedGifts.filter(x => x !== id);
+    delete tempGiftSpecs[id];
+    renderSpecStep();
+}
+
+function confirmGifts() {
+    if (tempSelectedSpecsGlobal.length === 0) { showToast('请至少选择1个适用规格'); return; }
+    let addedCount = 0;
+    for (const pid of tempSelectedGifts) {
+        const p = giftProductPool.find(x => x.id === pid);
+        if (!p) continue;
+        const gSpecs = (tempGiftSpecs[pid] && tempGiftSpecs[pid].length > 0) ? tempGiftSpecs[pid] : [p.specs[0]];
+        const qEl = document.getElementById('qty-' + pid);
+        const qty = qEl ? parseInt(qEl.value) || 1 : 1;
+        for (const gs of gSpecs) {
+            for (const ms of tempSelectedSpecsGlobal) {
+                if (!currentGiftMap[ms]) currentGiftMap[ms] = [];
+                if (!currentGiftMap[ms].some(g => g.productId === pid && g.spec === gs)) {
+                    currentGiftMap[ms].push({ productId: pid, productName: p.name, productCode: p.code, spec: gs, qty: qty, img: p.img });
+                    addedCount++;
+                }
+            }
+        }
+    }
+    tempSelectedGifts = [];
+    tempSelectedSpecsGlobal = [];
+    for (const k of Object.keys(tempGiftSpecs)) delete tempGiftSpecs[k];
+    document.getElementById('gift-spec-modal').classList.remove('show');
+    renderGiftList();
+    showToast(`成功关联 ${addedCount} 条赠品配置`);
+}
+
+// ============ 订单明细 ============
+function renderOrderItems() {
+    const tbody = document.getElementById('order-items-body');
+    tbody.innerHTML = orderItems.map(item => `
+        <tr class="${item.isGift ? 'gift-row' : ''}">
+            <td><div class="product-img-cell">${item.img}</div></td>
+            <td>
+                <div style="font-weight:500;">${item.name}${item.isGift ? '<span class="gift-tag">赠品</span>' : ''}</div>
+                <div style="font-size:12px; color:#999; margin-top:4px;">规格：${item.spec}</div>
+                ${item.isGift ? `<div style="font-size:11px; color:#ff6b7a; margin-top:4px;">📌 ${item.linkedSpec}</div>` : ''}
+            </td>
+            <td style="${item.isGift ? 'color:#999;' : 'color:#ff6b7a;font-weight:500;'}">${item.isGift ? '¥0.00' : '¥' + item.price.toFixed(2)}</td>
+            <td>×${item.qty}</td>
+            <td style="${item.isGift ? 'color:#999;' : 'color:#ff6b7a;font-weight:600;'}">${item.isGift ? '¥0.00' : '¥' + item.subtotal.toFixed(2)}</td>
+            <td>${item.isGift ? '<span class="tag tag-blue">赠品</span>' : '<span class="tag tag-gray">主商品</span>'}</td>
+            <td>${item.isGift ? '<span style="color:#999; font-size:12px;">赠品不支持售后</span>' : '<button class="btn-link">申请售后</button><button class="btn-link">查看</button>'}</td>
+        </tr>
+    `).join('');
+}
+
+function saveProduct() { showToast('商品保存成功'); setTimeout(() => switchPage('list'), 1200); }
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// 初始化
+renderProductList();
+renderGiftList();
+</script>
+
+</body>
+</html>
