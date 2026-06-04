@@ -930,20 +930,20 @@ function switchCondType(type) {
 }
 
 function updatePreview() {
+    const totalQty = Object.values(tempSelectedGifts).reduce((s, g) => s + g.qty, 0);
+    const giftCount = Object.keys(tempSelectedGifts).length;
     if (currentCondType === 'qty') {
         const t = parseInt(document.getElementById('in-qty-threshold').value) || 0;
-        const g = parseInt(document.getElementById('in-qty-gift').value) || 0;
-        document.getElementById('preview-qty').innerHTML = `✅ 预览：购买满 ${t} 件，赠送 ${g} 件赠品`;
+        document.getElementById('preview-qty').innerHTML = `✅ 预览：购买满 ${t} 件，赠送 ${giftCount} 种赠品共 ${totalQty || '?'} 件（数量在下方每个赠品单独设置）`;
     } else {
         const t = parseInt(document.getElementById('in-amount-threshold').value) || 0;
-        const g = parseInt(document.getElementById('in-amount-gift').value) || 0;
-        document.getElementById('preview-amount').innerHTML = `✅ 预览：订单实付金额满 ¥${t.toLocaleString()}.00，赠送 ${g} 件赠品`;
+        document.getElementById('preview-amount').innerHTML = `✅ 预览：订单实付金额满 ¥${t.toLocaleString()}.00，赠送 ${giftCount} 种赠品共 ${totalQty || '?'} 件（数量在下方每个赠品单独设置）`;
     }
 }
 
 // 监听输入
 document.addEventListener('input', (e) => {
-    if (['in-qty-threshold', 'in-qty-gift', 'in-amount-threshold', 'in-amount-gift'].includes(e.target.id)) {
+    if (['in-qty-threshold', 'in-amount-threshold'].includes(e.target.id)) {
         updatePreview();
     }
 });
@@ -997,6 +997,7 @@ function toggleGiftInModal(id) {
         tempSelectedGifts[id] = { spec: p.specs[0], qty: 1 };
     }
     renderGiftProductListInModal();
+    updatePreview();
 }
 function setGiftSpec(id, spec) {
     if (tempSelectedGifts[id]) {
@@ -1009,6 +1010,7 @@ function setGiftQty(id, val) {
     if (tempSelectedGifts[id]) {
         tempSelectedGifts[id].qty = n;
         renderGiftProductListInModal();
+        updatePreview();
     }
 }
 
