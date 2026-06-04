@@ -692,13 +692,19 @@
                 </div>
             </div>
 
-            <!-- 第3步：选择赠品商品 + 规格 + 数量 -->
+            <!-- 第3步：选择赠品商品 -->
             <div style="margin-bottom:10px;font-size:13px;font-weight:500;color:#333;">
-                ② 选择赠品商品（勾选后设置每个赠品的规格和数量）：
+                ② 选择赠品商品：
             </div>
-            <div class="product-select-list" id="gift-product-list"></div>
-            <div style="font-size:12px;color:#999;margin-top:8px;">
+            <div class="product-select-list" id="gift-product-list" style="max-height:220px;overflow-y:auto;border:1px solid #f0f0f0;border-radius:6px;padding:8px;background:#fafbfc;"></div>
+            <div style="font-size:12px;color:#999;margin-top:8px;margin-bottom:16px;">
                 已选 <span id="selected-count" style="color:#ff6b7a;font-weight:600;">0</span> 个赠品商品
+            </div>
+
+            <!-- 已选赠品配置区（分区展示规格和数量，独立行高）-->
+            <div id="gift-config-area" style="padding:14px 16px;background:#fff5f5;border:1px solid #ffe0e0;border-radius:6px;">
+                <div style="font-size:13px;font-weight:500;color:#ff6b7a;margin-bottom:10px;">📦 已选赠品配置（选择每个赠品的规格和赠送数量）：</div>
+                <div id="selected-gifts-config" style="display:flex;flex-direction:column;gap:8px;"></div>
             </div>
         </div>
         <div class="modal-footer">
@@ -949,45 +955,67 @@ document.addEventListener('input', (e) => {
 });
 
 function renderGiftProductListInModal() {
+    // 上部：紧凑的勾选列表
     const list = document.getElementById('gift-product-list');
     list.innerHTML = giftProductPool.map(p => {
         const selected = tempSelectedGifts[p.id];
-        const sel = selected ? 'selected' : '';
         return `
-            <div class="product-select-item ${sel}" style="${selected ? '' : ''}">
-                <div onclick="toggleGiftInModal(${p.id})" style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer;">
-                    <div class="checkbox">✓</div>
-                    <div class="product-select-img">${p.img}</div>
-                    <div class="product-select-info">
-                        <div class="product-select-name">${p.name}</div>
-                        <div class="product-select-spec">商品编号：${p.code} · 可选规格：${p.specs.join(' / ')}</div>
-                    </div>
-                    <div class="product-select-price">参考价 ¥${p.price}</div>
+            <div class="product-select-item ${selected ? 'selected' : ''}"
+                 onclick="toggleGiftInModal(${p.id})"
+                 style="padding:8px 12px;margin-bottom:4px;border:1px solid ${selected ? '#ff6b7a' : '#e8e8e8'};background:${selected ? '#fff5f5' : '#fff'};border-radius:4px;cursor:pointer;display:flex;align-items:center;gap:10px;">
+                <div style="width:16px;height:16px;border:2px solid ${selected ? '#ff6b7a' : '#ccc'};border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:11px;color:${selected ? '#ff6b7a' : 'transparent'};flex-shrink:0;">✓</div>
+                <div style="width:36px;height:36px;background:#f5f5f5;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${p.img}</div>
+                <div style="flex:1;min-width:0;overflow:hidden;">
+                    <div style="font-size:12px;color:#333;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
+                    <div style="font-size:11px;color:#999;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">编号：${p.code} · 可选：${p.specs.join(' / ')}</div>
                 </div>
-                ${selected ? `
-                    <div style="width:100%;margin-top:12px;padding-top:12px;border-top:1px dashed #ffe0e0;display:flex;align-items:center;gap:16px;flex-wrap:wrap;" onclick="event.stopPropagation()">
-                        <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#666;">
-                            <span style="color:#ff6b7a;font-weight:500;">规格：</span>
-                            ${p.specs.map(s => `
-                                <span class="spec-select-item ${selected.spec === s ? 'selected' : ''}"
-                                      style="padding:3px 10px;border:1px solid #e0e0e0;border-radius:3px;font-size:12px;cursor:pointer;${selected.spec === s ? 'background:#ff6b7a;border-color:#ff6b7a;color:#fff;' : 'background:#fff;color:#666;'}"
-                                      onclick="setGiftSpec(${p.id},'${s}')">${s}</span>
-                            `).join('')}
-                        </div>
-                        <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#666;">
-                            <span style="color:#ff6b7a;font-weight:500;">数量：</span>
-                            <input type="number" min="1" max="99" value="${selected.qty}"
-                                   onchange="setGiftQty(${p.id}, this.value)"
-                                   onclick="event.stopPropagation()"
-                                   style="width:60px;height:26px;padding:0 6px;border:1px solid #e0e0e0;border-radius:3px;text-align:center;font-size:12px;outline:none;">
-                            <span style="color:#999;">件/单</span>
-                        </div>
-                    </div>
-                ` : ''}
+                <div style="font-size:11px;color:#999;flex-shrink:0;">¥${p.price}</div>
             </div>
         `;
     }).join('');
-    document.getElementById('selected-count').textContent = Object.keys(tempSelectedGifts).length;
+
+    // 下部：已选赠品配置区（规格 + 数量）
+    const selIds = Object.keys(tempSelectedGifts);
+    const configArea = document.getElementById('selected-gifts-config');
+    if (selIds.length === 0) {
+        configArea.innerHTML = `<div style="font-size:12px;color:#999;padding:8px;text-align:center;">请在上列表中勾选赠品商品，勾选后在此配置规格和数量</div>`;
+    } else {
+        configArea.innerHTML = selIds.map(id => {
+            const pid = parseInt(id);
+            const p = giftProductPool.find(x => x.id === pid);
+            const info = tempSelectedGifts[pid];
+            return `
+                <div style="display:flex;align-items:center;gap:12px;padding:8px 10px;background:#fff;border:1px solid #ffe0e0;border-radius:4px;">
+                    <div style="font-size:18px;">${p.img}</div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:12px;color:#333;font-weight:500;">${p.name}</div>
+                        <div style="font-size:11px;color:#999;margin-top:2px;">${p.code}</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#666;">
+                        <span style="color:#ff6b7a;font-weight:500;">规格：</span>
+                        <div style="display:flex;gap:4px;">
+                            ${p.specs.map(s => `
+                                <span onclick="event.stopPropagation();setGiftSpec(${pid},'${s}')"
+                                      style="padding:3px 8px;border:1px solid ${info.spec === s ? '#ff6b7a' : '#e0e0e0'};border-radius:3px;font-size:11px;cursor:pointer;background:${info.spec === s ? '#ff6b7a' : '#fff'};color:${info.spec === s ? '#fff' : '#666'};line-height:1.4;">${s}</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#666;">
+                        <span style="color:#ff6b7a;font-weight:500;">数量：</span>
+                        <input type="number" min="1" max="99" value="${info.qty}"
+                               onchange="event.stopPropagation();setGiftQty(${pid}, this.value)"
+                               onclick="event.stopPropagation()"
+                               style="width:56px;height:26px;padding:0 6px;border:1px solid #e0e0e0;border-radius:3px;text-align:center;font-size:12px;outline:none;">
+                        <span style="font-size:11px;color:#999;">件/单</span>
+                    </div>
+                    <div onclick="event.stopPropagation();toggleGiftInModal(${pid})"
+                         style="cursor:pointer;color:#ff4d4f;font-size:12px;padding:4px 8px;" title="移除">✕</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    document.getElementById('selected-count').textContent = selIds.length;
 }
 function toggleGiftInModal(id) {
     if (tempSelectedGifts[id]) {
