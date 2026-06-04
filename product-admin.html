@@ -545,7 +545,7 @@
                 <span class="title-text" style="color:#ff6b7a;">🎁 赠品规则（按规格配置）</span>
                 <div style="display:flex; gap:8px;">
                     <span style="font-size:12px;color:#999;font-weight:400;">多条件满足则叠加赠送</span>
-                    <button class="btn btn-primary btn-sm" onclick="openCondModal('240粒/瓶')">+ 新增赠品条件</button>
+                    <button class="btn btn-primary btn-sm" onclick="openCondModal()">+ 新增赠品条件</button>
                 </div>
             </div>
 
@@ -621,22 +621,30 @@
 <div class="modal-overlay" id="cond-modal">
     <div class="modal modal-lg">
         <div class="modal-header">
-            <div class="modal-title">新增赠品条件 - <span id="cond-modal-spec" style="color:#ff6b7a;">240粒/瓶</span></div>
+            <div class="modal-title">新增赠品条件</div>
             <button class="modal-close" onclick="document.getElementById('cond-modal').classList.remove('show')">×</button>
         </div>
         <div class="modal-body">
 
             <!-- 步骤指示 -->
             <div style="display:flex; align-items:center; margin-bottom:18px; gap:8px;">
-                <span class="step-badge step-active">1</span><span style="font-size:12px;color:#ff6b7a;font-weight:500;">选择条件类型</span>
+                <span class="step-badge step-active">1</span><span style="font-size:12px;color:#ff6b7a;font-weight:500;">选择适用规格</span>
                 <div style="flex:1;height:1px;background:#f0f0f0;margin:0 8px;"></div>
                 <span class="step-badge step-active">2</span><span style="font-size:12px;color:#ff6b7a;font-weight:500;">设置条件参数</span>
                 <div style="flex:1;height:1px;background:#f0f0f0;margin:0 8px;"></div>
-                <span class="step-badge step-active">3</span><span style="font-size:12px;color:#ff6b7a;font-weight:500;">选择赠品</span>
+                <span class="step-badge step-active">3</span><span style="font-size:12px;color:#ff6b7a;font-weight:500;">选择赠品(规格+数量)</span>
             </div>
 
-            <!-- 第1步：条件类型选择 -->
-            <div class="cond-type-tabs">
+            <!-- 第1步：主商品适用规格 -->
+            <div style="margin-bottom:16px; padding:14px 16px; background:#fff5f5; border:1px solid #ffe0e0; border-radius:6px;">
+                <div style="font-size:13px; font-weight:500; color:#ff6b7a; margin-bottom:8px;">
+                    ① 选择适用的商品规格（多选，以下规格购买时触发本赠品规则）
+                </div>
+                <div class="spec-select-list" id="main-spec-select" style="margin:0;"></div>
+            </div>
+
+            <!-- 第2步：条件类型 + 参数 -->
+            <div class="cond-type-tabs" style="margin-bottom:16px;">
                 <div class="cond-type-tab active" id="tab-qty" onclick="switchCondType('qty')">
                     <span class="big-icon">📦</span><b>按购买数量赠送</b>
                     <div class="small-desc">买 X 件赠送 Y 件赠品</div>
@@ -647,42 +655,29 @@
                 </div>
             </div>
 
-            <!-- 第2步：条件参数 -->
-            <div class="condition-setup">
-                <!-- 按数量 -->
+            <div class="condition-setup" style="margin-bottom:16px;">
                 <div id="setup-qty">
                     <div class="setup-row">
                         <span class="setup-label">📦 触发数量：</span>
                         <input type="number" id="in-qty-threshold" value="10" min="1">
                         <span class="inline-text">件及以上</span>
                     </div>
-                    <div class="setup-row">
-                        <span class="setup-label">🎁 赠送数量：</span>
-                        <input type="number" id="in-qty-gift" value="1" min="1">
-                        <span class="inline-text">件赠品</span>
-                    </div>
                     <div class="setup-preview" id="preview-qty">
-                        ✅ 预览：购买满 10 件，赠送 1 件赠品
+                        ✅ 预览：购买满 10 件，赠送对应数量赠品
                     </div>
                 </div>
-                <!-- 按金额（默认隐藏） -->
                 <div id="setup-amount" style="display:none;">
                     <div class="setup-row">
                         <span class="setup-label">💰 实付金额：</span>
                         <input type="number" id="in-amount-threshold" value="100" min="1">
                         <span class="inline-text">元及以上</span>
                     </div>
-                    <div class="setup-row">
-                        <span class="setup-label">🎁 赠送数量：</span>
-                        <input type="number" id="in-amount-gift" value="1" min="1">
-                        <span class="inline-text">件赠品</span>
-                    </div>
                     <div class="setup-preview" id="preview-amount">
-                        ✅ 预览：订单实付金额满 ¥100.00，赠送 1 件赠品
+                        ✅ 预览：订单实付金额满 ¥100.00，赠送对应数量赠品
                     </div>
                 </div>
 
-                <!-- 有效期（两种类型都需要） -->
+                <!-- 有效期 -->
                 <div style="margin-top:16px; padding-top:14px; border-top:1px dashed #e8e8e8;">
                     <div class="setup-row">
                         <span class="setup-label">📅 有效期：</span>
@@ -692,14 +687,15 @@
                     </div>
                     <div style="font-size:12px;color:#999;line-height:1.7;">
                         · 有效期内下单且满足数量/金额条件才会赠送<br>
-                        · 订单下单时间若超出有效期，即使满足条件也不赠送<br>
-                        · 多个条件各自独立设置有效期，过期条件自动失效
+                        · 过期条件自动失效
                     </div>
                 </div>
             </div>
 
-            <!-- 第3步：选择赠品商品 -->
-            <div style="margin-bottom:12px;font-size:13px;font-weight:500;color:#333;">选择赠品商品（至少选1个，多选可叠加赠送）：</div>
+            <!-- 第3步：选择赠品商品 + 规格 + 数量 -->
+            <div style="margin-bottom:10px;font-size:13px;font-weight:500;color:#333;">
+                ② 选择赠品商品（勾选后设置每个赠品的规格和数量）：
+            </div>
             <div class="product-select-list" id="gift-product-list"></div>
             <div style="font-size:12px;color:#999;margin-top:8px;">
                 已选 <span id="selected-count" style="color:#ff6b7a;font-weight:600;">0</span> 个赠品商品
@@ -771,8 +767,11 @@ const orderItems = [
 
 // 临时状态
 let currentCondType = 'qty';
-let tempSelectedGiftIds = [];
-let currentTargetSpec = '240粒/瓶';
+// tempSelectedGifts: { productId: { spec: string, qty: number } }
+let tempSelectedGifts = {};
+// 选择的主商品规格（数组，支持多选）
+let tempSelectedMainSpecs = [];
+const MAIN_PRODUCT_SPECS = ['120粒/瓶', '240粒/瓶', '360粒/瓶'];
 
 // ============ 页面切换 ============
 function switchPage(pageName) {
@@ -898,14 +897,27 @@ function editCond(spec, cid) { showToast('编辑功能（原型演示）'); }
 
 // ============ 条件弹窗 ============
 function openCondModal(spec) {
-    currentTargetSpec = spec;
-    document.getElementById('cond-modal-spec').textContent = spec;
     currentCondType = 'qty';
-    tempSelectedGiftIds = [];
+    tempSelectedGifts = {};
+    tempSelectedMainSpecs = spec ? [spec] : [];
+    renderMainSpecSelect();
     switchCondType('qty');
     renderGiftProductListInModal();
     updatePreview();
     document.getElementById('cond-modal').classList.add('show');
+}
+
+// 渲染主商品规格选择（弹窗第1步）
+function renderMainSpecSelect() {
+    const el = document.getElementById('main-spec-select');
+    el.innerHTML = MAIN_PRODUCT_SPECS.map(s => `
+        <div class="spec-select-item ${tempSelectedMainSpecs.includes(s) ? 'selected' : ''}" onclick="toggleMainSpec('${s}')">${s}</div>
+    `).join('');
+}
+function toggleMainSpec(spec) {
+    const i = tempSelectedMainSpecs.indexOf(spec);
+    if (i >= 0) tempSelectedMainSpecs.splice(i, 1); else tempSelectedMainSpecs.push(spec);
+    renderMainSpecSelect();
 }
 
 function switchCondType(type) {
@@ -938,56 +950,108 @@ document.addEventListener('input', (e) => {
 
 function renderGiftProductListInModal() {
     const list = document.getElementById('gift-product-list');
-    list.innerHTML = giftProductPool.map(p => `
-        <div class="product-select-item ${tempSelectedGiftIds.includes(p.id) ? 'selected' : ''}" onclick="toggleGiftInModal(${p.id})">
-            <div class="checkbox">✓</div>
-            <div class="product-select-img">${p.img}</div>
-            <div class="product-select-info">
-                <div class="product-select-name">${p.name}</div>
-                <div class="product-select-spec">商品编号：${p.code} · 可选规格：${p.specs.join(' / ')}</div>
+    list.innerHTML = giftProductPool.map(p => {
+        const selected = tempSelectedGifts[p.id];
+        const sel = selected ? 'selected' : '';
+        return `
+            <div class="product-select-item ${sel}" style="${selected ? '' : ''}">
+                <div onclick="toggleGiftInModal(${p.id})" style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer;">
+                    <div class="checkbox">✓</div>
+                    <div class="product-select-img">${p.img}</div>
+                    <div class="product-select-info">
+                        <div class="product-select-name">${p.name}</div>
+                        <div class="product-select-spec">商品编号：${p.code} · 可选规格：${p.specs.join(' / ')}</div>
+                    </div>
+                    <div class="product-select-price">参考价 ¥${p.price}</div>
+                </div>
+                ${selected ? `
+                    <div style="width:100%;margin-top:12px;padding-top:12px;border-top:1px dashed #ffe0e0;display:flex;align-items:center;gap:16px;flex-wrap:wrap;" onclick="event.stopPropagation()">
+                        <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#666;">
+                            <span style="color:#ff6b7a;font-weight:500;">规格：</span>
+                            ${p.specs.map(s => `
+                                <span class="spec-select-item ${selected.spec === s ? 'selected' : ''}"
+                                      style="padding:3px 10px;border:1px solid #e0e0e0;border-radius:3px;font-size:12px;cursor:pointer;${selected.spec === s ? 'background:#ff6b7a;border-color:#ff6b7a;color:#fff;' : 'background:#fff;color:#666;'}"
+                                      onclick="setGiftSpec(${p.id},'${s}')">${s}</span>
+                            `).join('')}
+                        </div>
+                        <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#666;">
+                            <span style="color:#ff6b7a;font-weight:500;">数量：</span>
+                            <input type="number" min="1" max="99" value="${selected.qty}"
+                                   onchange="setGiftQty(${p.id}, this.value)"
+                                   onclick="event.stopPropagation()"
+                                   style="width:60px;height:26px;padding:0 6px;border:1px solid #e0e0e0;border-radius:3px;text-align:center;font-size:12px;outline:none;">
+                            <span style="color:#999;">件/单</span>
+                        </div>
+                    </div>
+                ` : ''}
             </div>
-            <div class="product-select-price">参考价 ¥${p.price}</div>
-        </div>
-    `).join('');
-    document.getElementById('selected-count').textContent = tempSelectedGiftIds.length;
+        `;
+    }).join('');
+    document.getElementById('selected-count').textContent = Object.keys(tempSelectedGifts).length;
 }
 function toggleGiftInModal(id) {
-    const i = tempSelectedGiftIds.indexOf(id);
-    if (i >= 0) tempSelectedGiftIds.splice(i, 1); else tempSelectedGiftIds.push(id);
+    if (tempSelectedGifts[id]) {
+        delete tempSelectedGifts[id];
+    } else {
+        const p = giftProductPool.find(x => x.id === id);
+        tempSelectedGifts[id] = { spec: p.specs[0], qty: 1 };
+    }
     renderGiftProductListInModal();
+}
+function setGiftSpec(id, spec) {
+    if (tempSelectedGifts[id]) {
+        tempSelectedGifts[id].spec = spec;
+        renderGiftProductListInModal();
+    }
+}
+function setGiftQty(id, val) {
+    const n = parseInt(val) || 1;
+    if (tempSelectedGifts[id]) {
+        tempSelectedGifts[id].qty = n;
+        renderGiftProductListInModal();
+    }
 }
 
 function confirmCondition() {
-    if (tempSelectedGiftIds.length === 0) { showToast('请至少选择1个赠品商品'); return; }
+    if (tempSelectedMainSpecs.length === 0) { showToast('请至少选择1个适用的商品规格'); return; }
+    if (Object.keys(tempSelectedGifts).length === 0) { showToast('请至少选择1个赠品商品'); return; }
     const isQty = currentCondType === 'qty';
     const tEl = document.getElementById(isQty ? 'in-qty-threshold' : 'in-amount-threshold');
-    const gEl = document.getElementById(isQty ? 'in-qty-gift' : 'in-amount-gift');
     const start = document.getElementById('in-date-start').value;
     const end = document.getElementById('in-date-end').value;
-    if (!tEl.value || !gEl.value) { showToast('请填写完整的条件参数'); return; }
+    if (!tEl.value) { showToast('请填写完整的条件参数'); return; }
     if (!start || !end) { showToast('请选择有效期'); return; }
 
-    const gifts = tempSelectedGiftIds.map(id => {
-        const p = giftProductPool.find(x => x.id === id);
-        return { productId: id, name: p.name, code: p.code, spec: p.specs[0], qty: parseInt(gEl.value), img: p.img };
+    // 构建赠品列表（使用每个赠品自己的 spec + qty）
+    const gifts = Object.keys(tempSelectedGifts).map(id => {
+        const pid = parseInt(id);
+        const p = giftProductPool.find(x => x.id === pid);
+        const info = tempSelectedGifts[pid];
+        return { productId: pid, name: p.name, code: p.code, spec: info.spec, qty: info.qty, img: p.img };
     });
 
-    const newCond = {
-        id: 'c' + Date.now(),
-        type: currentCondType,
-        threshold: parseInt(tEl.value),
-        giftQty: parseInt(gEl.value),
-        dateStart: start,
-        dateEnd: end,
-        gifts: gifts
-    };
-    if (!currentGiftMap[currentTargetSpec]) currentGiftMap[currentTargetSpec] = [];
-    currentGiftMap[currentTargetSpec].push(newCond);
+    const threshold = parseInt(tEl.value);
+    const specCount = tempSelectedMainSpecs.length;
+    // 对每个选中的主商品规格都创建同样的条件
+    for (const spec of tempSelectedMainSpecs) {
+        const newCond = {
+            id: 'c' + Date.now() + '-' + spec,
+            type: currentCondType,
+            threshold: threshold,
+            giftQty: gifts.reduce((s, g) => s + g.qty, 0),
+            dateStart: start,
+            dateEnd: end,
+            gifts: gifts
+        };
+        if (!currentGiftMap[spec]) currentGiftMap[spec] = [];
+        currentGiftMap[spec].push(newCond);
+    }
 
     document.getElementById('cond-modal').classList.remove('show');
-    tempSelectedGiftIds = [];
+    tempSelectedGifts = {};
+    tempSelectedMainSpecs = [];
     renderGiftList();
-    showToast(`已添加「${isQty ? '按数量' : '按金额'}」条件到规格「${currentTargetSpec}」`);
+    showToast(`已添加「${isQty ? '按数量' : '按金额'}」条件到 ${specCount} 个规格`);
 }
 
 // ============ 订单明细 ============
