@@ -487,15 +487,10 @@
             <button class="btn btn-primary" onclick="switchPage('add')">+ 新增商品</button>
         </div>
         <table class="data-table">
-            <thead><tr><th style="width:70px;">图片</th><th>商品名称</th><th style="width:130px;">商品编号</th><th style="width:80px;">价格</th><th style="width:90px;">商品类型</th><th style="width:130px;">赠品条件数</th><th style="width:80px;">状态</th><th style="width:220px;">操作</th></tr></thead>
+            <thead><tr><th style="width:70px;">图片</th><th>商品名称</th><th style="width:130px;">商品编号</th><th style="width:80px;">价格</th><th style="width:90px;">商品类型</th><th style="width:130px;">赠品条件数</th><th style="width:80px;">状态</th><th style="width:240px;">操作</th></tr></thead>
             <tbody id="product-list-body"></tbody>
         </table>
-        <div class="pagination">
-            <span style="margin-right: 12px;">共 <b style="color:#ff6b7a">8</b> 条记录</span>
-            <button class="page-btn">&lt;</button>
-            <button class="page-btn active">1</button>
-            <button class="page-btn">&gt;</button>
-        </div>
+        <div class="pagination" id="pagination-bar"></div>
     </div>
 
     <!-- ====== 页面2：新增商品（含条件赠品） ====== -->
@@ -972,7 +967,7 @@ function saveEditGift() {
     renderProductList();
     showToast('赠品配置已保存');
 }
-</script>
+
 // ============ 数据 ============
 const productData = [
     { id: 1, name: '绿韵草本精华礼盒套装', code: 'SP20260604001', price: 298, stock: 500, type: '实物商品', giftCondCount: 3, status: '上架', img: '🎁' },
@@ -983,6 +978,22 @@ const productData = [
     { id: 6, name: '植物手工皂', code: 'SP20260604006', price: 0, stock: 3000, type: '赠品', giftCondCount: 0, status: '上架', img: '🧼' },
     { id: 7, name: '绿茶草本香薰蜡烛', code: 'SP20260604007', price: 68, stock: 450, type: '实物商品', giftCondCount: 1, status: '上架', img: '🕯️' },
     { id: 8, name: '绿韵草本面膜', code: 'SP20260604008', price: 0, stock: 2000, type: '赠品', giftCondCount: 0, status: '上架', img: '🧖' },
+    { id: 9, name: '品牌定制书签', code: 'SP20260604009', price: 0, stock: 8000, type: '赠品', giftCondCount: 0, status: '上架', img: '🔖' },
+    { id: 10, name: '草本试用装（3件套）', code: 'SP20260604010', price: 0, stock: 3500, type: '赠品', giftCondCount: 0, status: '上架', img: '📦' },
+    { id: 11, name: '玫瑰精华乳液', code: 'SP20260604011', price: 168, stock: 620, type: '实物商品', giftCondCount: 2, status: '上架', img: '🌹' },
+    { id: 12, name: '薰衣草安眠香包', code: 'SP20260604012', price: 58, stock: 900, type: '实物商品', giftCondCount: 0, status: '上架', img: '🌿' },
+    { id: 13, name: '茶树精油祛痘凝胶', code: 'SP20260604013', price: 128, stock: 420, type: '实物商品', giftCondCount: 1, status: '上架', img: '🌱' },
+    { id: 14, name: '蜂蜜护手霜', code: 'SP20260604014', price: 45, stock: 1500, type: '实物商品', giftCondCount: 0, status: '上架', img: '🍯' },
+    { id: 15, name: '洋甘菊舒缓爽肤水', code: 'SP20260604015', price: 98, stock: 680, type: '实物商品', giftCondCount: 1, status: '上架', img: '🌼' },
+    { id: 16, name: '薄荷清凉沐浴露', code: 'SP20260604016', price: 78, stock: 890, type: '实物商品', giftCondCount: 0, status: '上架', img: '🫧' },
+    { id: 17, name: '椰子油润发膏', code: 'SP20260604017', price: 52, stock: 550, type: '实物商品', giftCondCount: 0, status: '下架', img: '🥥' },
+    { id: 18, name: '柠檬草驱蚊喷雾', code: 'SP20260604018', price: 42, stock: 1100, type: '实物商品', giftCondCount: 0, status: '上架', img: '🍋' },
+    { id: 19, name: '橙花紧致面霜', code: 'SP20260604019', price: 218, stock: 360, type: '实物商品', giftCondCount: 2, status: '上架', img: '🍊' },
+    { id: 20, name: '荷荷巴油按摩精华', code: 'SP20260604020', price: 158, stock: 480, type: '实物商品', giftCondCount: 1, status: '上架', img: '💆' },
+    { id: 21, name: '金盏花修护眼霜', code: 'SP20260604021', price: 188, stock: 290, type: '实物商品', giftCondCount: 1, status: '上架', img: '👁️' },
+    { id: 22, name: '茉莉香氛身体乳', code: 'SP20260604022', price: 138, stock: 520, type: '实物商品', giftCondCount: 0, status: '上架', img: '🌸' },
+    { id: 23, name: '绿韵尊享护肤礼盒', code: 'SP20260604023', price: 888, stock: 150, type: '套餐商品', giftCondCount: 4, status: '上架', img: '💝' },
+    { id: 24, name: '芦荟舒缓凝胶', code: 'SP20260604024', price: 35, stock: 2000, type: '实物商品', giftCondCount: 0, status: '上架', img: '🌵' }
 ];
 
 const giftProductPool = [
@@ -1045,13 +1056,20 @@ function switchPage(pageName) {
     window.scrollTo(0, 0);
 }
 
-// ============ 商品列表 ============
+// ============ 商品列表（含分页） ============
+let currentPage = 1;
+const pageSize = 10;
+
 function renderProductList() {
     const tbody = document.getElementById('product-list-body');
-    tbody.innerHTML = productData.map(p => {
-        // 动态从 currentGiftMap 统计条件数
-        const totalConds = Object.values(currentGiftMap || {}).reduce((s, arr) => s + (arr || []).length, 0);
-        const giftCount = (p.giftCondCount > 0) ? totalConds : (p.type === '实物商品' ? totalConds : 0);
+    const total = productData.length;
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    if (currentPage > totalPages) currentPage = totalPages;
+    const start = (currentPage - 1) * pageSize;
+    const pageItems = productData.slice(start, start + pageSize);
+
+    tbody.innerHTML = pageItems.map(p => {
+        const giftCount = p.giftCondCount || 0;
         return `
         <tr>
             <td><div class="product-img-cell">${p.img}</div></td>
@@ -1060,15 +1078,38 @@ function renderProductList() {
             <td style="color:${p.price === 0 ? '#999' : '#ff6b7a'};font-weight:500;">${p.price === 0 ? '¥0 (赠品)' : '¥' + p.price}</td>
             <td><span class="tag ${p.type === '赠品' ? 'tag-blue' : 'tag-gray'}">${p.type}</span></td>
             <td>${giftCount > 0 ? `<span class="product-gift-count">${giftCount} 条</span>` : '<span style="color:#999;">—</span>'}</td>
-            <td><span class="tag tag-green">${p.status}</span></td>
+            <td><span class="tag ${p.status === '下架' ? 'tag-gray' : 'tag-green'}">${p.status}</span></td>
             <td>
                 <button class="btn-link" onclick="switchPage('add')">编辑</button>
-                <button class="btn-link" onclick="openEditGiftModal('${p.code.replace(/'/g,'')}', '${p.name.replace(/'/g,'')}')" style="color:#ff6b7a;font-weight:500;">编辑赠品</button>
+                <button class="btn-link" onclick="openEditGiftModal('${p.code}', '${p.name}')" style="color:#ff6b7a;font-weight:500;">编辑赠品</button>
                 <button class="btn-link" onclick="switchPage('order-detail')">查看</button>
-                <button class="btn-link" style="color:#ff4d4f;">删除</button>
             </td>
         </tr>
     `;}).join('');
+
+    renderPagination(total, totalPages);
+}
+
+function renderPagination(total, totalPages) {
+    const bar = document.getElementById('pagination-bar');
+    if (!bar) return;
+    let pages = '';
+    for (let i = 1; i <= totalPages; i++) {
+        pages += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="gotoPage(${i})">${i}</button>`;
+    }
+    bar.innerHTML = `
+        <span style="margin-right: 12px;">共 <b style="color:#ff6b7a">${total}</b> 条记录</span>
+        <button class="page-btn" onclick="gotoPage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled style="opacity:.5;cursor:not-allowed;"' : ''}>&lt;</button>
+        ${pages}
+        <button class="page-btn" onclick="gotoPage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled style="opacity:.5;cursor:not-allowed;"' : ''}>&gt;</button>
+        <span style="margin-left:12px;color:#999;font-size:12px;">每页 ${pageSize} 条</span>
+    `;
+}
+function gotoPage(n) {
+    const totalPages = Math.max(1, Math.ceil(productData.length / pageSize));
+    if (n < 1 || n > totalPages) return;
+    currentPage = n;
+    renderProductList();
 }
 
 // ============ 赠品列表（按规格 + 条件卡片） ============
