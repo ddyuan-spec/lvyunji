@@ -487,7 +487,7 @@
             <button class="btn btn-primary" onclick="switchPage('add')">+ 新增商品</button>
         </div>
         <table class="data-table">
-            <thead><tr><th style="width:70px;">图片</th><th>商品名称</th><th style="width:130px;">商品编号</th><th style="width:80px;">价格</th><th style="width:90px;">商品类型</th><th style="width:130px;">赠品条件数</th><th style="width:80px;">状态</th><th style="width:200px;">操作</th></tr></thead>
+            <thead><tr><th style="width:70px;">图片</th><th>商品名称</th><th style="width:130px;">商品编号</th><th style="width:80px;">价格</th><th style="width:90px;">商品类型</th><th style="width:130px;">赠品条件数</th><th style="width:80px;">状态</th><th style="width:220px;">操作</th></tr></thead>
             <tbody id="product-list-body"></tbody>
         </table>
         <div class="pagination">
@@ -717,7 +717,262 @@
 <!-- Toast -->
 <div class="toast" id="toast">操作成功</div>
 
+<!-- ========== 弹窗：编辑赠品 ========== -->
+<div class="modal-overlay" id="edit-gift-modal">
+    <div class="modal modal-lg" style="width:860px;">
+        <div class="modal-header">
+            <div class="modal-title">
+                <span style="font-size:12px;color:#999;font-weight:400;">编辑商品赠品 · </span>
+                <span id="edit-gift-product-name" style="color:#ff6b7a;">商品</span>
+            </div>
+            <button class="modal-close" onclick="document.getElementById('edit-gift-modal').classList.remove('show')">×</button>
+        </div>
+        <div class="modal-body" id="edit-gift-body" style="max-height:65vh;overflow-y:auto;">
+            <!-- 动态渲染：规格分组 + 每个规格下的条件列表 + 每个条件下的赠品 -->
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="document.getElementById('edit-gift-modal').classList.remove('show')">取消</button>
+            <button class="btn btn-primary" onclick="saveEditGift()">保存</button>
+        </div>
+    </div>
+</div>
+
 <script>
+// 编辑弹窗专用数据（深拷贝，保存时写回）
+let editGiftData = null;
+
+function openEditGiftModal(code, name) {
+    document.getElementById('edit-gift-product-name').textContent = name;
+    // 深拷贝 currentGiftMap
+    editGiftData = JSON.parse(JSON.stringify(currentGiftMap));
+    renderEditGiftBody();
+    document.getElementById('edit-gift-modal').classList.add('show');
+}
+
+function renderEditGiftBody() {
+    const specs = Object.keys(editGiftData);
+    const body = document.getElementById('edit-gift-body');
+    let totalConds = 0;
+    let totalGifts = 0;
+    specs.forEach(s => {
+        totalConds += (editGiftData[s] || []).length;
+        (editGiftData[s] || []).forEach(c => totalGifts += (c.gifts || []).length);
+    });
+
+    body.innerHTML = `
+        <div style="padding:10px 14px;background:#fff5f5;border:1px solid #ffe0e0;border-radius:6px;margin-bottom:16px;font-size:12px;color:#666;line-height:1.7;">
+            📦 当前商品共 <b style="color:#ff6b7a;">${specs.length}</b> 个规格，
+            <b style="color:#ff6b7a;">${totalConds}</b> 条赠品条件，
+            <b style="color:#ff6b7a;">${totalGifts}</b> 个赠品配置
+            · 多条件满足时叠加赠送 · 赠品不参与售后
+        </div>
+        ${specs.map(spec => renderEditSpecSection(spec, editGiftData[spec] || [])).join('')}
+        <div style="margin-top:16px;padding:12px;text-align:center;border:1px dashed #ffd9d9;border-radius:6px;background:#fffafa;">
+            <button class="btn" onclick="addNewSpecInEdit()" style="margin-right:8px;">+ 为其他规格新增条件组</button>
+            <span style="font-size:12px;color:#999;">（支持为该商品的任意规格单独配置赠品）</span>
+        </div>
+    `;
+}
+
+function renderEditSpecSection(spec, conds) {
+    const condCount = conds.length;
+    return `
+        <div style="margin-bottom:18px;padding:14px 16px;background:#fff;border:1px solid #f0f0f0;border-radius:6px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px dashed #f0f0f0;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="background:#fff0f0;color:#ff6b7a;padding:3px 10px;border-radius:3px;font-size:12px;font-weight:500;">规格：${spec}</span>
+                    <span style="font-size:12px;color:#999;">共 ${condCount} 条条件（满足任一条件即触发对应赠品，多满足多赠）</span>
+                </div>
+                <div>
+                    <button class="btn btn-sm" onclick="addConditionInEdit('${spec}')">+ 新增条件</button>
+                </div>
+            </div>
+            ${conds.length === 0
+                ? `<div style="padding:20px;text-align:center;color:#999;font-size:12px;border:1px dashed #f0f0f0;border-radius:4px;">此规格暂未配置赠品条件</div>`
+                : conds.map((cond, idx) => renderEditConditionCard(spec, idx, cond)).join('')
+            }
+        </div>
+    `;
+}
+
+function renderEditConditionCard(spec, idx, cond) {
+    const isQty = cond.type === 'qty';
+    const condKey = `${spec}__${idx}`;
+    const totalGiftQty = (cond.gifts || []).reduce((s, g) => s + (g.qty || 0), 0);
+    return `
+        <div style="margin-bottom:12px;padding:12px 14px;background:#fafbfc;border:1px solid #eef1f4;border-radius:6px;">
+            <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">
+                <div style="width:26px;height:26px;border-radius:4px;background:${isQty ? '#e6f4ff' : '#f6ffed'};color:${isQty ? '#1677ff' : '#52c41a'};display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">${isQty ? '件' : '¥'}</div>
+                <div style="flex:1;">
+                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+                        <span style="font-size:12px;color:#333;font-weight:500;">条件类型：</span>
+                        <div style="display:flex;gap:4px;">
+                            <span onclick="changeCondType('${condKey}','qty')"
+                                  style="padding:3px 10px;border:1px solid ${isQty ? '#ff6b7a' : '#e0e0e0'};border-radius:3px;font-size:12px;cursor:pointer;background:${isQty ? '#ff6b7a' : '#fff'};color:${isQty ? '#fff' : '#666'};">按购买数量</span>
+                            <span onclick="changeCondType('${condKey}','amount')"
+                                  style="padding:3px 10px;border:1px solid ${!isQty ? '#ff6b7a' : '#e0e0e0'};border-radius:3px;font-size:12px;cursor:pointer;background:${!isQty ? '#ff6b7a' : '#fff'};color:${!isQty ? '#fff' : '#666'};">按订单金额</span>
+                        </div>
+                        <span style="font-size:12px;color:#333;font-weight:500;margin-left:10px;">阈值：</span>
+                        <input type="number" min="1" value="${cond.threshold}"
+                               onchange="changeCondThreshold('${condKey}', this.value)"
+                               style="width:80px;height:26px;padding:0 8px;border:1px solid #e0e0e0;border-radius:3px;font-size:12px;text-align:center;outline:none;">
+                        <span style="font-size:12px;color:#999;">${isQty ? '件及以上赠送' : '元及以上赠送'}</span>
+                        <span style="font-size:12px;color:#333;font-weight:500;margin-left:10px;">有效期：</span>
+                        <input type="date" value="${cond.dateStart}"
+                               onchange="changeCondDate('${condKey}','start', this.value)"
+                               style="height:26px;padding:0 6px;border:1px solid #e0e0e0;border-radius:3px;font-size:12px;outline:none;">
+                        <span style="font-size:12px;color:#999;">至</span>
+                        <input type="date" value="${cond.dateEnd}"
+                               onchange="changeCondDate('${condKey}','end', this.value)"
+                               style="height:26px;padding:0 6px;border:1px solid #e0e0e0;border-radius:3px;font-size:12px;outline:none;">
+                    </div>
+                    <div style="font-size:12px;color:#999;">
+                        ✅ 预览：${isQty ? '购买满' : '订单实付'} ${cond.threshold} ${isQty ? '件' : '元'}，赠送 ${(cond.gifts||[]).length} 种赠品共 ${totalGiftQty} 件
+                    </div>
+                </div>
+                <button class="btn-link" style="color:#ff4d4f;font-size:12px;" onclick="removeConditionInEdit('${condKey}')">删除条件</button>
+            </div>
+            <!-- 赠品列表 -->
+            <div style="padding:10px 12px;background:#fff;border:1px solid #f0f0f0;border-radius:4px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                    <div style="font-size:12px;color:#333;font-weight:500;">🎁 赠品列表（共 ${(cond.gifts||[]).length} 种）：</div>
+                    <button class="btn btn-sm" onclick="addGiftToCondition('${condKey}')">+ 新增赠品</button>
+                </div>
+                ${(cond.gifts || []).length === 0
+                    ? `<div style="padding:12px;text-align:center;color:#999;font-size:12px;">暂未配置赠品</div>`
+                    : `<div style="display:flex;flex-direction:column;gap:6px;">
+                        ${cond.gifts.map((g, gi) => renderEditGiftItem(condKey, gi, g)).join('')}
+                       </div>`
+                }
+            </div>
+        </div>
+    `;
+}
+
+function renderEditGiftItem(condKey, gi, g) {
+    const giftPoolItem = giftProductPool.find(x => x.name === g.name || x.code === g.code);
+    const specs = giftPoolItem ? giftPoolItem.specs : [g.spec];
+    const img = g.img || '🎁';
+    return `
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#fafbfc;border:1px solid #f0f0f0;border-radius:4px;">
+            <div style="font-size:20px;">${img}</div>
+            <div style="flex:1;min-width:0;">
+                <div style="font-size:12px;color:#333;font-weight:500;">${g.name}</div>
+                <div style="font-size:11px;color:#999;margin-top:2px;">${g.code || ''}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#666;">
+                <span style="color:#ff6b7a;font-weight:500;">规格：</span>
+                <div style="display:flex;gap:4px;">
+                    ${specs.map(s => `
+                        <span onclick="changeGiftSpec('${condKey}', ${gi}, '${s}')"
+                              style="padding:3px 8px;border:1px solid ${g.spec === s ? '#ff6b7a' : '#e0e0e0'};border-radius:3px;font-size:11px;cursor:pointer;background:${g.spec === s ? '#ff6b7a' : '#fff'};color:${g.spec === s ? '#fff' : '#666'};">${s}</span>
+                    `).join('')}
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#666;">
+                <span style="color:#ff6b7a;font-weight:500;">数量：</span>
+                <input type="number" min="1" max="99" value="${g.qty || 1}"
+                       onchange="changeGiftQty('${condKey}', ${gi}, this.value)"
+                       style="width:50px;height:24px;padding:0 6px;border:1px solid #e0e0e0;border-radius:3px;text-align:center;font-size:12px;outline:none;">
+                <span style="font-size:11px;color:#999;">件</span>
+            </div>
+            <div onclick="removeGiftFromCondition('${condKey}', ${gi})"
+                 style="cursor:pointer;color:#ff4d4f;font-size:14px;padding:4px 8px;" title="移除">✕</div>
+        </div>
+    `;
+}
+
+// ======= 编辑操作函数 =======
+function findCondByKey(condKey) {
+    const [spec, idxStr] = condKey.split('__');
+    return { spec: decodeURIComponent(spec), idx: parseInt(idxStr), cond: editGiftData[decodeURIComponent(spec)][parseInt(idxStr)] };
+}
+
+function changeCondType(condKey, type) {
+    const r = findCondByKey(condKey);
+    r.cond.type = type;
+    renderEditGiftBody();
+}
+function changeCondThreshold(condKey, val) {
+    const r = findCondByKey(condKey);
+    r.cond.threshold = parseInt(val) || 1;
+    renderEditGiftBody();
+}
+function changeCondDate(condKey, field, val) {
+    const r = findCondByKey(condKey);
+    if (field === 'start') r.cond.dateStart = val;
+    else r.cond.dateEnd = val;
+    // 不重新渲染（避免输入中断）
+}
+function removeConditionInEdit(condKey) {
+    const r = findCondByKey(condKey);
+    if (!confirm('确认删除此条件？')) return;
+    editGiftData[r.spec].splice(r.idx, 1);
+    renderEditGiftBody();
+}
+function addConditionInEdit(spec) {
+    if (!editGiftData[spec]) editGiftData[spec] = [];
+    editGiftData[spec].push({
+        id: 'c_new_' + Date.now(),
+        type: 'qty',
+        threshold: 10,
+        giftQty: 1,
+        dateStart: '2026-06-01',
+        dateEnd: '2026-12-31',
+        gifts: []
+    });
+    renderEditGiftBody();
+}
+function addNewSpecInEdit() {
+    const s = prompt('请输入规格名称（如：120粒/瓶）：');
+    if (!s) return;
+    if (!editGiftData[s]) editGiftData[s] = [];
+    addConditionInEdit(s);
+}
+function addGiftToCondition(condKey) {
+    // 简单的选择逻辑：从赠品池中选第一个未选的；或弹窗让用户选择
+    // 为简单起见，展示一个临时选择面板
+    const pick = prompt('从赠品池选择：输入要添加的赠品编号（1=草本护发精油小样，2=植物手工皂，3=草本面膜，4=定制书签，5=草本试用装）：', '1');
+    if (!pick) return;
+    const poolItems = [
+        { name: '草本护发精油（小样）', code: 'SP20260604004', spec: '10ml小样', img: '🧴' },
+        { name: '植物手工皂', code: 'SP20260604006', spec: '薰衣草', img: '🧼' },
+        { name: '绿韵草本面膜（5片装）', code: 'SP20260604008', spec: '补水', img: '🧖' },
+        { name: '品牌定制书签', code: 'SP20260604011', spec: '经典款', img: '🔖' },
+        { name: '草本试用装（3件套）', code: 'SP20260604010', spec: '旅行装', img: '📦' },
+    ];
+    const item = poolItems[parseInt(pick) - 1];
+    if (!item) { showToast('编号无效'); return; }
+    const r = findCondByKey(condKey);
+    r.cond.gifts.push({ productId: Date.now(), name: item.name, code: item.code, spec: item.spec, qty: 1, img: item.img });
+    renderEditGiftBody();
+}
+function changeGiftSpec(condKey, gi, spec) {
+    const r = findCondByKey(condKey);
+    r.cond.gifts[gi].spec = spec;
+    renderEditGiftBody();
+}
+function changeGiftQty(condKey, gi, val) {
+    const r = findCondByKey(condKey);
+    r.cond.gifts[gi].qty = parseInt(val) || 1;
+    // 不重新渲染整个body，避免输入焦点丢失
+}
+function removeGiftFromCondition(condKey, gi) {
+    const r = findCondByKey(condKey);
+    r.cond.gifts.splice(gi, 1);
+    renderEditGiftBody();
+}
+
+function saveEditGift() {
+    // 写回主数据
+    currentGiftMap = editGiftData;
+    document.getElementById('edit-gift-modal').classList.remove('show');
+    if (typeof renderGiftList === 'function') renderGiftList();
+    // 更新商品列表的条件数显示
+    renderProductList();
+    showToast('赠品配置已保存');
+}
+</script>
 // ============ 数据 ============
 const productData = [
     { id: 1, name: '绿韵草本精华礼盒套装', code: 'SP20260604001', price: 298, stock: 500, type: '实物商品', giftCondCount: 3, status: '上架', img: '🎁' },
@@ -793,22 +1048,27 @@ function switchPage(pageName) {
 // ============ 商品列表 ============
 function renderProductList() {
     const tbody = document.getElementById('product-list-body');
-    tbody.innerHTML = productData.map(p => `
+    tbody.innerHTML = productData.map(p => {
+        // 动态从 currentGiftMap 统计条件数
+        const totalConds = Object.values(currentGiftMap || {}).reduce((s, arr) => s + (arr || []).length, 0);
+        const giftCount = (p.giftCondCount > 0) ? totalConds : (p.type === '实物商品' ? totalConds : 0);
+        return `
         <tr>
             <td><div class="product-img-cell">${p.img}</div></td>
             <td><div class="product-name-cell">${p.name}</div></td>
             <td>${p.code}</td>
             <td style="color:${p.price === 0 ? '#999' : '#ff6b7a'};font-weight:500;">${p.price === 0 ? '¥0 (赠品)' : '¥' + p.price}</td>
             <td><span class="tag ${p.type === '赠品' ? 'tag-blue' : 'tag-gray'}">${p.type}</span></td>
-            <td>${p.giftCondCount > 0 ? `已配置 <span class="product-gift-count">${p.giftCondCount}</span> 条` : '—'}</td>
+            <td>${giftCount > 0 ? `<span class="product-gift-count">${giftCount} 条</span>` : '<span style="color:#999;">—</span>'}</td>
             <td><span class="tag tag-green">${p.status}</span></td>
             <td>
                 <button class="btn-link" onclick="switchPage('add')">编辑</button>
+                <button class="btn-link" onclick="openEditGiftModal('${p.code.replace(/'/g,'')}', '${p.name.replace(/'/g,'')}')" style="color:#ff6b7a;font-weight:500;">编辑赠品</button>
                 <button class="btn-link" onclick="switchPage('order-detail')">查看</button>
                 <button class="btn-link" style="color:#ff4d4f;">删除</button>
             </td>
         </tr>
-    `).join('');
+    `;}).join('');
 }
 
 // ============ 赠品列表（按规格 + 条件卡片） ============
