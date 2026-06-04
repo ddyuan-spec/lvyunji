@@ -487,7 +487,7 @@
             <button class="btn btn-primary" onclick="switchPage('add')">+ 新增商品</button>
         </div>
         <table class="data-table">
-            <thead><tr><th style="width:70px;">图片</th><th>商品名称</th><th style="width:130px;">商品编号</th><th style="width:80px;">价格</th><th style="width:90px;">商品类型</th><th style="width:130px;">赠品条件数</th><th style="width:80px;">状态</th><th style="width:240px;">操作</th></tr></thead>
+            <thead><tr><th style="width:70px;">图片</th><th>商品名称</th><th style="width:130px;">商品编号</th><th style="width:80px;">价格</th><th style="width:90px;">商品类型</th><th style="width:80px;">状态</th><th style="width:200px;">操作</th></tr></thead>
             <tbody id="product-list-body"></tbody>
         </table>
         <div class="pagination" id="pagination-bar"></div>
@@ -1068,16 +1068,13 @@ function renderProductList() {
     const start = (currentPage - 1) * pageSize;
     const pageItems = productData.slice(start, start + pageSize);
 
-    tbody.innerHTML = pageItems.map(p => {
-        const giftCount = p.giftCondCount || 0;
-        return `
+    tbody.innerHTML = pageItems.map(p => `
         <tr>
             <td><div class="product-img-cell">${p.img}</div></td>
             <td><div class="product-name-cell">${p.name}</div></td>
             <td>${p.code}</td>
             <td style="color:${p.price === 0 ? '#999' : '#ff6b7a'};font-weight:500;">${p.price === 0 ? '¥0 (赠品)' : '¥' + p.price}</td>
             <td><span class="tag ${p.type === '赠品' ? 'tag-blue' : 'tag-gray'}">${p.type}</span></td>
-            <td>${giftCount > 0 ? `<span class="product-gift-count">${giftCount} 条</span>` : '<span style="color:#999;">—</span>'}</td>
             <td><span class="tag ${p.status === '下架' ? 'tag-gray' : 'tag-green'}">${p.status}</span></td>
             <td>
                 <button class="btn-link" onclick="switchPage('add')">编辑</button>
@@ -1085,7 +1082,7 @@ function renderProductList() {
                 <button class="btn-link" onclick="switchPage('order-detail')">查看</button>
             </td>
         </tr>
-    `;}).join('');
+    `).join('');
 
     renderPagination(total, totalPages);
 }
