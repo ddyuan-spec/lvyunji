@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品管理 - 原型预览</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5; color: #333; font-size: 13px; line-height: 1.6;
+        }
+
+        /* ========== 顶部导航 ========== */
+        .top-header {
+            position: fixed; top: 0; left: 0; right: 0; height: 56px;
+            background: #2b2d42; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 16px; z-index: 1000;
+        }
+        .logo { color: #fff; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .logo::before { content: '🧮'; font-size: 20px; }
+        .top-nav { display: flex; gap: 20px; }
+        .top-nav-item {
+            color: #a0a0b0; font-size: 13px; cursor: pointer; padding: 8px 12px;
+            border-radius: 4px; transition: all .2s;
+        }
+        .top-nav-item:hover { color: #fff; background: rgba(255,255,255,0.08); }
+        .top-nav-item.active { color: #ff6b7a; background: rgba(255,107,122,0.1); }
+        .admin-info { color: #a0a0b0; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+        .admin-info::before { content: '👤'; }
+
+        /* ========== 侧边栏 ========== */
+        .sidebar {
+            position: fixed; top: 56px; left: 0; bottom: 0; width: 180px;
+            background: #fff; border-right: 1px solid #e8e8e8; overflow-y: auto;
+        }
+        .sidebar-menu { padding: 8px 0; }
+        .sidebar-group-title { padding: 10px 16px 6px; color: #999; font-size: 12px; font-weight: 600; }
+        .sidebar-item {
+            display: flex; align-items: center; padding: 10px 16px; color: #555;
+            font-size: 13px; cursor: pointer; transition: all .15s;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-item:hover { background: #f5f5f7; }
+        .sidebar-item.active {
+            background: #fff0f0; color: #ff6b7a; border-left-color: #ff6b7a; font-weight: 500;
+        }
+        .sidebar-item .icon { margin-right: 8px; font-size: 14px; }
+
+        /* ========== 主内容区 ========== */
+        .main {
+            margin-left: 180px; margin-top: 56px; padding: 16px;
+            min-height: calc(100vh - 56px);
+        }
+
+        .breadcrumb {
+            font-size: 12px; color: #999; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .breadcrumb a { color: #666; text-decoration: none; cursor: pointer; }
+        .breadcrumb a:hover { color: #ff6b7a; }
+        .breadcrumb span { color: #ccc; margin: 0 4px; }
+        .breadcrumb .current { color: #333; }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* ========== 卡片/区块 ========== */
+        .card {
+            background: #fff; border-radius: 6px; padding: 20px 24px; margin-bottom: 16px;
+        }
+        .section {
+            background: #fff; border-radius: 6px; padding: 20px 24px; margin-bottom: 12px;
+        }
+        .section-title {
+            font-size: 14px; font-weight: 600; color: #333; margin-bottom: 16px;
+            padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .required-star { color: #ff6b7a; margin-right: 2px; }
+
+        /* ========== 搜索/筛选区 ========== */
+        .search-bar {
+            background: #fff; border-radius: 6px; padding: 16px 20px; margin-bottom: 16px;
+            display: flex; align-items: center; flex-wrap: wrap; gap: 12px;
+        }
+        .search-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #666; }
+        .search-item input, .search-item select {
+            height: 32px; padding: 0 10px; border: 1px solid #e0e0e0; border-radius: 4px;
+            font-size: 13px; outline: none; min-width: 120px;
+        }
+
+        /* ========== 按钮 ========== */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            height: 32px; padding: 0 16px; border: 1px solid #e0e0e0;
+            border-radius: 4px; background: #fff; color: #666;
+            font-size: 13px; cursor: pointer; transition: all .15s;
+            gap: 4px; white-space: nowrap;
+        }
+        .btn:hover { border-color: #ff6b7a; color: #ff6b7a; }
+        .btn-primary { background: #ff6b7a; color: #fff; border-color: #ff6b7a; }
+        .btn-primary:hover { background: #ff5252; border-color: #ff5252; color: #fff; }
+        .btn-sm { height: 28px; padding: 0 10px; font-size: 12px; }
+        .btn-link {
+            background: none; border: none; color: #ff6b7a; padding: 0 4px; height: auto;
+            font-size: 12px; cursor: pointer;
+        }
+        .btn-link:hover { color: #ff5252; text-decoration: underline; }
+        .btn-add-spec {
+            background: #fafafa; border: 1px dashed #e0e0e0; color: #666;
+            width: 100%; height: 32px; margin-top: 8px;
+        }
+        .btn-add-spec:hover { border-color: #ff6b7a; color: #ff6b7a; background: #fff0f0; }
+
+        /* ========== 表格 ========== */
+        .data-table {
+            width: 100%; border-collapse: collapse; background: #fff; border-radius: 6px; overflow: hidden;
+        }
+        .data-table th, .data-table td {
+            padding: 12px; text-align: left; border-bottom: 1px solid #f0f0f0; font-size: 13px;
+        }
+        .data-table th {
+            background: #fafafa; color: #666; font-weight: 500; border-bottom: 1px solid #e8e8e8;
+        }
+        .data-table tr:hover td { background: #fafafa; }
+        .data-table tr:last-child td { border-bottom: none; }
+
+        /* ========== 表单 ========== */
+        .form-row {
+            display: flex; align-items: flex-start; margin-bottom: 18px; gap: 40px; flex-wrap: wrap;
+        }
+        .form-item { display: flex; align-items: center; gap: 8px; min-width: 320px; }
+        .form-item .label { min-width: 90px; text-align: right; color: #333; font-size: 13px; flex-shrink: 0; }
+        .form-item input[type="text"], .form-item input[type="number"],
+        .form-item select, .form-item textarea {
+            height: 32px; padding: 0 10px; border: 1px solid #e0e0e0; border-radius: 4px;
+            font-size: 13px; outline: none; flex: 1; min-width: 200px; background: #fff;
+        }
+        .form-item textarea { height: 80px; padding: 8px 10px; resize: vertical; }
+        .radio-group { display: flex; gap: 16px; flex-wrap: wrap; }
+        .radio-group label { display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: 13px; color: #555; }
+
+        /* ========== 图片上传 ========== */
+        .image-upload-area { display: flex; gap: 12px; flex-wrap: wrap; }
+        .image-upload-box {
+            width: 100px; height: 100px; border: 1px dashed #e0e0e0; border-radius: 4px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; background: #fafafa; color: #999; transition: all .15s;
+        }
+        .image-upload-box:hover { border-color: #ff6b7a; color: #ff6b7a; background: #fff0f0; }
+        .image-upload-box .plus { font-size: 24px; font-weight: 300; }
+        .image-upload-box .tip { font-size: 11px; margin-top: 4px; }
+        .image-item {
+            width: 100px; height: 100px; border: 1px solid #e0e0e0; border-radius: 4px;
+            position: relative; overflow: hidden; background: #fafafa;
+        }
+        .image-item .img-content {
+            width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+            font-size: 36px;
+        }
+        .image-item .img-remove {
+            position: absolute; top: 4px; right: 4px; width: 20px; height: 20px;
+            background: rgba(0,0,0,0.6); color: #fff; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 14px;
+        }
+        .image-item .img-label {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: rgba(0,0,0,0.5); color: #fff; font-size: 11px;
+            padding: 2px 4px; text-align: center;
+        }
+
+        /* ========== 规格表格 ========== */
+        .spec-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .spec-table th, .spec-table td { padding: 8px 10px; border: 1px solid #f0f0f0; text-align: center; }
+        .spec-table th { background: #fafafa; font-weight: 500; color: #666; }
+        .spec-table input[type="text"], .spec-table input[type="number"] {
+            width: 100%; height: 28px; padding: 0 8px; border: 1px solid #e8e8e8;
+            border-radius: 3px; text-align: center; font-size: 12px; outline: none;
+        }
+        .spec-group-input {
+            display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 12px;
+            background: #fafafa; border-radius: 4px;
+        }
+        .spec-group-input .spec-label { display: flex; align-items: center; gap: 6px; min-width: 120px; }
+        .spec-group-input input[type="text"] { flex: 1; height: 28px; padding: 0 10px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 12px; outline: none; }
+
+        /* ========== 赠品列表（按规格分组 + 多条件卡片） ========== */
+        .gift-empty { padding: 30px; text-align: center; color: #999; font-size: 13px; border: 1px dashed #f0f0f0; border-radius: 4px; background: #fff; }
+        .spec-section {
+            margin-bottom: 18px; background: #fff; border: 1px solid #f0f0f0; border-radius: 6px; padding: 14px 16px;
+        }
+        .spec-section-head {
+            display: flex; align-items: center; justify-content: space-between;
+            padding-bottom: 10px; margin-bottom: 12px; border-bottom: 1px dashed #f0f0f0;
+        }
+        .spec-tag {
+            background: #fff0f0; color: #ff6b7a; padding: 3px 10px; border-radius: 3px;
+            font-size: 12px; font-weight: 500;
+        }
+        .spec-meta { font-size: 12px; color: #999; margin-left: 10px; }
+
+        /* 条件卡片 */
+        .condition-card {
+            background: #fafbfc; border: 1px solid #eef1f4; border-radius: 6px; padding: 12px 14px;
+            margin-bottom: 10px; display: flex; gap: 12px; align-items: flex-start;
+        }
+        .condition-card:hover { border-color: #ffd9d9; background: #fffafa; }
+        .condition-icon {
+            width: 36px; height: 36px; border-radius: 6px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center; font-size: 18px;
+        }
+        .condition-icon.type-qty { background: #e6f4ff; color: #1677ff; }
+        .condition-icon.type-amount { background: #f6ffed; color: #52c41a; }
+        .condition-body { flex: 1; min-width: 0; }
+        .condition-title {
+            display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+            font-size: 13px; color: #333; font-weight: 500;
+        }
+        .condition-type-badge {
+            padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 500;
+        }
+        .condition-type-badge.type-qty { background: #e6f4ff; color: #1677ff; }
+        .condition-type-badge.type-amount { background: #f6ffed; color: #52c41a; }
+        .condition-rule { font-size: 12px; color: #555; margin-bottom: 6px; line-height: 1.7; }
+        .condition-rule .hl { color: #ff6b7a; font-weight: 600; }
+        .condition-gifts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+        .mini-gift {
+            background: #fff; border: 1px solid #f0f0f0; border-radius: 4px;
+            padding: 6px 10px; display: flex; align-items: center; gap: 6px; font-size: 12px;
+        }
+        .mini-gift .mini-img { font-size: 16px; }
+        .mini-gift .mini-name { color: #333; }
+        .mini-gift .mini-qty { color: #ff6b7a; font-weight: 500; }
+        .condition-date {
+            font-size: 11px; color: #999; margin-top: 6px; display: flex; align-items: center; gap: 4px;
+        }
+        .condition-date.expiring { color: #faad14; }
+        .condition-actions { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+        .condition-actions .btn-link { padding: 0 2px; }
+
+        /* ========== 赠品标签 ========== */
+        .gift-tag {
+            display: inline-block; padding: 2px 8px; background: #fff0f0; color: #ff6b7a;
+            border-radius: 3px; font-size: 11px; font-weight: 500; margin-left: 4px;
+        }
+
+        /* ========== 弹窗 ========== */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.45); z-index: 2000; align-items: center; justify-content: center;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal {
+            background: #fff; border-radius: 8px; width: 720px; max-width: 90vw;
+            max-height: 85vh; display: flex; flex-direction: column; overflow: hidden;
+        }
+        .modal-lg { width: 820px; }
+        .modal-header {
+            padding: 16px 20px; border-bottom: 1px solid #f0f0f0;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-title { font-size: 15px; font-weight: 600; color: #333; }
+        .modal-close {
+            background: none; border: none; font-size: 20px; color: #999;
+            cursor: pointer; width: 28px; height: 28px; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .modal-close:hover { background: #f5f5f5; color: #ff6b7a; }
+        .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+        .modal-footer {
+            padding: 12px 20px; border-top: 1px solid #f0f0f0;
+            display: flex; justify-content: flex-end; gap: 8px;
+        }
+
+        /* 步骤指示 */
+        .step-badge {
+            width: 26px; height: 26px; border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 600;
+            background: #f0f0f0; color: #999;
+        }
+        .step-badge.step-active { background: #ff6b7a; color: #fff; }
+
+        /* 条件类型选择 Tab */
+        .cond-type-tabs {
+            display: flex; gap: 8px; margin-bottom: 16px; padding: 4px;
+            background: #f5f5f5; border-radius: 6px;
+        }
+        .cond-type-tab {
+            flex: 1; padding: 12px 16px; text-align: center; border-radius: 4px;
+            cursor: pointer; font-size: 13px; color: #666; transition: all .15s;
+        }
+        .cond-type-tab.active {
+            background: #fff; color: #ff6b7a; font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .cond-type-tab .big-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+        .cond-type-tab .small-desc { font-size: 11px; color: #999; font-weight: 400; margin-top: 2px; }
+
+        /* 条件设置表单 */
+        .condition-setup {
+            background: #fafbfc; border: 1px solid #eef1f4; border-radius: 6px; padding: 16px;
+            margin-bottom: 16px;
+        }
+        .setup-row {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 14px; font-size: 13px; color: #555;
+        }
+        .setup-row .setup-label { min-width: 110px; color: #333; font-weight: 500; flex-shrink: 0; }
+        .setup-row input[type="number"] {
+            width: 100px; height: 32px; padding: 0 10px; border: 1px solid #e0e0e0;
+            border-radius: 4px; font-size: 13px; outline: none; text-align: center;
+        }
+        .setup-row input[type="date"] {
+            height: 32px; padding: 0 10px; border: 1px solid #e0e0e0;
+            border-radius: 4px; font-size: 13px; outline: none;
+        }
+        .setup-row input:focus { border-color: #ff6b7a; }
+        .setup-row .inline-text { color: #666; }
+        .setup-preview {
+            background: #fff6f6; border: 1px solid #ffd9d9; border-radius: 4px;
+            padding: 10px 14px; color: #ff6b7a; font-size: 13px; margin-top: 8px;
+            font-weight: 500;
+        }
+
+        /* 弹窗内的商品选择 */
+        .modal-search {
+            display: flex; gap: 8px; margin-bottom: 16px; padding: 12px;
+            background: #fafafa; border-radius: 6px;
+        }
+        .modal-search input {
+            flex: 1; height: 32px; padding: 0 10px; border: 1px solid #e0e0e0;
+            border-radius: 4px; font-size: 13px; outline: none;
+        }
+        .product-select-list { max-height: 340px; overflow-y: auto; }
+        .product-select-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px;
+            border: 1px solid #f0f0f0; border-radius: 6px; margin-bottom: 8px;
+            cursor: pointer; transition: all .15s;
+        }
+        .product-select-item:hover { border-color: #ff6b7a; background: #fffafa; }
+        .product-select-item.selected { border-color: #ff6b7a; background: #fff0f0; }
+        .product-select-item .checkbox {
+            width: 16px; height: 16px; border: 2px solid #ddd; border-radius: 3px;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            font-size: 11px; color: transparent;
+        }
+        .product-select-item.selected .checkbox { background: #ff6b7a; border-color: #ff6b7a; color: #fff; }
+        .product-select-img {
+            width: 44px; height: 44px; background: #f5f5f5; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+        }
+        .product-select-info { flex: 1; min-width: 0; }
+        .product-select-name { font-size: 13px; color: #333; font-weight: 500; margin-bottom: 4px; }
+        .product-select-spec { font-size: 12px; color: #999; }
+        .product-select-price { font-size: 12px; color: #ff6b7a; font-weight: 500; flex-shrink: 0; }
+
+        /* 规格选择标签 */
+        .spec-select-list { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+        .spec-select-item {
+            padding: 6px 14px; border: 1px solid #e0e0e0; border-radius: 4px;
+            font-size: 12px; color: #666; cursor: pointer; transition: all .15s; background: #fff;
+        }
+        .spec-select-item:hover { border-color: #ff6b7a; color: #ff6b7a; }
+        .spec-select-item.selected { background: #ff6b7a; border-color: #ff6b7a; color: #fff; }
+
+        /* ========== 状态标签 ========== */
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; }
+        .tag-green { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
+        .tag-blue { background: #e6f7ff; color: #1677ff; border: 1px solid #91d5ff; }
+        .tag-gray { background: #fafafa; color: #999; border: 1px solid #e8e8e8; }
+        .tag-orange { background: #fff7e6; color: #faad14; border: 1px solid #ffd591; }
+
+        /* ========== Toast提示 ========== */
+        .toast {
+            position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); color: #fff; padding: 10px 20px;
+            border-radius: 4px; font-size: 13px; z-index: 3000;
+            display: none;
+        }
+        .toast.show { display: block; }
+
+        /* 底部操作栏 */
+        .bottom-bar {
+            position: sticky; bottom: 0; background: #fff; padding: 14px 24px;
+            border-top: 1px solid #f0f0f0; display: flex; justify-content: center;
+            gap: 12px; border-radius: 0 0 6px 6px;
+        }
+        .bottom-bar .btn { height: 36px; padding: 0 24px; font-size: 13px; }
+
+        /* 商品列表页 */
+        .product-img-cell {
+            width: 48px; height: 48px; background: #f5f5f5; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center; font-size: 20px;
+        }
+        .product-name-cell { font-weight: 500; }
+        .product-gift-count { color: #ff6b7a; font-size: 12px; font-weight: 600; }
+
+        /* 订单详情 */
+        .order-card {
+            background: #fff; border-radius: 6px; padding: 16px 20px; margin-bottom: 12px;
+        }
+        .order-card-title {
+            font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px;
+            padding-bottom: 10px; border-bottom: 1px solid #f0f0f0;
+        }
+        .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .info-item { display: flex; font-size: 13px; }
+        .info-item .info-label { color: #999; min-width: 80px; }
+        .info-item .info-value { color: #333; flex: 1; }
+        .gift-row td { background: #fffafa !important; }
+
+        /* 赠品触发来源标签 */
+        .trigger-tag {
+            display: inline-block; padding: 2px 6px; border-radius: 3px;
+            font-size: 11px; margin-top: 4px; font-weight: 500;
+        }
+        .trigger-tag.qty { background: #e6f4ff; color: #1677ff; }
+        .trigger-tag.amount { background: #f6ffed; color: #52c41a; }
+
+        /* 多条件叠加说明 */
+        .multi-hint {
+            background: #fff7e6; border: 1px solid #ffd591; border-radius: 4px;
+            padding: 10px 14px; color: #ad6800; font-size: 12px; line-height: 1.7;
+            margin-bottom: 12px;
+        }
+        .multi-hint b { color: #faad14; }
+
+        /* 分页 */
+        .pagination {
+            display: flex; justify-content: flex-end; align-items: center; gap: 4px;
+            padding: 16px 0; font-size: 13px; color: #666;
+        }
+        .page-btn {
+            min-width: 28px; height: 28px; padding: 0 8px; border: 1px solid #e0e0e0;
+            background: #fff; color: #666; border-radius: 3px; cursor: pointer; font-size: 12px;
+        }
+        .page-btn:hover { border-color: #ff6b7a; color: #ff6b7a; }
+        .page-btn.active { background: #ff6b7a; border-color: #ff6b7a; color: #fff; }
+    </style>
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<div class="top-header">
+    <div class="logo">绿韵家管理系统</div>
+    <div class="top-nav">
+        <div class="top-nav-item">控制台</div>
+        <div class="top-nav-item active">商品管理</div>
+        <div class="top-nav-item">订单中心</div>
+        <div class="top-nav-item">会员中心</div>
+        <div class="top-nav-item">营销中心</div>
+        <div class="top-nav-item">数据中心</div>
+    </div>
+    <div class="admin-info">管理员 admin</div>
+</div>
+
+<!-- 侧边栏 -->
+<div class="sidebar">
+    <div class="sidebar-menu">
+        <div class="sidebar-group-title">商品管理</div>
+        <div class="sidebar-item active" onclick="switchPage('list')"><span class="icon">📋</span>商品列表</div>
+        <div class="sidebar-item" onclick="switchPage('add')"><span class="icon">➕</span>新增商品</div>
+        <div class="sidebar-item"><span class="icon">📁</span>分类管理</div>
+    </div>
+    <div class="sidebar-menu">
+        <div class="sidebar-group-title">订单中心</div>
+        <div class="sidebar-item" onclick="switchPage('order-detail')"><span class="icon">📦</span>订单管理</div>
+        <div class="sidebar-item"><span class="icon">↩️</span>售后管理</div>
+    </div>
+</div>
+
+<!-- 主内容区 -->
+<div class="main">
+
+    <!-- ====== 页面1：商品列表 ====== -->
+    <div class="page active" id="page-list">
+        <div class="breadcrumb">
+            <a>首页</a><span>/</span><a>商品管理</a><span>/</span><span class="current">商品列表</span>
+        </div>
+        <div class="search-bar">
+            <div class="search-item"><span>分类：</span><select><option>全部分类</option></select></div>
+            <div class="search-item"><span>商品名称：</span><input type="text" placeholder="请输入商品名称"></div>
+            <button class="btn btn-primary">搜索</button>
+            <button class="btn">重置</button>
+            <div style="flex: 1;"></div>
+            <button class="btn btn-primary" onclick="switchPage('add')">+ 新增商品</button>
+        </div>
+        <table class="data-table">
+            <thead><tr><th style="width:70px;">图片</th><th>商品名称</th><th style="width:130px;">商品编号</th><th style="width:80px;">价格</th><th style="width:90px;">商品类型</th><th style="width:80px;">状态</th><th style="width:260px;">操作</th></tr></thead>
+            <tbody id="product-list-body"></tbody>
+        </table>
+        <div class="pagination" id="pagination-bar"></div>
+    </div>
+
+    <!-- ====== 页面2：新增商品（含条件赠品） ====== -->
+    <div class="page" id="page-add">
+        <div class="breadcrumb">
+            <a onclick="switchPage('list')">首页</a><span>/</span><a onclick="switchPage('list')">商品管理</a><span>/</span><span class="current">新增商品</span>
+        </div>
+
+        <!-- 基础信息 -->
+        <div class="section">
+            <div class="section-title"><span class="title-text">基础信息</span></div>
+            <div class="form-row">
+                <div class="form-item"><span class="label"><span class="required-star">*</span>分类</span><select><option>草本/草本植物/植物科学</option></select></div>
+                <div class="form-item"><span class="required-star">*</span>商品名称</span><input type="text" value="绿韵草本精华礼盒套装"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-item"><span class="label">商品编号</span><input type="text" value="SP20260604001" readonly style="background:#fafafa;color:#999;"></div>
+                <div class="form-item"><span class="label">商家</span><select><option>绿韵家旗舰店</option></select></div>
+            </div>
+        </div>
+
+        <!-- 商品图片 -->
+        <div class="section">
+            <div class="section-title"><span class="title-text">商品图片</span></div>
+            <div class="image-upload-area">
+                <div class="image-item"><div class="img-content">🌿</div><div class="img-label">主图1</div><div class="img-remove">×</div></div>
+                <div class="image-upload-box"><div class="plus">+</div><div class="tip">上传图片</div></div>
+            </div>
+        </div>
+
+        <!-- 规格 + 价格 -->
+        <div class="section">
+            <div class="section-title"><span class="title-text">商品规格 & 价格/库存</span></div>
+            <table class="spec-table">
+                <thead><tr><th>规格名</th><th>市场价</th><th>销售价</th><th>库存</th></tr></thead>
+                <tbody>
+                    <tr><td>120粒/瓶</td><td><input type="number" value="198"></td><td><input type="number" value="98"></td><td><input type="number" value="200"></td></tr>
+                    <tr><td>240粒/瓶</td><td><input type="number" value="298"></td><td><input type="number" value="298"></td><td><input type="number" value="500"></td></tr>
+                    <tr><td>360粒/瓶</td><td><input type="number" value="398"></td><td><input type="number" value="398"></td><td><input type="number" value="300"></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ★ 赠品规则（按规格分组 + 多条件） -->
+        <div class="section" style="border: 2px dashed #ffd9d9; background: #fffafa;">
+            <div class="section-title">
+                <span class="title-text" style="color:#ff6b7a;">🎁 赠品规则（按规格配置）</span>
+                <div style="display:flex; gap:8px;">
+                    <span style="font-size:12px;color:#999;font-weight:400;">多条件满足则叠加赠送</span>
+                    <button class="btn btn-primary btn-sm" onclick="openCondModal()">+ 新增赠品条件</button>
+                </div>
+            </div>
+
+            <!-- 多条件叠加说明 -->
+            <div class="multi-hint">
+                💡 <b>多条件叠加规则</b>：同一规格下可配置多个赠送条件（按数量 / 按金额），各条件独立判断、可同时满足。若订单同时满足多个条件，则赠品叠加赠送。<br>
+                例：条件1「买10件赠1件」+ 条件2「实付满100元赠1件」，若用户购买10件且实付满100元，则总共赠送 <b>2件</b>。
+            </div>
+
+            <div id="gift-list-container"></div>
+        </div>
+
+        <!-- 底部操作 -->
+        <div class="bottom-bar">
+            <button class="btn" onclick="switchPage('list')">取消</button>
+            <button class="btn btn-primary" onclick="saveProduct()">保存</button>
+        </div>
+    </div>
+
+    <!-- ====== 页面3：订单详情（含多条件叠加赠品展示） ====== -->
+    <div class="page" id="page-order-detail">
+        <div class="breadcrumb">
+            <a onclick="switchPage('list')">首页</a><span>/</span><a>订单中心</a><span>/</span><span class="current">订单详情</span>
+        </div>
+
+        <div class="order-card">
+            <div class="order-card-title">订单信息</div>
+            <div class="info-grid">
+                <div class="info-item"><span class="info-label">订单编号：</span><span class="info-value">ORD20260604001</span></div>
+                <div class="info-item"><span class="info-label">下单时间：</span><span class="info-value">2026-06-04 10:30:25</span></div>
+                <div class="info-item"><span class="info-label">订单状态：</span><span class="info-value"><span class="tag tag-green">已发货</span></span></div>
+                <div class="info-item"><span class="info-label">付款时间：</span><span class="info-value">2026-06-04 10:31:02</span></div>
+                <div class="info-item"><span class="info-label">购买数量：</span><span class="info-value"><b style="color:#ff6b7a;">10件</b>（240粒/瓶 × 10）</span></div>
+                <div class="info-item"><span class="info-label">实付金额：</span><span class="info-value"><b style="color:#ff6b7a;">¥2,980.00</b></span></div>
+            </div>
+        </div>
+
+        <div class="order-card" style="border-left: 4px solid #faad14; background: #fffdf5;">
+            <div style="display:flex; align-items:flex-start; gap:10px;">
+                <div style="font-size: 22px;">🎁</div>
+                <div style="flex:1;">
+                    <div style="font-size:13px; font-weight:600; color:#ad6800; margin-bottom:4px;">本订单触发 <span style="color:#faad14;">2个</span> 赠品条件，共赠送 <span style="color:#faad14;">2件</span> 赠品（叠加赠送）</div>
+                    <div style="font-size:12px; color:#8c6d1f; line-height:1.8;">
+                        · 条件1（按数量）：购买满10件 → 赠「草本护发精油小样」×1件<br>
+                        · 条件2（按金额）：实付满100元 → 赠「植物手工皂」×1件
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="order-card">
+            <div class="order-card-title">商品清单</div>
+            <table class="data-table">
+                <thead><tr><th style="width:70px;">图片</th><th>商品名称 / 规格</th><th style="width:100px;">单价</th><th style="width:80px;">数量</th><th style="width:100px;">小计</th><th style="width:120px;">类型/来源</th><th style="width:150px;">操作</th></tr></thead>
+                <tbody id="order-items-body"></tbody>
+                <tfoot>
+                    <tr><td colspan="4" style="text-align:right;color:#666;">商品金额：</td><td style="font-weight:500;">¥2,980.00</td><td colspan="2"></td></tr>
+                    <tr><td colspan="4" style="text-align:right;color:#666;">赠品价值（赠送）：</td><td style="color:#999;">¥0.00</td><td colspan="2"></td></tr>
+                    <tr style="background:#fffafa;"><td colspan="4" style="text-align:right;font-weight:600;">应付金额：</td><td style="color:#ff6b7a;font-size:15px;font-weight:600;">¥2,980.00</td><td colspan="2" style="font-size:12px;color:#999;">含赠品价值 ¥97.00</td></tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="bottom-bar">
+            <button class="btn" onclick="switchPage('list')">返回列表</button>
+            <button class="btn btn-primary" onclick="openRefundModal()" style="background:linear-gradient(135deg,#ff6b7a,#ff5252);">申请退款</button>
+            <button class="btn btn-primary">打印订单</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- ========== 弹窗：售后退款（订单商品/基础商品切换） ========== -->
+<div class="modal-overlay" id="refund-modal">
+    <div class="modal modal-lg" style="width:900px;">
+        <div class="modal-header">
+            <div class="modal-title">售后退款</div>
+            <button class="modal-close" onclick="document.getElementById('refund-modal').classList.remove('show')">×</button>
+        </div>
+        <div class="modal-body" style="max-height:65vh; overflow-y:auto;">
+            <!-- Tab 切换 -->
+            <div style="display:flex; border-bottom:2px solid #f0f0f0; margin-bottom:16px;">
+                <div class="refund-tab active" id="refund-tab-order" onclick="switchRefundTab('order')" style="padding:10px 20px; cursor:pointer; font-size:14px; font-weight:500; color:#666; border-bottom:2px solid transparent; margin-bottom:-2px;">
+                    📦 订单商品退款
+                </div>
+                <div class="refund-tab" id="refund-tab-base" onclick="switchRefundTab('base')" style="padding:10px 20px; cursor:pointer; font-size:14px; font-weight:500; color:#666; border-bottom:2px solid transparent; margin-bottom:-2px;">
+                    🌽 基础商品退款
+                </div>
+            </div>
+            <style>
+                .refund-tab.active { color: #ff6b7a !important; border-bottom-color: #ff6b7a !important; }
+            </style>
+            <div id="refund-content">
+                <!-- 动态渲染 -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="document.getElementById('refund-modal').classList.remove('show')">取消</button>
+            <button class="btn btn-primary" onclick="saveRefund()">确认退款</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== 弹窗：条件类型选择 + 配置 ========== -->
+<div class="modal-overlay" id="cond-modal">
+    <div class="modal modal-lg">
+        <div class="modal-header">
+            <div class="modal-title">新增赠品条件</div>
+            <button class="modal-close" onclick="document.getElementById('cond-modal').classList.remove('show')">×</button>
+        </div>
+        <div class="modal-body">
+
+            <!-- 步骤指示 -->
+            <div style="display:flex; align-items:center; margin-bottom:18px; gap:8px;">
+                <span class="step-badge step-active">1</span><span style="font-size:12px;color:#ff6b7a;font-weight:500;">选择适用规格</span>
+                <div style="flex:1;height:1px;background:#f0f0f0;margin:0 8px;"></div>
+                <span class="step-badge step-active">2</span><span style="font-size:12px;color:#ff6b7a;font-weight:500;">设置条件参数</span>
+                <div style="flex:1;height:1px;background:#f0f0f0;margin:0 8px;"></div>
+                <span class="step-badge step-active">3</span><span style="font-size:12px;color:#ff6b7a;font-weight:500;">选择赠品(规格+数量)</span>
+            </div>
+
+            <!-- 第1步：主商品适用规格 -->
+            <div style="margin-bottom:16px; padding:14px 16px; background:#fff5f5; border:1px solid #ffe0e0; border-radius:6px;">
+                <div style="font-size:13px; font-weight:500; color:#ff6b7a; margin-bottom:8px;">
+                    ① 选择适用的商品规格（多选，以下规格购买时触发本赠品规则）
+                </div>
+                <div class="spec-select-list" id="main-spec-select" style="margin:0;"></div>
+            </div>
+
+            <!-- 第2步：条件类型 + 参数 -->
+            <div class="cond-type-tabs" style="margin-bottom:16px;">
+                <div class="cond-type-tab active" id="tab-qty" onclick="switchCondType('qty')">
+                    <span class="big-icon">📦</span><b>按购买数量赠送</b>
+                    <div class="small-desc">买 X 件赠送 Y 件赠品</div>
+                </div>
+                <div class="cond-type-tab" id="tab-amount" onclick="switchCondType('amount')">
+                    <span class="big-icon">💰</span><b>按实付金额赠送</b>
+                    <div class="small-desc">实付满 X 元赠送 Y 件赠品</div>
+                </div>
+            </div>
+
+            <div class="condition-setup" style="margin-bottom:16px;">
+                <div id="setup-qty">
+                    <div class="setup-row">
+                        <span class="setup-label">📦 触发数量：</span>
+                        <input type="number" id="in-qty-threshold" value="10" min="1">
+                        <span class="inline-text">件及以上</span>
+                    </div>
+                    <div class="setup-preview" id="preview-qty">
+                        ✅ 预览：购买满 10 件，赠送对应数量赠品
+                    </div>
+                </div>
+                <div id="setup-amount" style="display:none;">
+                    <div class="setup-row">
+                        <span class="setup-label">💰 实付金额：</span>
+                        <input type="number" id="in-amount-threshold" value="100" min="1">
+                        <span class="inline-text">元及以上</span>
+                    </div>
+                    <div class="setup-preview" id="preview-amount">
+                        ✅ 预览：订单实付金额满 ¥100.00，赠送对应数量赠品
+                    </div>
+                </div>
+
+                <!-- 有效期 -->
+                <div style="margin-top:16px; padding-top:14px; border-top:1px dashed #e8e8e8;">
+                    <div class="setup-row">
+                        <span class="setup-label">📅 有效期：</span>
+                        <input type="date" id="in-date-start" value="2026-06-01">
+                        <span class="inline-text">至</span>
+                        <input type="date" id="in-date-end" value="2026-12-31">
+                    </div>
+                    <div style="font-size:12px;color:#999;line-height:1.7;">
+                        · 有效期内下单且满足数量/金额条件才会赠送<br>
+                        · 过期条件自动失效
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第3步：选择赠品商品 -->
+            <div style="margin-bottom:10px;font-size:13px;font-weight:500;color:#333;">
+                ② 选择赠品商品：
+            </div>
+            <div class="product-select-list" id="gift-product-list" style="max-height:220px;overflow-y:auto;border:1px solid #f0f0f0;border-radius:6px;padding:8px;background:#fafbfc;"></div>
+            <div style="font-size:12px;color:#999;margin-top:8px;margin-bottom:16px;">
+                已选 <span id="selected-count" style="color:#ff6b7a;font-weight:600;">0</span> 个赠品商品
+            </div>
+
+            <!-- 已选赠品配置区（分区展示规格和数量，独立行高）-->
+            <div id="gift-config-area" style="padding:14px 16px;background:#fff5f5;border:1px solid #ffe0e0;border-radius:6px;">
+                <div style="font-size:13px;font-weight:500;color:#ff6b7a;margin-bottom:10px;">📦 已选赠品配置（选择每个赠品的规格和赠送数量）：</div>
+                <div id="selected-gifts-config" style="display:flex;flex-direction:column;gap:8px;"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="document.getElementById('cond-modal').classList.remove('show')">取消</button>
+            <button class="btn btn-primary" onclick="confirmCondition()">确认添加条件</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">操作成功</div>
+
+<!-- ========== 弹窗：编辑基础产品 ========== -->
+<div class="modal-overlay" id="base-product-modal">
+    <div class="modal modal-lg" style="width:800px;">
+        <div class="modal-header">
+            <div class="modal-title">
+                <span style="font-size:12px;color:#999;font-weight:400;">编辑基础产品 · </span>
+                <span id="base-product-name" style="color:#4a90e2;">商品</span>
+            </div>
+            <button class="modal-close" onclick="document.getElementById('base-product-modal').classList.remove('show')">×</button>
+        </div>
+        <div class="modal-body" id="base-product-body" style="max-height:65vh;overflow-y:auto;">
+            <!-- 动态渲染：规格列表 + 每个规格绑定的基础产品 -->
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="document.getElementById('base-product-modal').classList.remove('show')">取消</button>
+            <button class="btn btn-primary" onclick="saveBaseProduct()" style="background:linear-gradient(135deg,#4a90e2,#357abd);">保存</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== 弹窗：选择基础产品 ========== -->
+<div class="modal-overlay" id="select-base-modal">
+    <div class="modal" style="width:600px;">
+        <div class="modal-header">
+            <div class="modal-title">选择基础产品</div>
+            <button class="modal-close" onclick="document.getElementById('select-base-modal').classList.remove('show')">×</button>
+        </div>
+        <div class="modal-body">
+            <div style="margin-bottom:12px;">
+                <input type="text" placeholder="搜索基础产品名称/编号" style="width:100%;padding:8px 12px;border:1px solid #e0e0e0;border-radius:4px;">
+            </div>
+            <div class="product-select-list" id="base-product-select-list" style="max-height:300px;overflow-y:auto;">
+                <!-- 动态渲染基础产品列表 -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="document.getElementById('select-base-modal').classList.remove('show')">取消</button>
+            <button class="btn btn-primary" onclick="confirmSelectBaseProduct()" style="background:linear-gradient(135deg,#4a90e2,#357abd);">确认选择</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== 弹窗：编辑赠品 ========== -->
+<div class="modal-overlay" id="edit-gift-modal">
+    <div class="modal modal-lg" style="width:860px;">
+        <div class="modal-header">
+            <div class="modal-title">
+                <span style="font-size:12px;color:#999;font-weight:400;">编辑商品赠品 · </span>
+                <span id="edit-gift-product-name" style="color:#ff6b7a;">商品</span>
+            </div>
+            <button class="modal-close" onclick="document.getElementById('edit-gift-modal').classList.remove('show')">×</button>
+        </div>
+        <div class="modal-body" id="edit-gift-body" style="max-height:65vh;overflow-y:auto;">
+            <!-- 动态渲染：规格分组 + 每个规格下的条件列表 + 每个条件下的赠品 -->
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="document.getElementById('edit-gift-modal').classList.remove('show')">取消</button>
+            <button class="btn btn-primary" onclick="saveEditGift()">保存</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// 编辑弹窗专用数据（深拷贝，保存时写回）
+let editGiftData = null;
+
+function openEditGiftModal(code, name) {
+    document.getElementById('edit-gift-product-name').textContent = name;
+    // 深拷贝 currentGiftMap
+    editGiftData = JSON.parse(JSON.stringify(currentGiftMap));
+    renderEditGiftBody();
+    document.getElementById('edit-gift-modal').classList.add('show');
+}
+
+function renderEditGiftBody() {
+    const specs = Object.keys(editGiftData);
+    const body = document.getElementById('edit-gift-body');
+    let totalConds = 0;
+    let totalGifts = 0;
+    specs.forEach(s => {
+        totalConds += (editGiftData[s] || []).length;
+        (editGiftData[s] || []).forEach(c => totalGifts += (c.gifts || []).length);
+    });
+
+    body.innerHTML = `
+        <div style="padding:10px 14px;background:#fff5f5;border:1px solid #ffe0e0;border-radius:6px;margin-bottom:16px;font-size:12px;color:#666;line-height:1.7;">
+            📦 当前商品共 <b style="color:#ff6b7a;">${specs.length}</b> 个规格，
+            <b style="color:#ff6b7a;">${totalConds}</b> 条赠品条件，
+            <b style="color:#ff6b7a;">${totalGifts}</b> 个赠品配置
+            · 多条件满足时叠加赠送 · 赠品不参与售后
+        </div>
+        ${specs.map(spec => renderEditSpecSection(spec, editGiftData[spec] || [])).join('')}
+        <div style="margin-top:16px;padding:12px;text-align:center;border:1px dashed #ffd9d9;border-radius:6px;background:#fffafa;">
+            <button class="btn" onclick="addNewSpecInEdit()" style="margin-right:8px;">+ 为其他规格新增条件组</button>
+            <span style="font-size:12px;color:#999;">（支持为该商品的任意规格单独配置赠品）</span>
+        </div>
+    `;
+}
+
+function renderEditSpecSection(spec, conds) {
+    const condCount = conds.length;
+    return `
+        <div style="margin-bottom:18px;padding:14px 16px;background:#fff;border:1px solid #f0f0f0;border-radius:6px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px dashed #f0f0f0;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="background:#fff0f0;color:#ff6b7a;padding:3px 10px;border-radius:3px;font-size:12px;font-weight:500;">规格：${spec}</span>
+                    <span style="font-size:12px;color:#999;">共 ${condCount} 条条件（满足任一条件即触发对应赠品，多满足多赠）</span>
+                </div>
+                <div>
+                    <button class="btn btn-sm" onclick="addConditionInEdit('${spec}')">+ 新增条件</button>
+                </div>
+            </div>
+            ${conds.length === 0
+                ? `<div style="padding:20px;text-align:center;color:#999;font-size:12px;border:1px dashed #f0f0f0;border-radius:4px;">此规格暂未配置赠品条件</div>`
+                : conds.map((cond, idx) => renderEditConditionCard(spec, idx, cond)).join('')
+            }
+        </div>
+    `;
+}
+
+function renderEditConditionCard(spec, idx, cond) {
+    const isQty = cond.type === 'qty';
+    const condKey = `${spec}__${idx}`;
+    const totalGiftQty = (cond.gifts || []).reduce((s, g) => s + (g.qty || 0), 0);
+    return `
+        <div style="margin-bottom:12px;padding:12px 14px;background:#fafbfc;border:1px solid #eef1f4;border-radius:6px;">
+            <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">
+                <div style="width:26px;height:26px;border-radius:4px;background:${isQty ? '#e6f4ff' : '#f6ffed'};color:${isQty ? '#1677ff' : '#52c41a'};display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">${isQty ? '件' : '¥'}</div>
+                <div style="flex:1;">
+                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+                        <span style="font-size:12px;color:#333;font-weight:500;">条件类型：</span>
+                        <div style="display:flex;gap:4px;">
+                            <span onclick="changeCondType('${condKey}','qty')"
+                                  style="padding:3px 10px;border:1px solid ${isQty ? '#ff6b7a' : '#e0e0e0'};border-radius:3px;font-size:12px;cursor:pointer;background:${isQty ? '#ff6b7a' : '#fff'};color:${isQty ? '#fff' : '#666'};">按购买数量</span>
+                            <span onclick="changeCondType('${condKey}','amount')"
+                                  style="padding:3px 10px;border:1px solid ${!isQty ? '#ff6b7a' : '#e0e0e0'};border-radius:3px;font-size:12px;cursor:pointer;background:${!isQty ? '#ff6b7a' : '#fff'};color:${!isQty ? '#fff' : '#666'};">按订单金额</span>
+                        </div>
+                        <span style="font-size:12px;color:#333;font-weight:500;margin-left:10px;">阈值：</span>
+                        <input type="number" min="1" value="${cond.threshold}"
+                               onchange="changeCondThreshold('${condKey}', this.value)"
+                               style="width:80px;height:26px;padding:0 8px;border:1px solid #e0e0e0;border-radius:3px;font-size:12px;text-align:center;outline:none;">
+                        <span style="font-size:12px;color:#999;">${isQty ? '件及以上赠送' : '元及以上赠送'}</span>
+                        <span style="font-size:12px;color:#333;font-weight:500;margin-left:10px;">有效期：</span>
+                        <input type="date" value="${cond.dateStart}"
+                               onchange="changeCondDate('${condKey}','start', this.value)"
+                               style="height:26px;padding:0 6px;border:1px solid #e0e0e0;border-radius:3px;font-size:12px;outline:none;">
+                        <span style="font-size:12px;color:#999;">至</span>
+                        <input type="date" value="${cond.dateEnd}"
+                               onchange="changeCondDate('${condKey}','end', this.value)"
+                               style="height:26px;padding:0 6px;border:1px solid #e0e0e0;border-radius:3px;font-size:12px;outline:none;">
+                    </div>
+                    <div style="font-size:12px;color:#999;">
+                        ✅ 预览：${isQty ? '购买满' : '订单实付'} ${cond.threshold} ${isQty ? '件' : '元'}，赠送 ${(cond.gifts||[]).length} 种赠品共 ${totalGiftQty} 件
+                    </div>
+                </div>
+                <button class="btn-link" style="color:#ff4d4f;font-size:12px;" onclick="removeConditionInEdit('${condKey}')">删除条件</button>
+            </div>
+            <!-- 赠品列表 -->
+            <div style="padding:10px 12px;background:#fff;border:1px solid #f0f0f0;border-radius:4px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                    <div style="font-size:12px;color:#333;font-weight:500;">🎁 赠品列表（共 ${(cond.gifts||[]).length} 种）：</div>
+                    <button class="btn btn-sm" onclick="addGiftToCondition('${condKey}')">+ 新增赠品</button>
+                </div>
+                ${(cond.gifts || []).length === 0
+                    ? `<div style="padding:12px;text-align:center;color:#999;font-size:12px;">暂未配置赠品</div>`
+                    : `<div style="display:flex;flex-direction:column;gap:6px;">
+                        ${cond.gifts.map((g, gi) => renderEditGiftItem(condKey, gi, g)).join('')}
+                       </div>`
+                }
+            </div>
+        </div>
+    `;
+}
+
+function renderEditGiftItem(condKey, gi, g) {
+    const giftPoolItem = giftProductPool.find(x => x.name === g.name || x.code === g.code);
+    const specs = giftPoolItem ? giftPoolItem.specs : [g.spec];
+    const img = g.img || '🎁';
+    return `
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#fafbfc;border:1px solid #f0f0f0;border-radius:4px;">
+            <div style="font-size:20px;">${img}</div>
+            <div style="flex:1;min-width:0;">
+                <div style="font-size:12px;color:#333;font-weight:500;">${g.name}</div>
+                <div style="font-size:11px;color:#999;margin-top:2px;">${g.code || ''}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#666;">
+                <span style="color:#ff6b7a;font-weight:500;">规格：</span>
+                <div style="display:flex;gap:4px;">
+                    ${specs.map(s => `
+                        <span onclick="changeGiftSpec('${condKey}', ${gi}, '${s}')"
+                              style="padding:3px 8px;border:1px solid ${g.spec === s ? '#ff6b7a' : '#e0e0e0'};border-radius:3px;font-size:11px;cursor:pointer;background:${g.spec === s ? '#ff6b7a' : '#fff'};color:${g.spec === s ? '#fff' : '#666'};">${s}</span>
+                    `).join('')}
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#666;">
+                <span style="color:#ff6b7a;font-weight:500;">数量：</span>
+                <input type="number" min="1" max="99" value="${g.qty || 1}"
+                       onchange="changeGiftQty('${condKey}', ${gi}, this.value)"
+                       style="width:50px;height:24px;padding:0 6px;border:1px solid #e0e0e0;border-radius:3px;text-align:center;font-size:12px;outline:none;">
+                <span style="font-size:11px;color:#999;">件</span>
+            </div>
+            <div onclick="removeGiftFromCondition('${condKey}', ${gi})"
+                 style="cursor:pointer;color:#ff4d4f;font-size:14px;padding:4px 8px;" title="移除">✕</div>
+        </div>
+    `;
+}
+
+// ======= 编辑操作函数 =======
+function findCondByKey(condKey) {
+    const [spec, idxStr] = condKey.split('__');
+    return { spec: decodeURIComponent(spec), idx: parseInt(idxStr), cond: editGiftData[decodeURIComponent(spec)][parseInt(idxStr)] };
+}
+
+function changeCondType(condKey, type) {
+    const r = findCondByKey(condKey);
+    r.cond.type = type;
+    renderEditGiftBody();
+}
+function changeCondThreshold(condKey, val) {
+    const r = findCondByKey(condKey);
+    r.cond.threshold = parseInt(val) || 1;
+    renderEditGiftBody();
+}
+function changeCondDate(condKey, field, val) {
+    const r = findCondByKey(condKey);
+    if (field === 'start') r.cond.dateStart = val;
+    else r.cond.dateEnd = val;
+    // 不重新渲染（避免输入中断）
+}
+function removeConditionInEdit(condKey) {
+    const r = findCondByKey(condKey);
+    if (!confirm('确认删除此条件？')) return;
+    editGiftData[r.spec].splice(r.idx, 1);
+    renderEditGiftBody();
+}
+function addConditionInEdit(spec) {
+    if (!editGiftData[spec]) editGiftData[spec] = [];
+    editGiftData[spec].push({
+        id: 'c_new_' + Date.now(),
+        type: 'qty',
+        threshold: 10,
+        giftQty: 1,
+        dateStart: '2026-06-01',
+        dateEnd: '2026-12-31',
+        gifts: []
+    });
+    renderEditGiftBody();
+}
+function addNewSpecInEdit() {
+    const s = prompt('请输入规格名称（如：120粒/瓶）：');
+    if (!s) return;
+    if (!editGiftData[s]) editGiftData[s] = [];
+    addConditionInEdit(s);
+}
+function addGiftToCondition(condKey) {
+    // 简单的选择逻辑：从赠品池中选第一个未选的；或弹窗让用户选择
+    // 为简单起见，展示一个临时选择面板
+    const pick = prompt('从赠品池选择：输入要添加的赠品编号（1=草本护发精油小样，2=植物手工皂，3=草本面膜，4=定制书签，5=草本试用装）：', '1');
+    if (!pick) return;
+    const poolItems = [
+        { name: '草本护发精油（小样）', code: 'SP20260604004', spec: '10ml小样', img: '🧴' },
+        { name: '植物手工皂', code: 'SP20260604006', spec: '薰衣草', img: '🧼' },
+        { name: '绿韵草本面膜（5片装）', code: 'SP20260604008', spec: '补水', img: '🧖' },
+        { name: '品牌定制书签', code: 'SP20260604011', spec: '经典款', img: '🔖' },
+        { name: '草本试用装（3件套）', code: 'SP20260604010', spec: '旅行装', img: '📦' },
+    ];
+    const item = poolItems[parseInt(pick) - 1];
+    if (!item) { showToast('编号无效'); return; }
+    const r = findCondByKey(condKey);
+    r.cond.gifts.push({ productId: Date.now(), name: item.name, code: item.code, spec: item.spec, qty: 1, img: item.img });
+    renderEditGiftBody();
+}
+function changeGiftSpec(condKey, gi, spec) {
+    const r = findCondByKey(condKey);
+    r.cond.gifts[gi].spec = spec;
+    renderEditGiftBody();
+}
+function changeGiftQty(condKey, gi, val) {
+    const r = findCondByKey(condKey);
+    r.cond.gifts[gi].qty = parseInt(val) || 1;
+    // 不重新渲染整个body，避免输入焦点丢失
+}
+function removeGiftFromCondition(condKey, gi) {
+    const r = findCondByKey(condKey);
+    r.cond.gifts.splice(gi, 1);
+    renderEditGiftBody();
+}
+
+function saveEditGift() {
+    // 写回主数据
+    currentGiftMap = editGiftData;
+    document.getElementById('edit-gift-modal').classList.remove('show');
+    if (typeof renderGiftList === 'function') renderGiftList();
+    // 更新商品列表的条件数显示
+    renderProductList();
+    showToast('赠品配置已保存');
+}
+
+// ============ 数据 ============
+const productData = [
+    { id: 1, name: '绿韵草本精华礼盒套装', code: 'SP20260604001', price: 298, stock: 500, type: '实物商品', giftCondCount: 3, status: '上架', img: '🎁' },
+    { id: 2, name: '天然植物保湿喷雾', code: 'SP20260604002', price: 89, stock: 1200, type: '实物商品', giftCondCount: 1, status: '上架', img: '💧' },
+    { id: 3, name: '绿韵家经典套装', code: 'SP20260604003', price: 488, stock: 300, type: '套餐商品', giftCondCount: 2, status: '上架', img: '🧴' },
+    { id: 4, name: '草本护发精油小样', code: 'SP20260604004', price: 0, stock: 5000, type: '赠品', giftCondCount: 0, status: '上架', img: '🧴' },
+    { id: 5, name: '竹纤维洁面巾', code: 'SP20260604005', price: 39, stock: 800, type: '实物商品', giftCondCount: 0, status: '上架', img: '🧻' },
+    { id: 6, name: '植物手工皂', code: 'SP20260604006', price: 0, stock: 3000, type: '赠品', giftCondCount: 0, status: '上架', img: '🧼' },
+    { id: 7, name: '绿茶草本香薰蜡烛', code: 'SP20260604007', price: 68, stock: 450, type: '实物商品', giftCondCount: 1, status: '上架', img: '🕯️' },
+    { id: 8, name: '绿韵草本面膜', code: 'SP20260604008', price: 0, stock: 2000, type: '赠品', giftCondCount: 0, status: '上架', img: '🧖' },
+    { id: 9, name: '品牌定制书签', code: 'SP20260604009', price: 0, stock: 8000, type: '赠品', giftCondCount: 0, status: '上架', img: '🔖' },
+    { id: 10, name: '草本试用装（3件套）', code: 'SP20260604010', price: 0, stock: 3500, type: '赠品', giftCondCount: 0, status: '上架', img: '📦' },
+    { id: 11, name: '玫瑰精华乳液', code: 'SP20260604011', price: 168, stock: 620, type: '实物商品', giftCondCount: 2, status: '上架', img: '🌹' },
+    { id: 12, name: '薰衣草安眠香包', code: 'SP20260604012', price: 58, stock: 900, type: '实物商品', giftCondCount: 0, status: '上架', img: '🌿' },
+    { id: 13, name: '茶树精油祛痘凝胶', code: 'SP20260604013', price: 128, stock: 420, type: '实物商品', giftCondCount: 1, status: '上架', img: '🌱' },
+    { id: 14, name: '蜂蜜护手霜', code: 'SP20260604014', price: 45, stock: 1500, type: '实物商品', giftCondCount: 0, status: '上架', img: '🍯' },
+    { id: 15, name: '洋甘菊舒缓爽肤水', code: 'SP20260604015', price: 98, stock: 680, type: '实物商品', giftCondCount: 1, status: '上架', img: '🌼' },
+    { id: 16, name: '薄荷清凉沐浴露', code: 'SP20260604016', price: 78, stock: 890, type: '实物商品', giftCondCount: 0, status: '上架', img: '🫧' },
+    { id: 17, name: '椰子油润发膏', code: 'SP20260604017', price: 52, stock: 550, type: '实物商品', giftCondCount: 0, status: '下架', img: '🥥' },
+    { id: 18, name: '柠檬草驱蚊喷雾', code: 'SP20260604018', price: 42, stock: 1100, type: '实物商品', giftCondCount: 0, status: '上架', img: '🍋' },
+    { id: 19, name: '橙花紧致面霜', code: 'SP20260604019', price: 218, stock: 360, type: '实物商品', giftCondCount: 2, status: '上架', img: '🍊' },
+    { id: 20, name: '荷荷巴油按摩精华', code: 'SP20260604020', price: 158, stock: 480, type: '实物商品', giftCondCount: 1, status: '上架', img: '💆' },
+    { id: 21, name: '金盏花修护眼霜', code: 'SP20260604021', price: 188, stock: 290, type: '实物商品', giftCondCount: 1, status: '上架', img: '👁️' },
+    { id: 22, name: '茉莉香氛身体乳', code: 'SP20260604022', price: 138, stock: 520, type: '实物商品', giftCondCount: 0, status: '上架', img: '🌸' },
+    { id: 23, name: '绿韵尊享护肤礼盒', code: 'SP20260604023', price: 888, stock: 150, type: '套餐商品', giftCondCount: 4, status: '上架', img: '💝' },
+    { id: 24, name: '芦荟舒缓凝胶', code: 'SP20260604024', price: 35, stock: 2000, type: '实物商品', giftCondCount: 0, status: '上架', img: '🌵' }
+];
+
+const giftProductPool = [
+    { id: 4, name: '草本护发精油（小样）', code: 'SP20260604004', img: '🧴', specs: ['10ml小样'], price: 58 },
+    { id: 6, name: '植物手工皂', code: 'SP20260604006', img: '🧼', specs: ['薰衣草', '玫瑰', '茶树'], price: 39 },
+    { id: 8, name: '绿韵草本面膜（5片装）', code: 'SP20260604008', img: '🧖', specs: ['补水', '美白'], price: 99 },
+    { id: 9, name: '精美定制手提袋', code: 'SP20260604009', img: '👜', specs: ['中号', '大号'], price: 20 },
+    { id: 10, name: '草本试用装（3件套）', code: 'SP20260604010', img: '📦', specs: ['旅行装'], price: 48 },
+    { id: 11, name: '品牌定制书签', code: 'SP20260604011', img: '🔖', specs: ['经典款'], price: 15 },
+];
+
+// ========== 基础产品数据 ==========
+const baseProductPool = [
+    { id: 101, name: '有机玉米（单个）', code: 'BASE20260601001', img: '🌽', spec: '约200g/个', price: 2.5 },
+    { id: 102, name: '土鸡蛋（单个）', code: 'BASE20260601002', img: '🥚', spec: '约50g/个', price: 1.2 },
+    { id: 103, name: '红富士苹果（单个）', code: 'BASE20260601003', img: '🍎', spec: '约250g/个', price: 3.8 },
+    { id: 104, name: '精品土豆（单个）', code: 'BASE20260601004', img: '🥔', spec: '约150g/个', price: 1.5 },
+    { id: 105, name: '胡萝卜（单根）', code: 'BASE20260601005', img: '🥕', spec: '约100g/根', price: 1.0 },
+    { id: 106, name: '西红柿（单个）', code: 'BASE20260601006', img: '🍅', spec: '约120g/个', price: 2.0 },
+];
+
+// 规格 -> 基础产品绑定 映射
+// 每个绑定: { baseProductId, name, code, spec, qty, price, img }
+let currentBaseProductMap = {
+    '120粒/瓶': [
+        { baseProductId: 101, name: '有机玉米（单个）', code: 'BASE20260601001', spec: '约200g/个', qty: 5, price: 2.5, img: '🌽' }
+    ],
+    '240粒/瓶': [
+        { baseProductId: 101, name: '有机玉米（单个）', code: 'BASE20260601001', spec: '约200g/个', qty: 10, price: 2.5, img: '🌽' },
+        { baseProductId: 102, name: '土鸡蛋（单个）', code: 'BASE20260601002', spec: '约50g/个', qty: 3, price: 1.2, img: '🥚' }
+    ],
+    '360粒/瓶': [
+        { baseProductId: 101, name: '有机玉米（单个）', code: 'BASE20260601001', spec: '约200g/个', qty: 15, price: 2.5, img: '🌽' },
+        { baseProductId: 102, name: '土鸡蛋（单个）', code: 'BASE20260601002', spec: '约50g/个', qty: 5, price: 1.2, img: '🥚' },
+        { baseProductId: 103, name: '红富士苹果（单个）', code: 'BASE20260601003', spec: '约250g/个', qty: 2, price: 3.8, img: '🍎' }
+    ]
+};
+
+// 编辑弹窗专用数据
+let editBaseProductData = null;
+let currentEditingSpec = null;
+
+// 规格 -> [条件] 映射
+// 每个条件: { id, type: 'qty'|'amount', threshold, giftQty, dateStart, dateEnd, gifts:[{productId,name,code,spec,qty,img}] }
+let currentGiftMap = {
+    '120粒/瓶': [
+        { id: 'c1', type: 'amount', threshold: 500, giftQty: 1, dateStart: '2026-06-01', dateEnd: '2026-12-31',
+          gifts: [{ productId: 4, name: '草本护发精油（小样）', code: 'SP20260604004', spec: '10ml小样', qty: 1, img: '🧴' }] }
+    ],
+    '240粒/瓶': [
+        { id: 'c2', type: 'qty', threshold: 10, giftQty: 1, dateStart: '2026-06-01', dateEnd: '2026-12-31',
+          gifts: [{ productId: 4, name: '草本护发精油（小样）', code: 'SP20260604004', spec: '10ml小样', qty: 1, img: '🧴' }] },
+        { id: 'c3', type: 'amount', threshold: 100, giftQty: 1, dateStart: '2026-06-01', dateEnd: '2026-12-31',
+          gifts: [{ productId: 6, name: '植物手工皂', code: 'SP20260604006', spec: '薰衣草', qty: 1, img: '🧼' }] },
+        { id: 'c4', type: 'amount', threshold: 2000, giftQty: 1, dateStart: '2026-06-01', dateEnd: '2026-08-31',
+          gifts: [{ productId: 8, name: '绿韵草本面膜（5片装）', code: 'SP20260604008', spec: '补水', qty: 1, img: '🧖' }] }
+    ],
+    '360粒/瓶': [
+        { id: 'c5', type: 'qty', threshold: 5, giftQty: 2, dateStart: '2026-06-01', dateEnd: '2026-12-31',
+          gifts: [{ productId: 10, name: '草本试用装（3件套）', code: 'SP20260604010', spec: '旅行装', qty: 1, img: '📦' }] },
+        { id: 'c6', type: 'amount', threshold: 1500, giftQty: 1, dateStart: '2026-06-01', dateEnd: '2026-12-31',
+          gifts: [{ productId: 11, name: '品牌定制书签', code: 'SP20260604011', spec: '经典款', qty: 1, img: '🔖' }] }
+    ]
+};
+
+// 订单明细（展示多条件叠加效果）
+const orderItems = [
+    { name: '绿韵草本精华礼盒套装', spec: '240粒/瓶', price: 298, qty: 10, subtotal: 2980, img: '🎁', isGift: false },
+    { name: '草本护发精油（小样）', spec: '10ml小样', price: 0, qty: 1, subtotal: 0, img: '🧴', isGift: true,
+      trigger: 'qty', triggerText: '条件1：购买满10件赠送', linkedSpec: '随240粒/瓶 × 10件' },
+    { name: '植物手工皂', spec: '薰衣草', price: 0, qty: 1, subtotal: 0, img: '🧼', isGift: true,
+      trigger: 'amount', triggerText: '条件2：实付满¥100赠送', linkedSpec: '订单实付¥2,980.00' },
+];
+
+// 临时状态
+let currentCondType = 'qty';
+// tempSelectedGifts: { productId: { spec: string, qty: number } }
+let tempSelectedGifts = {};
+// 选择的主商品规格（数组，支持多选）
+let tempSelectedMainSpecs = [];
+const MAIN_PRODUCT_SPECS = ['120粒/瓶', '240粒/瓶', '360粒/瓶'];
+
+// ============ 页面切换 ============
+function switchPage(pageName) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + pageName).classList.add('active');
+    document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+    if (pageName === 'list') { document.querySelectorAll('.sidebar-item')[0].classList.add('active'); renderProductList(); }
+    if (pageName === 'add') { document.querySelectorAll('.sidebar-item')[1].classList.add('active'); renderGiftList(); }
+    if (pageName === 'order-detail') { document.querySelectorAll('.sidebar-item')[2].classList.add('active'); renderOrderItems(); }
+    window.scrollTo(0, 0);
+}
+
+// ============ 商品列表（含分页） ============
+let currentPage = 1;
+const pageSize = 10;
+
+function renderProductList() {
+    const tbody = document.getElementById('product-list-body');
+    const total = productData.length;
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    if (currentPage > totalPages) currentPage = totalPages;
+    const start = (currentPage - 1) * pageSize;
+    const pageItems = productData.slice(start, start + pageSize);
+
+    tbody.innerHTML = pageItems.map(p => `
+        <tr>
+            <td><div class="product-img-cell">${p.img}</div></td>
+            <td><div class="product-name-cell">${p.name}</div></td>
+            <td>${p.code}</td>
+            <td style="color:${p.price === 0 ? '#999' : '#ff6b7a'};font-weight:500;">${p.price === 0 ? '¥0 (赠品)' : '¥' + p.price}</td>
+            <td><span class="tag ${p.type === '赠品' ? 'tag-blue' : 'tag-gray'}">${p.type}</span></td>
+            <td><span class="tag ${p.status === '下架' ? 'tag-gray' : 'tag-green'}">${p.status}</span></td>
+            <td>
+                <button class="btn-link" onclick="switchPage('add')">编辑</button>
+                <button class="btn-link" onclick="openEditGiftModal('${p.code}', '${p.name}')" style="color:#ff6b7a;font-weight:500;">编辑赠品</button>
+                <button class="btn-link" onclick="openBaseProductModal('${p.code}', '${p.name}')" style="color:#4a90e2;font-weight:500;">编辑基础产品</button>
+                <button class="btn-link" onclick="switchPage('order-detail')">查看</button>
+            </td>
+        </tr>
+    `).join('');
+
+    renderPagination(total, totalPages);
+}
+
+function renderPagination(total, totalPages) {
+    const bar = document.getElementById('pagination-bar');
+    if (!bar) return;
+    let pages = '';
+    for (let i = 1; i <= totalPages; i++) {
+        pages += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="gotoPage(${i})">${i}</button>`;
+    }
+    bar.innerHTML = `
+        <span style="margin-right: 12px;">共 <b style="color:#ff6b7a">${total}</b> 条记录</span>
+        <button class="page-btn" onclick="gotoPage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled style="opacity:.5;cursor:not-allowed;"' : ''}>&lt;</button>
+        ${pages}
+        <button class="page-btn" onclick="gotoPage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled style="opacity:.5;cursor:not-allowed;"' : ''}>&gt;</button>
+        <span style="margin-left:12px;color:#999;font-size:12px;">每页 ${pageSize} 条</span>
+    `;
+}
+function gotoPage(n) {
+    const totalPages = Math.max(1, Math.ceil(productData.length / pageSize));
+    if (n < 1 || n > totalPages) return;
+    currentPage = n;
+    renderProductList();
+}
+
+// ============ 赠品列表（按规格 + 条件卡片） ============
+function renderGiftList() {
+    const container = document.getElementById('gift-list-container');
+    const specs = Object.keys(currentGiftMap).filter(k => currentGiftMap[k].length > 0);
+    if (specs.length === 0) {
+        container.innerHTML = `<div class="gift-empty">还未配置任何赠品条件，点击右上角 <b style="color:#ff6b7a;">+ 新增赠品条件</b> 开始配置</div>`;
+        return;
+    }
+    let html = '';
+    for (const spec of specs) {
+        const conds = currentGiftMap[spec];
+        const qtyCount = conds.filter(c => c.type === 'qty').length;
+        const amtCount = conds.filter(c => c.type === 'amount').length;
+        html += `
+            <div class="spec-section">
+                <div class="spec-section-head">
+                    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
+                        <span class="spec-tag">规格：${spec}</span>
+                        <span class="spec-meta">共 ${conds.length} 条条件
+                            ${qtyCount > 0 ? `（按数量×${qtyCount}）` : ''}
+                            ${amtCount > 0 ? `（按金额×${amtCount}）` : ''}
+                        </span>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn btn-sm" onclick="openCondModal('${spec}')">+ 新增条件</button>
+                        <button class="btn-link" style="color:#ff4d4f;" onclick="removeAllConds('${spec}')">清空规格</button>
+                    </div>
+                </div>
+                ${conds.map(c => renderConditionCard(spec, c)).join('')}
+            </div>
+        `;
+    }
+    container.innerHTML = html;
+}
+
+function renderConditionCard(spec, cond) {
+    const isQty = cond.type === 'qty';
+    const icon = isQty ? '📦' : '💰';
+    const typeLabel = isQty ? '按数量' : '按金额';
+    const ruleText = isQty
+        ? `购买满 <span class="hl">${cond.threshold}</span> 件（含以上），赠送 <span class="hl">${cond.giftQty}</span> 件赠品`
+        : `订单实付金额满 <span class="hl">¥${cond.threshold.toLocaleString()}</span>（含以上），赠送 <span class="hl">${cond.giftQty}</span> 件赠品`;
+    const today = new Date('2026-06-04');
+    const endDate = new Date(cond.dateEnd);
+    const isExpiring = (endDate - today) / (1000 * 60 * 60 * 24) <= 60;
+    return `
+        <div class="condition-card">
+            <div class="condition-icon type-${cond.type}">${icon}</div>
+            <div class="condition-body">
+                <div class="condition-title">
+                    <span class="condition-type-badge type-${cond.type}">${typeLabel}</span>
+                    <span>条件${isQty ? '数量' : '金额'}</span>
+                </div>
+                <div class="condition-rule">${ruleText}</div>
+                <div class="condition-gifts">
+                    ${cond.gifts.map(g => `
+                        <div class="mini-gift">
+                            <span class="mini-img">${g.img}</span>
+                            <span class="mini-name">${g.name}</span>
+                            <span style="color:#999;font-size:11px;">(${g.spec})</span>
+                            <span class="mini-qty">×${g.qty}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="condition-date ${isExpiring ? 'expiring' : ''}">
+                    📅 有效期：${cond.dateStart} 至 ${cond.dateEnd} ${isExpiring ? '⚠️ 2个月内到期' : ''}
+                </div>
+            </div>
+            <div class="condition-actions">
+                <button class="btn-link" onclick="editCond('${spec}','${cond.id}')">编辑</button>
+                <button class="btn-link" style="color:#ff4d4f;" onclick="removeCond('${spec}','${cond.id}')">删除</button>
+            </div>
+        </div>
+    `;
+}
+
+function removeCond(spec, cid) {
+    if (!confirm('确认删除此条件？')) return;
+    currentGiftMap[spec] = currentGiftMap[spec].filter(c => c.id !== cid);
+    renderGiftList();
+    showToast('已删除条件');
+}
+function removeAllConds(spec) {
+    if (!confirm('确认清空规格「' + spec + '」下所有条件？')) return;
+    currentGiftMap[spec] = [];
+    renderGiftList();
+    showToast('已清空');
+}
+function editCond(spec, cid) { showToast('编辑功能（原型演示）'); }
+
+// ============ 条件弹窗 ============
+function openCondModal(spec) {
+    currentCondType = 'qty';
+    tempSelectedGifts = {};
+    tempSelectedMainSpecs = spec ? [spec] : [];
+    renderMainSpecSelect();
+    switchCondType('qty');
+    renderGiftProductListInModal();
+    updatePreview();
+    document.getElementById('cond-modal').classList.add('show');
+}
+
+// 渲染主商品规格选择（弹窗第1步）
+function renderMainSpecSelect() {
+    const el = document.getElementById('main-spec-select');
+    el.innerHTML = MAIN_PRODUCT_SPECS.map(s => `
+        <div class="spec-select-item ${tempSelectedMainSpecs.includes(s) ? 'selected' : ''}" onclick="toggleMainSpec('${s}')">${s}</div>
+    `).join('');
+}
+function toggleMainSpec(spec) {
+    const i = tempSelectedMainSpecs.indexOf(spec);
+    if (i >= 0) tempSelectedMainSpecs.splice(i, 1); else tempSelectedMainSpecs.push(spec);
+    renderMainSpecSelect();
+}
+
+function switchCondType(type) {
+    currentCondType = type;
+    document.getElementById('tab-qty').classList.toggle('active', type === 'qty');
+    document.getElementById('tab-amount').classList.toggle('active', type === 'amount');
+    document.getElementById('setup-qty').style.display = type === 'qty' ? 'block' : 'none';
+    document.getElementById('setup-amount').style.display = type === 'amount' ? 'block' : 'none';
+    updatePreview();
+}
+
+function updatePreview() {
+    const totalQty = Object.values(tempSelectedGifts).reduce((s, g) => s + g.qty, 0);
+    const giftCount = Object.keys(tempSelectedGifts).length;
+    if (currentCondType === 'qty') {
+        const t = parseInt(document.getElementById('in-qty-threshold').value) || 0;
+        document.getElementById('preview-qty').innerHTML = `✅ 预览：购买满 ${t} 件，赠送 ${giftCount} 种赠品共 ${totalQty || '?'} 件（数量在下方每个赠品单独设置）`;
+    } else {
+        const t = parseInt(document.getElementById('in-amount-threshold').value) || 0;
+        document.getElementById('preview-amount').innerHTML = `✅ 预览：订单实付金额满 ¥${t.toLocaleString()}.00，赠送 ${giftCount} 种赠品共 ${totalQty || '?'} 件（数量在下方每个赠品单独设置）`;
+    }
+}
+
+// 监听输入
+document.addEventListener('input', (e) => {
+    if (['in-qty-threshold', 'in-amount-threshold'].includes(e.target.id)) {
+        updatePreview();
+    }
+});
+
+function renderGiftProductListInModal() {
+    // 上部：紧凑的勾选列表
+    const list = document.getElementById('gift-product-list');
+    list.innerHTML = giftProductPool.map(p => {
+        const selected = tempSelectedGifts[p.id];
+        return `
+            <div class="product-select-item ${selected ? 'selected' : ''}"
+                 onclick="toggleGiftInModal(${p.id})"
+                 style="padding:8px 12px;margin-bottom:4px;border:1px solid ${selected ? '#ff6b7a' : '#e8e8e8'};background:${selected ? '#fff5f5' : '#fff'};border-radius:4px;cursor:pointer;display:flex;align-items:center;gap:10px;">
+                <div style="width:16px;height:16px;border:2px solid ${selected ? '#ff6b7a' : '#ccc'};border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:11px;color:${selected ? '#ff6b7a' : 'transparent'};flex-shrink:0;">✓</div>
+                <div style="width:36px;height:36px;background:#f5f5f5;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${p.img}</div>
+                <div style="flex:1;min-width:0;overflow:hidden;">
+                    <div style="font-size:12px;color:#333;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
+                    <div style="font-size:11px;color:#999;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">编号：${p.code} · 可选：${p.specs.join(' / ')}</div>
+                </div>
+                <div style="font-size:11px;color:#999;flex-shrink:0;">¥${p.price}</div>
+            </div>
+        `;
+    }).join('');
+
+    // 下部：已选赠品配置区（规格 + 数量）
+    const selIds = Object.keys(tempSelectedGifts);
+    const configArea = document.getElementById('selected-gifts-config');
+    if (selIds.length === 0) {
+        configArea.innerHTML = `<div style="font-size:12px;color:#999;padding:8px;text-align:center;">请在上列表中勾选赠品商品，勾选后在此配置规格和数量</div>`;
+    } else {
+        configArea.innerHTML = selIds.map(id => {
+            const pid = parseInt(id);
+            const p = giftProductPool.find(x => x.id === pid);
+            const info = tempSelectedGifts[pid];
+            return `
+                <div style="display:flex;align-items:center;gap:12px;padding:8px 10px;background:#fff;border:1px solid #ffe0e0;border-radius:4px;">
+                    <div style="font-size:18px;">${p.img}</div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:12px;color:#333;font-weight:500;">${p.name}</div>
+                        <div style="font-size:11px;color:#999;margin-top:2px;">${p.code}</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#666;">
+                        <span style="color:#ff6b7a;font-weight:500;">规格：</span>
+                        <div style="display:flex;gap:4px;">
+                            ${p.specs.map(s => `
+                                <span onclick="event.stopPropagation();setGiftSpec(${pid},'${s}')"
+                                      style="padding:3px 8px;border:1px solid ${info.spec === s ? '#ff6b7a' : '#e0e0e0'};border-radius:3px;font-size:11px;cursor:pointer;background:${info.spec === s ? '#ff6b7a' : '#fff'};color:${info.spec === s ? '#fff' : '#666'};line-height:1.4;">${s}</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#666;">
+                        <span style="color:#ff6b7a;font-weight:500;">数量：</span>
+                        <input type="number" min="1" max="99" value="${info.qty}"
+                               onchange="event.stopPropagation();setGiftQty(${pid}, this.value)"
+                               onclick="event.stopPropagation()"
+                               style="width:56px;height:26px;padding:0 6px;border:1px solid #e0e0e0;border-radius:3px;text-align:center;font-size:12px;outline:none;">
+                        <span style="font-size:11px;color:#999;">件/单</span>
+                    </div>
+                    <div onclick="event.stopPropagation();toggleGiftInModal(${pid})"
+                         style="cursor:pointer;color:#ff4d4f;font-size:12px;padding:4px 8px;" title="移除">✕</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    document.getElementById('selected-count').textContent = selIds.length;
+}
+function toggleGiftInModal(id) {
+    if (tempSelectedGifts[id]) {
+        delete tempSelectedGifts[id];
+    } else {
+        const p = giftProductPool.find(x => x.id === id);
+        tempSelectedGifts[id] = { spec: p.specs[0], qty: 1 };
+    }
+    renderGiftProductListInModal();
+    updatePreview();
+}
+function setGiftSpec(id, spec) {
+    if (tempSelectedGifts[id]) {
+        tempSelectedGifts[id].spec = spec;
+        renderGiftProductListInModal();
+    }
+}
+function setGiftQty(id, val) {
+    const n = parseInt(val) || 1;
+    if (tempSelectedGifts[id]) {
+        tempSelectedGifts[id].qty = n;
+        renderGiftProductListInModal();
+        updatePreview();
+    }
+}
+
+function confirmCondition() {
+    if (tempSelectedMainSpecs.length === 0) { showToast('请至少选择1个适用的商品规格'); return; }
+    if (Object.keys(tempSelectedGifts).length === 0) { showToast('请至少选择1个赠品商品'); return; }
+    const isQty = currentCondType === 'qty';
+    const tEl = document.getElementById(isQty ? 'in-qty-threshold' : 'in-amount-threshold');
+    const start = document.getElementById('in-date-start').value;
+    const end = document.getElementById('in-date-end').value;
+    if (!tEl.value) { showToast('请填写完整的条件参数'); return; }
+    if (!start || !end) { showToast('请选择有效期'); return; }
+
+    // 构建赠品列表（使用每个赠品自己的 spec + qty）
+    const gifts = Object.keys(tempSelectedGifts).map(id => {
+        const pid = parseInt(id);
+        const p = giftProductPool.find(x => x.id === pid);
+        const info = tempSelectedGifts[pid];
+        return { productId: pid, name: p.name, code: p.code, spec: info.spec, qty: info.qty, img: p.img };
+    });
+
+    const threshold = parseInt(tEl.value);
+    const specCount = tempSelectedMainSpecs.length;
+    // 对每个选中的主商品规格都创建同样的条件
+    for (const spec of tempSelectedMainSpecs) {
+        const newCond = {
+            id: 'c' + Date.now() + '-' + spec,
+            type: currentCondType,
+            threshold: threshold,
+            giftQty: gifts.reduce((s, g) => s + g.qty, 0),
+            dateStart: start,
+            dateEnd: end,
+            gifts: gifts
+        };
+        if (!currentGiftMap[spec]) currentGiftMap[spec] = [];
+        currentGiftMap[spec].push(newCond);
+    }
+
+    document.getElementById('cond-modal').classList.remove('show');
+    tempSelectedGifts = {};
+    tempSelectedMainSpecs = [];
+    renderGiftList();
+    showToast(`已添加「${isQty ? '按数量' : '按金额'}」条件到 ${specCount} 个规格`);
+}
+
+// ============ 订单明细 ============
+function renderOrderItems() {
+    const tbody = document.getElementById('order-items-body');
+    tbody.innerHTML = orderItems.map(item => `
+        <tr class="${item.isGift ? 'gift-row' : ''}">
+            <td><div class="product-img-cell">${item.img}</div></td>
+            <td>
+                <div style="font-weight:500;">${item.name}${item.isGift ? '<span class="gift-tag">赠品</span>' : ''}</div>
+                <div style="font-size:12px; color:#999; margin-top:4px;">规格：${item.spec}</div>
+                ${item.isGift ? `<div style="margin-top:4px;"><span class="trigger-tag ${item.trigger}">${item.triggerText}</span></div>
+                                  <div style="font-size:11px;color:#999;margin-top:4px;">📌 ${item.linkedSpec}</div>` : ''}
+            </td>
+            <td style="${item.isGift ? 'color:#999;' : 'color:#ff6b7a;font-weight:500;'}">${item.isGift ? '¥0.00' : '¥' + item.price.toFixed(2)}</td>
+            <td>×${item.qty}</td>
+            <td style="${item.isGift ? 'color:#999;' : 'color:#ff6b7a;font-weight:600;'}">${item.isGift ? '¥0.00' : '¥' + item.subtotal.toLocaleString() + '.00'}</td>
+            <td>${item.isGift ? '<span class="tag tag-blue">赠品</span>' : '<span class="tag tag-gray">主商品</span>'}</td>
+            <td>${item.isGift ? '<span style="color:#999;font-size:12px;">赠品不支持售后</span>' : '<button class="btn-link">申请售后</button><button class="btn-link">查看</button>'}</td>
+        </tr>
+    `).join('');
+}
+
+// ============ 基础产品弹窗功能 ============
+function openBaseProductModal(code, name) {
+    document.getElementById('base-product-name').textContent = name;
+    editBaseProductData = JSON.parse(JSON.stringify(currentBaseProductMap));
+    renderBaseProductBody();
+    document.getElementById('base-product-modal').classList.add('show');
+}
+
+function renderBaseProductBody() {
+    const body = document.getElementById('base-product-body');
+    const specs = Object.keys(editBaseProductData);
+    let totalBindings = 0;
+    specs.forEach(s => totalBindings += (editBaseProductData[s] || []).length);
+
+    body.innerHTML = `
+        <div style="margin-bottom:16px; padding:10px 14px; background:#f0f7ff; border-radius:6px; border-left:3px solid #4a90e2;">
+            <b style="color:#4a90e2;">${specs.length}</b> 个规格已配置，
+            <b style="color:#4a90e2;">${totalBindings}</b> 个基础产品绑定
+            <span style="color:#999; font-size:12px;"> · 售后退款时可按基础产品数量退款</span>
+        </div>
+        ${specs.map(spec => renderBaseSpecSection(spec, editBaseProductData[spec] || [])).join('')}
+        <div style="text-align:center; padding:20px;">
+            <button class="btn" style="background:#f0f7ff; color:#4a90e2; border:1px dashed #4a90e2;" onclick="showToast('所有规格已配置')">
+                + 为其他规格配置基础产品
+            </button>
+        </div>
+    `;
+}
+
+function renderBaseSpecSection(spec, bindings) {
+    const bindCount = bindings.length;
+    return `
+        <div style="margin-bottom:16px; border:1px solid #e8e8e8; border-radius:8px; overflow:hidden;">
+            <div style="background:#fafbfc; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #f0f0f0;">
+                <div style="font-weight:600; color:#333;">📦 ${spec}</div>
+                <div style="font-size:12px; color:#999;">
+                    共 ${bindCount} 个基础产品
+                    <button class="btn btn-sm" style="margin-left:8px; background:#4a90e2; color:#fff; border:none;" onclick="openSelectBaseProduct('${spec}')">+ 添加基础产品</button>
+                </div>
+            </div>
+            <div style="padding:8px 14px;">
+                ${bindCount === 0
+                    ? `<div style="padding:16px; text-align:center; color:#999; font-size:12px;">此规格暂未绑定基础产品</div>`
+                    : `<table style="width:100%; font-size:12px;">
+                        <thead><tr style="color:#999;"><th style="text-align:left; padding:6px;">基础产品</th><th style="text-align:center; padding:6px;">规格</th><th style="text-align:center; padding:6px;">单价</th><th style="text-align:center; padding:6px;">数量</th><th style="text-align:right; padding:6px;">操作</th></tr></thead>
+                        <tbody>
+                            ${bindings.map((b, i) => `
+                                <tr style="border-bottom:1px solid #f5f5f5;">
+                                    <td style="padding:8px 6px; display:flex; align-items:center; gap:8px;">
+                                        <span style="font-size:20px;">${b.img}</span>
+                                        <div>
+                                            <div style="font-weight:500;">${b.name}</div>
+                                            <div style="color:#999; font-size:11px;">${b.code}</div>
+                                        </div>
+                                    </td>
+                                    <td style="text-align:center; padding:8px 6px; color:#666;">${b.spec}</td>
+                                    <td style="text-align:center; padding:8px 6px; color:#ff6b7a;">¥${b.price.toFixed(2)}</td>
+                                    <td style="text-align:center; padding:8px 6px;">
+                                        <input type="number" value="${b.qty}" min="1" style="width:50px; text-align:center; padding:4px; border:1px solid #e0e0e0; border-radius:4px;"
+                                            onchange="updateBaseQty('${spec}', ${i}, this.value)">
+                                    </td>
+                                    <td style="text-align:right; padding:8px 6px;">
+                                        <button class="btn-link" style="color:#ff4d4f;" onclick="removeBaseProduct('${spec}', ${i})">删除</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                       </table>`
+                }
+            </div>
+        </div>
+    `;
+}
+
+function openSelectBaseProduct(spec) {
+    currentEditingSpec = spec;
+    const list = document.getElementById('base-product-select-list');
+    list.innerHTML = baseProductPool.map(p => `
+        <div class="gift-select-item" onclick="toggleBaseSelect(this, ${p.id})" data-id="${p.id}">
+            <div class="gift-select-img">${p.img}</div>
+            <div class="gift-select-info">
+                <div class="gift-select-name">${p.name}</div>
+                <div class="gift-select-price">${p.code} · ¥${p.price.toFixed(2)} · ${p.spec}</div>
+            </div>
+            <div class="gift-select-check" id="base-check-${p.id}">✓</div>
+        </div>
+    `).join('');
+    document.getElementById('select-base-modal').classList.add('show');
+}
+
+let tempSelectedBaseId = null;
+function toggleBaseSelect(el, id) {
+    document.querySelectorAll('#base-product-select-list .gift-select-check').forEach(c => c.classList.remove('checked'));
+    document.getElementById('base-check-' + id).classList.add('checked');
+    tempSelectedBaseId = id;
+}
+
+function confirmSelectBaseProduct() {
+    if (!tempSelectedBaseId) { showToast('请选择1个基础产品'); return; }
+    const p = baseProductPool.find(x => x.id === tempSelectedBaseId);
+    if (!editBaseProductData[currentEditingSpec]) editBaseProductData[currentEditingSpec] = [];
+    // 检查是否已存在
+    const exists = editBaseProductData[currentEditingSpec].find(b => b.baseProductId === tempSelectedBaseId);
+    if (exists) { showToast('该基础产品已绑定'); return; }
+    editBaseProductData[currentEditingSpec].push({
+        baseProductId: p.id, name: p.name, code: p.code, spec: p.spec, qty: 1, price: p.price, img: p.img
+    });
+    document.getElementById('select-base-modal').classList.remove('show');
+    tempSelectedBaseId = null;
+    renderBaseProductBody();
+    showToast('基础产品已添加');
+}
+
+function updateBaseQty(spec, idx, val) {
+    const v = parseInt(val) || 1;
+    if (editBaseProductData[spec] && editBaseProductData[spec][idx]) {
+        editBaseProductData[spec][idx].qty = v;
+    }
+}
+
+function removeBaseProduct(spec, idx) {
+    editBaseProductData[spec].splice(idx, 1);
+    renderBaseProductBody();
+    showToast('已删除');
+}
+
+function saveBaseProduct() {
+    currentBaseProductMap = JSON.parse(JSON.stringify(editBaseProductData));
+    document.getElementById('base-product-modal').classList.remove('show');
+    showToast('基础产品配置已保存');
+}
+
+// ============ 售后退款弹窗（订单商品/基础商品切换） ============
+function openRefundModal() {
+    document.getElementById('refund-modal').classList.add('show');
+    renderRefundOrderTab();
+}
+
+function switchRefundTab(tab) {
+    document.querySelectorAll('.refund-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('refund-tab-' + tab).classList.add('active');
+    if (tab === 'order') renderRefundOrderTab();
+    else renderRefundBaseTab();
+}
+
+function renderRefundOrderTab() {
+    document.getElementById('refund-content').innerHTML = `
+        <table class="data-table" style="font-size:12px;">
+            <thead><tr><th>商品名称</th><th>规格</th><th>已退款/购买</th><th>实付款</th><th>可退金额</th><th>本次退款数量</th><th>本次退款金额</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td>绿韵草本精华礼盒套装</td>
+                    <td>240粒/瓶</td>
+                    <td>0/1</td>
+                    <td>¥298</td>
+                    <td>¥298</td>
+                    <td><input type="number" value="1" min="0" max="1" style="width:50px; padding:4px; border:1px solid #e0e0e0; border-radius:4px;"></td>
+                    <td><input type="number" value="298" style="width:60px; padding:4px; border:1px solid #e0e0e0; border-radius:4px;"></td>
+                </tr>
+            </tbody>
+        </table>
+        <div style="margin-top:12px; font-size:12px; color:#999;">注：调整退款金额，如果退还收益，收益将会按比例退还</div>
+    `;
+}
+
+function renderRefundBaseTab() {
+    // 获取当前订单规格对应的基础产品
+    const spec = '240粒/瓶'; // 当前订单规格
+    const bindings = currentBaseProductMap[spec] || [];
+    const orderQty = 10; // 订单购买数量
+    document.getElementById('refund-content').innerHTML = `
+        <table class="data-table" style="font-size:12px;">
+            <thead><tr><th>基础产品</th><th>规格</th><th>基础单价</th><th>已退款/购买总数</th><th>可退金额</th><th>本次退款数量</th><th>本次退款金额</th></tr></thead>
+            <tbody>
+                ${bindings.map(b => {
+                    const totalQty = b.qty * orderQty;
+                    const totalAmount = totalQty * b.price;
+                    return `
+                    <tr>
+                        <td style="display:flex; align-items:center; gap:6px;"><span style="font-size:18px;">${b.img}</span>${b.name}</td>
+                        <td>${b.spec}</td>
+                        <td>¥${b.price.toFixed(2)}</td>
+                        <td>0/${totalQty}</td>
+                        <td>¥${totalAmount.toFixed(2)}</td>
+                        <td><input type="number" value="0" min="0" max="${totalQty}" style="width:50px; padding:4px; border:1px solid #e0e0e0; border-radius:4px;" onchange="calcBaseRefund(this, ${b.price})"></td>
+                        <td><input type="number" value="0" class="base-refund-amt" style="width:60px; padding:4px; border:1px solid #e0e0e0; border-radius:4px;" readonly></td>
+                    </tr>`;
+                }).join('')}
+            </tbody>
+        </table>
+        <div style="margin-top:12px; padding:10px; background:#fff8e6; border-radius:6px; font-size:12px; color:#ad6800;">
+            <b>💡 退款说明：</b>基础产品退款金额 = 退款数量 × 基础单价。例如：退3个玉米 = 3 × ¥2.5 = ¥7.5
+        </div>
+    `;
+}
+
+function calcBaseRefund(input, price) {
+    const qty = parseInt(input.value) || 0;
+    const row = input.closest('tr');
+    const amtInput = row.querySelector('.base-refund-amt');
+    if (amtInput) amtInput.value = (qty * price).toFixed(2);
+}
+
+function saveRefund() {
+    document.getElementById('refund-modal').classList.remove('show');
+    showToast('退款申请已提交');
+}
+
+function saveProduct() { showToast('商品保存成功'); setTimeout(() => switchPage('list'), 1200); }
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// 初始化
+renderProductList();
+renderGiftList();
+</script>
+
+</body>
+</html>
