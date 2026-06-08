@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>绿韵家 - 客户端赠品体验</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+        background: #f5f5f5; color: #333; font-size: 14px; line-height: 1.6;
+        max-width: 430px; margin: 0 auto; min-height: 100vh;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    /* ========== 顶部导航 ========== */
+    .header {
+        position: sticky; top: 0; z-index: 100;
+        background: #fff; height: 48px;
+        display: flex; align-items: center; justify-content: center;
+        border-bottom: 1px solid #f0f0f0; font-size: 16px; font-weight: 600;
+    }
+    .header .back {
+        position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+        font-size: 20px; color: #666; cursor: pointer; padding: 8px;
+    }
+    .header .right {
+        position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+        font-size: 18px; color: #666; cursor: pointer; padding: 8px;
+    }
+
+    /* ========== 页面切换 ========== */
+    .page { display: none; animation: fadeIn 0.25s ease; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ========== 商品详情页 ========== */
+    .swiper {
+        width: 100%; height: 320px; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        display: flex; align-items: center; justify-content: center; font-size: 100px;
+        position: relative; overflow: hidden;
+    }
+    .swiper-dots {
+        position: absolute; bottom: 12px; left: 0; right: 0;
+        display: flex; justify-content: center; gap: 6px;
+    }
+    .swiper-dot { width: 6px; height: 6px; border-radius: 3px; background: rgba(0,0,0,0.2); }
+    .swiper-dot.active { width: 16px; background: #ff6b7a; }
+
+    .product-info { background: #fff; padding: 16px; }
+    .product-price-row {
+        display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px;
+    }
+    .product-price { font-size: 28px; color: #ff6b7a; font-weight: 700; }
+    .product-price::before { content: "¥"; font-size: 18px; }
+    .product-original { font-size: 14px; color: #999; text-decoration: line-through; }
+    .product-name { font-size: 16px; font-weight: 600; color: #333; line-height: 1.5; margin-bottom: 8px; }
+    .product-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+    .product-tag {
+        display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px;
+    }
+    .tag-red { background: #fff0f0; color: #ff6b7a; }
+    .tag-green { background: #f0fff4; color: #52c41a; }
+    .tag-orange { background: #fff8e6; color: #faad14; }
+    .product-sales { font-size: 12px; color: #999; }
+
+    /* 赠品活动区块 */
+    .gift-promo-section {
+        margin: 8px 0; background: #fff; padding: 0 16px;
+    }
+    .gift-promo-header {
+        display: flex; align-items: center; gap: 8px;
+        padding: 12px 0; border-bottom: 1px solid #f5f5f5;
+        font-size: 14px; font-weight: 600; color: #ff6b7a;
+    }
+    .gift-promo-header .icon { font-size: 18px; }
+    .gift-promo-list { padding: 8px 0; }
+    .gift-promo-item {
+        display: flex; align-items: flex-start; gap: 10px;
+        padding: 10px 0; border-bottom: 1px dashed #f0f0f0;
+    }
+    .gift-promo-item:last-child { border-bottom: none; }
+    .gift-promo-img {
+        width: 48px; height: 48px; background: #fff5f5; border-radius: 6px;
+        display: flex; align-items: center; justify-content: center; font-size: 24px;
+        flex-shrink: 0;
+    }
+    .gift-promo-info { flex: 1; }
+    .gift-promo-name { font-size: 13px; font-weight: 500; color: #333; }
+    .gift-promo-rule {
+        font-size: 12px; color: #ff6b7a; margin-top: 4px;
+        display: flex; align-items: center; gap: 4px;
+    }
+    .gift-promo-rule .badge {
+        display: inline-block; padding: 1px 6px; background: #fff0f0;
+        color: #ff6b7a; border-radius: 3px; font-size: 11px; font-weight: 600;
+    }
+    .gift-promo-status {
+        font-size: 11px; color: #52c41a; margin-top: 4px;
+        display: flex; align-items: center; gap: 4px;
+    }
+    .gift-promo-status.not-met { color: #999; }
+    .gift-progress {
+        margin-top: 6px; height: 4px; background: #f0f0f0; border-radius: 2px; overflow: hidden;
+    }
+    .gift-progress-bar {
+        height: 100%; background: linear-gradient(90deg, #ff6b7a, #ff5252);
+        border-radius: 2px; transition: width 0.3s ease;
+    }
+
+    /* 规格选择 */
+    .spec-section { margin: 8px 0; background: #fff; padding: 0 16px; }
+    .spec-title { padding: 12px 0; font-size: 14px; font-weight: 600; color: #333; }
+    .spec-options { display: flex; gap: 10px; flex-wrap: wrap; padding-bottom: 12px; }
+    .spec-option {
+        padding: 8px 16px; border: 1px solid #e0e0e0; border-radius: 4px;
+        font-size: 13px; color: #555; cursor: pointer; transition: all 0.2s;
+        background: #fff;
+    }
+    .spec-option.active {
+        border-color: #ff6b7a; color: #ff6b7a; background: #fffafa; font-weight: 600;
+    }
+    .spec-option.disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* 数量选择 */
+    .qty-section {
+        margin: 8px 0; background: #fff; padding: 12px 16px;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .qty-label { font-size: 14px; font-weight: 600; color: #333; }
+    .qty-control {
+        display: flex; align-items: center; border: 1px solid #e0e0e0; border-radius: 4px; overflow: hidden;
+    }
+    .qty-btn {
+        width: 36px; height: 32px; display: flex; align-items: center; justify-content: center;
+        background: #f5f5f5; border: none; font-size: 16px; color: #666; cursor: pointer;
+    }
+    .qty-btn:active { background: #e8e8e8; }
+    .qty-input {
+        width: 48px; height: 32px; text-align: center; border: none;
+        font-size: 14px; color: #333; -webkit-appearance: none;
+    }
+
+    /* 底部操作栏 */
+    .bottom-bar {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        max-width: 430px; margin: 0 auto;
+        background: #fff; border-top: 1px solid #f0f0f0;
+        display: flex; align-items: center; padding: 8px 12px;
+        z-index: 100; padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    }
+    .bottom-bar .icon-btns {
+        display: flex; gap: 16px; padding: 0 12px;
+    }
+    .icon-btn {
+        display: flex; flex-direction: column; align-items: center; gap: 2px;
+        font-size: 10px; color: #666; cursor: pointer;
+    }
+    .icon-btn .emoji { font-size: 20px; }
+    .bottom-bar .action-btns {
+        flex: 1; display: flex; gap: 8px;
+    }
+    .btn {
+        flex: 1; height: 40px; border-radius: 20px; border: none;
+        font-size: 14px; font-weight: 600; cursor: pointer; display: flex;
+        align-items: center; justify-content: center;
+    }
+    .btn-cart { background: linear-gradient(135deg, #ffb347, #ffcc33); color: #fff; }
+    .btn-buy { background: linear-gradient(135deg, #ff6b7a, #ff5252); color: #fff; }
+
+    /* ========== 购物车页 ========== */
+    .cart-item {
+        background: #fff; margin: 8px 0; padding: 12px 16px;
+        display: flex; gap: 10px;
+    }
+    .cart-item-img {
+        width: 80px; height: 80px; background: #f5f5f5; border-radius: 6px;
+        display: flex; align-items: center; justify-content: center; font-size: 36px;
+        flex-shrink: 0;
+    }
+    .cart-item-info { flex: 1; }
+    .cart-item-name { font-size: 14px; font-weight: 500; color: #333; line-height: 1.4; }
+    .cart-item-spec { font-size: 12px; color: #999; margin-top: 4px; }
+    .cart-item-price { font-size: 15px; color: #ff6b7a; font-weight: 700; margin-top: 8px; }
+    .cart-item-price::before { content: "¥"; font-size: 12px; }
+    .cart-item .qty-control { margin-top: 8px; align-self: flex-start; }
+
+    /* 购物车赠品提示 */
+    .cart-gift-banner {
+        background: linear-gradient(135deg, #fff8e6 0%, #fffdf5 100%);
+        border: 1px solid #ffe7ba; border-radius: 8px;
+        margin: 0 16px 8px; padding: 10px 12px;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .cart-gift-banner .icon { font-size: 20px; }
+    .cart-gift-banner .text { font-size: 12px; color: #ad6800; line-height: 1.5; }
+    .cart-gift-banner .text strong { color: #d48806; }
+
+    /* 购物车结算栏 */
+    .cart-settle {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        max-width: 430px; margin: 0 auto;
+        background: #fff; border-top: 1px solid #f0f0f0;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 8px 16px; z-index: 100;
+        padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    }
+    .cart-settle-left { display: flex; align-items: center; gap: 8px; }
+    .cart-settle-total { font-size: 14px; color: #333; }
+    .cart-settle-total .price { color: #ff6b7a; font-size: 18px; font-weight: 700; }
+    .cart-settle-total .price::before { content: "¥"; font-size: 12px; }
+    .cart-settle-right { display: flex; align-items: center; gap: 12px; }
+    .cart-settle-gift {
+        font-size: 11px; color: #faad14; background: #fff8e6;
+        padding: 2px 8px; border-radius: 10px;
+    }
+    .btn-settle {
+        background: linear-gradient(135deg, #ff6b7a, #ff5252);
+        color: #fff; padding: 10px 28px; border-radius: 20px;
+        font-size: 14px; font-weight: 600; border: none; cursor: pointer;
+    }
+
+    /* ========== 订单确认页 ========== */
+    .order-confirm-section {
+        background: #fff; margin: 8px 0; padding: 12px 16px;
+    }
+    .order-confirm-title {
+        font-size: 14px; font-weight: 600; color: #333; margin-bottom: 10px;
+        display: flex; align-items: center; gap: 6px;
+    }
+    .order-item-row {
+        display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f5f5f5;
+    }
+    .order-item-row:last-child { border-bottom: none; }
+    .order-item-row.gift-row { background: #fffafa; margin: 0 -16px; padding: 8px 16px; }
+    .order-item-img {
+        width: 60px; height: 60px; background: #f5f5f5; border-radius: 6px;
+        display: flex; align-items: center; justify-content: center; font-size: 28px;
+        flex-shrink: 0;
+    }
+    .order-item-img.gift { background: #fff5f5; }
+    .order-item-detail { flex: 1; }
+    .order-item-name { font-size: 13px; font-weight: 500; color: #333; }
+    .order-item-name .gift-tag {
+        display: inline-block; padding: 1px 5px; background: #fff0f0;
+        color: #ff6b7a; border-radius: 3px; font-size: 10px; margin-left: 4px;
+    }
+    .order-item-spec { font-size: 11px; color: #999; margin-top: 2px; }
+    .order-item-trigger {
+        display: inline-block; margin-top: 4px; padding: 1px 6px;
+        background: #fff8e6; color: #faad14; border-radius: 3px; font-size: 10px;
+    }
+    .order-item-price { text-align: right; }
+    .order-item-price .current { font-size: 13px; color: #ff6b7a; font-weight: 600; }
+    .order-item-price .current::before { content: "¥"; font-size: 11px; }
+    .order-item-price .original {
+        font-size: 11px; color: #999; text-decoration: line-through; margin-top: 2px;
+    }
+    .order-item-price .qty { font-size: 11px; color: #999; margin-top: 2px; }
+
+    /* 赠品汇总卡片 */
+    .gift-summary-card {
+        background: linear-gradient(135deg, #fffdf5 0%, #fff8e6 100%);
+        border: 1px solid #ffe7ba; border-radius: 8px;
+        margin: 0 16px 8px; padding: 12px;
+    }
+    .gift-summary-title {
+        font-size: 13px; font-weight: 600; color: #ad6800; margin-bottom: 6px;
+        display: flex; align-items: center; gap: 6px;
+    }
+    .gift-summary-item {
+        font-size: 12px; color: #8c6d1f; line-height: 1.8; padding-left: 20px;
+    }
+
+    /* 金额汇总 */
+    .amount-summary { background: #fff; padding: 12px 16px; margin: 8px 0; }
+    .amount-row {
+        display: flex; justify-content: space-between; padding: 6px 0;
+        font-size: 13px; color: #666;
+    }
+    .amount-row.total {
+        border-top: 1px dashed #e0e0e0; margin-top: 6px; padding-top: 10px;
+        font-size: 15px; font-weight: 600; color: #333;
+    }
+    .amount-row.total .price { color: #ff6b7a; font-size: 18px; }
+    .amount-row.total .price::before { content: "¥"; font-size: 12px; }
+    .amount-row .gift-value { color: #999; font-size: 12px; }
+
+    /* 提交订单按钮 */
+    .submit-bar {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        max-width: 430px; margin: 0 auto;
+        background: #fff; border-top: 1px solid #f0f0f0;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 8px 16px; z-index: 100;
+        padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    }
+    .submit-info { font-size: 13px; color: #666; }
+    .submit-info .price { color: #ff6b7a; font-size: 20px; font-weight: 700; }
+    .submit-info .price::before { content: "¥"; font-size: 13px; }
+    .btn-submit {
+        background: linear-gradient(135deg, #ff6b7a, #ff5252);
+        color: #fff; padding: 12px 36px; border-radius: 22px;
+        font-size: 15px; font-weight: 600; border: none; cursor: pointer;
+    }
+
+    /* ========== 订单详情页 ========== */
+    .order-status-bar {
+        background: linear-gradient(135deg, #ff6b7a 0%, #ff5252 100%);
+        color: #fff; padding: 20px 16px;
+    }
+    .order-status-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .order-status-desc { font-size: 13px; opacity: 0.9; }
+
+    .order-info-section { background: #fff; margin: 8px 0; padding: 12px 16px; }
+    .order-info-row {
+        display: flex; justify-content: space-between; padding: 6px 0;
+        font-size: 13px;
+    }
+    .order-info-row .label { color: #999; }
+    .order-info-row .value { color: #333; font-weight: 500; }
+
+    /* 订单赠品卡片 */
+    .order-gift-card {
+        background: linear-gradient(135deg, #fffdf5 0%, #fff8e6 100%);
+        border-left: 4px solid #faad14;
+        margin: 0 16px 8px; padding: 12px;
+        border-radius: 0 8px 8px 0;
+    }
+    .order-gift-card-title {
+        font-size: 13px; font-weight: 600; color: #ad6800; margin-bottom: 6px;
+    }
+    .order-gift-card-item {
+        font-size: 12px; color: #8c6d1f; line-height: 1.8;
+    }
+
+    /* 售后提示 */
+    .after-sale-tip {
+        background: #f5f5f5; margin: 0 16px 8px; padding: 10px 12px;
+        border-radius: 6px; font-size: 12px; color: #999;
+        display: flex; align-items: center; gap: 6px;
+    }
+
+    /* 空状态 */
+    .empty-state {
+        text-align: center; padding: 60px 20px; color: #999;
+    }
+    .empty-state .emoji { font-size: 48px; margin-bottom: 12px; }
+    .empty-state .text { font-size: 14px; }
+
+    /* 弹窗 */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5); z-index: 200;
+        display: none; align-items: flex-end; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-panel {
+        background: #fff; width: 100%; max-width: 430px;
+        border-radius: 16px 16px 0 0; max-height: 70vh;
+        overflow-y: auto; animation: slideUp 0.25s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .modal-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 16px; border-bottom: 1px solid #f0f0f0;
+        position: sticky; top: 0; background: #fff; z-index: 10;
+    }
+    .modal-title { font-size: 16px; font-weight: 600; }
+    .modal-close { font-size: 20px; color: #999; cursor: pointer; background: none; border: none; }
+    .modal-body { padding: 12px 16px; }
+    .modal-footer {
+        padding: 12px 16px; border-top: 1px solid #f0f0f0;
+        display: flex; gap: 10px;
+    }
+    .modal-footer .btn { border-radius: 8px; height: 44px; }
+    .modal-footer .btn-cancel { background: #f5f5f5; color: #333; }
+    .modal-footer .btn-confirm { background: linear-gradient(135deg, #ff6b7a, #ff5252); color: #fff; }
+
+    /* 赠品选择列表 */
+    .gift-select-item {
+        display: flex; align-items: center; gap: 10px;
+        padding: 10px 0; border-bottom: 1px solid #f5f5f5;
+    }
+    .gift-select-img {
+        width: 48px; height: 48px; background: #fff5f5; border-radius: 6px;
+        display: flex; align-items: center; justify-content: center; font-size: 24px;
+    }
+    .gift-select-info { flex: 1; }
+    .gift-select-name { font-size: 13px; font-weight: 500; }
+    .gift-select-price { font-size: 12px; color: #999; margin-top: 2px; }
+    .gift-select-check {
+        width: 20px; height: 20px; border: 2px solid #ddd; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 12px; color: #fff;
+    }
+    .gift-select-check.checked {
+        background: #ff6b7a; border-color: #ff6b7a;
+    }
+
+    /* Toast */
+    .toast {
+        position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-20px);
+        background: rgba(0,0,0,0.75); color: #fff; padding: 10px 20px;
+        border-radius: 20px; font-size: 13px; z-index: 300;
+        opacity: 0; transition: all 0.3s ease; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* 页面内容区底部留白（避开固定底部栏） */
+    .page-content { padding-bottom: 70px; }
+
+    /* 导航标签 */
+    .nav-tabs {
+        display: flex; background: #fff; border-bottom: 1px solid #f0f0f0;
+    }
+    .nav-tab {
+        flex: 1; text-align: center; padding: 12px;
+        font-size: 13px; color: #666; cursor: pointer;
+        border-bottom: 2px solid transparent; transition: all 0.2s;
+    }
+    .nav-tab.active {
+        color: #ff6b7a; border-bottom-color: #ff6b7a; font-weight: 600;
+    }
+
+    /* 订单列表 */
+    .order-list-item {
+        background: #fff; margin: 8px 0; padding: 12px 16px;
+    }
+    .order-list-header {
+        display: flex; justify-content: space-between; align-items: center;
+        padding-bottom: 8px; border-bottom: 1px solid #f5f5f5;
+        font-size: 12px; color: #999;
+    }
+    .order-list-status { color: #ff6b7a; font-weight: 600; }
+    .order-list-status.green { color: #52c41a; }
+    .order-list-products { padding: 8px 0; }
+    .order-list-product {
+        display: flex; gap: 10px; padding: 6px 0;
+    }
+    .order-list-img {
+        width: 60px; height: 60px; background: #f5f5f5; border-radius: 6px;
+        display: flex; align-items: center; justify-content: center; font-size: 28px;
+    }
+    .order-list-info { flex: 1; }
+    .order-list-name { font-size: 13px; color: #333; }
+    .order-list-spec { font-size: 11px; color: #999; margin-top: 2px; }
+    .order-list-price { text-align: right; }
+    .order-list-price .p { font-size: 13px; color: #333; }
+    .order-list-price .p::before { content: "¥"; font-size: 11px; }
+    .order-list-price .q { font-size: 11px; color: #999; }
+    .order-list-footer {
+        display: flex; justify-content: space-between; align-items: center;
+        padding-top: 8px; border-top: 1px solid #f5f5f5;
+    }
+    .order-list-total { font-size: 13px; color: #333; }
+    .order-list-total .price { color: #ff6b7a; font-weight: 700; }
+    .order-list-total .price::before { content: "¥"; font-size: 11px; }
+    .order-list-btns { display: flex; gap: 8px; }
+    .order-list-btn {
+        padding: 6px 14px; border-radius: 14px; font-size: 12px;
+        border: 1px solid #ddd; background: #fff; color: #666; cursor: pointer;
+    }
+    .order-list-btn.primary {
+        background: linear-gradient(135deg, #ff6b7a, #ff5252);
+        color: #fff; border: none;
+    }
+</style>
+</head>
+<body>
+
+<!-- Toast -->
+<div class="toast" id="toast">操作成功</div>
+
+<!-- ==================== 页面1: 商品详情 ==================== -->
+<div class="page active" id="page-product">
+    <div class="header">
+        <span class="back" onclick="showToast('返回')">‹</span>
+        商品详情
+        <span class="right" onclick="showToast('更多')">⋯</span>
+    </div>
+    <div class="page-content">
+        <!-- 商品轮播 -->
+        <div class="swiper">
+            🧴
+            <div class="swiper-dots">
+                <div class="swiper-dot active"></div>
+                <div class="swiper-dot"></div>
+                <div class="swiper-dot"></div>
+            </div>
+        </div>
+
+        <!-- 商品信息 -->
+        <div class="product-info">
+            <div class="product-price-row">
+                <span class="product-price">298</span>
+                <span class="product-original">¥398</span>
+            </div>
+            <div class="product-name">绿韵草本精华礼盒套装 天然植物萃取 深层滋养修护</div>
+            <div class="product-tags">
+                <span class="product-tag tag-red">满赠活动</span>
+                <span class="product-tag tag-green">正品保证</span>
+                <span class="product-tag tag-orange">限时优惠</span>
+            </div>
+            <div class="product-sales">已售 1.2万+ · 好评率 98%</div>
+        </div>
+
+        <!-- 赠品活动 -->
+        <div class="gift-promo-section">
+            <div class="gift-promo-header">
+                <span class="icon">🎁</span>
+                <span>赠品活动</span>
+            </div>
+            <div class="gift-promo-list">
+                <div class="gift-promo-item">
+                    <div class="gift-promo-img">🧴</div>
+                    <div class="gift-promo-info">
+                        <div class="gift-promo-name">草本护发精油（小样）</div>
+                        <div class="gift-promo-rule">
+                            <span class="badge">满10件</span>
+                            <span>购买满10件即赠</span>
+                        </div>
+                        <div class="gift-promo-status" id="gift-status-1">
+                            <span>✓</span>
+                            <span>已满足（当前10件）</span>
+                        </div>
+                        <div class="gift-progress">
+                            <div class="gift-progress-bar" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="gift-promo-item">
+                    <div class="gift-promo-img">🧼</div>
+                    <div class="gift-promo-info">
+                        <div class="gift-promo-name">植物手工皂</div>
+                        <div class="gift-promo-rule">
+                            <span class="badge">满¥100</span>
+                            <span>实付满¥100即赠</span>
+                        </div>
+                        <div class="gift-promo-status" id="gift-status-2">
+                            <span>✓</span>
+                            <span>已满足（实付¥2,980）</span>
+                        </div>
+                        <div class="gift-progress">
+                            <div class="gift-progress-bar" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="gift-promo-item">
+                    <div class="gift-promo-img">🧖</div>
+                    <div class="gift-promo-info">
+                        <div class="gift-promo-name">绿韵草本面膜（5片装）</div>
+                        <div class="gift-promo-rule">
+                            <span class="badge">满¥2000</span>
+                            <span>实付满¥2,000即赠</span>
+                        </div>
+                        <div class="gift-promo-status not-met" id="gift-status-3">
+                            <span>○</span>
+                            <span>还差¥20（当前¥2,980/¥3,000）</span>
+                        </div>
+                        <div class="gift-progress">
+                            <div class="gift-progress-bar" style="width: 99%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 规格选择 -->
+        <div class="spec-section">
+            <div class="spec-title">选择规格</div>
+            <div class="spec-options">
+                <div class="spec-option" onclick="selectSpec(this)">120粒/瓶</div>
+                <div class="spec-option active" onclick="selectSpec(this)">240粒/瓶</div>
+                <div class="spec-option" onclick="selectSpec(this)">360粒/瓶</div>
+            </div>
+        </div>
+
+        <!-- 数量 -->
+        <div class="qty-section">
+            <span class="qty-label">购买数量</span>
+            <div class="qty-control">
+                <button class="qty-btn" onclick="changeQty(-1)">−</button>
+                <input class="qty-input" type="number" value="10" id="qty-input" readonly>
+                <button class="qty-btn" onclick="changeQty(1)">+</button>
+            </div>
+        </div>
+
+        <!-- 商品详情图 -->
+        <div style="background:#fff; margin:8px 0; padding:16px;">
+            <div style="font-size:14px; font-weight:600; margin-bottom:12px;">商品详情</div>
+            <div style="height:200px; background:linear-gradient(135deg, #e8f5e9, #c8e6c9); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:60px; color:#81c784;">
+                📋 商品详情图
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部操作栏 -->
+    <div class="bottom-bar">
+        <div class="icon-btns">
+            <div class="icon-btn" onclick="switchPage('cart')">
+                <span class="emoji">🛒</span>
+                <span>购物车</span>
+            </div>
+            <div class="icon-btn" onclick="showToast('收藏成功')">
+                <span class="emoji">⭐</span>
+                <span>收藏</span>
+            </div>
+        </div>
+        <div class="action-btns">
+            <button class="btn btn-cart" onclick="addToCart()">加入购物车</button>
+            <button class="btn btn-buy" onclick="switchPage('confirm')">立即购买</button>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== 页面2: 购物车 ==================== -->
+<div class="page" id="page-cart">
+    <div class="header">
+        <span class="back" onclick="switchPage('product')">‹</span>
+        购物车
+        <span class="right" onclick="showToast('管理')">管理</span>
+    </div>
+    <div class="page-content">
+        <!-- 赠品提示 -->
+        <div class="cart-gift-banner">
+            <span class="icon">🎁</span>
+            <div class="text">
+                本单已满足 <strong>2个</strong> 赠品条件，共获得 <strong>2件</strong> 赠品<br>
+                再购 <strong>¥20</strong> 可再得「绿韵草本面膜」
+            </div>
+        </div>
+
+        <!-- 商品列表 -->
+        <div class="cart-item">
+            <div class="cart-item-img">🧴</div>
+            <div class="cart-item-info">
+                <div class="cart-item-name">绿韵草本精华礼盒套装</div>
+                <div class="cart-item-spec">规格：240粒/瓶</div>
+                <div class="cart-item-price">298</div>
+                <div class="qty-control">
+                    <button class="qty-btn" onclick="changeCartQty(-1)">−</button>
+                    <input class="qty-input" type="number" value="10" id="cart-qty" readonly>
+                    <button class="qty-btn" onclick="changeCartQty(1)">+</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 赠品列表 -->
+        <div style="background:#fff; margin:8px 0; padding:12px 16px;">
+            <div style="font-size:13px; font-weight:600; color:#ff6b7a; margin-bottom:10px;">
+                🎁 赠品清单（随单赠送）
+            </div>
+            <div class="order-item-row gift-row" style="margin:0 -16px; padding:8px 16px;">
+                <div class="order-item-img gift">🧴</div>
+                <div class="order-item-detail">
+                    <div class="order-item-name">
+                        草本护发精油（小样）
+                        <span class="gift-tag">赠品</span>
+                    </div>
+                    <div class="order-item-spec">规格：10ml小样</div>
+                    <span class="order-item-trigger">触发：满10件</span>
+                </div>
+                <div class="order-item-price">
+                    <div class="current" style="color:#999;">0</div>
+                    <div class="qty">×1</div>
+                </div>
+            </div>
+            <div class="order-item-row gift-row" style="margin:0 -16px; padding:8px 16px;">
+                <div class="order-item-img gift">🧼</div>
+                <div class="order-item-detail">
+                    <div class="order-item-name">
+                        植物手工皂
+                        <span class="gift-tag">赠品</span>
+                    </div>
+                    <div class="order-item-spec">规格：薰衣草</div>
+                    <span class="order-item-trigger">触发：满¥100</span>
+                </div>
+                <div class="order-item-price">
+                    <div class="current" style="color:#999;">0</div>
+                    <div class="qty">×1</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 结算栏 -->
+    <div class="cart-settle">
+        <div class="cart-settle-left">
+            <div class="cart-settle-total">
+                合计：<span class="price">2,980</span>
+            </div>
+        </div>
+        <div class="cart-settle-right">
+            <span class="cart-settle-gift">🎁 含2件赠品</span>
+            <button class="btn-settle" onclick="switchPage('confirm')">去结算</button>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== 页面3: 订单确认 ==================== -->
+<div class="page" id="page-confirm">
+    <div class="header">
+        <span class="back" onclick="switchPage('cart')">‹</span>
+        确认订单
+        <span class="right"></span>
+    </div>
+    <div class="page-content">
+        <!-- 收货地址 -->
+        <div class="order-confirm-section">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                <span style="font-size:16px;">📍</span>
+                <span style="font-size:14px; font-weight:600;">收货地址</span>
+            </div>
+            <div style="font-size:13px; color:#333; line-height:1.6;">
+                <div><strong>张三</strong> <span style="color:#999;">138****8888</span></div>
+                <div style="color:#666; margin-top:4px;">北京市朝阳区建国路88号SOHO现代城A座1201室</div>
+            </div>
+        </div>
+
+        <!-- 商品清单 -->
+        <div class="order-confirm-section">
+            <div class="order-confirm-title">📦 商品清单</div>
+            <div class="order-item-row">
+                <div class="order-item-img">🧴</div>
+                <div class="order-item-detail">
+                    <div class="order-item-name">绿韵草本精华礼盒套装</div>
+                    <div class="order-item-spec">规格：240粒/瓶</div>
+                </div>
+                <div class="order-item-price">
+                    <div class="current">298</div>
+                    <div class="qty">×10</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 赠品汇总 -->
+        <div class="gift-summary-card">
+            <div class="gift-summary-title">🎁 本单赠品（共2件）</div>
+            <div class="gift-summary-item">· 条件1（满10件）：赠「草本护发精油小样」×1</div>
+            <div class="gift-summary-item">· 条件2（满¥100）：赠「植物手工皂」×1</div>
+        </div>
+
+        <!-- 赠品明细 -->
+        <div class="order-confirm-section">
+            <div class="order-confirm-title">🎁 赠品明细</div>
+            <div class="order-item-row gift-row">
+                <div class="order-item-img gift">🧴</div>
+                <div class="order-item-detail">
+                    <div class="order-item-name">
+                        草本护发精油（小样）
+                        <span class="gift-tag">赠品</span>
+                    </div>
+                    <div class="order-item-spec">规格：10ml小样</div>
+                    <span class="order-item-trigger">触发：满10件</span>
+                </div>
+                <div class="order-item-price">
+                    <div class="current" style="color:#999;">0</div>
+                    <div class="qty">×1</div>
+                </div>
+            </div>
+            <div class="order-item-row gift-row">
+                <div class="order-item-img gift">🧼</div>
+                <div class="order-item-detail">
+                    <div class="order-item-name">
+                        植物手工皂
+                        <span class="gift-tag">赠品</span>
+                    </div>
+                    <div class="order-item-spec">规格：薰衣草</div>
+                    <span class="order-item-trigger">触发：满¥100</span>
+                </div>
+                <div class="order-item-price">
+                    <div class="current" style="color:#999;">0</div>
+                    <div class="qty">×1</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 金额汇总 -->
+        <div class="amount-summary">
+            <div class="amount-row">
+                <span>商品金额</span>
+                <span>¥2,980.00</span>
+            </div>
+            <div class="amount-row">
+                <span>运费</span>
+                <span style="color:#52c41a;">免运费</span>
+            </div>
+            <div class="amount-row">
+                <span>优惠</span>
+                <span>-¥0.00</span>
+            </div>
+            <div class="amount-row">
+                <span>赠品价值</span>
+                <span class="gift-value">¥97.00（赠送）</span>
+            </div>
+            <div class="amount-row total">
+                <span>应付金额</span>
+                <span class="price">2,980</span>
+            </div>
+        </div>
+
+        <!-- 售后提示 -->
+        <div class="after-sale-tip">
+            <span>ℹ️</span>
+            <span>赠品不参与售后，主商品退货时赠品需一并退回</span>
+        </div>
+    </div>
+
+    <!-- 提交订单 -->
+    <div class="submit-bar">
+        <div class="submit-info">
+            合计：<span class="price">2,980</span>
+        </div>
+        <button class="btn-submit" onclick="submitOrder()">提交订单</button>
+    </div>
+</div>
+
+<!-- ==================== 页面4: 订单详情 ==================== -->
+<div class="page" id="page-order">
+    <div class="header">
+        <span class="back" onclick="switchPage('product')">‹</span>
+        订单详情
+        <span class="right" onclick="showToast('更多')">⋯</span>
+    </div>
+    <div class="page-content">
+        <!-- 订单状态 -->
+        <div class="order-status-bar">
+            <div class="order-status-title">✓ 订单已支付</div>
+            <div class="order-status-desc">商家正在备货中，请耐心等待</div>
+        </div>
+
+        <!-- 订单信息 -->
+        <div class="order-info-section">
+            <div class="order-info-row">
+                <span class="label">订单编号</span>
+                <span class="value">ORD20260608001</span>
+            </div>
+            <div class="order-info-row">
+                <span class="label">下单时间</span>
+                <span class="value">2026-06-08 10:30:25</span>
+            </div>
+            <div class="order-info-row">
+                <span class="label">支付方式</span>
+                <span class="value">微信支付</span>
+            </div>
+        </div>
+
+        <!-- 收货地址 -->
+        <div class="order-info-section">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                <span style="font-size:16px;">📍</span>
+                <span style="font-size:14px; font-weight:600;">收货信息</span>
+            </div>
+            <div style="font-size:13px; color:#333; line-height:1.6;">
+                <div><strong>张三</strong> <span style="color:#999;">138****8888</span></div>
+                <div style="color:#666; margin-top:4px;">北京市朝阳区建国路88号SOHO现代城A座1201室</div>
+            </div>
+        </div>
+
+        <!-- 赠品卡片 -->
+        <div class="order-gift-card">
+            <div class="order-gift-card-title">🎁 本订单触发 2 个赠品条件</div>
+            <div class="order-gift-card-item">· 条件1（按数量）：购买满10件 → 赠「草本护发精油小样」×1</div>
+            <div class="order-gift-card-item">· 条件2（按金额）：实付满¥100 → 赠「植物手工皂」×1</div>
+        </div>
+
+        <!-- 商品清单 -->
+        <div class="order-confirm-section">
+            <div class="order-confirm-title">📦 商品清单</div>
+            <div class="order-item-row">
+                <div class="order-item-img">🧴</div>
+                <div class="order-item-detail">
+                    <div class="order-item-name">绿韵草本精华礼盒套装</div>
+                    <div class="order-item-spec">规格：240粒/瓶</div>
+                </div>
+                <div class="order-item-price">
+                    <div class="current">298</div>
+                    <div class="qty">×10</div>
+                </div>
+            </div>
+            <div class="order-item-row gift-row">
+                <div class="order-item-img gift">🧴</div>
+                <div class="order-item-detail">
+                    <div class="order-item-name">
+                        草本护发精油（小样）
+                        <span class="gift-tag">赠品</span>
+                    </div>
+                    <div class="order-item-spec">规格：10ml小样</div>
+                    <span class="order-item-trigger">触发：满10件</span>
+                </div>
+                <div class="order-item-price">
+                    <div class="current" style="color:#999;">0</div>
+                    <div class="qty">×1</div>
+                </div>
+            </div>
+            <div class="order-item-row gift-row">
+                <div class="order-item-img gift">🧼</div>
+                <div class="order-item-detail">
+                    <div class="order-item-name">
+                        植物手工皂
+                        <span class="gift-tag">赠品</span>
+                    </div>
+                    <div class="order-item-spec">规格：薰衣草</div>
+                    <span class="order-item-trigger">触发：满¥100</span>
+                </div>
+                <div class="order-item-price">
+                    <div class="current" style="color:#999;">0</div>
+                    <div class="qty">×1</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 金额汇总 -->
+        <div class="amount-summary">
+            <div class="amount-row">
+                <span>商品金额</span>
+                <span>¥2,980.00</span>
+            </div>
+            <div class="amount-row">
+                <span>运费</span>
+                <span style="color:#52c41a;">免运费</span>
+            </div>
+            <div class="amount-row">
+                <span>赠品价值</span>
+                <span class="gift-value">¥97.00（赠送）</span>
+            </div>
+            <div class="amount-row total">
+                <span>实付金额</span>
+                <span class="price">2,980</span>
+            </div>
+        </div>
+
+        <!-- 售后提示 -->
+        <div class="after-sale-tip">
+            <span>ℹ️</span>
+            <span>赠品不支持单独售后，主商品退货时赠品需一并退回</span>
+        </div>
+    </div>
+
+    <!-- 底部操作 -->
+    <div class="bottom-bar" style="justify-content: flex-end; gap: 10px;">
+        <button class="btn" style="background:#f5f5f5; color:#333; flex:0; padding:0 20px;" onclick="showToast('查看物流')">查看物流</button>
+        <button class="btn btn-buy" style="flex:0; padding:0 20px;" onclick="showToast('再次购买')">再次购买</button>
+    </div>
+</div>
+
+<script>
+// 页面切换
+function switchPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + pageId).classList.add('active');
+    window.scrollTo(0, 0);
+}
+
+// 规格选择
+function selectSpec(el) {
+    document.querySelectorAll('.spec-option').forEach(o => o.classList.remove('active'));
+    el.classList.add('active');
+}
+
+// 数量变更
+function changeQty(delta) {
+    const input = document.getElementById('qty-input');
+    let val = parseInt(input.value) + delta;
+    if (val < 1) val = 1;
+    if (val > 99) val = 99;
+    input.value = val;
+    updateGiftStatus(val);
+}
+
+function changeCartQty(delta) {
+    const input = document.getElementById('cart-qty');
+    let val = parseInt(input.value) + delta;
+    if (val < 1) val = 1;
+    if (val > 99) val = 99;
+    input.value = val;
+}
+
+// 更新赠品状态
+function updateGiftStatus(qty) {
+    const s1 = document.getElementById('gift-status-1');
+    const s2 = document.getElementById('gift-status-2');
+    const s3 = document.getElementById('gift-status-3');
+
+    // 满10件
+    if (qty >= 10) {
+        s1.innerHTML = '<span>✓</span><span>已满足（当前' + qty + '件）</span>';
+        s1.classList.remove('not-met');
+    } else {
+        s1.innerHTML = '<span>○</span><span>还差' + (10 - qty) + '件</span>';
+        s1.classList.add('not-met');
+    }
+
+    // 满¥100 (单价298，1件就满足)
+    const amount = qty * 298;
+    if (amount >= 100) {
+        s2.innerHTML = '<span>✓</span><span>已满足（实付¥' + amount.toLocaleString() + '）</span>';
+        s2.classList.remove('not-met');
+    } else {
+        s2.innerHTML = '<span>○</span><span>还差¥' + (100 - amount) + '</span>';
+        s2.classList.add('not-met');
+    }
+
+    // 满¥2000
+    if (amount >= 3000) {
+        s3.innerHTML = '<span>✓</span><span>已满足（实付¥' + amount.toLocaleString() + '）</span>';
+        s3.classList.remove('not-met');
+    } else {
+        s3.innerHTML = '<span>○</span><span>还差¥' + (3000 - amount) + '（当前¥' + amount.toLocaleString() + '/¥3,000）</span>';
+        s3.classList.add('not-met');
+    }
+}
+
+// 加入购物车
+function addToCart() {
+    showToast('已加入购物车');
+    setTimeout(() => switchPage('cart'), 800);
+}
+
+// 提交订单
+function submitOrder() {
+    showToast('订单提交成功');
+    setTimeout(() => switchPage('order'), 800);
+}
+
+// Toast
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// 初始化
+updateGiftStatus(10);
+</script>
+
+</body>
+</html>
