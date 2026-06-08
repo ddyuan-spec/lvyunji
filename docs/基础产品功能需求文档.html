@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>绿韵家后台管理系统 - 基础产品功能需求文档 V1.0</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+        background: #f5f5f7; color: #333; line-height: 1.8; font-size: 14px;
+    }
+    .top-bar {
+        position: sticky; top: 0; z-index: 100;
+        background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+        color: #fff; padding: 12px 32px;
+        box-shadow: 0 2px 12px rgba(74, 144, 226, 0.2);
+    }
+    .top-bar-inner {
+        max-width: 1280px; margin: 0 auto;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .top-title { font-size: 15px; font-weight: 600; }
+    .top-meta { font-size: 12px; opacity: 0.95; }
+    .doc-container {
+        max-width: 1180px; margin: 24px auto; background: #fff;
+        border-radius: 12px; box-shadow: 0 2px 16px rgba(0,0,0,0.06); overflow: hidden;
+    }
+    .doc-header {
+        background: linear-gradient(135deg, #f0f7ff 0%, #fff 100%);
+        padding: 48px 60px 40px; border-bottom: 3px solid #4a90e2;
+        position: relative; overflow: hidden;
+    }
+    .doc-header::before {
+        content: "🌽"; position: absolute; right: 60px; top: 50%;
+        transform: translateY(-50%); font-size: 120px; opacity: 0.12;
+    }
+    .doc-title { font-size: 32px; font-weight: 700; color: #4a90e2; margin-bottom: 12px; }
+    .doc-subtitle { font-size: 15px; color: #666; margin-bottom: 24px; }
+    .doc-meta-row { display: flex; gap: 24px; flex-wrap: wrap; }
+    .meta-item {
+        display: flex; align-items: center; gap: 8px;
+        background: rgba(255,255,255,0.7); padding: 8px 16px;
+        border-radius: 20px; border: 1px solid #d0e3ff; font-size: 13px;
+    }
+    .meta-item .label { color: #999; }
+    .meta-item .value { color: #4a90e2; font-weight: 600; }
+    .toc-section {
+        padding: 32px 60px; background: #fafafa; border-bottom: 1px solid #eee;
+    }
+    .toc-title {
+        font-size: 16px; font-weight: 700; color: #333; margin-bottom: 16px;
+        padding-left: 12px; border-left: 4px solid #4a90e2;
+    }
+    .toc-grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    }
+    .toc-item {
+        padding: 8px 16px; background: #fff; border: 1px solid #eee;
+        border-radius: 6px; text-decoration: none; color: #333; font-size: 13px;
+        transition: all 0.2s; display: flex; align-items: center; gap: 8px;
+    }
+    .toc-item:hover { border-color: #4a90e2; color: #4a90e2; background: #f0f7ff; }
+    .toc-item .num {
+        display: inline-block; width: 24px; height: 24px; line-height: 24px;
+        text-align: center; background: #e6f0ff; color: #4a90e2;
+        border-radius: 4px; font-size: 12px; font-weight: 600;
+    }
+    .section {
+        padding: 40px 60px; border-bottom: 1px solid #f0f0f0;
+    }
+    .section:last-child { border-bottom: none; }
+    .section-title {
+        font-size: 22px; font-weight: 700; color: #333; margin-bottom: 8px;
+        padding-bottom: 12px; border-bottom: 2px solid #4a90e2;
+        display: flex; align-items: center; gap: 12px;
+    }
+    .section-title .num-badge {
+        display: inline-block; width: 36px; height: 36px; line-height: 36px;
+        text-align: center; background: linear-gradient(135deg, #4a90e2, #357abd);
+        color: #fff; border-radius: 8px; font-size: 14px; font-weight: 700;
+    }
+    .sub-title {
+        font-size: 17px; font-weight: 600; color: #333; margin-top: 28px;
+        margin-bottom: 14px; padding-left: 12px; border-left: 3px solid #a8c8f0;
+    }
+    .sub-title:first-child { margin-top: 0; }
+    .sub-sub-title {
+        font-size: 14px; font-weight: 600; color: #555; margin-top: 20px; margin-bottom: 10px;
+    }
+    p { margin-bottom: 12px; color: #555; }
+    ul, ol { margin: 12px 0; padding-left: 20px; color: #555; }
+    li { margin-bottom: 6px; }
+    strong { color: #4a90e2; font-weight: 600; }
+    .info-box {
+        background: #f0f7ff; border-left: 4px solid #4a90e2;
+        padding: 14px 20px; border-radius: 4px; margin: 16px 0; color: #333;
+    }
+    .warning-box {
+        background: #fff8e6; border-left: 4px solid #faad14;
+        padding: 14px 20px; border-radius: 4px; margin: 16px 0; color: #333;
+    }
+    .tip-box {
+        background: #fff5f5; border-left: 4px solid #ff6b7a;
+        padding: 14px 20px; border-radius: 4px; margin: 16px 0; color: #333;
+    }
+    .success-box {
+        background: #f0fff4; border-left: 4px solid #52c41a;
+        padding: 14px 20px; border-radius: 4px; margin: 16px 0; color: #333;
+    }
+    table {
+        width: 100%; border-collapse: collapse; margin: 16px 0;
+        font-size: 13px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        border-radius: 8px; overflow: hidden;
+    }
+    thead { background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); }
+    thead th {
+        padding: 14px 16px; text-align: left; color: #fff;
+        font-weight: 600; font-size: 13px; border: none;
+    }
+    tbody td {
+        padding: 12px 16px; border-bottom: 1px solid #f0f0f0; color: #555;
+    }
+    tbody tr { background: #fff; transition: background 0.15s; }
+    tbody tr:hover { background: #f0f7ff; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody td:first-child { color: #333; font-weight: 500; }
+    pre {
+        background: #1e293b; color: #e2e8f0; padding: 20px;
+        border-radius: 8px; overflow-x: auto;
+        font-family: "SF Mono", "Consolas", "Monaco", monospace;
+        font-size: 13px; line-height: 1.7; margin: 16px 0;
+    }
+    code {
+        background: #f0f0f5; color: #e83e8c;
+        padding: 2px 6px; border-radius: 3px;
+        font-family: "SF Mono", "Consolas", monospace; font-size: 12.5px;
+    }
+    pre code { background: none; color: #e2e8f0; padding: 0; }
+    .flow-diagram {
+        background: #fff; border: 1px solid #eee; border-radius: 12px;
+        padding: 32px; margin: 20px 0; overflow-x: auto;
+    }
+    .diagram-title {
+        text-align: center; font-size: 15px; font-weight: 700;
+        color: #333; margin-bottom: 24px;
+        padding-bottom: 12px; border-bottom: 2px dashed #eee;
+    }
+    .flow-container { display: flex; flex-direction: column; align-items: center; }
+    .flow-row {
+        display: flex; align-items: center; gap: 8px;
+        margin-bottom: 4px; flex-wrap: wrap; justify-content: center;
+    }
+    .flow-node {
+        background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+        color: #fff; padding: 12px 20px; border-radius: 8px;
+        font-size: 13px; font-weight: 600; min-width: 140px;
+        text-align: center; box-shadow: 0 3px 10px rgba(74, 144, 226, 0.25);
+    }
+    .flow-node.secondary {
+        background: linear-gradient(135deg, #ff6b7a 0%, #ff5252 100%);
+        box-shadow: 0 3px 10px rgba(255, 107, 122, 0.25);
+    }
+    .flow-node.success {
+        background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%);
+        box-shadow: 0 3px 10px rgba(82, 196, 26, 0.25);
+    }
+    .flow-node.warning {
+        background: linear-gradient(135deg, #faad14 0%, #d48806 100%);
+        box-shadow: 0 3px 10px rgba(250, 173, 20, 0.25);
+    }
+    .flow-node.gray {
+        background: #f5f5f5; color: #666; box-shadow: none; border: 1px solid #ddd;
+    }
+    .flow-arrow { color: #999; font-size: 20px; font-weight: 700; line-height: 1; }
+    .flow-arrow-down { color: #999; font-size: 24px; line-height: 1; margin: 8px 0; height: 20px; }
+    .flow-branch {
+        display: flex; gap: 40px; align-items: flex-start;
+        margin-top: 12px; justify-content: center; flex-wrap: wrap;
+    }
+    .flow-column { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .flow-label {
+        font-size: 12px; color: #666; background: #f5f5f5;
+        padding: 3px 10px; border-radius: 12px; margin: 6px 0;
+    }
+    .product-grid {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 16px 0;
+    }
+    .product-card {
+        border: 1px solid #eee; border-radius: 10px; padding: 16px;
+        background: #fff; transition: all 0.2s;
+    }
+    .product-card:hover {
+        border-color: #4a90e2;
+        box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+        transform: translateY(-2px);
+    }
+    .product-emoji {
+        font-size: 36px; text-align: center; margin-bottom: 8px;
+        background: #f0f7ff; border-radius: 8px; padding: 12px;
+    }
+    .product-name {
+        font-size: 13px; font-weight: 600; color: #333;
+        margin-bottom: 4px; text-align: center;
+    }
+    .product-code {
+        font-size: 11px; color: #999; text-align: center;
+        margin-bottom: 8px; font-family: monospace;
+    }
+    .product-spec {
+        font-size: 11px; color: #666; text-align: center;
+        padding: 4px 8px; background: #f5f5f5;
+        border-radius: 4px; margin-bottom: 8px;
+    }
+    .product-price {
+        font-size: 16px; color: #4a90e2; font-weight: 700; text-align: center;
+    }
+    .example-block {
+        background: #fafbfc; border: 1px solid #e8e8e8;
+        border-radius: 8px; padding: 16px 20px; margin: 12px 0;
+    }
+    .example-title {
+        font-size: 13px; font-weight: 700; color: #4a90e2; margin-bottom: 10px;
+    }
+    .example-line { font-size: 13px; color: #555; padding: 3px 0; }
+    .example-line .k { color: #999; }
+    .example-line .v { color: #333; font-weight: 500; }
+    .doc-footer {
+        text-align: center; padding: 24px; color: #999;
+        font-size: 12px; background: #fafafa;
+    }
+    @media (max-width: 900px) {
+        .section { padding: 24px 20px; }
+        .toc-section { padding: 24px 20px; }
+        .doc-header { padding: 32px 24px; }
+        .toc-grid { grid-template-columns: 1fr; }
+        .product-grid { grid-template-columns: 1fr; }
+    }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-inner">
+        <div class="top-title">📋 绿韵家后台管理系统 · 需求文档</div>
+        <div class="top-meta">V1.0 · 2026-06-08</div>
+    </div>
+</div>
+
+<div class="doc-container">
+
+    <div class="doc-header">
+        <div class="doc-title">基础产品功能需求文档</div>
+        <div class="doc-subtitle">商品管理模块 · 基础产品绑定与售后退款</div>
+        <div class="doc-meta-row">
+            <div class="meta-item"><span class="label">文档版本：</span><span class="value">V1.0</span></div>
+            <div class="meta-item"><span class="label">编写日期：</span><span class="value">2026-06-08</span></div>
+            <div class="meta-item"><span class="label">适用系统：</span><span class="value">绿韵家后台管理系统</span></div>
+        </div>
+    </div>
+
+    <div class="toc-section">
+        <div class="toc-title">📖 目录导航</div>
+        <div class="toc-grid">
+            <a href="#s1" class="toc-item"><span class="num">一</span>需求概述</a>
+            <a href="#s2" class="toc-item"><span class="num">二</span>功能模块</a>
+            <a href="#s3" class="toc-item"><span class="num">三</span>业务规则</a>
+            <a href="#s4" class="toc-item"><span class="num">四</span>字段定义</a>
+            <a href="#s5" class="toc-item"><span class="num">五</span>交互流程图</a>
+            <a href="#s6" class="toc-item"><span class="num">六</span>界面原型参考</a>
+            <a href="#s7" class="toc-item"><span class="num">七</span>非功能需求</a>
+            <a href="#s8" class="toc-item"><span class="num">八</span>附录</a>
+        </div>
+    </div>
+
+    <div class="section" id="s1">
+        <div class="section-title"><span class="num-badge">一</span>需求概述</div>
+
+        <div class="sub-title">1.1 背景</div>
+        <p>为支持售后退款时按基础产品数量进行退款（如：10个装玉米退3个单个玉米），绿韵家后台管理系统需在商品管理模块中增加<strong>基础产品管理功能</strong>。商家可为商品的不同规格绑定对应的基础产品，售后退款时按基础产品数量计算退款金额。</p>
+
+        <div class="sub-title">1.2 目标</div>
+        <ul>
+            <li>✅ 支持按商品规格绑定基础产品（如：10个装 → 10个单个玉米）</li>
+            <li>✅ 售后退款时支持按基础产品数量退款</li>
+            <li>✅ 退款金额 = 退款数量 × 基础产品单价</li>
+            <li>✅ 同一规格可绑定多个基础产品</li>
+        </ul>
+
+        <div class="sub-title">1.3 适用范围</div>
+        <ul>
+            <li>后台管理系统：商品列表页、新增/编辑商品页</li>
+            <li>订单系统：订单详情页售后退款</li>
+        </ul>
+    </div>
+
+    <div class="section" id="s2">
+        <div class="section-title"><span class="num-badge">二</span>功能模块</div>
+
+        <div class="sub-title">2.1 商品列表页 · 编辑基础产品入口</div>
+        <div class="sub-sub-title">2.1.1 页面位置</div>
+        <p>商品管理 &gt; 商品列表</p>
+
+        <div class="sub-sub-title">2.1.2 功能描述</div>
+        <ul>
+            <li>商品列表表格每行操作列提供【编辑基础产品】文字按钮（蓝色）</li>
+            <li>点击后打开"编辑基础产品"弹窗，对应该商品的基础产品配置</li>
+        </ul>
+
+        <div class="sub-sub-title">2.1.3 交互流程</div>
+        <div class="flow-container">
+            <div class="flow-row">
+                <div class="flow-node">商品列表页</div>
+                <span class="flow-arrow">➜</span>
+                <div class="flow-node secondary">点击【编辑基础产品】</div>
+                <span class="flow-arrow">➜</span>
+                <div class="flow-node secondary">打开编辑基础产品弹窗</div>
+                <span class="flow-arrow">➜</span>
+                <div class="flow-node">配置基础产品绑定</div>
+                <span class="flow-arrow">➜</span>
+                <div class="flow-node success">保存</div>
+            </div>
+        </div>
+
+        <div class="sub-title">2.2 新增/编辑商品页 · 基础产品配置</div>
+        <div class="sub-sub-title">2.2.1 页面位置</div>
+        <p>商品管理 &gt; 新增商品 / 编辑商品</p>
+
+        <div class="sub-sub-title">2.2.2 功能描述</div>
+        <p>在商品基础信息填写区域下方，增加"基础产品"配置区块：</p>
+        <div class="info-box">
+            <div style="font-weight:600; margin-bottom:6px;">🌽 基础产品（按规格绑定）</div>
+            <div style="color:#666; margin-top:8px;"><strong>基础产品规则：</strong>为每个商品规格绑定对应的基础产品（如：10个装玉米 → 基础产品为10个单个玉米）。售后退款时，可按基础产品数量进行退款，退款金额 = 退款数量 × 基础产品单价。</div>
+        </div>
+
+        <div class="sub-sub-title">2.2.3 基础产品数据结构</div>
+        <pre><code><span class="code-comment">// 规格 -> [基础产品绑定] 映射
+// 每个绑定: { baseProductId, name, code, spec, qty, price, img }</span>
+{
+    <span class="code-string">'120粒/瓶'</span>: [
+        {
+            baseProductId: <span class="code-num">101</span>,
+            name: <span class="code-string">'有机玉米（单个）'</span>,
+            code: <span class="code-string">'BASE20260601001'</span>,
+            spec: <span class="code-string">'约200g/个'</span>,
+            qty: <span class="code-num">5</span>,              <span class="code-comment">// 该规格包含5个基础产品</span>
+            price: <span class="code-num">2.5</span>,           <span class="code-comment">// 基础产品单价</span>
+            img: <span class="code-string">'🌽'</span>
+        }
+    ],
+    <span class="code-string">'240粒/瓶'</span>: [
+        { baseProductId: <span class="code-num">101</span>, name: <span class="code-string">'有机玉米（单个）'</span>, qty: <span class="code-num">10</span>, price: <span class="code-num">2.5</span> },
+        { baseProductId: <span class="code-num">102</span>, name: <span class="code-string">'土鸡蛋（单个）'</span>, qty: <span class="code-num">3</span>, price: <span class="code-num">1.2</span> }
+    ]
+}</code></pre>
+
+        <div class="sub-sub-title">2.2.4 编辑基础产品弹窗</div>
+        <div class="example-block">
+            <div class="example-title">弹窗结构</div>
+            <div class="example-line"><span class="k">弹窗标题：</span><span class="v">编辑基础产品 · {商品名称}</span></div>
+            <div class="example-line"><span class="k">顶部统计：</span><span class="v">N 个规格已配置，M 个基础产品绑定</span></div>
+            <div class="example-line"><span class="k">内容区域：</span><span class="v">按规格分组展示基础产品绑定列表</span></div>
+        </div>
+
+        <div class="example-block">
+            <div class="example-title">规格分组卡片</div>
+            <div class="example-line">· 规格名称（如：240粒/瓶）</div>
+            <div class="example-line">· 基础产品数量提示：共 N 个基础产品</div>
+            <div class="example-line">· 每个基础产品展示为表格行：图片+名称+编号+规格+单价+数量+操作</div>
+            <div class="example-line">· 数量可编辑（input number）</div>
+            <div class="example-line">· 操作按钮：删除</div>
+            <div class="example-line">· 【+ 添加基础产品】按钮</div>
+        </div>
+
+        <div class="sub-sub-title">2.2.5 选择基础产品弹窗</div>
+        <div class="example-block">
+            <div class="example-title">弹窗结构</div>
+            <div class="example-line"><span class="k">弹窗标题：</span><span class="v">选择基础产品</span></div>
+            <div class="example-line"><span class="k">搜索框：</span><span class="v">搜索基础产品名称/编号</span></div>
+            <div class="example-line"><span class="k">列表项：</span><span class="v">圆形单选框 + 图片 + 名称 + 编号 + 单价 + 规格</span></div>
+            <div class="example-line"><span class="k">选中效果：</span><span class="v">整行蓝色边框 + 浅蓝背景 + 勾选框变蓝白 ✓</span></div>
+            <div class="example-line"><span class="k">底部按钮：</span><span class="v">取消 | 确认选择</span></div>
+        </div>
+
+        <div class="sub-title">2.3 订单详情页 · 售后退款</div>
+        <div class="sub-sub-title">2.3.1 页面位置</div>
+        <p>订单中心 &gt; 订单详情 &gt; 申请退款</p>
+
+        <div class="sub-sub-title">2.3.2 退款Tab切换</div>
+        <div class="example-block">
+            <div class="example-title">Tab结构</div>
+            <div class="example-line"><span class="k">Tab 1：</span><span class="v">📦 订单商品退款</span></div>
+            <div class="example-line"><span class="k">Tab 2：</span><span class="v">🌽 基础商品退款</span></div>
+        </div>
+
+        <div class="sub-sub-title">2.3.3 订单商品退款Tab</div>
+        <table>
+            <thead><tr><th>商品名称</th><th>规格</th><th>已退款/购买</th><th>实付款</th><th>可退金额</th><th>本次退款数量</th><th>本次退款金额</th></tr></thead>
+            <tbody>
+                <tr><td>绿韵草本精华礼盒套装</td><td>240粒/瓶</td><td>0/1</td><td>¥298</td><td>¥298</td><td><input type="number" value="1" style="width:50px;"></td><td><input type="number" value="298" style="width:60px;"></td></tr>
+            </tbody>
+        </table>
+
+        <div class="sub-sub-title">2.3.4 基础商品退款Tab</div>
+        <table>
+            <thead><tr><th>基础产品</th><th>规格</th><th>基础单价</th><th>已退款/购买总数</th><th>可退金额</th><th>本次退款数量</th><th>本次退款金额</th></tr></thead>
+            <tbody>
+                <tr><td>🌽 有机玉米（单个）</td><td>约200g/个</td><td>¥2.50</td><td>0/10</td><td>¥25.00</td><td><input type="number" value="0" style="width:50px;"></td><td><input type="number" value="0" style="width:60px;"></td></tr>
+                <tr><td>🥚 土鸡蛋（单个）</td><td>约50g/个</td><td>¥1.20</td><td>0/3</td><td>¥3.60</td><td><input type="number" value="0" style="width:50px;"></td><td><input type="number" value="0" style="width:60px;"></td></tr>
+            </tbody>
+        </table>
+
+        <div class="warning-box">
+            <b>💡 退款说明：</b>基础产品退款金额 = 退款数量 × 基础单价。例如：退3个玉米 = 3 × ¥2.5 = ¥7.5
+        </div>
+    </div>
+
+    <div class="section" id="s3">
+        <div class="section-title"><span class="num-badge">三</span>业务规则</div>
+
+        <div class="sub-title">3.1 基础产品规则</div>
+        <table>
+            <thead><tr><th style="width:160px;">规则项</th><th>说明</th></tr></thead>
+            <tbody>
+                <tr><td>绑定关系</td><td>每个商品规格可绑定多个基础产品</td></tr>
+                <tr><td>基础产品数量</td><td>表示该规格包含的基础产品个数（如10个装玉米 → qty=10）</td></tr>
+                <tr><td>基础产品单价</td><td>独立定价，用于计算退款金额</td></tr>
+                <tr><td>不同规格</td><td>不同规格可绑定不同的基础产品，互不影响</td></tr>
+            </tbody>
+        </table>
+
+        <div class="sub-title">3.2 售后退款规则</div>
+        <table>
+            <thead><tr><th style="width:160px;">规则项</th><th>说明</th></tr></thead>
+            <tbody>
+                <tr><td>退款方式</td><td>支持订单商品退款和基础商品退款两种方式</td></tr>
+                <tr><td>基础商品退款</td><td>按基础产品数量退款，退款金额 = 退款数量 × 基础单价</td></tr>
+                <tr><td>退款上限</td><td>退款数量不能超过购买总数</td></tr>
+                <tr><td>金额计算</td><td>系统自动计算：退款数量 × 基础单价 = 本次退款金额</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section" id="s4">
+        <div class="section-title"><span class="num-badge">四</span>字段定义</div>
+
+        <div class="sub-title">4.1 基础产品绑定字段</div>
+        <table>
+            <thead><tr><th style="width:120px;">字段名</th><th style="width:100px;">类型</th><th style="width:80px;">必填</th><th>说明</th></tr></thead>
+            <tbody>
+                <tr><td><code>baseProductId</code></td><td>Integer</td><td style="color:#ff6b7a;">是</td><td>基础产品ID</td></tr>
+                <tr><td><code>name</code></td><td>String</td><td style="color:#ff6b7a;">是</td><td>基础产品名称</td></tr>
+                <tr><td><code>code</code></td><td>String</td><td style="color:#ff6b7a;">是</td><td>基础产品编号</td></tr>
+                <tr><td><code>spec</code></td><td>String</td><td style="color:#ff6b7a;">是</td><td>基础产品规格</td></tr>
+                <tr><td><code>qty</code></td><td>Integer</td><td style="color:#ff6b7a;">是</td><td>绑定数量（该规格包含的基础产品个数）</td></tr>
+                <tr><td><code>price</code></td><td>Decimal</td><td style="color:#ff6b7a;">是</td><td>基础产品单价</td></tr>
+                <tr><td><code>img</code></td><td>String</td><td>否</td><td>基础产品图片</td></tr>
+            </tbody>
+        </table>
+
+        <div class="sub-title">4.2 基础产品池字段</div>
+        <table>
+            <thead><tr><th style="width:120px;">字段名</th><th style="width:100px;">类型</th><th style="width:80px;">必填</th><th>说明</th></tr></thead>
+            <tbody>
+                <tr><td><code>id</code></td><td>Integer</td><td style="color:#ff6b7a;">是</td><td>基础产品唯一ID</td></tr>
+                <tr><td><code>name</code></td><td>String</td><td style="color:#ff6b7a;">是</td><td>基础产品名称</td></tr>
+                <tr><td><code>code</code></td><td>String</td><td style="color:#ff6b7a;">是</td><td>基础产品编号</td></tr>
+                <tr><td><code>spec</code></td><td>String</td><td style="color:#ff6b7a;">是</td><td>规格描述</td></tr>
+                <tr><td><code>price</code></td><td>Decimal</td><td style="color:#ff6b7a;">是</td><td>单价</td></tr>
+                <tr><td><code>img</code></td><td>String</td><td>否</td><td>图片</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section" id="s5">
+        <div class="section-title"><span class="num-badge">五</span>交互流程图</div>
+
+        <div class="sub-title">5.1 配置基础产品流程</div>
+        <div class="flow-diagram">
+            <div class="diagram-title">🌽 基础产品配置流程图</div>
+            <div class="flow-container">
+                <div class="flow-node">商品列表页 / 编辑商品页</div>
+                <div class="flow-arrow-down">▼</div>
+                <div class="flow-node secondary">点击【编辑基础产品】</div>
+                <div class="flow-arrow-down">▼</div>
+                <div class="flow-node">打开【编辑基础产品】弹窗</div>
+                <div class="flow-arrow-down">▼</div>
+                <div class="flow-node secondary">选择规格（如：240粒/瓶）</div>
+                <div class="flow-arrow-down">▼</div>
+                <div class="flow-node">点击【+ 添加基础产品】</div>
+                <div class="flow-arrow-down">▼</div>
+                <div class="flow-node secondary">从基础产品池选择产品</div>
+                <div class="flow-arrow-down">▼</div>
+                <div class="flow-node">设置绑定数量</div>
+                <div class="flow-arrow-down">▼</div>
+                <div class="flow-node success">✅ 保存基础产品配置</div>
+            </div>
+        </div>
+
+        <div class="sub-title">5.2 售后退款流程</div>
+        <div class="flow-diagram">
+            <div class="diagram-title">💰 售后退款流程图</div>
+            <div class="flow-container">
+                <div class="flow-node">👤 用户申请退款</div>
+                <div class="flow-arrow-down">▼</div>
+                <div class="flow-node secondary">📊 打开退款弹窗</div>
+                <div class="flow-arrow-down">▼</div>
+                <div class="flow-node">选择退款方式</div>
+                <div class="flow-branch">
+                    <div class="flow-column">
+                        <div class="flow-label">📦 订单商品退款</div>
+                        <div class="flow-arrow-down">▼</div>
+                        <div class="flow-node secondary">按商品数量退款</div>
+                        <div class="flow-arrow-down">▼</div>
+                        <div class="flow-node">输入退款数量</div>
+                    </div>
+                    <div class="flow-column">
+                        <div class="flow-label">🌽 基础商品退款</div>
+                        <div class="flow-arrow-down">▼</div>
+                        <div class="flow-node secondary">按基础产品数量退款</div>
+                        <div class="flow-arrow-down">▼</div>
+                        <div class="flow-node">输入退款数量<br>金额=数量×单价</div>
+                    </div>
+                </div>
+                <div class="flow-arrow-down" style="margin-top:16px;">▼</div>
+                <div class="flow-node success">✅ 提交退款申请</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section" id="s6">
+        <div class="section-title"><span class="num-badge">六</span>界面原型参考</div>
+
+        <div class="example-block">
+            <div class="example-title">6.1 商品列表页</div>
+            <div class="example-line">· <span class="k">表格列：</span><span class="v">图片、商品名称、商品编号、价格、商品类型、状态、操作</span></div>
+            <div class="example-line">· <span class="k">操作列按钮：</span><span class="v">编辑 | 编辑赠品 | <b style="color:#4a90e2;">编辑基础产品</b> | 查看</span></div>
+        </div>
+
+        <div class="example-block">
+            <div class="example-title">6.2 编辑基础产品弹窗</div>
+            <div class="example-line">· 按规格分组展示基础产品绑定</div>
+            <div class="example-line">· 每个规格卡片：规格名称 + 基础产品数量 + 添加按钮</div>
+            <div class="example-line">· 基础产品表格：图片、名称、编号、规格、单价、数量(input)、删除按钮</div>
+            <div class="example-line">· 空状态：此规格暂未绑定基础产品</div>
+        </div>
+
+        <div class="example-block">
+            <div class="example-title">6.3 选择基础产品弹窗</div>
+            <div class="example-line">· 搜索框：搜索基础产品名称/编号</div>
+            <div class="example-line">· 列表项：圆形单选框 + 图片 + 名称 + 编号 + 单价 + 规格</div>
+            <div class="example-line">· 选中效果：蓝色边框 + 浅蓝背景 + 勾选框变蓝白 ✓</div>
+        </div>
+
+        <div class="example-block">
+            <div class="example-title">6.4 售后退款弹窗</div>
+            <div class="example-line">· Tab切换：📦 订单商品退款 | 🌽 基础商品退款</div>
+            <div class="example-line">· 订单商品退款表格：商品名称/规格/已退款/购买/实付款/可退金额/本次退款数量/本次退款金额</div>
+            <div class="example-line">· 基础商品退款表格：基础产品/规格/基础单价/已退款/购买总数/可退金额/本次退款数量/本次退款金额</div>
+            <div class="example-line">· 底部提示：基础产品退款金额 = 退款数量 × 基础单价</div>
+        </div>
+    </div>
+
+    <div class="section" id="s7">
+        <div class="section-title"><span class="num-badge">七</span>非功能需求</div>
+
+        <div class="sub-title">7.1 性能要求</div>
+        <ul>
+            <li>⚡ 基础产品查询响应时间 &lt; <strong>200ms</strong></li>
+            <li>⚡ 退款金额计算实时完成</li>
+        </ul>
+
+        <div class="sub-title">7.2 兼容性要求</div>
+        <ul>
+            <li>🌐 支持 Chrome、Firefox、Safari、Edge 等主流浏览器</li>
+            <li>🖥️ 后台管理系统适配 1920×1080 及以上分辨率</li>
+        </ul>
+
+        <div class="sub-title">7.3 安全要求</div>
+        <ul>
+            <li>🔐 基础产品配置操作需校验管理员权限</li>
+            <li>📝 基础产品修改记录操作日志</li>
+        </ul>
+    </div>
+
+    <div class="section" id="s8">
+        <div class="section-title"><span class="num-badge">八</span>附录</div>
+
+        <div class="sub-title">8.1 基础产品池示例</div>
+        <div class="product-grid">
+            <div class="product-card">
+                <div class="product-emoji">🌽</div>
+                <div class="product-name">有机玉米（单个）</div>
+                <div class="product-code">BASE20260601001</div>
+                <div class="product-spec">约200g/个</div>
+                <div class="product-price">¥2.50</div>
+            </div>
+            <div class="product-card">
+                <div class="product-emoji">🥚</div>
+                <div class="product-name">土鸡蛋（单个）</div>
+                <div class="product-code">BASE20260601002</div>
+                <div class="product-spec">约50g/个</div>
+                <div class="product-price">¥1.20</div>
+            </div>
+            <div class="product-card">
+                <div class="product-emoji">🍎</div>
+                <div class="product-name">红富士苹果（单个）</div>
+                <div class="product-code">BASE20260601003</div>
+                <div class="product-spec">约250g/个</div>
+                <div class="product-price">¥3.80</div>
+            </div>
+            <div class="product-card">
+                <div class="product-emoji">🥔</div>
+                <div class="product-name">精品土豆（单个）</div>
+                <div class="product-code">BASE20260601004</div>
+                <div class="product-spec">约150g/个</div>
+                <div class="product-price">¥1.50</div>
+            </div>
+            <div class="product-card">
+                <div class="product-emoji">🥕</div>
+                <div class="product-name">胡萝卜（单根）</div>
+                <div class="product-code">BASE20260601005</div>
+                <div class="product-spec">约100g/根</div>
+                <div class="product-price">¥1.00</div>
+            </div>
+            <div class="product-card">
+                <div class="product-emoji">🍅</div>
+                <div class="product-name">西红柿（单个）</div>
+                <div class="product-code">BASE20260601006</div>
+                <div class="product-spec">约120g/个</div>
+                <div class="product-price">¥2.00</div>
+            </div>
+        </div>
+
+        <div class="sub-title">8.2 绑定配置示例</div>
+
+        <div class="example-block">
+            <div class="example-title">📦 示例：240粒/瓶 规格绑定</div>
+            <div class="example-line"><span class="k">基础产品1：</span><span class="v">有机玉米（单个）× 10个 · ¥2.50/个</span></div>
+            <div class="example-line"><span class="k">基础产品2：</span><span class="v">土鸡蛋（单个）× 3个 · ¥1.20/个</span></div>
+            <div class="example-line" style="margin-top:8px; color:#666;">购买1件240粒/瓶，实际获得：10个玉米 + 3个鸡蛋</div>
+        </div>
+
+        <div class="example-block">
+            <div class="example-title">💰 退款示例</div>
+            <div class="example-line"><span class="k">场景：</span><span class="v">用户购买1件240粒/瓶，申请退3个玉米</span></div>
+            <div class="example-line"><span class="k">计算：</span><span class="v">3个 × ¥2.50 = <strong style="color:#4a90e2;">¥7.50</strong></span></div>
+            <div class="example-line"><span class="k">剩余：</span><span class="v">7个玉米 + 3个鸡蛋（可继续退）</span></div>
+        </div>
+    </div>
+
+    <div class="doc-footer">
+        📋 绿韵家后台管理系统 · 基础产品功能需求文档 V1.0 &nbsp;|&nbsp; 2026-06-08 &nbsp;|&nbsp; 文档结束
+    </div>
+
+</div>
+
+</body>
+</html>
