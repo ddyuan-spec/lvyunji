@@ -355,6 +355,29 @@
         .product-select-spec { font-size: 12px; color: #999; }
         .product-select-price { font-size: 12px; color: #ff6b7a; font-weight: 500; flex-shrink: 0; }
 
+        /* 基础产品选择列表 */
+        .base-select-list { max-height: 340px; overflow-y: auto; }
+        .base-select-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px;
+            border: 1px solid #f0f0f0; border-radius: 6px; margin-bottom: 8px;
+            cursor: pointer; transition: all .15s;
+        }
+        .base-select-item:hover { border-color: #4a90e2; background: #f0f7ff; }
+        .base-select-item.selected { border-color: #4a90e2; background: #e6f0ff; }
+        .base-select-item .checkbox {
+            width: 18px; height: 18px; border: 2px solid #ddd; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            font-size: 11px; color: transparent; transition: all .15s;
+        }
+        .base-select-item.selected .checkbox { background: #4a90e2; border-color: #4a90e2; color: #fff; }
+        .base-select-img {
+            width: 44px; height: 44px; background: #f0f7ff; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+        }
+        .base-select-info { flex: 1; min-width: 0; }
+        .base-select-name { font-size: 13px; color: #333; font-weight: 500; margin-bottom: 4px; }
+        .base-select-meta { font-size: 12px; color: #999; }
+
         /* 规格选择标签 */
         .spec-select-list { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
         .spec-select-item {
@@ -532,6 +555,25 @@
                     <tr><td>360粒/瓶</td><td><input type="number" value="398"></td><td><input type="number" value="398"></td><td><input type="number" value="300"></td></tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- ★ 基础产品（按规格绑定） -->
+        <div class="section" style="border: 2px dashed #d0e3ff; background: #f5f9ff;">
+            <div class="section-title">
+                <span class="title-text" style="color:#4a90e2;">🌽 基础产品（按规格绑定）</span>
+                <div style="display:flex; gap:8px;">
+                    <span style="font-size:12px;color:#999;font-weight:400;">售后可按基础产品数量退款</span>
+                    <button class="btn btn-sm" onclick="openBaseProductModalFromEdit()" style="background:linear-gradient(135deg,#4a90e2,#357abd);color:#fff;border:none;">+ 新增基础产品</button>
+                </div>
+            </div>
+
+            <!-- 基础产品说明 -->
+            <div style="padding:10px 14px; background:#fff; border-radius:6px; margin-bottom:12px; font-size:12px; color:#666; line-height:1.8; border-left:3px solid #4a90e2;">
+                💡 <b style="color:#4a90e2;">基础产品规则</b>：为每个商品规格绑定对应的基础产品（如：10个装玉米 → 基础产品为10个单个玉米）。<br>
+                售后退款时，可按基础产品数量进行退款，退款金额 = 退款数量 × 基础产品单价。
+            </div>
+
+            <div id="base-product-edit-container"></div>
         </div>
 
         <!-- ★ 赠品规则（按规格分组 + 多条件） -->
@@ -1517,6 +1559,49 @@ function openBaseProductModal(code, name) {
     document.getElementById('base-product-modal').classList.add('show');
 }
 
+// 从编辑页打开基础产品弹窗
+function openBaseProductModalFromEdit() {
+    document.getElementById('base-product-name').textContent = '绿韵草本精华礼盒套装';
+    editBaseProductData = JSON.parse(JSON.stringify(currentBaseProductMap));
+    renderBaseProductBody();
+    document.getElementById('base-product-modal').classList.add('show');
+}
+
+// 渲染编辑页基础产品列表
+function renderBaseProductEditList() {
+    const container = document.getElementById('base-product-edit-container');
+    if (!container) return;
+    const specs = Object.keys(currentBaseProductMap).filter(k => currentBaseProductMap[k].length > 0);
+    if (specs.length === 0) {
+        container.innerHTML = `<div style="padding:20px; text-align:center; color:#999; font-size:13px;">还未配置任何基础产品，点击右上角 <b style="color:#4a90e2;">+ 新增基础产品</b> 开始配置</div>`;
+        return;
+    }
+    let html = '';
+    for (const spec of specs) {
+        const bindings = currentBaseProductMap[spec];
+        html += `
+            <div style="margin-bottom:12px; border:1px solid #e0e0e0; border-radius:6px; overflow:hidden;">
+                <div style="background:#f0f7ff; padding:8px 12px; font-weight:600; color:#333; font-size:13px;">
+                    📦 ${spec} · 共 ${bindings.length} 个基础产品
+                </div>
+                <div style="padding:8px 12px;">
+                    ${bindings.map(b => `
+                        <div style="display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid #f5f5f5;">
+                            <span style="font-size:20px;">${b.img}</span>
+                            <div style="flex:1;">
+                                <div style="font-size:13px; font-weight:500;">${b.name}</div>
+                                <div style="font-size:11px; color:#999;">${b.code} · ${b.spec} · ¥${b.price.toFixed(2)}</div>
+                            </div>
+                            <div style="font-size:13px; color:#4a90e2; font-weight:600;">×${b.qty}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+    container.innerHTML = html;
+}
+
 function renderBaseProductBody() {
     const body = document.getElementById('base-product-body');
     const specs = Object.keys(editBaseProductData);
@@ -1585,15 +1670,16 @@ function renderBaseSpecSection(spec, bindings) {
 
 function openSelectBaseProduct(spec) {
     currentEditingSpec = spec;
+    tempSelectedBaseId = null;
     const list = document.getElementById('base-product-select-list');
     list.innerHTML = baseProductPool.map(p => `
-        <div class="gift-select-item" onclick="toggleBaseSelect(this, ${p.id})" data-id="${p.id}">
-            <div class="gift-select-img">${p.img}</div>
-            <div class="gift-select-info">
-                <div class="gift-select-name">${p.name}</div>
-                <div class="gift-select-price">${p.code} · ¥${p.price.toFixed(2)} · ${p.spec}</div>
+        <div class="base-select-item" id="base-item-${p.id}" onclick="toggleBaseSelect(this, ${p.id})" data-id="${p.id}">
+            <div class="checkbox" id="base-check-${p.id}">✓</div>
+            <div class="base-select-img">${p.img}</div>
+            <div class="base-select-info">
+                <div class="base-select-name">${p.name}</div>
+                <div class="base-select-meta">${p.code} · ¥${p.price.toFixed(2)} · ${p.spec}</div>
             </div>
-            <div class="gift-select-check" id="base-check-${p.id}">✓</div>
         </div>
     `).join('');
     document.getElementById('select-base-modal').classList.add('show');
@@ -1601,8 +1687,12 @@ function openSelectBaseProduct(spec) {
 
 let tempSelectedBaseId = null;
 function toggleBaseSelect(el, id) {
-    document.querySelectorAll('#base-product-select-list .gift-select-check').forEach(c => c.classList.remove('checked'));
-    document.getElementById('base-check-' + id).classList.add('checked');
+    // 清除所有选中状态
+    document.querySelectorAll('#base-product-select-list .base-select-item').forEach(item => {
+        item.classList.remove('selected');
+    });
+    // 设置当前选中
+    el.classList.add('selected');
     tempSelectedBaseId = id;
 }
 
@@ -1729,6 +1819,7 @@ function showToast(msg) {
 // 初始化
 renderProductList();
 renderGiftList();
+renderBaseProductEditList();
 </script>
 
 </body>
