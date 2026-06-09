@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>活动配置系统需求文档 - 绿韵家</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-light: #3b82f6;
+      --primary-dark: #1d4ed8;
+      --secondary: #7c3aed;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #06b6d4;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --gray-900: #0f172a;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-800);
+      line-height: 1.7;
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+    
+    /* Header */
+    .doc-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      padding: 48px 40px;
+      border-radius: 16px;
+      margin-bottom: 32px;
+      box-shadow: 0 10px 40px rgba(37,99,235,0.2);
+    }
+    .doc-header h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+    .doc-header .subtitle { font-size: 16px; opacity: 0.9; margin-bottom: 20px; }
+    .doc-meta { display: flex; gap: 24px; flex-wrap: wrap; font-size: 13px; opacity: 0.85; }
+    .doc-meta span { display: flex; align-items: center; gap: 6px; }
+    
+    /* TOC */
+    .toc {
+      background: white;
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 32px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border: 1px solid var(--gray-200);
+    }
+    .toc h2 { font-size: 18px; color: var(--primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .toc ul { list-style: none; }
+    .toc li { padding: 6px 0; }
+    .toc a { color: var(--gray-600); text-decoration: none; font-size: 14px; transition: color 0.2s; }
+    .toc a:hover { color: var(--primary); }
+    .toc .toc-h1 { font-weight: 600; color: var(--gray-800); }
+    .toc .toc-h2 { padding-left: 20px; }
+    .toc .toc-h3 { padding-left: 40px; font-size: 13px; }
+    
+    /* Sections */
+    .section {
+      background: white;
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border: 1px solid var(--gray-200);
+    }
+    .section h2 {
+      font-size: 22px;
+      color: var(--primary);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section h3 {
+      font-size: 18px;
+      color: var(--gray-700);
+      margin: 24px 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section h4 {
+      font-size: 15px;
+      color: var(--gray-700);
+      margin: 18px 0 10px;
+      font-weight: 600;
+    }
+    .section p { margin-bottom: 12px; color: var(--gray-600); }
+    .section ul, .section ol { margin: 12px 0 12px 24px; color: var(--gray-600); }
+    .section li { margin-bottom: 6px; }
+    
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 14px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      padding: 12px 14px;
+      text-align: left;
+      font-weight: 600;
+    }
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--gray-200);
+      color: var(--gray-700);
+    }
+    tr:nth-child(even) { background: var(--gray-50); }
+    tr:hover { background: #eff6ff; }
+    
+    /* Info boxes */
+    .info-box {
+      background: #eff6ff;
+      border-left: 4px solid var(--primary);
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+    }
+    .info-box.warning {
+      background: #fffbeb;
+      border-left-color: var(--warning);
+    }
+    .info-box.success {
+      background: #ecfdf5;
+      border-left-color: var(--success);
+    }
+    .info-box.danger {
+      background: #fef2f2;
+      border-left-color: var(--danger);
+    }
+    .info-box-title {
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--gray-800);
+    }
+    
+    /* Flow diagram */
+    .flow-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: var(--gray-50);
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+    .flow-node {
+      background: white;
+      border: 2px solid var(--primary);
+      border-radius: 10px;
+      padding: 14px 20px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary);
+      min-width: 120px;
+      box-shadow: 0 2px 6px rgba(37,99,235,0.1);
+    }
+    .flow-node.start { background: var(--success); color: white; border-color: var(--success); }
+    .flow-node.end { background: var(--danger); color: white; border-color: var(--danger); }
+    .flow-node.action { background: var(--primary); color: white; border-color: var(--primary); }
+    .flow-node.decision { border-radius: 50%; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; }
+    .flow-arrow {
+      color: var(--gray-400);
+      font-size: 20px;
+    }
+    .flow-arrow.down {
+      width: 100%;
+      text-align: center;
+      transform: rotate(90deg);
+    }
+    
+    /* Status badges */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-draft { background: var(--gray-200); color: var(--gray-600); }
+    .badge-pending { background: #fef3c7; color: #92400e; }
+    .badge-online { background: #d1fae5; color: #065f46; }
+    .badge-expired { background: #fee2e2; color: #991b1b; }
+    .badge-offline { background: #e0e7ff; color: #3730a3; }
+    
+    /* Code block */
+    .code-block {
+      background: var(--gray-900);
+      color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 8px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 13px;
+      overflow-x: auto;
+      margin: 14px 0;
+      line-height: 1.6;
+    }
+    .code-block .key { color: #93c5fd; }
+    .code-block .str { color: #86efac; }
+    .code-block .num { color: #fca5a5; }
+    .code-block .comment { color: var(--gray-500); }
+    
+    /* Architecture diagram */
+    .arch-layer {
+      background: white;
+      border: 2px solid var(--gray-300);
+      border-radius: 10px;
+      padding: 16px;
+      margin: 8px 0;
+    }
+    .arch-layer-title {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--gray-700);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .arch-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .arch-item {
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-size: 13px;
+      color: var(--gray-700);
+    }
+    .arch-item.primary { background: #dbeafe; border-color: var(--primary); color: var(--primary-dark); }
+    .arch-item.success { background: #d1fae5; border-color: var(--success); color: #065f46; }
+    .arch-item.warning { background: #fef3c7; border-color: var(--warning); color: #92400e; }
+    
+    /* Page mockup */
+    .page-mockup {
+      background: var(--gray-100);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 16px 0;
+      border: 1px solid var(--gray-200);
+    }
+    .mockup-header {
+      background: white;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      font-weight: 600;
+      color: var(--gray-700);
+      border: 1px solid var(--gray-200);
+    }
+    .mockup-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .mockup-card {
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      flex: 1;
+      border: 1px solid var(--gray-200);
+      text-align: center;
+    }
+    .mockup-card .num { font-size: 24px; font-weight: 700; color: var(--primary); }
+    .mockup-card .label { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
+    .mockup-table { background: white; border-radius: 8px; overflow: hidden; border: 1px solid var(--gray-200); }
+    .mockup-table-row {
+      display: flex;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 13px;
+    }
+    .mockup-table-row.header { background: var(--gray-50); font-weight: 600; color: var(--gray-600); }
+    .mockup-table-row > div { flex: 1; }
+    .mockup-btn {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-left: 4px;
+    }
+    .mockup-btn.primary { background: var(--primary); color: white; }
+    .mockup-btn.ghost { background: var(--gray-100); color: var(--gray-600); }
+    
+    /* Rule matrix */
+    .rule-matrix {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .rule-card {
+      background: white;
+      border: 2px solid var(--gray-200);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+    .rule-card .from { font-size: 12px; color: var(--gray-500); }
+    .rule-card .arrow { font-size: 20px; color: var(--primary); margin: 4px 0; }
+    .rule-card .to { font-size: 14px; font-weight: 700; color: var(--primary-dark); }
+    .rule-card .condition { font-size: 12px; color: var(--gray-500); margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--gray-200); }
+    
+    /* Highlight text */
+    .highlight { background: #fef3c7; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+    .highlight-blue { background: #dbeafe; padding: 2px 6px; border-radius: 4px; font-weight: 600; color: var(--primary-dark); }
+    
+    /* Footer */
+    .doc-footer {
+      text-align: center;
+      padding: 24px;
+      color: var(--gray-400);
+      font-size: 13px;
+      margin-top: 20px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container { padding: 16px; }
+      .doc-header { padding: 28px 20px; }
+      .doc-header h1 { font-size: 24px; }
+      .section { padding: 20px; }
+      .flow-container { flex-direction: column; }
+      .flow-arrow { transform: rotate(90deg); }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+<!-- Header -->
+<div class="doc-header">
+  <h1>活动配置系统需求文档</h1>
+  <div class="subtitle">绿韵家后台管理系统 — 运营自主配置活动模块</div>
+  <div class="doc-meta">
+    <span>📄 版本: v1.0</span>
+    <span>📅 日期: 2026-06-09</span>
+    <span>👤 撰写: 产品团队</span>
+    <span>🏷️ 状态: 需求评审中</span>
+  </div>
+</div>
+
+<!-- TOC -->
+<div class="toc">
+  <h2>📑 目录</h2>
+  <ul>
+    <li class="toc-h1"><a href="#s1">一、文档概述</a></li>
+    <li class="toc-h2"><a href="#s1-1">1.1 背景与目标</a></li>
+    <li class="toc-h2"><a href="#s1-2">1.2 适用范围</a></li>
+    <li class="toc-h2"><a href="#s1-3">1.3 术语定义</a></li>
+    <li class="toc-h1"><a href="#s2">二、系统架构设计</a></li>
+    <li class="toc-h2"><a href="#s2-1">2.1 整体架构</a></li>
+    <li class="toc-h2"><a href="#s2-2">2.2 模块划分</a></li>
+    <li class="toc-h2"><a href="#s2-3">2.3 数据流转</a></li>
+    <li class="toc-h1"><a href="#s3">三、功能需求</a></li>
+    <li class="toc-h2"><a href="#s3-1">3.1 日常配置模块</a></li>
+    <li class="toc-h2"><a href="#s3-2">3.2 活动配置模块</a></li>
+    <li class="toc-h2"><a href="#s3-3">3.3 规则引擎模块</a></li>
+    <li class="toc-h2"><a href="#s3-4">3.4 数据统计模块</a></li>
+    <li class="toc-h1"><a href="#s4">四、业务规则详细设计</a></li>
+    <li class="toc-h2"><a href="#s4-1">4.1 限时促销升级活动</a></li>
+    <li class="toc-h2"><a href="#s4-2">4.2 启航奖奖励政策</a></li>
+    <li class="toc-h2"><a href="#s4-3">4.3 鼓励奖奖励政策</a></li>
+    <li class="toc-h1"><a href="#s5">五、数据模型设计</a></li>
+    <li class="toc-h1"><a href="#s6">六、界面原型说明</a></li>
+    <li class="toc-h1"><a href="#s7">七、非功能性需求</a></li>
+    <li class="toc-h1"><a href="#s8">八、附录</a></li>
+  </ul>
+</div>
+
+<!-- Section 1 -->
+<div class="section" id="s1">
+  <h2><span>📋</span> 一、文档概述</h2>
+  
+  <h3 id="s1-1">1.1 背景与目标</h3>
+  <p>绿韵家平台目前存在多种营销活动规则，包括限时促销升级、启航奖、鼓励奖等。这些规则目前以<strong>硬编码</strong>方式存在于系统中，每次调整都需要开发介入，响应周期长、灵活性差。</p>
+  
+  <div class="info-box">
+    <div class="info-box-title">🎯 核心目标</div>
+    <p>构建一套<strong>运营自主配置活动系统</strong>，让运营人员可以在后台独立创建、编辑、上下线活动，设定有效期，自主调整活动规则，<span class="highlight">全程无需开发介入</span>。</p>
+  </div>
+  
+  <p>系统需要覆盖PDF《业绩相关紧急需求》中的三大核心场景：</p>
+  <ul>
+    <li><strong>限时促销升级活动</strong> — 有明确截止日期的等级晋升活动</li>
+    <li><strong>启航奖奖励政策</strong> — 常态化的推荐奖励规则</li>
+    <li><strong>鼓励奖奖励政策</strong> — 常态化的级别超越奖励规则</li>
+  </ul>
+  
+  <h3 id="s1-2">1.2 适用范围</h3>
+  <table>
+    <tr><th>维度</th><th>说明</th></tr>
+    <tr><td>适用平台</td><td>绿韵家后台管理系统（Web端）</td></tr>
+    <tr><td>使用角色</td><td>运营人员、活动审核人员、管理员</td></tr>
+    <tr><td>影响范围</td><td>会员等级晋升、奖励计算、订单PV分配</td></tr>
+    <tr><td>关联系统</td><td>会员系统、订单系统、PV计算系统、奖励发放系统</td></tr>
+  </table>
+  
+  <h3 id="s1-3">1.3 术语定义</h3>
+  <table>
+    <tr><th>术语</th><th>定义</th></tr>
+    <tr><td>PV</td><td>Performance Value，业绩值，用于衡量会员消费和团队业绩的计量单位</td></tr>
+    <tr><td>日常配置</td><td>长期有效、不随活动变化的固定规则配置，如会员等级体系、推荐奖励比例</td></tr>
+    <tr><td>活动配置</td><td>有明确有效期、可随时创建和调整的活动规则配置</td></tr>
+    <tr><td>规则引擎</td><td>负责解析配置规则、匹配用户行为、执行对应动作的系统核心模块</td></tr>
+    <tr><td>规则矩阵</td><td>以表格形式组织的条件-动作映射关系，如"当前等级+PV门槛→目标等级"</td></tr>
+    <tr><td>活动生命周期</td><td>活动从创建到结束的完整状态流转：草稿→待审核→已上线→已过期/已下线</td></tr>
+  </table>
+</div>
+
+<!-- Section 2 -->
+<div class="section" id="s2">
+  <h2><span>🏗️</span> 二、系统架构设计</h2>
+  
+  <h3 id="s2-1">2.1 整体架构</h3>
+  <p>系统采用<strong>三层架构</strong>：配置层（运营操作）、引擎层（规则执行）、数据层（持久化存储）。</p>
+  
+  <div class="arch-layer">
+    <div class="arch-layer-title">🖥️ 第一层：配置层（运营后台）</div>
+    <div class="arch-items">
+      <div class="arch-item primary">日常配置管理</div>
+      <div class="arch-item primary">活动配置管理</div>
+      <div class="arch-item primary">活动效果统计</div>
+      <div class="arch-item primary">活动审核审批</div>
+      <div class="arch-item primary">活动模板库</div>
+    </div>
+  </div>
+  
+  <div style="text-align:center; color:var(--gray-400); font-size:20px; margin:4px 0;">⬇️</div>
+  
+  <div class="arch-layer">
+    <div class="arch-layer-title">⚙️ 第二层：规则引擎层（系统核心）</div>
+    <div class="arch-items">
+      <div class="arch-item success">条件匹配引擎</div>
+      <div class="arch-item success">奖励计算引擎</div>
+      <div class="arch-item success">等级变更引擎</div>
+      <div class="arch-item success">冲突检测引擎</div>
+      <div class="arch-item success">防重复校验</div>
+      <div class="arch-item success">活动优先级调度</div>
+    </div>
+  </div>
+  
+  <div style="text-align:center; color:var(--gray-400); font-size:20px; margin:4px 0;">⬇️</div>
+  
+  <div class="arch-layer">
+    <div class="arch-layer-title">💾 第三层：数据层（持久化存储）</div>
+    <div class="arch-items">
+      <div class="arch-item warning">活动配置表</div>
+      <div class="arch-item warning">活动规则表</div>
+      <div class="arch-item warning">活动记录表</div>
+      <div class="arch-item warning">会员等级表</div>
+      <div class="arch-item warning">奖励发放记录表</div>
+    </div>
+  </div>
+  
+  <h3 id="s2-2">2.2 模块划分</h3>
+  <table>
+    <tr><th>模块</th><th>功能说明</th><th>使用角色</th></tr>
+    <tr><td>日常配置</td><td>管理长期有效的固定规则：会员等级体系、推荐奖励规则、鼓励奖规则</td><td>管理员</td></tr>
+    <tr><td>活动管理</td><td>创建、编辑、上下线活动；设定有效期；配置规则矩阵</td><td>运营人员</td></tr>
+    <tr><td>活动审核</td><td>对运营提交的活动进行审批，控制活动上线质量</td><td>审核人员</td></tr>
+    <tr><td>规则引擎</td><td>实时解析配置规则，匹配用户行为，执行动作，记录日志</td><td>系统</td></tr>
+    <tr><td>数据统计</td><td>活动效果分析、参与人数统计、奖励发放统计</td><td>运营/管理员</td></tr>
+    <tr><td>模板库</td><td>保存历史活动作为模板，快速复用创建新活动</td><td>运营人员</td></tr>
+  </table>
+  
+  <h3 id="s2-3">2.3 数据流转</h3>
+  <p>以"会员消费触发等级晋升活动"为例，数据流转如下：</p>
+  
+  <div class="flow-container">
+    <div class="flow-node start">会员下单消费</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">订单完成<br/>PV计算</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node action">规则引擎<br/>匹配活动</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">检查有效期<br/>适用人群</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">检查限制规则<br/>（每人一次）</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node action">执行晋升<br/>发放奖励</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">记录活动日志</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node end">通知会员</div>
+  </div>
+</div>
+
+<!-- Section 3 -->
+<div class="section" id="s3">
+  <h2><span>⚙️</span> 三、功能需求</h2>
+  
+  <h3 id="s3-1">3.1 日常配置模块</h3>
+  <p>日常配置管理长期有效的固定规则，修改后全局生效。包含以下子模块：</p>
+  
+  <h4>3.1.1 会员等级体系配置</h4>
+  <table>
+    <tr><th>配置项</th><th>说明</th><th>示例</th></tr>
+    <tr><td>等级名称</td><td>会员等级的中文名称</td><td>新人、初级、中级、高级、体验达人、成长达人、精英达人</td></tr>
+    <tr><td>等级排序</td><td>等级的高低顺序，用于判断级别超越</td><td>1(新人) → 2(初级) → ... → 7(精英达人)</td></tr>
+    <tr><td>升级条件（日常）</td><td>非活动期间的正常升级规则</td><td>累计PV达到XXX 或 推荐人数达到XXX</td></tr>
+    <tr><td>等级图标</td><td>各等级对应的展示图标</td><td>上传图片</td></tr>
+  </table>
+  
+  <div class="info-box warning">
+    <div class="info-box-title">⚠️ 注意事项</div>
+    <p>会员等级体系是系统基础配置，修改会影响全局业务逻辑。建议：</p>
+    <ul>
+      <li>修改需经过审批流程</li>
+      <li>修改前显示影响范围预估（影响多少会员）</li>
+      <li>支持配置历史版本回滚</li>
+    </ul>
+  </div>
+  
+  <h4>3.1.2 推荐奖励规则配置（启航奖）</h4>
+  <table>
+    <tr><th>配置项</th><th>说明</th><th>当前值</th></tr>
+    <tr><td>适用对象</td><td>享受该奖励的最低会员等级</td><td>中级会员及以上</td></tr>
+    <tr><td>奖励代数</td><td>向下追溯几代消费PV</td><td>第2代</td></tr>
+    <tr><td>奖励比例</td><td>消费PV的百分比</td><td>5%</td></tr>
+    <tr><td>停止条件</td><td>达到某等级后不再享受</td><td>成长达人</td></tr>
+    <tr><td>级别依据</td><td>按临时级别还是永久级别判断</td><td>临时级别</td></tr>
+  </table>
+  
+  <h4>3.1.3 鼓励奖规则配置</h4>
+  <table>
+    <tr><th>配置项</th><th>说明</th><th>当前值</th></tr>
+    <tr><td>适用对象</td><td>享受该奖励的会员等级范围</td><td>成长达人、服务达人</td></tr>
+    <tr><td>停止等级</td><td>达到某等级后不再发放</td><td>精英达人</td></tr>
+    <tr><td>奖励比例</td><td>订单PV的百分比</td><td>1%</td></tr>
+    <tr><td>分配规则</td><td>同级被超越者如何分配</td><td>同级平分</td></tr>
+    <tr><td>阻断规则</td><td>更高级别如何阻断奖励传递</td><td>更高级别阻断，仅靠近订单者获得</td></tr>
+    <tr><td>级别依据</td><td>按临时级别还是永久级别判断</td><td>临时级别</td></tr>
+  </table>
+  
+  <h3 id="s3-2">3.2 活动配置模块</h3>
+  <p>活动配置是系统的核心功能，用于创建和管理有明确有效期的活动。</p>
+  
+  <h4>3.2.1 活动类型定义</h4>
+  <table>
+    <tr><th>活动类型</th><th>说明</th><th>适用场景</th></tr>
+    <tr><td>等级晋升活动</td><td>满足条件后直接晋升会员等级</td><td>限时促销升级</td></tr>
+    <tr><td>消费奖励活动</td><td>满足消费条件后发放额外奖励</td><td>消费满额返PV</td></tr>
+    <tr><td>推荐奖励活动</td><td>满足推荐条件后发放额外奖励</td><td>推荐新人奖励</td></tr>
+    <tr><td>组合活动</td><td>同时包含多种规则的活动</td><td>晋升+奖励组合</td></tr>
+  </table>
+  
+  <h4>3.2.2 活动基础信息配置</h4>
+  <table>
+    <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+    <tr><td>活动名称</td><td>文本</td><td>是</td><td>活动的展示名称，如"限时促销升级活动"</td></tr>
+    <tr><td>活动类型</td><td>单选</td><td>是</td><td>从预定义的活动类型中选择</td></tr>
+    <tr><td>活动描述</td><td>文本域</td><td>否</td><td>活动的详细说明，内部使用</td></tr>
+    <tr><td>开始时间</td><td>日期时间</td><td>是</td><td>活动生效时间</td></tr>
+    <tr><td>结束时间</td><td>日期时间</td><td>是</td><td>活动截止时间（含当日）</td></tr>
+    <tr><td>优先级</td><td>数字</td><td>是</td><td>多个活动冲突时的执行优先级，数字越大优先级越高</td></tr>
+    <tr><td>适用人群</td><td>多选</td><td>是</td><td>哪些会员等级可以参与（可多选，全选=所有会员）</td></tr>
+    <tr><td>每人参与次数</td><td>数字</td><td>是</td><td>每个会员最多参与几次，0=不限次数</td></tr>
+  </table>
+  
+  <h4>3.2.3 规则矩阵配置（以等级晋升活动为例）</h4>
+  <p>运营通过可视化表格配置"条件→动作"的映射关系：</p>
+  
+  <div class="page-mockup">
+    <div class="mockup-header">📝 规则矩阵配置 — 限时促销升级活动</div>
+    <div class="mockup-table">
+      <div class="mockup-table-row header">
+        <div>当前等级</div>
+        <div>当天自购达PV</div>
+        <div>晋升到的等级</div>
+        <div>操作</div>
+      </div>
+      <div class="mockup-table-row">
+        <div>新人</div>
+        <div>1,800</div>
+        <div>中级会员</div>
+        <div><span class="mockup-btn ghost">编辑</span><span class="mockup-btn ghost">删除</span></div>
+      </div>
+      <div class="mockup-table-row">
+        <div>新人</div>
+        <div>6,300</div>
+        <div>高级会员</div>
+        <div><span class="mockup-btn ghost">编辑</span><span class="mockup-btn ghost">删除</span></div>
+      </div>
+      <div class="mockup-table-row">
+        <div>新人</div>
+        <div>10,800</div>
+        <div>体验达人</div>
+        <div><span class="mockup-btn ghost">编辑</span><span class="mockup-btn ghost">删除</span></div>
+      </div>
+      <div class="mockup-table-row">
+        <div>中级</div>
+        <div>1,800</div>
+        <div>高级会员</div>
+        <div><span class="mockup-btn ghost">编辑</span><span class="mockup-btn ghost">删除</span></div>
+      </div>
+      <div class="mockup-table-row">
+        <div>...</div>
+        <div>...</div>
+        <div>...</div>
+        <div><span class="mockup-btn primary">+ 新增规则</span></div>
+      </div>
+    </div>
+  </div>
+  
+  <h4>3.2.4 活动生命周期管理</h4>
+  <p>活动具有完整的状态流转机制：</p>
+  
+  <div class="flow-container">
+    <div class="flow-node start">草稿<br/><span style="font-size:11px;opacity:0.8">运营编辑中</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">提交审核</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">待审核<br/><span style="font-size:11px;opacity:0.8">审核中</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node action">已上线<br/><span style="font-size:11px;opacity:0.8">生效中</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node end">已过期<br/><span style="font-size:11px;opacity:0.8">自动结束</span></div>
+  </div>
+  
+  <p style="text-align:center; color:var(--gray-500); font-size:13px; margin-top:-8px;">已上线活动可手动下线 → 变为"已下线"状态</p>
+  
+  <table>
+    <tr><th>状态</th><th>说明</th><th>可执行操作</th><th>规则引擎</th></tr>
+    <tr><td><span class="badge badge-draft">草稿</span></td><td>运营正在编辑，尚未提交</td><td>编辑、删除、提交审核</td><td>不执行</td></tr>
+    <tr><td><span class="badge badge-pending">待审核</span></td><td>已提交，等待审核人员审批</td><td>审核通过、审核驳回</td><td>不执行</td></tr>
+    <tr><td><span class="badge badge-online">已上线</span></td><td>活动生效中，系统实时执行</td><td>手动下线、查看详情</td><td>执行</td></tr>
+    <tr><td><span class="badge badge-offline">已下线</span></td><td>手动提前结束的活动</td><td>查看详情、复制为新活动</td><td>不执行</td></tr>
+    <tr><td><span class="badge badge-expired">已过期</span></td><td>超过结束时间自动停止</td><td>查看详情、复制为新活动</td><td>不执行</td></tr>
+  </table>
+  
+  <h4>3.2.5 活动模板库</h4>
+  <p>支持将历史活动保存为模板，快速创建新活动：</p>
+  <ul>
+    <li><strong>保存模板</strong>：任何状态的活动均可保存为模板，模板包含完整的规则矩阵和配置</li>
+    <li><strong>使用模板</strong>：从模板库选择模板，系统自动填充配置，运营只需修改日期和数值</li>
+    <li><strong>模板分类</strong>：按活动类型自动分类，支持搜索和筛选</li>
+    <li><strong>模板权限</strong>：支持设置模板可见范围（个人/部门/全公司）</li>
+  </ul>
+  
+  <h3 id="s3-3">3.3 规则引擎模块</h3>
+  <p>规则引擎是系统的核心执行模块，负责实时解析配置规则并执行相应动作。</p>
+  
+  <h4>3.3.1 引擎执行流程</h4>
+  <div class="flow-container">
+    <div class="flow-node start">用户行为触发<br/>（下单/升级）</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">查询所有<br/>"已上线"活动</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">按优先级排序</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">检查有效期</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">检查适用人群</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">检查限制规则</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node action">匹配规则矩阵</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node action">执行动作</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">记录日志</div>
+  </div>
+  
+  <h4>3.3.2 冲突检测与处理</h4>
+  <div class="info-box warning">
+    <div class="info-box-title">⚠️ 冲突场景示例</div>
+    <p>场景：同时存在"限时促销升级活动"和"日常升级规则"，会员当天自购PV达到6,300：</p>
+    <ul>
+      <li>限时活动：新人 → 直接晋升高级会员</li>
+      <li>日常规则：新人 → 按累计PV逐步升级</li>
+    </ul>
+    <p><strong>处理策略</strong>：活动优先级高于日常规则。当活动生效期间，优先执行活动规则；活动未命中时，回退到日常规则。</p>
+  </div>
+  
+  <table>
+    <tr><th>冲突类型</th><th>检测逻辑</th><th>处理策略</th></tr>
+    <tr><td>活动 vs 日常规则</td><td>同一触发条件同时命中活动和日常规则</td><td>活动优先级高，优先执行活动规则</td></tr>
+    <tr><td>活动 vs 活动</td><td>多个活动同时命中同一用户</td><td>按优先级排序，高优先级先执行；互斥活动仅执行一个</td></tr>
+    <tr><td>规则矩阵内冲突</td><td>同一当前等级+不同PV门槛映射到不同目标等级</td><td>取最高目标等级（或配置时强制校验不允许）</td></tr>
+  </table>
+  
+  <h4>3.3.3 防重复机制</h4>
+  <p>防止同一会员重复享受同一活动：</p>
+  <ul>
+    <li><strong>活动级去重</strong>：记录每个会员参与每个活动的次数，达到上限后不再触发</li>
+    <li><strong>规则级去重</strong>：同一活动内不同规则行独立计数</li>
+    <li><strong>幂等性保证</strong>：同一笔订单不会重复触发同一活动（通过订单ID+活动ID唯一索引）</li>
+    <li><strong>跨活动去重</strong>：支持配置"互斥活动组"，组内活动仅可参与一次</li>
+  </ul>
+  
+  <h4>3.3.4 审计日志</h4>
+  <p>所有活动触发都必须记录详细日志，便于对账和问题排查：</p>
+  <table>
+    <tr><th>字段</th><th>说明</th></tr>
+    <tr><td>日志ID</td><td>唯一标识</td></tr>
+    <tr><td>活动ID</td><td>触发的活动</td></tr>
+    <tr><td>会员ID</td><td>受益会员</td></tr>
+    <tr><td>触发时间</td><td>精确到毫秒</td></tr>
+    <tr><td>触发条件</td><td>命中的规则条件详情（JSON）</td></tr>
+    <tr><td>执行动作</td><td>执行的具体动作（晋升/奖励）</td></tr>
+    <tr><td>动作结果</td><td>成功/失败及详情</td></tr>
+    <tr><td>关联订单ID</td><td>触发该活动的订单</td></tr>
+    <tr><td>变更前后</td><td>等级变更前后的值 / 奖励发放金额</td></tr>
+  </table>
+  
+  <h3 id="s3-4">3.4 数据统计模块</h3>
+  
+  <h4>3.4.1 活动效果总览</h4>
+  <div class="page-mockup">
+    <div class="mockup-header">📊 活动效果总览看板</div>
+    <div class="mockup-row">
+      <div class="mockup-card">
+        <div class="num">1,234</div>
+        <div class="label">参与人数</div>
+      </div>
+      <div class="mockup-card">
+        <div class="num">856</div>
+        <div class="label">晋升人数</div>
+      </div>
+      <div class="mockup-card">
+        <div class="num">¥45,600</div>
+        <div class="label">发放奖励总额</div>
+      </div>
+      <div class="mockup-card">
+        <div class="num">68.5%</div>
+        <div class="label">参与转化率</div>
+      </div>
+    </div>
+  </div>
+  
+  <h4>3.4.2 统计维度</h4>
+  <table>
+    <tr><th>统计项</th><th>维度</th><th>说明</th></tr>
+    <tr><td>参与人数</td><td>活动/日期/等级</td><td>有多少会员触发了该活动</td></tr>
+    <tr><td>晋升人数</td><td>活动/目标等级</td><td>有多少会员通过活动晋升了等级</td></tr>
+    <tr><td>奖励发放</td><td>活动/会员/时间</td><td>发放的奖励金额/PV明细</td></tr>
+    <tr><td>转化漏斗</td><td>活动</td><td>曝光→触发→完成 的转化路径</td></tr>
+    <tr><td>活动对比</td><td>多活动</td><td>不同活动的效果对比分析</td></tr>
+  </table>
+</div>
+
+<!-- Section 4 -->
+<div class="section" id="s4">
+  <h2><span>📜</span> 四、业务规则详细设计</h2>
+  <p>本节详细描述PDF《业绩相关紧急需求》中三大业务场景的系统化配置方案。</p>
+  
+  <h3 id="s4-1">4.1 限时促销升级活动</h3>
+  
+  <h4>4.1.1 业务规则还原</h4>
+  <div class="info-box">
+    <div class="info-box-title">📋 原始需求摘要</div>
+    <ul>
+      <li><strong>活动截止</strong>：2026年8月20日（含当日）</li>
+      <li><strong>核心原则</strong>：活动期间内，每个会员只有一次通过自购消费快速晋升的机会</li>
+      <li><strong>晋升后永久有效</strong>：一旦达标并晋升，该等级永久有效</li>
+      <li><strong>一次机会</strong>：每个会员只能在某一天使用一次该活动</li>
+      <li><strong>生效日自选</strong>：会员可选择某一天作为"活动生效日"</li>
+      <li><strong>最低门槛</strong>：仅对当日自购累计PV达到900及以上的会员进行晋升判定</li>
+    </ul>
+  </div>
+  
+  <h4>4.1.2 系统配置方案</h4>
+  <p><strong>步骤1：创建活动基础信息</strong></p>
+  <table>
+    <tr><th>配置项</th><th>配置值</th></tr>
+    <tr><td>活动名称</td><td>限时促销升级活动</td></tr>
+    <tr><td>活动类型</td><td>等级晋升活动</td></tr>
+    <tr><td>开始时间</td><td>2026-06-01 00:00:00</td></tr>
+    <tr><td>结束时间</td><td>2026-08-20 23:59:59</td></tr>
+    <tr><td>优先级</td><td>100（高于日常规则）</td></tr>
+    <tr><td>适用人群</td><td>所有等级（新人、初级、中级、高级）</td></tr>
+    <tr><td>每人参与次数</td><td>1</td></tr>
+  </table>
+  
+  <p><strong>步骤2：配置规则矩阵</strong></p>
+  <div class="rule-matrix">
+    <div class="rule-card">
+      <div class="from">新人</div>
+      <div class="arrow">⬇️</div>
+      <div class="to">中级会员</div>
+      <div class="condition">当天自购PV ≥ 1,800</div>
+    </div>
+    <div class="rule-card">
+      <div class="from">新人</div>
+      <div class="arrow">⬇️</div>
+      <div class="to">高级会员</div>
+      <div class="condition">当天自购PV ≥ 6,300</div>
+    </div>
+    <div class="rule-card">
+      <div class="from">新人</div>
+      <div class="arrow">⬇️</div>
+      <div class="to">体验达人</div>
+      <div class="condition">当天自购PV ≥ 10,800</div>
+    </div>
+    <div class="rule-card">
+      <div class="from">初级</div>
+      <div class="arrow">⬇️</div>
+      <div class="to">中级会员</div>
+      <div class="condition">当天自购PV ≥ 900</div>
+    </div>
+    <div class="rule-card">
+      <div class="from">初级</div>
+      <div class="arrow">⬇️</div>
+      <div class="to">高级会员</div>
+      <div class="condition">当天自购PV ≥ 5,400</div>
+    </div>
+    <div class="rule-card">
+      <div class="from">初级</div>
+      <div class="arrow">⬇️</div>
+      <div class="to">体验达人</div>
+      <div class="condition">当天自购PV ≥ 9,900</div>
+    </div>
+    <div class="rule-card">
+      <div class="from">中级</div>
+      <div class="arrow">⬇️</div>
+      <div class="to">高级会员</div>
+      <div class="condition">当天自购PV ≥ 1,800</div>
+    </div>
+    <div class="rule-card">
+      <div class="from">中级</div>
+      <div class="arrow">⬇️</div>
+      <div class="to">体验达人</div>
+      <div class="condition">当天自购PV ≥ 6,300</div>
+    </div>
+    <div class="rule-card">
+      <div class="from">高级</div>
+      <div class="arrow">⬇️</div>
+      <div class="to">体验达人</div>
+      <div class="condition">当天自购PV ≥ 1,800</div>
+    </div>
+  </div>
+  
+  <p><strong>步骤3：配置限制规则</strong></p>
+  <table>
+    <tr><th>限制规则</th><th>配置值</th><th>说明</th></tr>
+    <tr><td>每人参与次数</td><td>1</td><td>每个会员整个活动期间只能参与一次</td></tr>
+    <tr><td>最低PV门槛</td><td>900</td><td>当日自购累计PV低于900不触发晋升判定</td></tr>
+    <tr><td>晋升后永久有效</td><td>是</td><td>通过活动晋升的等级为永久等级</td></tr>
+    <tr><td>生效日自选</td><td>是</td><td>会员可自主选择某一天作为活动生效日</td></tr>
+  </table>
+  
+  <h4>4.1.3 执行示例</h4>
+  <div class="info-box success">
+    <div class="info-box-title">✅ 示例场景</div>
+    <p><strong>新人小王</strong>：8月1日当天自购6,300 PV</p>
+    <ul>
+      <li>系统检测到当日累计PV = 6,300 ≥ 最低门槛900</li>
+      <li>匹配规则矩阵：新人 + 6,300 PV → 高级会员</li>
+      <li>检查限制：小王未参与过本活动 ✓</li>
+      <li>执行晋升：小王直接成为高级会员（永久有效）</li>
+      <li>记录日志：活动ID + 会员ID + 晋升前后等级 + 订单ID</li>
+      <li>标记状态：小王已使用本次活动机会，后续不再触发</li>
+    </ul>
+    <p><strong>8月2日</strong>：小王再自购5,000 PV → 系统检测到已使用过本活动 → <span class="highlight">不触发</span></p>
+  </div>
+  
+  <h3 id="s4-2">4.2 启航奖奖励政策</h3>
+  
+  <h4>4.2.1 业务规则还原</h4>
+  <div class="info-box">
+    <div class="info-box-title">📋 原始需求摘要</div>
+    <ul>
+      <li><strong>适用对象</strong>：中级会员及以上等级用户（以临时级别为准）</li>
+      <li><strong>奖励内容</strong>：额外奖励第二代消费PV的5%</li>
+      <li><strong>计算逻辑</strong>：A推荐B，B推荐C，C消费时A获得C消费PV的5%</li>
+      <li><strong>停止条件</strong>：会员临时级别达到"成长达人"后不再享受</li>
+      <li><strong>性质</strong>：常态化，暂无终止时间</li>
+    </ul>
+  </div>
+  
+  <h4>4.2.2 系统配置方案</h4>
+  <p>启航奖属于<strong>日常配置</strong>，在"日常配置 → 推荐奖励规则"中配置：</p>
+  <table>
+    <tr><th>配置项</th><th>配置值</th></tr>
+    <tr><td>规则名称</td><td>启航奖</td></tr>
+    <tr><td>适用最低等级</td><td>中级会员</td></tr>
+    <tr><td>奖励对象</td><td>第二代消费PV</td></tr>
+    <tr><td>奖励比例</td><td>5%</td></tr>
+    <tr><td>停止等级</td><td>成长达人（达到后停止）</td></tr>
+    <tr><td>级别依据</td><td>临时级别</td></tr>
+    <tr><td>生效状态</td><td>已启用</td></tr>
+  </table>
+  
+  <h4>4.2.3 执行流程</h4>
+  <div class="flow-container">
+    <div class="flow-node start">C会员消费<br/>产生PV</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">查询C的<br/>推荐关系链</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">找到A<br/>（C的第二代上级）</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">检查A的<br/>临时级别</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">≥中级且<br/>&lt;成长达人？</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node action">计算奖励<br/>PV × 5%</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">发放给A</div>
+  </div>
+  
+  <h3 id="s4-3">4.3 鼓励奖奖励政策</h3>
+  
+  <h4>4.3.1 业务规则还原</h4>
+  <div class="info-box">
+    <div class="info-box-title">📋 原始需求摘要</div>
+    <ul>
+      <li><strong>适用对象</strong>：成长达人、服务达人（以临时级别为准）</li>
+      <li><strong>停止等级</strong>：精英达人起不再发放</li>
+      <li><strong>奖励来源</strong>：每笔订单PV的1%</li>
+      <li><strong>分配规则</strong>：根据关系链从成长达人起，当会员级别被超越时发放</li>
+      <li><strong>同级平分</strong>：如果多人在同一区间内被超越，则同级平分1%</li>
+      <li><strong>级别阻断</strong>：更高级别会阻断奖励传递，仅靠近订单者可获得完整1%</li>
+    </ul>
+  </div>
+  
+  <h4>4.3.2 系统配置方案</h4>
+  <p>鼓励奖属于<strong>日常配置</strong>，在"日常配置 → 鼓励奖规则"中配置：</p>
+  <table>
+    <tr><th>配置项</th><th>配置值</th></tr>
+    <tr><td>规则名称</td><td>鼓励奖</td></tr>
+    <tr><td>适用等级范围</td><td>成长达人、服务达人</td></tr>
+    <tr><td>停止等级</td><td>精英达人（达到后停止）</td></tr>
+    <tr><td>奖励比例</td><td>订单PV的1%</td></tr>
+    <tr><td>分配方式</td><td>同级平分</td></tr>
+    <tr><td>阻断规则</td><td>更高级别阻断，靠近订单者优先</td></tr>
+    <tr><td>级别依据</td><td>临时级别</td></tr>
+  </table>
+  
+  <h4>4.3.3 计算示例</h4>
+  <div class="info-box">
+    <div class="info-box-title">📊 示例：关系链 ④→④→③→②→④→③→②→③→②→⑤（推了1个900PV）</div>
+    <p>订单产生者等级为⑤，订单PV = 900</p>
+    <ul>
+      <li><strong>三个④</strong>：在同一区间被超越 → 同级平分1% → 每人获得 900 × 1% ÷ 3 = <strong>3 PV</strong></li>
+      <li><strong>两个③</strong>：在同一区间被超越 → 同级平分1% → 每人获得 900 × 1% ÷ 2 = <strong>4.5 PV</strong></li>
+      <li><strong>靠近订单的②</strong>：与另一个②之间有更高级别③阻断 → 仅靠近订单的②获得完整1% → <strong>9 PV</strong></li>
+      <li><strong>另一个②</strong>：被③阻断 → <strong>0 PV</strong></li>
+    </ul>
+  </div>
+</div>
+
+<!-- Section 5 -->
+<div class="section" id="s5">
+  <h2><span>🗄️</span> 五、数据模型设计</h2>
+  
+  <h4>5.1 活动主表（activity）</h4>
+  <table>
+    <tr><th>字段名</th><th>类型</th><th>说明</th></tr>
+    <tr><td>id</td><td>BIGINT</td><td>主键，自增</td></tr>
+    <tr><td>name</td><td>VARCHAR(100)</td><td>活动名称</td></tr>
+    <tr><td>type</td><td>TINYINT</td><td>活动类型：1=等级晋升 2=消费奖励 3=推荐奖励 4=组合</td></tr>
+    <tr><td>status</td><td>TINYINT</td><td>状态：0=草稿 1=待审核 2=已上线 3=已下线 4=已过期</td></tr>
+    <tr><td>start_time</td><td>DATETIME</td><td>开始时间</td></tr>
+    <tr><td>end_time</td><td>DATETIME</td><td>结束时间</td></tr>
+    <tr><td>priority</td><td>INT</td><td>优先级，数字越大优先级越高</td></tr>
+    <tr><td>applicable_levels</td><td>VARCHAR(200)</td><td>适用人群等级ID，逗号分隔</td></tr>
+    <tr><td>max_participation</td><td>INT</td><td>每人最大参与次数，0=不限</td></tr>
+    <tr><td>min_pv_threshold</td><td>DECIMAL(18,2)</td><td>最低PV门槛</td></tr>
+    <tr><td>config</td><td>JSON</td><td>扩展配置，存储活动特有参数</td></tr>
+    <tr><td>is_permanent</td><td>TINYINT</td><td>晋升是否永久有效：0=否 1=是</td></tr>
+    <tr><td>created_by</td><td>BIGINT</td><td>创建人ID</td></tr>
+    <tr><td>approved_by</td><td>BIGINT</td><td>审核人ID</td></tr>
+    <tr><td>created_at</td><td>DATETIME</td><td>创建时间</td></tr>
+    <tr><td>updated_at</td><td>DATETIME</td><td>更新时间</td></tr>
+  </table>
+  
+  <h4>5.2 活动规则表（activity_rule）</h4>
+  <table>
+    <tr><th>字段名</th><th>类型</th><th>说明</th></tr>
+    <tr><td>id</td><td>BIGINT</td><td>主键，自增</td></tr>
+    <tr><td>activity_id</td><td>BIGINT</td><td>关联活动ID</td></tr>
+    <tr><td>sort_order</td><td>INT</td><td>规则排序</td></tr>
+    <tr><td>current_level</td><td>TINYINT</td><td>当前等级条件</td></tr>
+    <tr><td>condition_type</td><td>TINYINT</td><td>条件类型：1=当天自购PV 2=累计PV 3=推荐人数</td></tr>
+    <tr><td>condition_operator</td><td>VARCHAR(10)</td><td>条件运算符：>= = <=</td></tr>
+    <tr><td>condition_value</td><td>DECIMAL(18,2)</td><td>条件阈值</td></tr>
+    <tr><td>action_type</td><td>TINYINT</td><td>动作类型：1=晋升等级 2=发放奖励</td></tr>
+    <tr><td>action_value</td><td>VARCHAR(100)</td><td>动作值：目标等级ID 或 奖励配置JSON</td></tr>
+    <tr><td>created_at</td><td>DATETIME</td><td>创建时间</td></tr>
+  </table>
+  
+  <h4>5.3 活动记录表（activity_record）</h4>
+  <table>
+    <tr><th>字段名</th><th>类型</th><th>说明</th></tr>
+    <tr><td>id</td><td>BIGINT</td><td>主键，自增</td></tr>
+    <tr><td>activity_id</td><td>BIGINT</td><td>活动ID</td></tr>
+    <tr><td>rule_id</td><td>BIGINT</td><td>命中的规则ID</td></tr>
+    <tr><td>user_id</td><td>BIGINT</td><td>会员ID</td></tr>
+    <tr><td>order_id</td><td>BIGINT</td><td>关联订单ID</td></tr>
+    <tr><td>trigger_time</td><td>DATETIME</td><td>触发时间</td></tr>
+    <tr><td>trigger_detail</td><td>JSON</td><td>触发条件详情</td></tr>
+    <tr><td>action_type</td><td>TINYINT</td><td>执行动作类型</td></tr>
+    <tr><td>action_result</td><td>JSON</td><td>动作执行结果</td></tr>
+    <tr><td>before_value</td><td>VARCHAR(100)</td><td>变更前值</td></tr>
+    <tr><td>after_value</td><td>VARCHAR(100)</td><td>变更后值</td></tr>
+    <tr><td>status</td><td>TINYINT</td><td>记录状态：0=处理中 1=成功 2=失败</td></tr>
+    <tr><td>created_at</td><td>DATETIME</td><td>创建时间</td></tr>
+  </table>
+  
+  <h4>5.4 日常配置表（daily_config）</h4>
+  <table>
+    <tr><th>字段名</th><th>类型</th><th>说明</th></tr>
+    <tr><td>id</td><td>BIGINT</td><td>主键，自增</td></tr>
+    <tr><td>config_key</td><td>VARCHAR(50)</td><td>配置项标识：level_system / sail_award / encourage_award</td></tr>
+    <tr><td>config_name</td><td>VARCHAR(100)</td><td>配置名称</td></tr>
+    <tr><td>config_value</td><td>JSON</td><td>配置内容</td></tr>
+    <tr><td>version</td><td>INT</td><td>版本号</td></tr>
+    <tr><td>is_enabled</td><td>TINYINT</td><td>是否启用</td></tr>
+    <tr><td>created_by</td><td>BIGINT</td><td>创建人</td></tr>
+    <tr><td>created_at</td><td>DATETIME</td><td>创建时间</td></tr>
+    <tr><td>updated_at</td><td>DATETIME</td><td>更新时间</td></tr>
+  </table>
+  
+  <h4>5.5 会员活动参与记录表（user_activity_participation）</h4>
+  <table>
+    <tr><th>字段名</th><th>类型</th><th>说明</th></tr>
+    <tr><td>id</td><td>BIGINT</td><td>主键，自增</td></tr>
+    <tr><td>user_id</td><td>BIGINT</td><td>会员ID</td></tr>
+    <tr><td>activity_id</td><td>BIGINT</td><td>活动ID</td></tr>
+    <tr><td>participation_count</td><td>INT</td><td>已参与次数</td></tr>
+    <tr><td>first_time</td><td>DATETIME</td><td>首次参与时间</td></tr>
+    <tr><td>last_time</td><td>DATETIME</td><td>最后参与时间</td></tr>
+    <tr><td>created_at</td><td>DATETIME</td><td>创建时间</td></tr>
+    <tr><td>updated_at</td><td>DATETIME</td><td>更新时间</td></tr>
+  </table>
+</div>
+
+<!-- Section 6 -->
+<div class="section" id="s6">
+  <h2><span>🖥️</span> 六、界面原型说明</h2>
+  
+  <h4>6.1 活动配置中心首页</h4>
+  <div class="page-mockup">
+    <div class="mockup-header">🏠 活动配置中心</div>
+    <div class="mockup-row">
+      <div class="mockup-card">
+        <div class="num" style="color:var(--success)">3</div>
+        <div class="label">进行中活动</div>
+      </div>
+      <div class="mockup-card">
+        <div class="num" style="color:var(--warning)">2</div>
+        <div class="label">待审核活动</div>
+      </div>
+      <div class="mockup-card">
+        <div class="num" style="color:var(--gray-500)">12</div>
+        <div class="label">已过期活动</div>
+      </div>
+      <div class="mockup-card">
+        <div class="num" style="color:var(--primary)">5</div>
+        <div class="label">可用模板</div>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; margin-bottom:12px;">
+      <div style="flex:1; background:white; border:1px solid var(--gray-200); border-radius:6px; padding:8px 12px; font-size:13px; color:var(--gray-400);">🔍 搜索活动名称...</div>
+      <div style="background:white; border:1px solid var(--gray-200); border-radius:6px; padding:8px 12px; font-size:13px; color:var(--gray-500);">活动类型 ▼</div>
+      <div style="background:white; border:1px solid var(--gray-200); border-radius:6px; padding:8px 12px; font-size:13px; color:var(--gray-500);">状态 ▼</div>
+      <div style="background:var(--primary); color:white; border-radius:6px; padding:8px 16px; font-size:13px; font-weight:600;">+ 创建活动</div>
+    </div>
+    <div class="mockup-table">
+      <div class="mockup-table-row header">
+        <div>活动名称</div>
+        <div>类型</div>
+        <div>有效期</div>
+        <div>状态</div>
+        <div>操作</div>
+      </div>
+      <div class="mockup-table-row">
+        <div>限时促销升级活动</div>
+        <div>等级晋升</div>
+        <div>2026-06-01 ~ 08-20</div>
+        <div><span style="color:var(--success); font-weight:600;">● 已上线</span></div>
+        <div><span class="mockup-btn ghost">详情</span><span class="mockup-btn ghost">下线</span></div>
+      </div>
+      <div class="mockup-table-row">
+        <div>618消费返PV</div>
+        <div>消费奖励</div>
+        <div>2026-06-18 ~ 06-20</div>
+        <div><span style="color:var(--warning); font-weight:600;">● 待审核</span></div>
+        <div><span class="mockup-btn ghost">详情</span><span class="mockup-btn ghost">编辑</span></div>
+      </div>
+    </div>
+  </div>
+  
+  <h4>6.2 创建活动流程</h4>
+  <div class="flow-container">
+    <div class="flow-node">步骤1<br/>填写基础信息</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">步骤2<br/>配置规则矩阵</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">步骤3<br/>设置限制规则</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">步骤4<br/>预览与测试</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node action">提交审核</div>
+  </div>
+  
+  <h4>6.3 日常配置页面</h4>
+  <div class="page-mockup">
+    <div class="mockup-header">⚙️ 日常配置</div>
+    <div style="display:flex; gap:12px;">
+      <div style="flex:1; background:white; border:1px solid var(--gray-200); border-radius:8px; padding:16px;">
+        <div style="font-weight:600; color:var(--gray-700); margin-bottom:8px;">👥 会员等级体系</div>
+        <div style="font-size:12px; color:var(--gray-500);">7个等级 · 最后更新 2026-05-20</div>
+        <div style="margin-top:10px;"><span class="mockup-btn primary">配置</span></div>
+      </div>
+      <div style="flex:1; background:white; border:1px solid var(--gray-200); border-radius:8px; padding:16px;">
+        <div style="font-weight:600; color:var(--gray-700); margin-bottom:8px;">🚀 启航奖规则</div>
+        <div style="font-size:12px; color:var(--gray-500);">第二代PV 5% · 已启用</div>
+        <div style="margin-top:10px;"><span class="mockup-btn primary">配置</span></div>
+      </div>
+      <div style="flex:1; background:white; border:1px solid var(--gray-200); border-radius:8px; padding:16px;">
+        <div style="font-weight:600; color:var(--gray-700); margin-bottom:8px;">🏆 鼓励奖规则</div>
+        <div style="font-size:12px; color:var(--gray-500);">订单PV 1% · 已启用</div>
+        <div style="margin-top:10px;"><span class="mockup-btn primary">配置</span></div>
+      </div>
+    </div>
+  </div>
+  
+  <h4>6.4 活动效果统计页面</h4>
+  <div class="page-mockup">
+    <div class="mockup-header">📈 活动效果分析 — 限时促销升级活动</div>
+    <div class="mockup-row">
+      <div class="mockup-card"><div class="num">1,234</div><div class="label">参与人数</div></div>
+      <div class="mockup-card"><div class="num">856</div><div class="label">晋升人数</div></div>
+      <div class="mockup-card"><div class="num">69.4%</div><div class="label">晋升转化率</div></div>
+    </div>
+    <div style="background:white; border:1px solid var(--gray-200); border-radius:8px; padding:16px; margin-top:10px;">
+      <div style="font-weight:600; color:var(--gray-700); margin-bottom:10px; font-size:13px;">晋升等级分布</div>
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+        <div style="width:80px; font-size:12px; color:var(--gray-600);">中级会员</div>
+        <div style="flex:1; background:var(--gray-100); border-radius:4px; height:20px; overflow:hidden;">
+          <div style="width:45%; background:var(--primary); height:100%; border-radius:4px;"></div>
+        </div>
+        <div style="width:40px; font-size:12px; color:var(--gray-600); text-align:right;">45%</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+        <div style="width:80px; font-size:12px; color:var(--gray-600);">高级会员</div>
+        <div style="flex:1; background:var(--gray-100); border-radius:4px; height:20px; overflow:hidden;">
+          <div style="width:35%; background:var(--success); height:100%; border-radius:4px;"></div>
+        </div>
+        <div style="width:40px; font-size:12px; color:var(--gray-600); text-align:right;">35%</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <div style="width:80px; font-size:12px; color:var(--gray-600);">体验达人</div>
+        <div style="flex:1; background:var(--gray-100); border-radius:4px; height:20px; overflow:hidden;">
+          <div style="width:20%; background:var(--warning); height:100%; border-radius:4px;"></div>
+        </div>
+        <div style="width:40px; font-size:12px; color:var(--gray-600); text-align:right;">20%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 7 -->
+<div class="section" id="s7">
+  <h2><span>🔒</span> 七、非功能性需求</h2>
+  
+  <h4>7.1 性能需求</h4>
+  <table>
+    <tr><th>指标</th><th>要求</th><th>说明</th></tr>
+    <tr><td>规则匹配响应</td><td>≤ 100ms</td><td>用户行为触发到规则匹配完成的耗时</td></tr>
+    <tr><td>活动列表加载</td><td>≤ 500ms</td><td>活动管理页面列表加载时间</td></tr>
+    <tr><td>并发处理</td><td>≥ 1000 TPS</td><td>高峰期订单触发规则引擎的并发处理能力</td></tr>
+    <tr><td>数据查询</td><td>≤ 2s</td><td>活动效果统计报表查询时间</td></tr>
+  </table>
+  
+  <h4>7.2 安全需求</h4>
+  <ul>
+    <li><strong>权限控制</strong>：活动创建、编辑、审核、上线操作需不同角色权限</li>
+    <li><strong>操作审计</strong>：所有配置变更记录操作人、时间、变更内容</li>
+    <li><strong>数据校验</strong>：配置提交时进行完整性和逻辑校验（如结束时间必须晚于开始时间）</li>
+    <li><strong>防误操作</strong>：活动下线、删除等危险操作需二次确认</li>
+  </ul>
+  
+  <h4>7.3 可靠性需求</h4>
+  <ul>
+    <li><strong>高可用</strong>：规则引擎服务可用性 ≥ 99.9%</li>
+    <li><strong>数据一致性</strong>：活动触发和奖励发放需保证事务一致性</li>
+    <li><strong>故障恢复</strong>：支持活动配置的版本回滚，故障时可快速恢复上一版本</li>
+    <li><strong>灰度发布</strong>：新活动支持按会员ID尾号灰度，验证无误后再全量上线</li>
+  </ul>
+  
+  <h4>7.4 可扩展性需求</h4>
+  <ul>
+    <li><strong>活动类型扩展</strong>：支持通过插件方式新增活动类型，无需修改核心代码</li>
+    <li><strong>条件类型扩展</strong>：支持新增条件判断维度（如消费频次、商品品类等）</li>
+    <li><strong>动作类型扩展</strong>：支持新增执行动作（如发放优惠券、积分等）</li>
+  </ul>
+</div>
+
+<!-- Section 8 -->
+<div class="section" id="s8">
+  <h2><span>📎</span> 八、附录</h2>
+  
+  <h4>8.1 会员等级对照表</h4>
+  <table>
+    <tr><th>等级ID</th><th>等级名称</th><th>排序</th></tr>
+    <tr><td>1</td><td>新人</td><td>1</td></tr>
+    <tr><td>2</td><td>初级</td><td>2</td></tr>
+    <tr><td>3</td><td>中级</td><td>3</td></tr>
+    <tr><td>4</td><td>高级</td><td>4</td></tr>
+    <tr><td>5</td><td>体验达人</td><td>5</td></tr>
+    <tr><td>6</td><td>成长达人</td><td>6</td></tr>
+    <tr><td>7</td><td>精英达人</td><td>7</td></tr>
+    <tr><td>8</td><td>服务达人</td><td>8</td></tr>
+  </table>
+  
+  <h4>8.2 活动类型枚举</h4>
+  <table>
+    <tr><th>枚举值</th><th>名称</th><th>说明</th></tr>
+    <tr><td>1</td><td>等级晋升活动</td><td>满足条件后直接晋升会员等级</td></tr>
+    <tr><td>2</td><td>消费奖励活动</td><td>满足消费条件后发放额外奖励</td></tr>
+    <tr><td>3</td><td>推荐奖励活动</td><td>满足推荐条件后发放额外奖励</td></tr>
+    <tr><td>4</td><td>组合活动</td><td>同时包含多种规则的活动</td></tr>
+  </table>
+  
+  <h4>8.3 活动状态枚举</h4>
+  <table>
+    <tr><th>枚举值</th><th>名称</th><th>说明</th></tr>
+    <tr><td>0</td><td>草稿</td><td>运营编辑中</td></tr>
+    <tr><td>1</td><td>待审核</td><td>已提交等待审批</td></tr>
+    <tr><td>2</td><td>已上线</td><td>活动生效中</td></tr>
+    <tr><td>3</td><td>已下线</td><td>手动提前结束</td></tr>
+    <tr><td>4</td><td>已过期</td><td>超过结束时间自动停止</td></tr>
+  </table>
+  
+  <h4>8.4 相关文档</h4>
+  <ul>
+    <li>《业绩相关紧急需求》PDF文档（业务原始需求）</li>
+    <li>《绿韵家会员等级体系说明》</li>
+    <li>《PV计算规则文档》</li>
+    <li>《推荐关系链算法文档》</li>
+  </ul>
+</div>
+
+<div class="doc-footer">
+  <p>绿韵家产品团队 · 活动配置系统需求文档 v1.0</p>
+  <p>本文档为内部资料，请勿外传</p>
+</div>
+
+</div>
+</body>
+</html>
