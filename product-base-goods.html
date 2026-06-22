@@ -667,164 +667,384 @@
 
     <!-- ========== 页面4: 售后管理 ========== -->
     <div class="page active" id="page-after-sale">
-        <div class="breadcrumb">
-            <a onclick="switchPage('list')">首页</a><span>/</span><a>订单中心</a><span>/</span><span class="current">售后管理</span>
-        </div>
 
-        <!-- 筛选区 -->
-        <div class="filter-bar">
-            <div class="filter-item">
-                <label>订单编号</label>
-                <input type="text" placeholder="输入订单编号" style="width:160px;">
-            </div>
-            <div class="filter-item">
-                <label>售后类型</label>
-                <select style="width:140px;">
-                    <option>全部</option>
-                    <option>订单商品退款</option>
-                    <option>基础商品退款</option>
-                </select>
-            </div>
-            <div class="filter-item">
-                <label>售后状态</label>
-                <select style="width:120px;">
-                    <option>全部</option>
-                    <option>待审核</option>
-                    <option>审核通过</option>
-                    <option>退款中</option>
-                    <option>已完成</option>
-                    <option>已拒绝</option>
-                </select>
-            </div>
-            <div class="filter-item">
-                <label>申请时间</label>
-                <input type="date" style="width:140px;"> <span style="color:#999;">~</span> <input type="date" style="width:140px;">
-            </div>
-            <button class="btn btn-primary btn-sm" onclick="showToast('查询成功')">查询</button>
-            <button class="btn btn-sm">重置</button>
+    <!-- 页面标题栏 -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin:0; font-size:18px; font-weight:600; color:#333;">全部售后单</h2>
+        <div style="display:flex; gap:10px;">
+            <button class="btn btn-sm" onclick="showToast('新增售后单')" style="background:#e74c3c; color:#fff; border:none; padding:6px 18px; border-radius:4px; cursor:pointer; font-size:13px;">新增</button>
+            <button class="btn btn-sm" onclick="showToast('导出数据')" style="background:#27ae60; color:#fff; border:none; padding:6px 18px; border-radius:4px; cursor:pointer; font-size:13px;">导出</button>
         </div>
+    </div>
 
-        <!-- 统计卡片 -->
-        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px;">
-            <div style="background:#fff; padding:14px; border-radius:8px; border-left:4px solid #4a90e2;">
-                <div style="font-size:12px; color:#999;">待审核</div>
-                <div style="font-size:22px; font-weight:700; color:#4a90e2; margin-top:4px;">3</div>
-            </div>
-            <div style="background:#fff; padding:14px; border-radius:8px; border-left:4px solid #faad14;">
-                <div style="font-size:12px; color:#999;">退款中</div>
-                <div style="font-size:22px; font-weight:700; color:#faad14; margin-top:4px;">2</div>
-            </div>
-            <div style="background:#fff; padding:14px; border-radius:8px; border-left:4px solid #52c41a;">
-                <div style="font-size:12px; color:#999;">已完成</div>
-                <div style="font-size:22px; font-weight:700; color:#52c41a; margin-top:4px;">15</div>
-            </div>
-            <div style="background:#fff; padding:14px; border-radius:8px; border-left:4px solid #ff4d4f;">
-                <div style="font-size:12px; color:#999;">已拒绝</div>
-                <div style="font-size:22px; font-weight:700; color:#ff4d4f; margin-top:4px;">1</div>
-            </div>
+    <!-- Tab 状态栏 -->
+    <div style="display:flex; gap:0; margin-bottom:16px; border-bottom:2px solid #eee; flex-wrap:wrap;">
+        <div class="after-sale-tab active" data-tab="all" onclick="switchAfterSaleTab(this)">全部(<b>47</b>)</div>
+        <div class="after-sale-tab" data-tab="pending" onclick="switchAfterSaleTab(this)">待处理(<b>5</b>)</div>
+        <div class="after-sale-tab" data-tab="returning" onclick="switchAfterSaleTab(this)">待退货(<b>1</b>)</div>
+        <div class="after-sale-tab" data-tab="refunded" onclick="switchAfterSaleTab(this)">已退款</div>
+        <div class="after-sale-tab" data-tab="appeal" onclick="switchAfterSaleTab(this)">申诉处理</div>
+        <div class="after-sale-tab" data-tab="rejected" onclick="switchAfterSaleTab(this)">已拒绝</div>
+        <div class="after-sale-tab" data-tab="cancelled" onclick="switchAfterSaleTab(this)">已取消</div>
+    </div>
+    <style>
+        .after-sale-tab { padding:8px 20px; font-size:13px; color:#666; cursor:pointer; border:none; background:none;
+            position:relative; transition:all .2s; }
+        .after-sale-tab:hover { color:#e74c3c; }
+        .after-sale-tab.active { color:#fff; background:#e74c3c; border-radius:4px 4px 0 0; font-weight:500; }
+        .after-sale-tab.active b { color:#fff; }
+        .after-sale-tab b { color:#e74c3c; font-weight:600; }
+    </style>
+
+    <!-- 筛选区：单行多字段 -->
+    <div class="as-filter-bar">
+        <div class="as-filter-group">
+            <label>订单编号</label>
+            <input type="text" placeholder="订单编号" class="as-filter-input">
         </div>
+        <div class="as-filter-group">
+            <label>商品信息</label>
+            <input type="text" placeholder="商品名称/编号/规格" class="as-filter-input">
+        </div>
+        <div class="as-filter-group">
+            <label>数据来源</label>
+            <select class="as-filter-input">
+                <option value="">全部来源</option>
+                <option>线上商城</option>
+                <option>线下门店</option>
+                <option>分销代理</option>
+            </select>
+        </div>
+        <div class="as-filter-group">
+            <label>购买平台</label>
+            <select class="as-filter-input">
+                <option value="">全部平台</option>
+                <option>微信小程序</option>
+                <option>H5商城</option>
+                <option>APP</option>
+                <option>PC端</option>
+            </select>
+        </div>
+        <div class="as-filter-group">
+            <label>城市代理/合伙人</label>
+            <input type="text" placeholder="" class="as-filter-input">
+        </div>
+        <div class="as-filter-group">
+            <label>区域经理</label>
+            <input type="text" placeholder="" class="as-filter-input">
+        </div>
+        <div class="as-filter-group">
+            <label>订单状态</label>
+            <select class="as-filter-input">
+                <option value="">全部</option>
+                <option>已完成</option>
+                <option>进行中</option>
+                <option>已取消</option>
+            </select>
+        </div>
+        <div class="as-filter-group">
+            <label>退款类型</label>
+            <select class="as-filter-input">
+                <option value="">全部</option>
+                <option selected>商品退款</option>
+                <option>基础产品退款</option>
+            </select>
+        </div>
+        <div class="as-filter-group">
+            <label>退款原因</label>
+            <select class="as-filter-input">
+                <option value="">全部原因</option>
+                <option>商品质量问题</option>
+                <option>商品与描述不符</option>
+                <option>数量/规格发错</option>
+                <option>基础产品损坏</option>
+                <option>不想要了</option>
+            </select>
+        </div>
+        <div class="as-filter-group">
+            <label>申请人</label>
+            <input type="text" placeholder="" class="as-filter-input">
+        </div>
+        <div class="as-filter-group">
+            <label>创建时间</label>
+            <input type="date" class="as-filter-input" style="width:130px;">
+        </div>
+        <div class="as-filter-action">
+            <button class="as-query-btn" onclick="showToast('查询成功')">查询</button>
+        </div>
+    </div>
+    <style>
+        .as-filter-bar {
+            display:flex; align-items:flex-end; gap:10px; padding:16px 20px;
+            background:#fff; border-radius:6px; margin-bottom:16px;
+            box-shadow:0 1px 3px rgba(0,0,0,.04); flex-wrap:wrap;
+        }
+        .as-filter-group { display:flex; flex-direction:column; gap:4px; min-width:100px; }
+        .as-filter-group label { font-size:11px; color:#999; white-space:nowrap; }
+        .as-filter-input {
+            height:32px; padding:0 8px; border:1px solid #e0e0e0; border-radius:4px;
+            font-size:12px; outline:none; width:120px; transition:border-color .2s; background:#fff;
+        }
+        .as-filter-input:focus { border-color:#4a90e2; }
+        select.as-filter-input { width:120px; }
+        .as-filter-action { align-self:flex-end; padding-bottom:0; }
+        .as-query-btn {
+            height:32px; padding:0 20px; background:#4a90e2; color:#fff; border:none;
+            border-radius:4px; font-size:13px; cursor:pointer; transition:background .2s; white-space:nowrap;
+        }
+        .as-query-btn:hover { background:#357abd; }
+    </style>
 
-        <!-- 售后列表 -->
-        <div class="content-card">
-            <div class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
-                <span>售后记录列表</span>
-                <span style="font-size:12px; color:#999;">共 21 条记录</span>
-            </div>
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>售后单号</th>
-                        <th>订单编号</th>
-                        <th>售后类型</th>
-                        <th>退款商品</th>
-                        <th>退款数量</th>
-                        <th>退款金额</th>
-                        <th>申请时间</th>
-                        <th>状态</th>
-                        <th>操作</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="font-family:monospace; font-size:12px;">AS20260608001</td>
-                        <td style="font-family:monospace; font-size:12px;">ORD20260604001</td>
-                        <td><span class="tag tag-blue" style="background:#e6f4ff; color:#1677ff;">基础商品退款</span></td>
-                        <td>🌽 有机玉米（单个）</td>
-                        <td>3个</td>
-                        <td style="color:#ff6b7a; font-weight:600;">¥7.50</td>
-                        <td style="font-size:12px;">2026-06-08 14:30</td>
-                        <td><span class="tag tag-orange" style="background:#fff8e6; color:#faad14;">待审核</span></td>
-                        <td>
-                            <button class="btn-link" onclick="openRefundModal()">处理</button>
-                            <button class="btn-link">详情</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="font-family:monospace; font-size:12px;">AS20260608002</td>
-                        <td style="font-family:monospace; font-size:12px;">ORD20260604002</td>
-                        <td><span class="tag" style="background:#f0f0f0; color:#666;">订单商品退款</span></td>
-                        <td>🧴 绿韵草本精华礼盒</td>
-                        <td>1件</td>
-                        <td style="color:#ff6b7a; font-weight:600;">¥298.00</td>
-                        <td style="font-size:12px;">2026-06-08 11:20</td>
-                        <td><span class="tag tag-green">已完成</span></td>
-                        <td>
-                            <button class="btn-link">详情</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="font-family:monospace; font-size:12px;">AS20260607003</td>
-                        <td style="font-family:monospace; font-size:12px;">ORD20260604003</td>
-                        <td><span class="tag tag-blue" style="background:#e6f4ff; color:#1677ff;">基础商品退款</span></td>
-                        <td>🥚 土鸡蛋（单个）</td>
-                        <td>2个</td>
-                        <td style="color:#ff6b7a; font-weight:600;">¥2.40</td>
-                        <td style="font-size:12px;">2026-06-07 16:45</td>
-                        <td><span class="tag tag-green">已完成</span></td>
-                        <td>
-                            <button class="btn-link">详情</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="font-family:monospace; font-size:12px;">AS20260607004</td>
-                        <td style="font-family:monospace; font-size:12px;">ORD20260604001</td>
-                        <td><span class="tag tag-blue" style="background:#e6f4ff; color:#1677ff;">基础商品退款</span></td>
-                        <td>🌽 有机玉米（单个）</td>
-                        <td>5个</td>
-                        <td style="color:#ff6b7a; font-weight:600;">¥12.50</td>
-                        <td style="font-size:12px;">2026-06-07 10:15</td>
-                        <td><span class="tag tag-orange" style="background:#fff8e6; color:#faad14;">待审核</span></td>
-                        <td>
-                            <button class="btn-link" onclick="openRefundModal()">处理</button>
-                            <button class="btn-link">详情</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="font-family:monospace; font-size:12px;">AS20260606005</td>
-                        <td style="font-family:monospace; font-size:12px;">ORD20260604004</td>
-                        <td><span class="tag" style="background:#f0f0f0; color:#666;">订单商品退款</span></td>
-                        <td>🧼 植物手工皂</td>
-                        <td>2件</td>
-                        <td style="color:#ff6b7a; font-weight:600;">¥78.00</td>
-                        <td style="font-size:12px;">2026-06-06 09:30</td>
-                        <td><span class="tag" style="background:#fff0f0; color:#ff4d4f;">已拒绝</span></td>
-                        <td>
-                            <button class="btn-link">详情</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="pagination" style="margin-top:16px;">
-                <span style="margin-right:12px;">共 <b style="color:#4a90e2">21</b> 条记录</span>
-                <button class="page-btn" style="opacity:.5; cursor:not-allowed;">&lt;</button>
-                <button class="page-btn active">1</button>
-                <button class="page-btn">2</button>
-                <button class="page-btn">3</button>
-                <button class="page-btn">&gt;</button>
-                <span style="margin-left:12px; color:#999; font-size:12px;">每页 10 条</span>
+    <!-- 数据表格 -->
+    <div class="content-card" style="padding:0; overflow:hidden;">
+        <table class="data-table" style="border-collapse:collapse; width:100%; table-layout:auto;">
+            <thead>
+                <tr style="background:#fafafa; border-bottom:2px solid #eee;">
+                    <th style="padding:10px 8px; text-align:left; font-size:12px; font-weight:600; color:#666; white-space:nowrap;">单据编号</th>
+                    <th style="padding:10px 8px; text-align:left; font-size:12px; font-weight:600; color:#666; white-space:nowrap;">订单编号</th>
+                    <th style="padding:10px 8px; text-align:left; font-size:12px; font-weight:600; color:#666; white-space:nowrap;">客户姓名</th>
+                    <th style="padding:10px 8px; text-align:left; font-size:12px; font-weight:600; color:#666; white-space:nowrap;">数据来源</th>
+                    <th style="padding:10px 8px; text-align:left; font-size:12px; font-weight:600; color:#666; white-space:nowrap;">购买平台</th>
+                    <th style="padding:10px 8px; text-align:left; font-size:12px; font-weight:600; color:#666; white-space:nowrap;">城市代理人</th>
+                    <th style="padding:10px 8px; text-align:left; font-size:12px; font-weight:600; color:#666; white-space:nowrap;">区域经理</th>
+                    <th style="padding:10px 8px; text-align:left; font-size:12px; font-weight:600; color:#666; white-space:nowrap;">退款类型</th>
+                    <th style="padding:10px 8px; text-align:left; font-size:12px; font-weight:600; color:#666; white-space:nowrap; min-width:180px;">商品信息</th>
+                    <th style="padding:10px 8px; text-align:left; font-size:12px; font-weight:600; color:#666; white-space:nowrap;">单机/订单/<br>套餐</th>
+                    <th style="padding:10px 8px; text-align:left; font-size:12px; font-weight:600; color:#666; white-space:nowrap;">状态</th>
+                    <th style="padding:10px 8px; text-align:right; font-size:12px; font-weight:600; color:#666; white-space:nowrap;">退款金额</th>
+                    <th style="padding:10px 8px; text-align:left; font-size:12px; font-weight:600; color:#666; white-space:nowrap;">退款单人</th>
+                    <th style="padding:10px 8px; text-align:left; font-size:12px; font-weight:600; color:#666; white-space:nowrap;">申请时间</th>
+                    <th style="padding:10px 8px; text-align:left; font-size:12px; font-weight:600; color:#666; white-space:nowrap;">到账时间</th>
+                    <th style="padding:10px 8px; text-align:center; font-size:12px; font-weight:600; color:#666; white-space:nowrap;">操作</th>
+                </tr>
+            </thead>
+            <tbody id="after-sale-tbody">
+                <tr onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background=''" style="border-bottom:1px solid #f5f5f5;">
+                    <td style="padding:10px 8px; font-family:monospace; font-size:11px; color:#4a90e2;">单据编号14486</td>
+                    <td style="padding:10px 8px; font-family:monospace; font-size:11px; color:#4a90e2;">订单编号<br>1565071978526<br>正元汇丰<br>汇丰汇丰</td>
+                    <td style="padding:10px 8px; font-size:12px;">张总新明</td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">不满意不想要退货下架</td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">平台采购</td>
+                    <td style="padding:10px 8px; font-size:12px;">-</td>
+                    <td style="padding:10px 8px; font-size:12px;"><span style="color:#e74c3c;font-weight:500;">董娜</span></td>
+                    <td style="padding:10px 8px; font-size:12px;">已完成</td>
+                    <td style="padding:10px 8px;">
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span style="font-size:20px;">&#x1F954;</span>
+                            <div><div style="font-size:12px;font-weight:500;color:#333;">江苏绿韵田园健康基地1号</div></div>
+                        </div>
+                    </td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">398|1</td>
+                    <td style="padding:10px 8px;"><span style="display:inline-block;padding:2px 8px;border-radius:3px;background:#f0f0f0;font-size:11px;color:#666;">销售渠道未启用该渠道管理选项（67744468）</span></td>
+                    <td style="padding:10px 8px; text-align:right; font-size:12px; color:#e74c3c; font-weight:600;"></td>
+                    <td style="padding:10px 8px; font-size:11px; color:#4a90e2;">订单单人，物语（677444488）</td>
+                    <td style="padding:10px 8px; font-size:11px; color:#888;">2026-03-14 17:23</td>
+                    <td style="padding:10px 8px; font-size:11px; color:#999;">-</td>
+                    <td style="padding:10px 8px; text-align:center;"><button class="btn-link" onclick="openRefundModal()" style="color:#4a90e2;font-size:12px;">查看</button></td>
+                </tr>
+                <tr onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background=''" style="border-bottom:1px solid #f5f5f5;">
+                    <td style="padding:10px 8px; font-family:monospace; font-size:11px; color:#4a90e2;">单据编号14429</td>
+                    <td style="padding:10px 8px; font-family:monospace; font-size:11px; color:#4a90e2;">订单编号<br>15820528826800<br>正元汇丰<br>汇丰汇丰</td>
+                    <td style="padding:10px 8px; font-size:12px;">张总新明</td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">不满意不想要退货下架</td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">白鸽淘</td>
+                    <td style="padding:10px 8px; font-size:12px;">-</td>
+                    <td style="padding:10px 8px; font-size:12px;"><span style="color:#e74c3c;font-weight:500;">董娜</span></td>
+                    <td style="padding:10px 8px; font-size:12px;">已完成</td>
+                    <td style="padding:10px 8px;">
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span style="font-size:20px;">&#x1F954;</span>
+                            <div><div style="font-size:12px;font-weight:500;color:#333;">动销套餐【直邮加力式营养备餐包50L】</div></div>
+                        </div>
+                    </td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">299|1</td>
+                    <td style="padding:10px 8px;"><span style="display:inline-block;padding:2px 8px;border-radius:3px;background:#f0f0f0;font-size:11px;color:#666;">普通执行不能授权权限公司</span></td>
+                    <td style="padding:10px 8px; text-align:right; font-size:12px; color:#e74c3c; font-weight:600;"></td>
+                    <td style="padding:10px 8px; font-size:11px; color:#4a90e2;">订单单人，陈敏敏（18666289777）</td>
+                    <td style="padding:10px 8px; font-size:11px; color:#888;">2026-03-08 12:24</td>
+                    <td style="padding:10px 8px; font-size:11px; color:#999;">2026-03-10 09:41</td>
+                    <td style="padding:10px 8px; text-align:center;"><button class="btn-link" style="color:#4a90e2;font-size:12px;">查看</button></td>
+                </tr>
+                <tr onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background=''" style="border-bottom:1px solid #f5f5f5;">
+                    <td style="padding:10px 8px; font-family:monospace; font-size:11px; color:#4a90e2;">单据编号14358</td>
+                    <td style="padding:10px 8px; font-family:monospace; font-size:11px; color:#4a90e2;">订单编号<br>15802507930098<br>正元汇丰<br>汇丰汇丰</td>
+                    <td style="padding:10px 8px; font-size:12px;">石慧丽</td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">地址一-电话</td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">白鸽淘</td>
+                    <td style="padding:10px 8px; font-size:12px;">吕品群</td>
+                    <td style="padding:10px 8px; font-size:12px;"><span style="color:#e74c3c;font-weight:500;">董娜</span></td>
+                    <td style="padding:10px 8px; font-size:12px;">已完成</td>
+                    <td style="padding:10px 8px;">
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span style="font-size:20px;">&#x1F954;</span>
+                            <div><div style="font-size:12px;font-weight:500;color:#333;">世界 青山北(或2020PCSM)</div></div>
+                        </div>
+                    </td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">308|1</td>
+                    <td style="padding:10px 8px;"><span style="display:inline-block;padding:2px 8px;border-radius:3px;background:#f0f0f0;font-size:11px;color:#666;">贵州市绿韵田园健康基地有限公司</span></td>
+                    <td style="padding:10px 8px; text-align:right; font-size:12px; color:#e74c3c; font-weight:600;"></td>
+                    <td style="padding:10px 8px; font-size:11px; color:#4a90e2;">订单单人，崔梦（15068821215）</td>
+                    <td style="padding:10px 8px; font-size:11px; color:#888;">2026-03-08 17:34</td>
+                    <td style="padding:10px 8px; font-size:11px; color:#999;">2026-03-09 17:14</td>
+                    <td style="padding:10px 8px; text-align:center;"><button class="btn-link" style="color:#4a90e2;font-size:12px;">查看</button></td>
+                </tr>
+                <tr onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background=''" style="border-bottom:1px solid #f5f5f5;">
+                    <td style="padding:10px 8px; font-family:monospace; font-size:11px; color:#4a90e2;">单据编号14184</td>
+                    <td style="padding:10px 8px; font-family:monospace; font-size:11px; color:#4a90e2;">订单编号<br>1582222401493<br>正元汇丰<br>汇丰汇丰</td>
+                    <td style="padding:10px 8px; font-size:12px;">张总新明</td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">七天无理由退换货退款</td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">平台采购</td>
+                    <td style="padding:10px 8px; font-size:12px;">-</td>
+                    <td style="padding:10px 8px; font-size:12px;"><span style="color:#e74c3c;font-weight:500;">董娜</span></td>
+                    <td style="padding:10px 8px; font-size:12px;">已完成</td>
+                    <td style="padding:10px 8px;">
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span style="font-size:20px;">&#x1F954;</span>
+                            <div><div style="font-size:12px;font-weight:500;color:#333;">沅陵野炊食材料包（盒）</div></div>
+                        </div>
+                    </td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">195|1</td>
+                    <td style="padding:10px 8px;"><span style="display:inline-block;padding:2px 8px;border-radius:3px;background:#f0f0f0;font-size:11px;color:#666;">规格套餐/复购（150688196963）</span></td>
+                    <td style="padding:10px 8px; text-align:right; font-size:12px; color:#e74c3c; font-weight:600;"></td>
+                    <td style="padding:10px 8px; font-size:11px; color:#4a90e2;">订单单人，石慧生（18568855877）</td>
+                    <td style="padding:10px 8px; font-size:11px; color:#888;">2026-02-26 19:46</td>
+                    <td style="padding:10px 8px; font-size:11px; color:#999;">-</td>
+                    <td style="padding:10px 8px; text-align:center;"><button class="btn-link" style="color:#4a90e2;font-size:12px;">查看</button></td>
+                </tr>
+                <tr onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background=''" style="border-bottom:1px solid #f5f5f5;">
+                    <td style="padding:10px 8px; font-family:monospace; font-size:11px; color:#4a90e2;">单据编号14291</td>
+                    <td style="padding:10px 8px; font-family:monospace; font-size:11px; color:#4a90e2;">订单编号<br>15802717121461<br>正元汇丰<br>汇丰汇丰</td>
+                    <td style="padding:10px 8px; font-size:12px;">石慧丽</td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">地址一-电话</td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">其他淘</td>
+                    <td style="padding:10px 8px; font-size:12px;">-</td>
+                    <td style="padding:10px 8px; font-size:12px;"><span style="color:#e74c3c;font-weight:500;">申娜</span></td>
+                    <td style="padding:10px 8px; font-size:12px;">已完成</td>
+                    <td style="padding:10px 8px;">
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span style="font-size:20px;">&#x1F954;</span>
+                            <div><div style="font-size:12px;font-weight:500;color:#333;">瑞德洋行初探营每包43个*5袋</div></div>
+                        </div>
+                    </td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">248|2</td>
+                    <td style="padding:10px 8px;"><span style="display:inline-block;padding:2px 8px;border-radius:3px;background:#f0f0f0;font-size:11px;color:#666;">规格套餐/复购</span></td>
+                    <td style="padding:10px 8px; text-align:right; font-size:12px; color:#e74c3c; font-weight:600;"></td>
+                    <td style="padding:10px 8px; font-size:11px; color:#4a90e2;">联系人（15338836886）</td>
+                    <td style="padding:10px 8px; font-size:11px; color:#888;">2026-02-27 16:14</td>
+                    <td style="padding:10px 8px; font-size:11px; color:#999;">2026-02-27 16:14</td>
+                    <td style="padding:10px 8px; text-align:center;"><button class="btn-link" style="color:#4a90e2;font-size:12px;">查看</button></td>
+                </tr>
+                <tr onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background=''" style="border-bottom:1px solid #f5f5f5;">
+                    <td style="padding:10px 8px; font-family:monospace; font-size:11px; color:#4a90e2;">单据编号14556</td>
+                    <td style="padding:10px 8px; font-family:monospace; font-size:11px; color:#4a90e2;">订单编号<br>15799676788<br>正元汇丰<br>汇丰汇丰</td>
+                    <td style="padding:10px 8px; font-size:12px;">石慧丽</td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">地址一-电话</td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">白鸽淘</td>
+                    <td style="padding:10px 8px; font-size:12px;">-</td>
+                    <td style="padding:10px 8px; font-size:12px;"><span style="color:#e74c3c;font-weight:500;">申娜</span></td>
+                    <td style="padding:10px 8px; font-size:12px;">已完成</td>
+                    <td style="padding:10px 8px;">
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span style="font-size:20px;">&#x1F954;</span>
+                            <div><div style="font-size:12px;font-weight:500;color:#333;">瑞德洋行初探营每包43个*5袋</div></div>
+                        </div>
+                    </td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">208|2</td>
+                    <td style="padding:10px 8px;"><span style="display:inline-block;padding:2px 8px;border-radius:3px;background:#f0f0f0;font-size:11px;color:#666;">规格套餐/复购</span></td>
+                    <td style="padding:10px 8px; text-align:right; font-size:12px; color:#e74c3c; font-weight:600;"></td>
+                    <td style="padding:10px 8px; font-size:11px; color:#4a90e2;">联系人（15338836064）</td>
+                    <td style="padding:10px 8px; font-size:11px; color:#888;">2026-01-27 14:46</td>
+                    <td style="padding:10px 8px; font-size:11px; color:#999;">2026-01-27 14:00</td>
+                    <td style="padding:10px 8px; text-align:center;"><button class="btn-link" style="color:#4a90e2;font-size:12px;">查看</button></td>
+                </tr>
+                <tr onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background=''" style="border-bottom:1px solid #f5f5f5;">
+                    <td style="padding:10px 8px; font-family:monospace; font-size:11px; color:#4a90e2;">单据编号13878</td>
+                    <td style="padding:10px 8px; font-family:monospace; font-size:11px; color:#4a90e2;">订单编号<br>15622021595<br>正元汇丰<br>汇丰汇丰</td>
+                    <td style="padding:10px 8px; font-size:12px;">张总新明</td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">不满意不想要退货下架</td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">白鸽淘</td>
+                    <td style="padding:10px 8px; font-size:12px;">吕品群</td>
+                    <td style="padding:10px 8px; font-size:12px;"><span style="color:#e74c3c;font-weight:500;">董娜</span></td>
+                    <td style="padding:10px 8px; font-size:12px;">已完成</td>
+                    <td style="padding:10px 8px;">
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span style="font-size:20px;">&#x1F954;</span>
+                            <div><div style="font-size:12px;font-weight:500;color:#333;">套餐拆分套餐4 套餐后三套主推定制方案</div></div>
+                        </div>
+                    </td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">115|1</td>
+                    <td style="padding:10px 8px;"><span style="display:inline-block;padding:2px 8px;border-radius:3px;background:#f0f0f0;font-size:11px;color:#666;">规格套餐/复购</span></td>
+                    <td style="padding:10px 8px; text-align:right; font-size:12px; color:#e74c3c; font-weight:600;"></td>
+                    <td style="padding:10px 8px; font-size:11px; color:#4a90e2;">夏之雨（13512658377）</td>
+                    <td style="padding:10px 8px; font-size:11px; color:#888;">2026-01-08 16:37</td>
+                    <td style="padding:10px 8px; font-size:11px; color:#999;">2026-01-08 16:42</td>
+                    <td style="padding:10px 8px; text-align:center;"><button class="btn-link" style="color:#4a90e2;font-size:12px;">查看</button></td>
+                </tr>
+                <tr onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background=''" style="border-bottom:1px solid #f5f5f5;">
+                    <td style="padding:10px 8px; font-family:monospace; font-size:11px; color:#4a90e2;">单据编号13108</td>
+                    <td style="padding:10px 8px; font-family:monospace; font-size:11px; color:#4a90e2;">订单编号<br>15512953392<br>正元汇丰<br>汇丰汇丰</td>
+                    <td style="padding:10px 8px; font-size:12px;">张总新明</td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">不合适不合务</td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">平台采购</td>
+                    <td style="padding:10px 8px; font-size:12px;">吕品群</td>
+                    <td style="padding:10px 8px; font-size:12px;"><span style="color:#e74c3c;font-weight:500;">董娜</span></td>
+                    <td style="padding:10px 8px; font-size:12px;">已完成</td>
+                    <td style="padding:10px 8px;">
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span style="font-size:20px;">&#x1F954;</span>
+                            <div><div style="font-size:12px;font-weight:500;color:#333;">江苏省盐城市亭湖区文峰街道50号*7*6栋</div></div>
+                        </div>
+                    </td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">258|2</td>
+                    <td style="padding:10px 8px;"><span style="display:inline-block;padding:2px 8px;border-radius:3px;background:#f0f0f0;font-size:11px;color:#666;">江兴福绿韵田园生态有限公司</span></td>
+                    <td style="padding:10px 8px; text-align:right; font-size:12px; color:#e74c3c; font-weight:600;"></td>
+                    <td style="padding:10px 8px; font-size:11px; color:#4a90e2;">订单单人，（心（18502417972）</td>
+                    <td style="padding:10px 8px; font-size:11px; color:#888;">2024-11-28 10:56</td>
+                    <td style="padding:10px 8px; font-size:11px; color:#999;">-</td>
+                    <td style="padding:10px 8px; text-align:center;"><button class="btn-link" style="color:#4a90e2;font-size:12px;">查看</button></td>
+                </tr>
+                <tr onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background=''" style="border-bottom:1px solid #f5f5f5;">
+                    <td style="padding:10px 8px; font-family:monospace; font-size:11px; color:#4a90e2;">单据编号12877</td>
+                    <td style="padding:10px 8px; font-family:monospace; font-size:11px; color:#4a90e2;">订单编号<br>15310988282<br>正元汇丰<br>汇丰汇丰</td>
+                    <td style="padding:10px 8px; font-size:12px;">张总新明</td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">七天无理由退换货退款</td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">白鸽淘</td>
+                    <td style="padding:10px 8px; font-size:12px;">-</td>
+                    <td style="padding:10px 8px; font-size:12px;"><span style="color:#e74c3c;font-weight:500;">董晓岚</span></td>
+                    <td style="padding:10px 8px; font-size:12px;">已完成</td>
+                    <td style="padding:10px 8px;">
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span style="font-size:20px;">&#x1F954;</span>
+                            <div><div style="font-size:12px;font-weight:500;color:#333;">高原通脉组理疗康原盒装（1盒/7天*5气量）</div></div>
+                        </div>
+                    </td>
+                    <td style="padding:10px 8px; font-size:12px; color:#888;">1528|1</td>
+                    <td style="padding:10px 8px;"><span style="display:inline-block;padding:2px 8px;border-radius:3px;background:#f0f0f0;font-size:11px;color:#666;">规格套餐/复购</span></td>
+                    <td style="padding:10px 8px; text-align:right; font-size:12px; color:#e74c3c; font-weight:600;"></td>
+                    <td style="padding:10px 8px; font-size:11px; color:#4a90e2;">小金鱼（15504502381）</td>
+                    <td style="padding:10px 8px; font-size:11px; color:#888;">2023-11-14 11:39</td>
+                    <td style="padding:10px 8px; font-size:11px; color:#999;">2023-11-17 16:53</td>
+                    <td style="padding:10px 8px; text-align:center;"><button class="btn-link" style="color:#4a90e2;font-size:12px;">查看</button></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 分页器 -->
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-top:1px solid #f0f0f0;background:#fafafa;">
+            <div style="font-size:12px;color:#666;">共 <b style="color:#333;">51</b> 条 &nbsp; 1/6页</div>
+            <div style="display:flex;gap:4px;align-items:center;">
+                <button style="width:28px;height:28px;border:1px solid #ddd;border-radius:3px;background:#fff;font-size:12px;color:#ccc;cursor:default;">&lt;</button>
+                <button style="width:28px;height:28px;border:1px solid #ddd;border-radius:3px;background:#e74c3c;color:#fff;font-size:12px;cursor:pointer;">1</button>
+                <button style="width:28px;height:28px;border:1px solid #ddd;border-radius:3px;background:#fff;font-size:12px;color:#333;cursor:pointer;">2</button>
+                <button style="width:28px;height:28px;border:1px solid #ddd;border-radius:3px;background:#fff;font-size:12px;color:#333;cursor:pointer;">3</button>
+                <button style="width:28px;height:28px;border:1px solid #ddd;border-radius:3px;background:#fff;font-size:12px;color:#333;cursor:pointer;">&gt;</button>
+                <span style="margin-left:8px;font-size:12px;color:#666;">尾页</span>
+                <span style="margin-left:16px;font-size:12px;color:#999;">每5条/页</span>
             </div>
         </div>
     </div>
+</div>
+
 
 </div>
 
@@ -1951,6 +2171,14 @@ function saveBaseProduct() {
     currentBaseProductMap = JSON.parse(JSON.stringify(editBaseProductData));
     document.getElementById('base-product-modal').classList.remove('show');
     showToast('基础产品配置已保存');
+}
+
+// ========== 售后管理 Tab 切换 ==========
+function switchAfterSaleTab(el) {
+    document.querySelectorAll('.after-sale-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    const tab = el.getAttribute('data-tab');
+    console.log('切换到:', tab);
 }
 
 // ============ 售后退款弹窗（订单商品/基础商品切换） ============
