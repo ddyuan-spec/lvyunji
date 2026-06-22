@@ -3,587 +3,942 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>关系链代付原型·横向平铺</title>
+<title>关系链代付·交互原型</title>
 <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-        background: #f2f2f2; color: #333; font-size: 14px; line-height: 1.5;
-        display: flex; align-items: flex-start; gap: 24px; padding: 30px 30px 50px; overflow-x: auto; min-height: 100vh;
-    }
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f2f2f2; color: #333; font-size: 14px; line-height: 1.5;
+    display: flex; justify-content: center; align-items: flex-start;
+    min-height: 100vh; padding: 20px 12px;
+}
 
-    /* ========== 页面卡片 ========== */
-    .page-wrap { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; width: 375px; }
-    .page-label { font-size: 11px; color: #999; font-weight: 700; letter-spacing: 2px; }
-    .page { display: block !important; width: 375px; min-height: 100%; background: #f2f2f2; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.08); border: 1px solid #e0e0e0; position: relative; }
+/* ========== 手机外框 ========== */
+.phone-frame {
+    width: 375px; min-height: 812px; max-height: calc(100vh - 40px);
+    background: #f2f2f2; border-radius: 40px;
+    overflow: hidden; position: relative;
+    box-shadow: 0 0 0 10px #222, 0 0 0 12px #444,
+                0 24px 60px rgba(0,0,0,0.3);
+    display: flex; flex-direction: column;
+}
 
-    /* ========== 顶部导航栏（参考截图风格）========== */
-    .header {
-        background: #fff; height: 44px;
-        display: flex; align-items: center; justify-content: center;
-        border-bottom: 1px solid #eee; font-size: 17px; font-weight: 500; color: #333;
-        position: relative; top: 0; z-index: 100;
-    }
-    .header .back {
-        position: absolute; left: 0; top: 0; bottom: 0;
-        display: flex; align-items: center; padding-left: 14px; font-size: 26px; color: #333;
-        cursor: default; line-height: 1;
-    }
-    .header .right {
-        position: absolute; right: 12px; display: flex; gap: 16px; align-items: center;
-    }
-    .header .right .dot-btn { font-size: 20px; color: #666; cursor: default; letter-spacing: -2px; }
+/* 刘海 */
+.notch {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 150px; height: 28px; background: #222;
+    border-radius: 0 0 18px 18px; z-index: 999;
+}
 
-    /* ========== 支付倒计时+金额区（参考收银台截图）========== */
-    .pay-countdown-area {
-        background: #fff; text-align: center; padding: 28px 0 24px;
-    }
-    .countdown-label { font-size: 13px; color: #999; margin-bottom: 6px; }
-    .pay-amount-big { font-size: 40px; color: #222; font-weight: 600; letter-spacing: -1px; }
-    .pay-amount-big::before { content: "\00A5"; font-size: 22px; font-weight: 500; margin-right: 2px; }
+/* 账号切换栏 */
+.account-bar {
+    background: linear-gradient(135deg,#1a1a2e,#16213e); padding: 34px 14px 10px;
+    display: flex; gap: 6px; z-index: 100; position: relative;
+}
+.acct-btn {
+    flex: 1; padding: 7px 0; border-radius: 16px; font-size: 12px; font-weight: 600;
+    text-align: center; cursor: pointer; border: none; color: rgba(255,255,255,0.55);
+    background: rgba(255,255,255,0.08); transition: all .25s;
+}
+.acct-btn.active {
+    background: rgba(255,255,255,0.16); color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.acct-btn .role-tag { font-size: 9px; opacity: 0.65; margin-top: 1px; }
 
-    /* ========== 选择支付方式标题 ========== */
-    .pay-method-title {
-        padding: 18px 16px 10px; font-size: 14px; color: #888; font-weight: 400;
-    }
+/* ========== 页面容器（堆叠，只显示当前页）========== */
+.pages-container {
+    flex: 1; overflow: hidden; position: relative;
+}
+.page {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    overflow-y: auto; overflow-x: hidden;
+    background: #f2f2f2;
+    opacity: 0; visibility: hidden;
+    transform: translateX(30px); transition: all .35s ease;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.page.active { opacity: 1; visibility: visible; transform: translateX(0); }
+.page.slide-left { transform: translateX(-30px); }
+.page.slide-right { transform: translateX(30px); }
 
-    /* ========== 支付方式列表（参考截图：白底卡片+左侧icon+名称+余额+右侧radio）========== */
-    .pay-method-list { background: #fff; margin: 0 12px; border-radius: 10px; overflow: hidden; }
-    .pay-method-item {
-        display: flex; align-items: center; padding: 15px 14px;
-        border-bottom: 1px solid #f5f5f5; cursor: default;
-    }
-    .pay-method-item:last-child { border-bottom: none; }
-    .pm-icon {
-        width: 32px; height: 32px; border-radius: 7px; display: flex; align-items: center; justify-content: center;
-        font-size: 17px; flex-shrink: 0; margin-right: 12px;
-    }
-    .pm-icon.orange { background: linear-gradient(135deg, #ff9a56, #ff6b35); color: #fff; }
-    .pm-icon.green { background: #e8f5e9; color: #07c160; }
-    .pm-icon.blue { background: #e8f0fe; color: #4285f4; }
-    .pm-info { flex: 1; }
-    .pm-name { font-size: 15px; color: #333; font-weight: 500; }
-    .pm-balance { font-size: 13px; color: #ff6b35; margin-top: 1px; }
-    .pm-radio {
-        width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid #ccc;
-        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
-    .pm-radio.checked { border-color: #07c160; background: #07c160; }
-    .pm-radio.checked::after {
-        content: ""; width: 6px; height: 10px; border: solid #fff; border-width: 0 2px 2px 0;
-        transform: rotate(45deg) translateY(-1px);
-    }
+/* ========== 顶部导航栏 ========== */
+.header {
+    background: #fff; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    border-bottom: 1px solid #eee; font-size: 17px; font-weight: 500; color: #333;
+    position: sticky; top: 0; z-index: 90;
+}
+.header .back {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    display: flex; align-items: center; padding-left: 14px; font-size: 26px; color: #333;
+    cursor: pointer; line-height: 1; user-select: none;
+}
+.header .back:active { opacity: 0.5; }
+.header .right {
+    position: absolute; right: 12px; display: flex; gap: 16px; align-items: center;
+}
+.header .right .dot-btn { font-size: 20px; color: #666; cursor: pointer; letter-spacing: -2px; }
 
-    /* ========== 底部确认按钮（全宽绿色大按钮，参考截图）========== */
-    .bottom-action-bar {
-        position: absolute; bottom: 0; left: 0; right: 0;
-        background: #fff; padding: 10px 20px; padding-bottom: calc(10px + env(safe-area-inset-bottom));
-        border-top: 1px solid #eee; z-index: 100;
-    }
-    .btn-confirm-pay {
-        width: 100%; height: 46px; border-radius: 23px; border: none;
-        background: #07c160; color: #fff; font-size: 17px; font-weight: 500;
-        cursor: default; display: flex; align-items: center; justify-content: center;
-    }
-    .btn-confirm-pay.orange { background: #ff6b35; }
-    .btn-confirm-pay.gray { background: #bbb; }
+/* ========== 商品轮播图 ========== */
+.swiper-area {
+    width: 100%; height: 340px; background: linear-gradient(135deg, #fff8e6, #ffe8cc);
+    display: flex; align-items: center; justify-content: center; font-size: 80px;
+    position: relative; flex-shrink: 0;
+}
+.swiper-dots {
+    position: absolute; bottom: 10px; right: 14px;
+    background: rgba(0,0,0,.35); padding: 3px 9px; border-radius: 10px;
+    display: flex; align-items: center;
+}
+.swiper-dots span { color: #fff; font-size: 11px; }
 
-    /* ========== 地址卡片 ========== */
-    .addr-card { background: #fff; padding: 14px 16px; position: relative; }
-    .addr-row { display: flex; align-items: center; gap: 8px; }
-    .addr-name { font-size: 15px; font-weight: 600; color: #222; }
-    .addr-phone { font-size: 14px; color: #555; }
-    .addr-detail { font-size: 13px; color: #888; line-height: 1.5; margin-top: 4px; }
-    .addr-line {
-        position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
-        background: repeating-linear-gradient(90deg,
-            #07c160 0, #07c600 10px, transparent 10px, transparent 13px,
-            #1890ff 13px, #1890ff 23px, transparent 23px, transparent 26px,
-            #faad14 26px, #faad14 36px, transparent 36px, transparent 39px,
-            #ff4d4f 39px, #ff4d4f 49px, transparent 49px, transparent 52px);
-        opacity: 0.45;
-    }
+/* ========== 价格区 ========== */
+.price-section { background: #fff; padding: 13px 16px; }
+.price-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.current-price { font-size: 26px; color: #e64340; font-weight: 700; letter-spacing: -.5px; }
+.current-price::before { content: "\00A5"; font-size: 15px; font-weight: 600; }
+.original-price { font-size: 13px; color: #ccc; text-decoration: line-through; }
+.sales-tag { display: inline-flex; align-items: center; gap: 2px; font-size: 11px; color: #ff6b35; font-weight: 500; }
+.sales-tag::before { content: "🔥"; }
 
-    /* ========== 商品行 ========== */
-    .goods-row { background: #fff; margin-top: 8px; padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start; }
-    .goods-thumb {
-        width: 80px; height: 80px; background: #f7f7f7; border-radius: 8px;
-        display: flex; align-items: center; justify-content: center; font-size: 34px; flex-shrink: 0;
-    }
-    .goods-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 2px 0; }
-    .goods-name { font-size: 14px; font-weight: 600; color: #222; line-height: 1.4; }
-    .goods-spec { font-size: 12px; color: #999; margin-top: 4px; }
-    .goods-price { font-size: 16px; color: #e64340; font-weight: 700; text-align: right; }
-    .goods-price::before { content: "\00A5"; font-size: 12px; }
+/* 标题区 */
+.title-section { background: #fff; padding: 0 16px 13px; border-top: 1px solid #f5f5f5; }
+.title-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.self-tag { display: inline-block; background: #ff6b35; color: #fff; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 3px; flex-shrink: 0; }
+.product-title { font-size: 16px; font-weight: 700; color: #222; line-height: 1.45; }
 
-    /* ========== 金额汇总 ========== */
-    .amount-box { background: #fff; margin-top: 8px; padding: 12px 16px; }
-    .amt-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 13px; color: #555; }
-    .amt-row.total { border-top: 1px dashed #eee; margin-top: 6px; padding-top: 12px; font-size: 15px; font-weight: 600; color: #222; }
-    .amt-row.total .val { color: #e64340; font-size: 19px; font-weight: 700; }
-    .amt-row.total .val::before { content: "\00A5"; font-size: 13px; font-weight: 500; }
+/* 信息行 */
+.info-section { background: #fff; margin-top: 8px; }
+.info-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 13px 16px; border-bottom: 1px solid #f5f5f5; min-height: 48px;
+}
+.info-row:last-child { border-bottom: none; }
+.info-label { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #333; font-weight: 500; }
+.info-label .icon { font-size: 16px; width: 22px; text-align: center; }
+.info-value { font-size: 13px; color: #666; display: flex; align-items: center; gap: 4px; }
+.info-value .arrow { color: #ccc; font-size: 12px; cursor: pointer; }
 
-    /* ========== 输入框 ========== */
-    .input-section { background: #fff; margin-top: 8px; padding: 20px 16px; }
-    .input-label { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px; }
-    .phone-input {
-        width: 100%; height: 48px; border: 1px solid #ddd; border-radius: 8px;
-        padding: 0 16px; font-size: 16px; color: #333; outline: none;
-        background: #fafafa; display: flex; align-items: center;
-    }
-    .phone-input input { flex: 1; border: none; background: none; outline: none; font-size: 16px; }
-    .input-hint { font-size: 12px; color: #aaa; margin-top: 8px; line-height: 1.6; }
+/* 数量选择 */
+.qty-section { background: #fff; padding: 13px 16px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; }
+.qty-label { font-size: 14px; font-weight: 600; color: #333; }
+.qty-control { display: flex; align-items: center; border: 1px solid #e0e0e0; border-radius: 6px; overflow: hidden; }
+.qty-btn {
+    width: 38px; height: 34px; display: flex; align-items: center; justify-content: center;
+    background: #f7f7f7; border: none; font-size: 18px; color: #333; cursor: pointer; user-select: none;
+}
+.qty-btn:active { background: #e8e8e8; }
+.qty-input { width: 48px; height: 34px; text-align: center; border: none; border-left: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0; font-size: 15px; color: #333; font-weight: 600; outline: none; }
 
-    /* ========== 校验结果卡片 ========== */
-    .verify-card { margin: 16px 0; padding: 16px; border-radius: 10px; }
-    .verify-card.ok { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 1px solid #86efac; }
-    .verify-card.err { background: linear-gradient(135deg, #fef2f2, #fee2e2); border: 1px solid #fca5a5; }
-    .vc-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-    .vc-icon { font-size: 20px; }
-    .vc-title { font-size: 15px; font-weight: 700; }
-    .vc-title.ok { color: #166534; }
-    .vc-title.err { color: #991b1b; }
-    .vc-body { font-size: 13px; color: #555; line-height: 1.8; }
-    .vc-body strong { color: #333; }
+/* 底部操作栏 */
+.bottom-bar {
+    background: #fff; border-top: 1px solid #eee;
+    display: flex; align-items: center; padding: 6px 12px;
+    position: sticky; bottom: 0; z-index: 90;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom));
+}
+.icon-btns { display: flex; gap: 16px; padding-right: 12px; }
+.icon-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; color: #555; cursor: pointer; user-select: none; }
+.icon-btn .emoji { font-size: 22px; }
+.action-btns { flex: 1; display: flex; gap: 8px; }
+.btn {
+    flex: 1; height: 38px; border-radius: 19px; border: none;
+    font-size: 13px; font-weight: 600; cursor: pointer; user-select: none;
+    display: flex; align-items: center; justify-content: center;
+}
+.btn-cart { background: #fff; color: #333; border: 1px solid #ddd; }
+.btn-buy { background: #07c160; color: #fff; border-radius: 19px; }
+.btn-buy:active { background: #06ad56; }
 
-    /* ========== 等待页 ========== */
-    .waiting-body { padding: 40px 20px; text-align: center; }
-    .wait-circle {
-        width: 80px; height: 80px; border-radius: 50%;
-        background: linear-gradient(135deg, #fff7ed, #fed7aa);
-        display: flex; align-items: center; justify-content: center;
-        margin: 0 auto 22px; font-size: 38px; animation: breathe 2s ease-in-out infinite;
-    }
-    @keyframes breathe { 0%,100%{transform:scale(1);} 50%{transform:scale(1.06);} }
-    .wait-title { font-size: 18px; font-weight: 700; color: #222; margin-bottom: 8px; }
-    .wait-desc { font-size: 13px; color: #888; line-height: 1.7; margin-bottom: 24px; }
-    .wait-detail-card {
-        background: #fff; border-radius: 12px; padding: 18px 16px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.04); text-align: left;
-    }
-    .wd-row { display: flex; justify-content: space-between; padding: 9px 0; font-size: 13px; }
-    .wd-lbl { color: #999; }
-    .wd-val { color: #333; font-weight: 500; }
-    .wd-val.red { color: #e64340; font-weight: 700; }
-    .wd-val.yellow { color: #f59e0b; font-weight: 600; }
-    .wait-tip-bar {
-        margin-top: 18px; padding: 12px 14px; border-radius: 10px;
-        background: linear-gradient(135deg, #eff6ff, #dbeafe);
-        border: 1px solid #93c5fd; font-size: 12px; color: #1e40af; line-height: 1.7;
-        display: flex; align-items: flex-start; gap: 8px; text-align: left;
-    }
+/* ========== 收银台 ========== */
+.pay-countdown-area { background: #fff; text-align: center; padding: 26px 0 22px; }
+.countdown-label { font-size: 13px; color: #999; margin-bottom: 6px; }
+.pay-amount-big { font-size: 40px; color: #222; font-weight: 600; letter-spacing: -1px; }
+.pay-amount-big::before { content: "\00A5"; font-size: 22px; font-weight: 500; margin-right: 2px; }
 
-    /* ========== 代付通知标签 ========== */
-    .notify-banner {
-        background: linear-gradient(135deg, #fef2f2, #fee2e2);
-        border: 1px solid #fecaca; border-radius: 10px;
-        margin: 12px 16px 0; padding: 12px 14px;
-        display: flex; align-items: center; gap: 8px;
-    }
-    .nb-icon { font-size: 18px; flex-shrink: 0; }
-    .nb-text { font-size: 13px; color: #991b1b; font-weight: 500; line-height: 1.5; }
+.pay-method-title { padding: 16px 16px 8px; font-size: 14px; color: #888; font-weight: 400; }
+.pay-method-list { background: #fff; margin: 0 12px; border-radius: 10px; overflow: hidden; }
+.pay-method-item {
+    display: flex; align-items: center; padding: 14px 14px;
+    border-bottom: 1px solid #f5f5f5; cursor: pointer; user-select: none;
+    transition: background .15s;
+}
+.pay-method-item:active { background: #fafafa; }
+.pay-method-item:last-child { border-bottom: none; }
+.pm-icon { width: 32px; height: 32px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; margin-right: 12px; }
+.pm-icon.orange { background: linear-gradient(135deg, #ff9a56, #ff6b35); color: #fff; }
+.pm-icon.green { background: #e8f5e9; color: #07c160; }
+.pm-icon.blue { background: #e8f0fe; color: #4285f4; }
+.pm-info { flex: 1; }
+.pm-name { font-size: 15px; color: #333; font-weight: 500; }
+.pm-balance { font-size: 13px; color: #ff6b35; margin-top: 1px; }
+.pm-radio {
+    width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid #ccc;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    transition: all .2s;
+}
+.pm-radio.checked { border-color: #07c160; background: #07c160; }
+.pm-radio.checked::after {
+    content: ""; width: 6px; height: 10px; border: solid #fff; border-width: 0 2px 2px 0;
+    transform: rotate(45deg) translateY(-1px);
+}
 
-    /* ========== 代付订单卡 ========== */
-    .proxy-order { background: #fff; margin-top: 8px; padding: 16px; border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.03); }
-    .po-header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
-    .po-title { font-size: 15px; font-weight: 700; color: #222; }
-    .po-tag { font-size: 11px; color: #fff; background: #ff6b35; padding: 2px 8px; border-radius: 8px; font-weight: 600; }
-    .po-from { display: flex; align-items: center; gap: 10px; padding-bottom: 12px; border-bottom: 1px solid #f5f5f5; }
-    .po-avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
-    .po-user-info { flex: 1; }
-    .po-user-name { font-size: 14px; font-weight: 600; color: #222; }
-    .po-user-sub { font-size: 12px; color: #999; margin-top: 1px; }
-    .po-goods { display: flex; gap: 10px; padding: 12px 0; align-items: center; border-bottom: 1px solid #f5f5f5; }
-    .po-g-img { width: 58px; height: 58px; background: #f7f7f7; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 27px; flex-shrink: 0; }
-    .po-g-info { flex: 1; }
-    .po-g-name { font-size: 13px; font-weight: 600; color: #222; }
-    .po-g-spec { font-size: 12px; color: #999; margin-top: 2px; }
-    .po-g-price { font-size: 15px; color: #e64340; font-weight: 700; }
-    .po-g-price::before { content: "\00A5"; font-size: 11px; }
-    .po-total { padding-top: 12px; text-align: right; }
-    .po-total-lbl { font-size: 12px; color: #999; }
-    .po-total-val { font-size: 24px; color: #e64340; font-weight: 700; }
-    .po-total-val::before { content: "\00A5"; font-size: 14px; }
+/* 地址卡片 */
+.addr-card { background: #fff; padding: 14px 16px; position: relative; }
+.addr-row { display: flex; align-items: center; gap: 8px; }
+.addr-name { font-size: 15px; font-weight: 600; color: #222; }
+.addr-phone { font-size: 14px; color: #555; }
+.addr-detail { font-size: 13px; color: #888; line-height: 1.5; margin-top: 4px; }
+.addr-line {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
+    background: repeating-linear-gradient(90deg, #07c160 0,#07c600 10px, transparent 10px,transparent 13px, #1890ff 13px,#1890ff 23px, transparent 23px,transparent 26px, #faad14 26px,#faad14 36px, transparent 36px,transparent 39px, #ff4d4f 39px,#ff4d4f 49px, transparent 49px,transparent 52px);
+    opacity: 0.45;
+}
 
-    /* ========== 钱包卡片 ========== */
-    .wallet-block { background: #fff; margin-top: 8px; }
-    .wb-title { font-size: 15px; font-weight: 600; color: #222; padding: 14px 16px 10px; display: flex; align-items: center; gap: 6px; }
-    .wallet-card-inner {
-        margin: 0 16px 12px; padding: 18px 16px; border-radius: 12px;
-        background: linear-gradient(135deg, #18181b, #27272a); color: #fff;
-    }
-    .wcr-row { display: flex; justify-content: space-between; padding: 7px 0; }
-    .wcr-lbl { font-size: 12px; color: rgba(255,255,255,0.5); }
-    .wcr-val { font-size: 16px; font-weight: 700; color: #fff; }
-    .wcr-val.g { color: #4ade80; }
-    .wcr-val.y { color: #fbbf24; }
-    .wcr-divider { border-top: 1px solid rgba(255,255,255,0.1); margin: 8px 0; padding-top: 10px; }
+/* 商品行 */
+.goods-row { background: #fff; margin-top: 8px; padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start; }
+.goods-thumb { width: 80px; height: 80px; background: #f7f7f7; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 34px; flex-shrink: 0; }
+.goods-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 2px 0; }
+.goods-name { font-size: 14px; font-weight: 600; color: #222; line-height: 1.4; }
+.goods-spec { font-size: 12px; color: #999; margin-top: 4px; }
+.goods-price { font-size: 16px; color: #e64340; font-weight: 700; text-align: right; }
+.goods-price::before { content: "\00A5"; font-size: 12px; }
 
-    /* ========== 拆分进度条 ========== */
-    .split-section { background: #fff; margin-top: 8px; padding: 16px; }
-    .ss-title { font-size: 14px; font-weight: 600; color: #222; margin-bottom: 14px; }
-    .ss-bar { display: flex; border-radius: 8px; overflow: hidden; height: 40px; margin-bottom: 14px; }
-    .ss-seg { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; line-height: 1.3; }
-    .ss-seg.elec { background: #3b82f6; flex: 7; }
-    .ss-seg.save { background: #f59e0b; flex: 3; }
-    .ss-details { display: flex; gap: 24px; }
-    .ss-d-item { flex: 1; }
-    .ss-d-lbl { font-size: 12px; color: #888; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
-    .ss-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-    .ss-dot.b { background: #3b82f6; }
-    .ss-dot.y { background: #f59e0b; }
-    .ss-d-val { font-size: 19px; font-weight: 700; color: #222; }
-    .ss-d-unit { font-size: 12px; color: #aaa; font-weight: 400; }
-    .ss-d-pct { font-size: 12px; color: #aaa; }
+/* 金额汇总 */
+.amount-box { background: #fff; margin-top: 8px; padding: 12px 16px; }
+.amt-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 13px; color: #555; }
+.amt-row.total { border-top: 1px dashed #eee; margin-top: 6px; padding-top: 12px; font-size: 15px; font-weight: 600; color: #222; }
+.amt-row.total .val { color: #e64340; font-size: 19px; font-weight: 700; }
+.amt-row.total .val::before { content: "\00A5"; font-size: 13px; font-weight: 500; }
 
-    /* ========== 规则说明 ========== */
-    .rule-block { background: #fff; margin-top: 8px; padding: 14px 16px; }
-    .rb-title { font-size: 14px; font-weight: 600; color: #222; margin-bottom: 10px; }
-    .rb-item { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; font-size: 12px; color: #666; line-height: 1.7; }
-    .rb-dot { width: 4px; height: 4px; border-radius: 50%; background: #ccc; margin-top: 7px; flex-shrink: 0; }
+/* 规则说明 */
+.rule-block { background: #fff; margin-top: 8px; padding: 14px 16px; }
+.rb-title { font-size: 14px; font-weight: 600; color: #222; margin-bottom: 10px; }
+.rb-item { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; font-size: 12px; color: #666; line-height: 1.7; }
+.rb-dot { width: 4px; height: 4px; border-radius: 50%; background: #ccc; margin-top: 7px; flex-shrink: 0; }
 
-    /* ========== 提交栏（左右布局）========== */
-    .submit-bar {
-        background: #fff; border-top: 1px solid #eee;
-        display: flex; align-items: center; justify-content: space-between;
-        padding: 10px 16px; position: absolute; bottom: 0; left: 0; right: 0;
-        z-index: 100; padding-bottom: calc(10px + env(safe-area-inset-bottom));
-    }
-    .sb-left { font-size: 13px; color: #555; }
-    .sb-left .p { color: #e64340; font-size: 21px; font-weight: 700; }
-    .sb-left .p::before { content: "\00A5"; font-size: 14px; }
+/* 底部按钮区 */
+.bottom-action-bar {
+    position: sticky; bottom: 0; left: 0; right: 0;
+    background: #fff; border-top: 1px solid #eee; padding: 10px 20px;
+    z-index: 90; padding-bottom: calc(10px + env(safe-area-inset-bottom));
+}
+.btn-confirm-pay {
+    width: 100%; height: 46px; border-radius: 23px; border: none;
+    background: #07c160; color: #fff; font-size: 17px; font-weight: 500;
+    cursor: pointer; user-select: none; display: flex; align-items: center; justify-content: center;
+}
+.btn-confirm-pay.orange { background: #ff6b35; }
+.btn-confirm-pay.gray { background: #bbb; }
+.btn-confirm-pay:active { opacity: 0.85; }
 
-    /* ========== 成功页 ========== */
-    .success-body { text-align: center; padding: 45px 24px 30px; }
-    .sc-icon {
-        width: 88px; height: 88px; border-radius: 50%;
-        background: linear-gradient(135deg, #dcfce7, #bbf7d0);
-        display: flex; align-items: center; justify-content: center;
-        margin: 0 auto 20px; font-size: 42px;
-    }
-    .sc-title { font-size: 20px; font-weight: 700; color: #222; margin-bottom: 8px; }
-    .sc-desc { font-size: 14px; color: #666; margin-bottom: 28px; line-height: 1.6; }
-    .sc-card { background: #fff; border-radius: 14px; padding: 18px 20px; text-align: left; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
-    .sc-r { display: flex; justify-content: space-between; padding: 10px 0; font-size: 13px; border-bottom: 1px solid #f5f5f5; }
-    .sc-r:last-child { border-bottom: none; }
-    .sc-k { color: #999; }
-    .sc-v { color: #333; font-weight: 500; }
-    .sc-v.hi { color: #e64340; font-weight: 700; font-size: 15px; }
-    .sc-v.green { color: #07c160; font-weight: 700; }
-    .sc-btns { margin-top: 28px; display: flex; flex-direction: column; gap: 12px; }
-    .sc-btn { height: 46px; border-radius: 23px; font-size: 15px; font-weight: 600; border: none; cursor: default; display: flex; align-items: center; justify-content: center; }
-    .sc-btn.pri { background: #07c160; color: #fff; }
-    .sc-btn.def { background: #fff; color: #555; border: 1px solid #ddd; }
+/* 提交栏 */
+.submit-bar {
+    position: sticky; bottom: 0; left: 0; right: 0;
+    background: #fff; border-top: 1px solid #eee;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px; z-index: 90;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+}
+.sb-left { font-size: 13px; color: #555; }
+.sb-left .p { color: #e64340; font-size: 21px; font-weight: 700; }
+.sb-left .p::before { content: "\00A5"; font-size: 14px; }
+
+/* 输入框 */
+.input-section { background: #fff; margin-top: 8px; padding: 20px 16px; }
+.input-label { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px; }
+.phone-input {
+    width: 100%; height: 48px; border: 1px solid #ddd; border-radius: 8px;
+    padding: 0 16px; font-size: 16px; color: #333; outline: none;
+    background: #fafafa; display: flex; align-items: center;
+}
+.phone-input input { flex: 1; border: none; background: none; outline: none; font-size: 16px; }
+.input-hint { font-size: 12px; color: #aaa; margin-top: 8px; line-height: 1.6; }
+
+/* 校验结果卡片 */
+.verify-card { margin: 16px 0; padding: 16px; border-radius: 10px; display: none; }
+.verify-card.show { display: block; animation: fadeUp .3s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+.verify-card.ok { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 1px solid #86efac; }
+.verify-card.err { background: linear-gradient(135deg, #fef2f2, #fee2e2); border: 1px solid #fca5a5; }
+.vc-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.vc-icon { font-size: 20px; }
+.vc-title { font-size: 15px; font-weight: 700; }
+.vc-title.ok { color: #166534; } .vc-title.err { color: #991b1b; }
+.vc-body { font-size: 13px; color: #555; line-height: 1.8; }
+.vc-body strong { color: #333; }
+
+/* 等待页 */
+.waiting-body { padding: 36px 20px; text-align: center; }
+.wait-circle {
+    width: 76px; height: 76px; border-radius: 50%;
+    background: linear-gradient(135deg, #fff7ed, #fed7aa);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px; font-size: 36px; animation: breathe 2s ease-in-out infinite;
+}
+@keyframes breathe { 0%,100%{transform:scale(1);} 50%{transform:scale(1.05);} }
+.wait-title { font-size: 17px; font-weight: 700; color: #222; margin-bottom: 8px; }
+.wait-desc { font-size: 13px; color: #888; line-height: 1.7; margin-bottom: 22px; }
+.wait-detail-card { background: #fff; border-radius: 12px; padding: 16px 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); text-align: left; }
+.wd-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; }
+.wd-lbl { color: #999; } .wd-val { color: #333; font-weight: 500; }
+.wd-val.red { color: #e64340; font-weight: 700; }
+.wd-val.yellow { color: #f59e0b; font-weight: 600; }
+.wait-tip-bar {
+    margin-top: 16px; padding: 12px 14px; border-radius: 10px;
+    background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 1px solid #93c5fd;
+    font-size: 12px; color: #1e40af; line-height: 1.7; display: flex; align-items: flex-start; gap: 8px; text-align: left;
+}
+.switch-hint {
+    margin-top: 16px; padding: 12px 14px; border-radius: 10px;
+    background: linear-gradient(135deg, #fef3c7, #fde68a); border: 1px solid #fcd34d;
+    font-size: 12px; color: #92400e; line-height: 1.7; display: flex; align-items: flex-start; gap: 8px; cursor: pointer; user-select: none;
+}
+.switch-hint:active { filter: brightness(0.95); }
+
+/* 代付通知标签 */
+.notify-banner {
+    background: linear-gradient(135deg, #fef2f2, #fee2e2); border: 1px solid #fecaca; border-radius: 10px;
+    margin: 12px 16px 0; padding: 12px 14px; display: flex; align-items: center; gap: 8px;
+}
+.nb-icon { font-size: 18px; flex-shrink: 0; }
+.nb-text { font-size: 13px; color: #991b1b; font-weight: 500; line-height: 1.5; }
+
+/* 代付订单卡 */
+.proxy-order { background: #fff; margin-top: 8px; padding: 16px; border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.03); }
+.po-header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.po-title { font-size: 15px; font-weight: 700; color: #222; }
+.po-tag { font-size: 11px; color: #fff; background: #ff6b35; padding: 2px 8px; border-radius: 8px; font-weight: 600; }
+.po-from { display: flex; align-items: center; gap: 10px; padding-bottom: 12px; border-bottom: 1px solid #f5f5f5; }
+.po-avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+.po-user-info { flex: 1; }
+.po-user-name { font-size: 14px; font-weight: 600; color: #222; }
+.po-user-sub { font-size: 12px; color: #999; margin-top: 1px; }
+.po-goods { display: flex; gap: 10px; padding: 12px 0; align-items: center; border-bottom: 1px solid #f5f5f5; }
+.po-g-img { width: 58px; height: 58px; background: #f7f7f7; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 27px; flex-shrink: 0; }
+.po-g-info { flex: 1; }
+.po-g-name { font-size: 13px; font-weight: 600; color: #222; }
+.po-g-spec { font-size: 12px; color: #999; margin-top: 2px; }
+.po-g-price { font-size: 15px; color: #e64340; font-weight: 700; }
+.po-g-price::before { content: "\00A5"; font-size: 11px; }
+.po-total { padding-top: 12px; text-align: right; }
+.po-total-lbl { font-size: 12px; color: #999; }
+.po-total-val { font-size: 24px; color: #e64340; font-weight: 700; }
+.po-total-val::before { content: "\00A5"; font-size: 14px; }
+
+/* 钱包卡片 */
+.wallet-block { background: #fff; margin-top: 8px; }
+.wb-title { font-size: 15px; font-weight: 600; color: #222; padding: 14px 16px 10px; display: flex; align-items: center; gap: 6px; }
+.wallet-card-inner {
+    margin: 0 16px 12px; padding: 18px 16px; border-radius: 12px;
+    background: linear-gradient(135deg, #18181b, #27272a); color: #fff;
+}
+.wcr-row { display: flex; justify-content: space-between; padding: 7px 0; }
+.wcr-lbl { font-size: 12px; color: rgba(255,255,255,0.5); }
+.wcr-val { font-size: 16px; font-weight: 700; color: #fff; }
+.wcr-val.g { color: #4ade80; } .wcr-val.y { color: #fbbf24; }
+.wcr-divider { border-top: 1px solid rgba(255,255,255,0.1); margin: 8px 0; padding-top: 10px; }
+
+/* 拆分进度条 */
+.split-section { background: #fff; margin-top: 8px; padding: 16px; }
+.ss-title { font-size: 14px; font-weight: 600; color: #222; margin-bottom: 14px; }
+.ss-bar { display: flex; border-radius: 8px; overflow: hidden; height: 40px; margin-bottom: 14px; }
+.ss-seg { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; line-height: 1.3; }
+.ss-seg.elec { background: #3b82f6; flex: 7; }
+.ss-seg.save { background: #f59e0b; flex: 3; }
+.ss-details { display: flex; gap: 24px; }
+.ss-d-item { flex: 1; }
+.ss-d-lbl { font-size: 12px; color: #888; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
+.ss-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.ss-dot.b { background: #3b82f6; } .ss-dot.y { background: #f59e0b; }
+.ss-d-val { font-size: 19px; font-weight: 700; color: #222; }
+.ss-d-unit { font-size: 12px; color: #aaa; font-weight: 400; }
+.ss-d-pct { font-size: 12px; color: #aaa; }
+
+/* 成功页 */
+.success-body { text-align: center; padding: 42px 24px 30px; }
+.sc-icon {
+    width: 84px; height: 84px; border-radius: 50%;
+    background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px; font-size: 40px; animation: popIn .4s ease;
+}
+@keyframes popIn { from{transform:scale(.5);opacity:0;} to{transform:scale(1);opacity:1;} }
+.sc-title { font-size: 20px; font-weight: 700; color: #222; margin-bottom: 8px; }
+.sc-desc { font-size: 14px; color: #666; margin-bottom: 26px; line-height: 1.6; }
+.sc-card { background: #fff; border-radius: 14px; padding: 16px 20px; text-align: left; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
+.sc-r { display: flex; justify-content: space-between; padding: 9px 0; font-size: 13px; border-bottom: 1px solid #f5f5f5; }
+.sc-r:last-child { border-bottom: none; }
+.sc-k { color: #999; } .sc-v { color: #333; font-weight: 500; }
+.sc-v.hi { color: #e64340; font-weight: 700; font-size: 15px; }
+.sc-v.green { color: #07c160; font-weight: 700; }
+.sc-btns { margin-top: 26px; display: flex; flex-direction: column; gap: 12px; }
+.sc-btn { height: 46px; border-radius: 23px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; user-select: none; display: flex; align-items: center; justify-content: center; }
+.sc-btn.pri { background: #07c160; color: #fff; }
+.sc-btn.def { background: #fff; color: #555; border: 1px solid #ddd; }
+.sc-btn:active { opacity: .85; }
+
+/* Toast */
+.toast {
+    position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    background: rgba(0,0,0,.78); color: #fff; padding: 10px 22px; border-radius: 20px;
+    font-size: 13px; z-index: 2000; opacity: 0; pointer-events: none;
+    transition: all .3s ease; white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* 页面指示器（流程步骤） */
+.step-indicator {
+    display: flex; justify-content: center; gap: 6px; padding: 10px 0 4px;
+    background: #f2f2f2;
+}
+.step-dot { width: 7px; height: 7px; border-radius: 50%; background: #ddd; transition: all .25s; }
+.step-dot.active { background: #07c160; width: 18px; border-radius: 4px; }
+.step-dot.done { background: #07c160; }
+
+/* 桌面端提示 */
+.desktop-tip {
+    display: none; position: fixed; top: 12px; left: 50%;
+    transform: translateX(-50%); background: rgba(0,0,0,.72);
+    color: #fff; padding: 8px 20px; border-radius: 20px; font-size: 12px;
+    z-index: 3000; white-space: nowrap;
+}
+@media(min-width:480px){ .desktop-tip { display: block; } }
 </style>
 </head>
 <body>
 
-<!-- ==================== PAGE 01 · 收银台 — 选择代付 ==================== -->
-<div class="page-wrap">
-<div class="page-label">PAGE 01 · 收银台</div>
-<div class="page" style="padding-bottom:70px;">
+<!-- 桌面提示 -->
+<div class="desktop-tip" id="desktopTip">💡 手机模拟器 — 点击按钮体验完整交互流程</div>
+
+<div class="phone-frame">
+<div class="notch"></div>
+
+<!-- ==================== 账号切换栏 ==================== -->
+<div class="account-bar" id="accountBar">
+    <button class="acct-btn active" data-acct="buyer" onclick="switchAccount('buyer')">
+        📱 订单账号
+        <div class="role-tag">新人 · 李小新</div>
+    </button>
+    <button class="acct-btn" data-acct="payer" onclick="switchAccount('payer')">
+        💰 支付账号
+        <div class="role-tag">老会员 · 王建国</div>
+    </button>
+</div>
+
+<!-- ==================== 页面容器 ==================== -->
+<div class="pages-container">
+
+<!-- ======== PAGE 01 · 商品详情（入口）======== -->
+<div class="page active" id="page-product" data-step="1">
 <div class="header">
-    <span class="back">‹</span>收银台
+    <span class="back" onclick="goBack()">‹</span>商品详情
+    <span class="right"><span style="font-size:18px;">♡</span></span>
+</div>
+<div style="padding-bottom:58px;">
+    <div class="swiper-area">
+        🧴
+        <div class="swiper-dots"><span>1/3</span></div>
+    </div>
+    <div class="price-section">
+        <div class="price-row">
+            <span class="current-price">298</span>
+            <span class="original-price">¥398</span>
+            <span class="sales-tag">已售4500+</span>
+        </div>
+    </div>
+    <div class="title-section">
+        <div class="title-row">
+            <span class="self-tag">自营</span>
+            <span class="product-title">绿韵草本精华礼盒套装</span>
+        </div>
+    </div>
+    <div class="info-section">
+        <div class="info-row">
+            <div class="info-label"><span class="icon">☰</span>规格</div>
+            <div class="info-value">共3款 <span class="arrow">›</span></div>
+        </div>
+        <div class="info-row">
+            <div class="info-label"><span class="icon">🚚</span>运费</div>
+            <div class="info-value">广东省内1件免运费 <span class="arrow">›</span></div>
+        </div>
+        <div class="info-row">
+            <div class="info-label"><span class="icon">⏱</span>参数</div>
+            <div class="info-value">暂无参数 <span class="arrow">›</span></div>
+        </div>
+    </div>
+    <div class="qty-section">
+        <span class="qty-label">购买数量</span>
+        <div class="qty-control">
+            <button class="qty-btn" onclick="changeQty(-1)">−</button>
+            <input class="qty-input" type="number" value="10" id="qtyInput" readonly>
+            <button class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+    </div>
+    <!-- 绿韵家官方自营 -->
+    <div style="background:#fff;margin-top:8px;padding:14px 16px;display:flex;align-items:center;gap:10px;">
+        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#dcfce7,#bbf7d0);display:flex;align-items:center;justify-content:center;font-size:18px;">♻️</div>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:600;color:#222;">绿韵家官方自营</div><div style="font-size:12px;color:#999;margin-top:1px;">湖南省长沙市雨花区方博汇云谷</div></div>
+        <div style="padding:4px 12px;background:#e8f5e9;color:#07c160;font-size:11px;border-radius:12px;font-weight:600;">进店</div>
+    </div>
+    <!-- 用户评价 -->
+    <div style="background:#fff;margin-top:8px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-size:15px;font-weight:600;color:#222;">用户评价<span style="color:#666;font-weight:400;font-size:13px;">(243)</span></div>
+        <span style="font-size:13px;color:#999;cursor:pointer;">查看更多 ›</span>
+    </div>
+</div>
+<div class="bottom-bar">
+    <div class="icon-btns">
+        <div class="icon-btn"><span class="emoji">🏠</span><span>首页</span></div>
+        <div class="icon-btn"><span class="emoji">👩‍💻</span><span>客服</span></div>
+        <div class="icon-btn"><span class="emoji">🛒</span><span>购物车</span></div>
+    </div>
+    <div class="action-btns">
+        <button class="btn btn-cart">加入购物车</button>
+        <button class="btn btn-buy" onclick="goToPage('page-checkout')">立即购买</button>
+    </div>
+</div>
+</div>
+
+
+<!-- ======== PAGE 02 · 收银台（选代付）======== -->
+<div class="page" id="page-checkout" data-step="2">
+<div class="header">
+    <span class="back" onclick="goBack()">‹</span>收银台
     <span class="right"><span class="dot-btn">···</span><span class="dot-btn">⊙</span></span>
 </div>
-
-<!-- 支付倒计时+金额 -->
-<div class="pay-countdown-area">
-    <div class="countdown-label">支付剩余时间 29:58</div>
-    <div class="pay-amount-big">2,980.00</div>
-</div>
-
-<!-- 收货地址 -->
-<div class="addr-card">
-    <div class="addr-row">
-        <span class="addr-name">李小新</span>
-        <span class="addr-phone">139****5678</span>
+<div style="padding-bottom:68px;">
+    <div class="pay-countdown-area">
+        <div class="countdown-label">支付剩余时间 <span id="countdownTimer">29:59</span></div>
+        <div class="pay-amount-big" id="checkoutAmount">2,980.00</div>
     </div>
-    <div class="addr-detail">广东省深圳市南山区科技园南路1号</div>
-    <div class="addr-line"></div>
-</div>
-
-<!-- 商品 -->
-<div class="goods-row">
-    <div class="goods-thumb">🧴</div>
-    <div class="goods-info">
-        <div class="goods-name">绿韵草本精华礼盒套装</div>
-        <div class="goods-spec">规格：240粒/瓶 × 10件</div>
-    </div>
-    <div class="goods-price">2,980.00</div>
-</div>
-
-<!-- 金额汇总 -->
-<div class="amount-box">
-    <div class="amt-row"><span>商品金额</span><span>¥2,980.00</span></div>
-    <div class="amt-row"><span>运费</span><span style="color:#07c160;">免运费</span></div>
-    <div class="amt-row total"><span>应付金额</span><span class="val">2,980</span></div>
-</div>
-
-<!-- 选择支付方式 -->
-<div class="pay-method-title">选择支付方式</div>
-<div class="pay-method-list">
-    <div class="pay-method-item">
-        <div class="pm-icon orange">💰</div>
-        <div class="pm-info">
-            <div class="pm-name">钱包支付</div>
-            <div class="pm-balance">¥ 0.00</div>
+    <div class="addr-card">
+        <div class="addr-row">
+            <span class="addr-name">李小新</span>
+            <span class="addr-phone">139****5678</span>
         </div>
-        <div class="pm-radio"></div>
+        <div class="addr-detail">广东省深圳市南山区科技园南路1号</div>
+        <div class="addr-line"></div>
     </div>
-    <div class="pay-method-item" style="background:#fffbf0;">
-        <div class="pm-icon orange" style="background:linear-gradient(135deg,#ff9a56,#ff6b35);">🤝</div>
-        <div class="pm-info">
-            <div class="pm-name">他人代付</div>
-            <div class="pm-balance">邀请关系链内老会员为您代付</div>
+    <div class="goods-row">
+        <div class="goods-thumb">🧴</div>
+        <div class="goods-info">
+            <div class="goods-name">绿韵草本精华礼盒套装</div>
+            <div class="goods-spec">规格：240粒/瓶 × <span id="coQty">10</span>件</div>
         </div>
-        <div class="pm-radio checked"></div>
+        <div class="goods-price" id="coPrice">2,980.00</div>
     </div>
-    <div class="pay-method-item">
-        <div class="pm-icon green">微</div>
-        <div class="pm-info">
-            <div class="pm-name">微信支付</div>
-        </div>
-        <div class="pm-radio"></div>
+    <div class="amount-box">
+        <div class="amt-row"><span>商品金额</span><span id="coAmt">¥2,980.00</span></div>
+        <div class="amt-row"><span>运费</span><span style="color:#07c160;">免运费</span></div>
+        <div class="amt-row total"><span>应付金额</span><span class="val" id="coTotal">2,980</span></div>
     </div>
-    <div class="pay-method-item">
-        <div class="pm-icon blue">💳</div>
-        <div class="pm-info">
-            <div class="pm-name">银行卡支付</div>
+    <div class="pay-method-title">选择支付方式</div>
+    <div class="pay-method-list" id="payMethodList">
+        <div class="pay-method-item" onclick="selectPay(this, false)">
+            <div class="pm-icon orange">💰</div>
+            <div class="pm-info"><div class="pm-name">钱包支付</div><div class="pm-balance">¥ 0.00</div></div>
+            <div class="pm-radio"></div>
         </div>
-        <div class="pm-radio"></div>
+        <div class="pay-method-item" onclick="selectPay(this, true)">
+            <div class="pm-icon orange" style="background:linear-gradient(135deg,#ff9a56,#ff6b35);">🤝</div>
+            <div class="pm-info"><div class="pm-name">他人代付</div><div class="pm-balance">邀请关系链内老会员为您代付</div></div>
+            <div class="pm-radio checked"></div>
+        </div>
+        <div class="pay-method-item" onclick="selectPay(this, false)">
+            <div class="pm-icon green">微</div>
+            <div class="pm-info"><div class="pm-name">微信支付</div></div>
+            <div class="pm-radio"></div>
+        </div>
+        <div class="pay-method-item" onclick="selectPay(this, false)">
+            <div class="pm-icon blue">💳</div>
+            <div class="pm-info"><div class="pm-name">银行卡支付</div></div>
+            <div class="pm-radio"></div>
+        </div>
+    </div>
+    <div class="rule-block">
+        <div class="rb-title">📋 代付规则说明</div>
+        <div class="rb-item"><span class="rb-dot"></span><span>代付人须与您在同一推荐关系链内</span></div>
+        <div class="rb-item"><span class="rb-dot"></span><span>需填写老会员手机号进行身份校验</span></div>
+        <div class="rb-item"><span class="rb-dot"></span><span>老会员确认后自动扣款完成支付</span></div>
+        <div class="rb-item"><span class="rb-dot"></span><span>扣款比例：70%电子钱包 + 30%储值钱包</span></div>
     </div>
 </div>
-
-<!-- 规则提示 -->
-<div class="rule-block">
-    <div class="rb-title">📋 代付规则说明</div>
-    <div class="rb-item"><span class="rb-dot"></span><span>代付人须与您在同一推荐关系链内</span></div>
-    <div class="rb-item"><span class="rb-dot"></span><span>需填写老会员手机号进行身份校验</span></div>
-    <div class="rb-item"><span class="rb-dot"></span><span>老会员确认后自动扣款完成支付</span></div>
-    <div class="rb-item"><span class="rb-dot"></span><span>扣款比例：70%电子钱包 + 30%储值钱包</span></div>
-</div>
-
-<!-- 底部按钮 -->
 <div class="bottom-action-bar">
-    <button class="btn-confirm-pay orange">请求代付</button>
-</div>
+    <button class="btn-confirm-pay orange" id="reqProxyBtn" onclick="requestProxy()">请求代付</button>
 </div>
 </div>
 
 
-<!-- ==================== PAGE 02 · 输入代付人手机号 ==================== -->
-<div class="page-wrap">
-<div class="page-label">PAGE 02 · 输入代付人信息</div>
-<div class="page" style="padding-bottom:70px;">
+<!-- ======== PAGE 03 · 输入代付人信息 ======== -->
+<div class="page" id="page-input-proxy" data-step="3">
 <div class="header">
-    <span class="back">‹</span>代付人信息
+    <span class="back" onclick="goBack()">‹</span>代付人信息
     <span class="right"><span class="dot-btn">···</span></span>
 </div>
-
-<div style="text-align:center;padding:24px 16px 0;">
-    <div style="font-size:42px;margin-bottom:14px;">🤝</div>
-    <div style="font-size:18px;font-weight:700;color:#222;margin-bottom:6px;">请输入代付人信息</div>
-    <div style="font-size:13px;color:#999;line-height:1.6;">系统将校验对方是否与您在同一关系链内</div>
-</div>
-
-<!-- 手机号输入 -->
-<div class="input-section">
-    <div class="input-label">📱 代付人手机号</div>
-    <div class="phone-input"><input type="tel" value="138****1234" readonly placeholder="请输入老会员手机号"></div>
-    <div class="input-hint">请确保输入的手机号已在平台注册且与您属于同一推荐关系链</div>
-</div>
-
-<!-- 校验结果 - 通过 -->
-<div class="verify-card ok">
-    <div class="vc-head"><span class="vc-icon">✅</span><span class="vc-title ok">关系链校验通过</span></div>
-    <div class="vc-body">
-        代付人：<strong>王建国（老会员）</strong><br>
-        关系链：<strong>张总 → 李经理 → 王建国 → 您</strong><br>
-        双方确认为同一推荐关系网络 ✓<br>
-        可发起代付请求
+<div style="padding-bottom:68px;">
+    <div style="text-align:center;padding:20px 16px 0;">
+        <div style="font-size:40px;margin-bottom:12px;">🤝</div>
+        <div style="font-size:17px;font-weight:700;color:#222;margin-bottom:6px;">请输入代付人信息</div>
+        <div style="font-size:13px;color:#999;line-height:1.6;">系统将校验对方是否与您在同一关系链内</div>
+    </div>
+    <div class="input-section">
+        <div class="input-label">📱 代付人手机号</div>
+        <div class="phone-input">
+            <input type="tel" id="phoneInput" placeholder="请输入老会员手机号"
+                   oninput="hideVerify()" maxlength="11">
+        </div>
+        <div class="input-hint">请确保输入的手机号已在平台注册且与您属于同一推荐关系链</div>
+    </div>
+    <!-- 校验结果 -->
+    <div class="verify-card ok" id="verifyOk">
+        <div class="vc-head"><span class="vc-icon">✅</span><span class="vc-title ok">关系链校验通过</span></div>
+        <div class="vc-body">
+            代付人：<strong>王建国（老会员）</strong><br>
+            关系链：<strong>张总 → 李经理 → 王建国 → 您</strong><br>
+            双方确认为同一推荐关系网络 ✓<br>
+            可发起代付请求
+        </div>
+    </div>
+    <div class="verify-card err" id="verifyErr">
+        <div class="vc-head"><span class="vc-icon">⚠️</span><span class="vc-title err">关系链校验失败</span></div>
+        <div class="vc-body">
+            该用户不在您的推荐关系链内<br>
+            为避免跨链代付风险，仅允许同一关系链内代付<br>
+            请确认手机号是否正确
+        </div>
     </div>
 </div>
-
-<!-- 校验结果 - 失败（隐藏示例） -->
-<div class="verify-card err" style="display:none;">
-    <div class="vc-head"><span class="vc-icon">⚠️</span><span class="vc-title err">关系链校验失败</span></div>
-    <div class="vc-body">
-        该用户不在您的推荐关系链内<br>
-        为避免跨链代付风险，仅允许同一关系链内代付<br>
-        请确认手机号是否正确
-    </div>
-</div>
-
 <div class="bottom-action-bar">
-    <button class="btn-confirm-pay orange" style="width:auto;padding:0 64px;">发起代付请求</button>
-</div>
+    <button class="btn-confirm-pay orange" id="submitProxyBtn" onclick="submitProxy()" style="width:auto;padding:0 64px;display:none;" disabled>发起代付请求</button>
+    <button class="btn-confirm-pay orange" id="fakeSubmitBtn" onclick="doFakeInput()" style="width:auto;padding:0 64px;">发起代付请求</button>
 </div>
 </div>
 
 
-<!-- ==================== PAGE 03 · 等待代付确认 ==================== -->
-<div class="page-wrap">
-<div class="page-label">PAGE 03 · 等待代付确认</div>
-<div class="page" style="padding-bottom:70px;">
+<!-- ======== PAGE 04 · 等待代付确认 ======== -->
+<div class="page" id="page-waiting" data-step="4">
 <div class="header">
-    <span class="back">‹</span>代付进度
+    <span class="back" onclick="goBack()">‹</span>代付进度
     <span class="right"><span class="dot-btn">···</span></span>
 </div>
-
-<div class="waiting-body">
-    <div class="wait-circle">⏳</div>
-    <div class="wait-title">代付请求已发送</div>
-    <div class="wait-desc">正在等待<strong>王建国</strong>确认代付<br>对方确认后将自动完成支付</div>
-
-    <div class="wait-detail-card">
-        <div class="wd-row"><span class="wd-lbl">代付人</span><span class="wd-val">王建国（138****1234）</span></div>
-        <div class="wd-row"><span class="wd-lbl">商品</span><span class="wd-val">绿韵草本精华礼盒套装 ×10</span></div>
-        <div class="wd-row"><span class="wd-lbl">代付金额</span><span class="wd-val red">¥2,980.00</span></div>
-        <div class="wd-row"><span class="wd-lbl">当前状态</span><span class="wd-val yellow">⏳ 待对方确认</span></div>
-    </div>
-
-    <div class="wait-tip-bar">
-        <span style="font-size:16px;flex-shrink:0;">💡</span>
-        <span>系统已向代付人发送小程序弹窗通知和智链提醒通知，请耐心等待对方确认。</span>
+<div style="padding-bottom:68px;">
+    <div class="waiting-body">
+        <div class="wait-circle">⏳</div>
+        <div class="wait-title">代付请求已发送</div>
+        <div class="wait-desc">正在等待<strong>王建国</strong>确认代付<br>对方确认后将自动完成支付</div>
+        <div class="wait-detail-card">
+            <div class="wd-row"><span class="wd-lbl">代付人</span><span class="wd-val">王建国（138****1234）</span></div>
+            <div class="wd-row"><span class="wd-lbl">商品</span><span class="wd-val">绿韵草本精华礼盒套装 ×10</span></div>
+            <div class="wd-row"><span class="wd-lbl">代付金额</span><span class="wd-val red">¥2,980.00</span></div>
+            <div class="wd-row"><span class="wd-lbl">当前状态</span><span class="wd-val yellow">⏳ 待对方确认</span></div>
+        </div>
+        <div class="wait-tip-bar">
+            <span style="font-size:16px;flex-shrink:0;">💡</span>
+            <span>系统已向代付人发送小程序弹窗通知和智链提醒通知，请耐心等待对方确认。</span>
+        </div>
+        <div class="switch-hint" onclick="switchAccount('payer');goToPage('page-payer-confirm')">
+            <span style="font-size:16px;flex-shrink:0;">🔀</span>
+            <span>点击切换到「<strong>支付账号（王建国）</strong>」去确认代付</span>
+        </div>
     </div>
 </div>
-
 <div class="bottom-action-bar">
-    <button class="btn-confirm-pay gray" style="width:auto;padding:0 44px;">取消代付请求</button>
-</div>
+    <button class="btn-confirm-pay gray" style="width:auto;padding:0 44px;" onclick="cancelProxy()">取消代付请求</button>
 </div>
 </div>
 
 
-<!-- ==================== PAGE 04 · 老会员确认代付（收银台风格）==================== -->
-<div class="page-wrap">
-<div class="page-label">PAGE 04 · 老会员确认代付</div>
-<div class="page" style="padding-bottom:70px;">
+<!-- ======== PAGE 05 · 老会员确认代付（支付账号视角）======= -->
+<div class="page" id="page-payer-confirm" data-step="4">
 <div class="header">
-    <span class="back">‹</span>代付确认
+    <span class="back" onclick="goBack()">‹</span>代付确认
     <span class="right"><span class="dot-btn">···</span><span class="dot-btn">⊙</span></span>
 </div>
-
-<!-- 支付金额展示（复用收银台风格） -->
-<div class="pay-countdown-area">
-    <div class="countdown-label">代付订单</div>
-    <div class="pay-amount-big">2,980.00</div>
-</div>
-
-<!-- 通知横幅 -->
-<div class="notify-banner">
-    <span class="nb-icon">🔔</span>
-    <span class="nb-text">您有一条来自关系链成员的代付请求，请确认后完成支付</span>
-</div>
-
-<!-- 代付订单详情 -->
-<div class="proxy-order">
-    <div class="po-header">
-        <span class="po-title">代付订单详情</span>
-        <span class="po-tag">待确认</span>
+<div style="padding-bottom:68px;">
+    <div class="pay-countdown-area">
+        <div class="countdown-label">代付订单</div>
+        <div class="pay-amount-big">2,980.00</div>
     </div>
-    <div class="po-from">
-        <div class="po-avatar">👤</div>
-        <div class="po-user-info">
-            <div class="po-user-name">李小新（新人会员）</div>
-            <div class="po-user-sub">139****5678 · 您的关系链下级</div>
+    <div class="notify-banner">
+        <span class="nb-icon">🔔</span>
+        <span class="nb-text">您有一条来自关系链成员的代付请求，请确认后完成支付</span>
+    </div>
+    <div class="proxy-order">
+        <div class="po-header">
+            <span class="po-title">代付订单详情</span>
+            <span class="po-tag">待确认</span>
+        </div>
+        <div class="po-from">
+            <div class="po-avatar">👤</div>
+            <div class="po-user-info">
+                <div class="po-user-name">李小新（新人会员）</div>
+                <div class="po-user-sub">139****5678 · 您的关系链下级</div>
+            </div>
+        </div>
+        <div class="po-goods">
+            <div class="po-g-img">🧴</div>
+            <div class="po-g-info">
+                <div class="po-g-name">绿韵草本精华礼盒套装</div>
+                <div class="po-g-spec">规格：240粒/瓶 × 10件</div>
+            </div>
+            <div class="po-g-price">298 × 10</div>
+        </div>
+        <div class="po-total">
+            <div class="po-total-lbl">代付金额</div>
+            <div class="po-total-val">2,980.00</div>
         </div>
     </div>
-    <div class="po-goods">
-        <div class="po-g-img">🧴</div>
-        <div class="po-g-info">
-            <div class="po-g-name">绿韵草本精华礼盒套装</div>
-            <div class="po-g-spec">规格：240粒/瓶 × 10件</div>
-        </div>
-        <div class="po-g-price">298 × 10</div>
-    </div>
-    <div class="po-total">
-        <div class="po-total-lbl">代付金额</div>
-        <div class="po-total-val">2,980.00</div>
-    </div>
-</div>
-
-<!-- 我的钱包 -->
-<div class="wallet-block">
-    <div class="wb-title">💼 我的钱包</div>
-    <div class="wallet-card-inner">
-        <div class="wcr-row"><span class="wcr-lbl">电子钱包余额</span><span class="wcr-val g">¥ 2,320.00</span></div>
-        <div class="wcr-row"><span class="wcr-lbl">储值钱包余额</span><span class="wcr-val y">¥ 995.00</span></div>
-        <div class="wcr-divider"></div>
-        <div class="wcr-row"><span class="wcr-lbl">合计可用</span><span class="wcr-val g">¥ 3,315.00</span></div>
-    </div>
-</div>
-
-<!-- 扣款拆分 -->
-<div class="split-section">
-    <div class="ss-title">💳 扣款明细（按比例组合支付）</div>
-    <div class="ss-bar">
-        <div class="ss-seg elec">电子钱包 70%<br>¥2,086.00</div>
-        <div class="ss-seg save">储值钱包 30%<br>¥894.00</div>
-    </div>
-    <div class="ss-details">
-        <div class="ss-d-item">
-            <div class="ss-d-lbl"><span class="ss-dot b"></span> 电子钱包</div>
-            <div class="ss-d-val">2,086<span class="ss-d-unit">元</span><span class="ss-d-pct">(70%)</span></div>
-        </div>
-        <div class="ss-d-item">
-            <div class="ss-d-lbl"><span class="ss-dot y"></span> 储值钱包</div>
-            <div class="ss-d-val">894<span class="ss-d-unit">元</span><span class="ss-d-pct">(30%)</span></div>
+    <div class="wallet-block">
+        <div class="wb-title">💼 我的钱包</div>
+        <div class="wallet-card-inner">
+            <div class="wcr-row"><span class="wcr-lbl">电子钱包余额</span><span class="wcr-val g">¥ 2,320.00</span></div>
+            <div class="wcr-row"><span class="wcr-lbl">储值钱包余额</span><span class="wcr-val y">¥ 995.00</span></div>
+            <div class="wcr-divider"></div>
+            <div class="wcr-row"><span class="wcr-lbl">合计可用</span><span class="wcr-val g">¥ 3,315.00</span></div>
         </div>
     </div>
+    <div class="split-section">
+        <div class="ss-title">💳 扣款明细（按比例组合支付）</div>
+        <div class="ss-bar">
+            <div class="ss-seg elec">电子钱包 70%<br>¥2,086.00</div>
+            <div class="ss-seg save">储值钱包 30%<br>¥894.00</div>
+        </div>
+        <div class="ss-details">
+            <div class="ss-d-item">
+                <div class="ss-d-lbl"><span class="ss-dot b"></span> 电子钱包</div>
+                <div class="ss-d-val">2,086<span class="ss-d-unit">元</span><span class="ss-d-pct">(70%)</span></div>
+            </div>
+            <div class="ss-d-item">
+                <div class="ss-d-lbl"><span class="ss-dot y"></span> 储值钱包</div>
+                <div class="ss-d-val">894<span class="ss-d-unit">元</span><span class="ss-d-pct">(30%)</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="rule-block">
+        <div class="rb-title">⚠️ 确认前请注意</div>
+        <div class="rb-item"><span class="rb-dot"></span><span>请核对订单金额无误后再确认支付</span></div>
+        <div class="rb-item"><span class="rb-dot"></span><span>确认后将从您的钱包按上述比例自动扣款</span></div>
+        <div class="rb-item"><span class="rb-dot"></span><span>本订单不可拆分，不支持多人共同代付</span></div>
+    </div>
 </div>
-
-<!-- 注意事项 -->
-<div class="rule-block">
-    <div class="rb-title">⚠️ 确认前请注意</div>
-    <div class="rb-item"><span class="rb-dot"></span><span>请核对订单金额无误后再确认支付</span></div>
-    <div class="rb-item"><span class="rb-dot"></span><span>确认后将从您的钱包按上述比例自动扣款</span></div>
-    <div class="rb-item"><span class="rb-dot"></span><span>本订单不可拆分，不支持多人共同代付</span></div>
-</div>
-
 <div class="submit-bar">
     <div class="sb-left">代付金额：<span class="p">2,980</span></div>
-    <button class="btn-confirm-pay orange" style="padding:0 28px;border-radius:22px;width:auto;font-size:15px;">确认并支付</button>
-</div>
+    <button class="btn-confirm-pay orange" style="padding:0 28px;border-radius:22px;width:auto;font-size:15px;" onclick="confirmPayment()">确认并支付</button>
 </div>
 </div>
 
 
-<!-- ==================== PAGE 05 · 代付成功 ==================== -->
-<div class="page-wrap">
-<div class="page-label">PAGE 05 · 代付成功</div>
-<div class="page">
+<!-- ======== PAGE 06 · 代付成功 ======== -->
+<div class="page" id="page-success" data-step="5">
 <div class="header">
-    <span class="back">‹</span>支付结果
+    <span class="back" onclick="goToPage('page-product')">‹</span>支付结果
     <span class="right"><span class="dot-btn">···</span></span>
 </div>
-
-<div class="success-body">
+<div class="success-body" id="successBody">
     <div class="sc-icon">✅</div>
-    <div class="sc-title">代付成功！</div>
-    <div class="sc-desc">您已成功为 <strong>李小新</strong> 完成代付<br>订单已生成，新人无需再进行任何操作</div>
+    <div class="sc-title" id="successTitle">代付成功！</div>
+    <div class="sc-desc" id="successDesc"></div>
+    <div class="sc-card" id="successCard"></div>
+    <div class="sc-btns" id="successBtns"></div>
+</div>
+</div>
 
-    <div class="sc-card">
+</div><!-- end pages-container -->
+</div><!-- end phone-frame -->
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ========== 状态管理 ==========
+let currentAcct = 'buyer'; // 'buyer' | 'payer'
+const history = [];
+let currentPage = 'page-product';
+let qty = 10;
+
+// ========== 倒计时 ==========
+let cdSeconds = 1799;
+setInterval(() => {
+    if(cdSeconds > 0) { cdSeconds--; const m=Math.floor(cdSeconds/60), s=cdSeconds%60; document.getElementById('countdownTimer').textContent=`${m}:${String(s).padStart(2,'0')}`;}
+},1000);
+
+// ========== 页面导航 ==========
+function goToPage(pageId) {
+    const oldPage = document.querySelector('.page.active');
+    if(oldPage && oldPage.id !== pageId) {
+        oldPage.classList.remove('active');
+        // 判断方向
+        const pages = ['page-product','page-checkout','page-input-proxy','page-waiting','page-pager-confirm','page-pager-waiting','page-success'];
+        const oi = pages.indexOf(oldPage.id), ni = pages.indexOf(pageId);
+        if(ni > oi) oldPage.classList.add('slide-left');
+        else oldPage.classList.add('slide-right');
+    }
+    history.push(currentPage);
+    currentPage = pageId;
+    const newPage = document.getElementById(pageId);
+    newPage.classList.remove('slide-left','slide-right');
+    requestAnimationFrame(()=>newPage.classList.add('active'));
+    updateStepIndicator();
+}
+
+function goBack() {
+    if(history.length === 0) return;
+    const target = history.pop();
+    const oldPage = document.getElementById(currentPage);
+    oldPage.classList.remove('active');
+    oldPage.classList.add('slide-right');
+    currentPage = target;
+    const newPage = document.getElementById(target);
+    setTimeout(()=>{
+        newPage.classList.remove('slide-left','slide-right');
+        requestAnimationFrame(()=>newPage.classList.add('active'));
+        updateStepIndicator();
+    }, 50);
+}
+
+function updateStepIndicator() {
+    // 清理旧指示器
+    document.querySelectorAll('.step-indicator').forEach(el=>el.remove());
+    const p = document.getElementById(currentPage);
+    if(!p || !p.dataset.step) return;
+    const step = parseInt(p.dataset.step);
+    if(step <= 1) return;
+    let html = '<div class="step-indicator">';
+    for(let i=1;i<step;i++) html+='<div class="step-dot done"></div>';
+    html+=`<div class="step-dot active"></div>`;
+    for(let i=step+1;i<=5;i++) html+='<div class="step-dot"></div>';
+    html+='</div>';
+    p.insertAdjacentHTML('afterbegin',html);
+}
+
+// ========== 数量控制 ==========
+function changeQty(delta) {
+    qty = Math.max(1, Math.min(99, qty+delta));
+    document.getElementById('qtyInput').value = qty;
+    const total = qty * 298;
+    document.getElementById('checkoutAmount').textContent = total.toLocaleString()+'.00';
+    document.getElementById('coPrice').textContent = total.toLocaleString()+'.00';
+    document.getElementById('coQty').textContent = qty;
+    document.getElementById('coAmt').textContent = '¥'+total.toLocaleString()+'.00';
+    document.getElementById('coTotal').textContent = total.toLocaleString();
+}
+
+// ========== 选择支付方式 ==========
+function selectPay(el, isProxy) {
+    document.querySelectorAll('.pm-radio').forEach(r=>r.classList.remove('checked'));
+    el.querySelector('.pm-radio').classList.add('checked');
+    document.querySelectorAll('.pay-method-item').forEach(i=>i.style.background='none');
+    if(isProxy) el.style.background='#fffbf0';
+    const btn = document.getElementById('reqProxyBtn');
+    if(isProxy) { btn.textContent='请求代付'; btn.className='btn-confirm-pay orange'; }
+    else { btn.textContent='确认支付'; btn.className='btn-confirm-pay'; }
+}
+
+// ========== 请求代付 → 进入输入页 ==========
+function requestProxy() {
+    showToast('已选择「他人代付」，进入下一步');
+    goToPage('page-input-proxy');
+}
+
+// ========== 输入代付人 ==========
+function hideVerify() {
+    document.getElementById('verifyOk').classList.remove('show');
+    document.getElementById('verifyErr').classList.remove('show');
+    document.getElementById('submitProxyBtn').style.display='none';
+    document.getElementById('fakeSubmitBtn').style.display='';
+}
+
+function doFakeInput() {
+    const input = document.getElementById('phoneInput');
+    input.value = '138****1234';
+    // 模拟校验延迟
+    showToast('正在校验关系链...');
+    setTimeout(() => {
+        document.getElementById('verifyOk').classList.add('show');
+        document.getElementById('fakeSubmitBtn').style.display='none';
+        const sb = document.getElementById('submitProxyBtn');
+        sb.style.display='';
+        sb.disabled=false;
+    }, 800);
+}
+
+function submitProxy() {
+    showToast('代付请求已发送！');
+    goToPage('page-waiting');
+}
+
+// ========== 取消代付 ==========
+function cancelProxy() {
+    if(confirm('确定取消代付请求？')) {
+        showToast('已取消代付请求');
+        goBack(); goBack();
+    }
+}
+
+// ========== 确认支付 ==========
+function confirmPayment() {
+    showToast('正在处理支付...');
+    setTimeout(() => {
+        renderSuccess('payer');
+        goToPage('page-success');
+    }, 800);
+}
+
+// ========== 渲染成功页 ==========
+function renderSuccess(viewFrom) {
+    const isPayer = viewFrom === 'payer';
+    document.getElementById('successTitle').textContent = '代付成功！';
+    document.getElementById('successDesc').innerHTML =
+        isPayer
+        ? '您已成功为 <strong>李小新</strong> 完成代付<br>订单已生成，对方无需再进行任何操作'
+        : '<strong>王建国</strong> 已为您完成代付<br>您的订单已生成并支付成功';
+
+    document.getElementById('successCard').innerHTML = `
         <div class="sc-r"><span class="sc-k">订单编号</span><span class="sc-v">ORD2026062200886</span></div>
         <div class="sc-r"><span class="sc-k">下单人</span><span class="sc-v">李小新（新人）</span></div>
-        <div class="sc-r"><span class="sc-k">代付人</span><span class="sc-v">王建国（您）</span></div>
-        <div class="sc-r"><span class="sc-k">商品</span><span class="sc-v">绿韵草本精华礼盒套装 ×10</span></div>
-        <div class="sc-r"><span class="sc-k">代付金额</span><span class="sc-v hi">¥2,980.00</span></div>
-        <div class="sc-r"><span class="sc-k">电子钱包扣款 (70%)</span><span class="sc-v">-¥2,086.00</span></div>
-        <div class="sc-r"><span class="sc-k">储值钱包扣款 (30%)</span><span class="sc-v">-¥894.00</span></div>
-        <div class="sc-r"><span class="sc-k">支付时间</span><span class="sc-v">2026-06-22 17:25:36</span></div>
+        <div class="sc-r"><span class="sc-k">代付人</span><span class="sc-v">${isPayer?'王建国（您）':'王建国'}</span></div>
+        <div class="sc-r"><span class="sc-k">商品</span><span class="sc-v">绿韵草本精华礼盒套装 ×${qty}</span></div>
+        <div class="sc-r"><span class="sc-k">代付金额</span><span class="sc-v hi">¥${(qty*298).toLocaleString()}.00</span></div>
+        <div class="sc-r"><span class="sc-k">电子钱包扣款 (70%)</span><span class="sc-v">-¥${Math.round(qty*298*0.7).toLocaleString()}.00</span></div>
+        <div class="sc-r"><span class="sc-k">储值钱包扣款 (30%)</span><span class="sc-v">-¥${Math.round(qty*298*0.3).toLocaleString()}.00</span></div>
+        <div class="sc-r"><span class="sc-k">支付时间</span><span class="sc-v">${new Date().toLocaleString()}</span></div>
         <div class="sc-r"><span class="sc-k">订单状态</span><span class="sc-v green">✓ 已支付 · 待发货</span></div>
-    </div>
+    `;
+    document.getElementById('successBtns').innerHTML = `
+        <button class="sc-btn pri" onclick="showToast('跳转订单详情...')">查看订单详情</button>
+        <button class="sc-btn def" onclick="goToPage('page-product')">返回首页</button>
+    `;
+}
 
-    <div class="sc-btns">
-        <button class="sc-btn pri">查看订单详情</button>
-        <button class="sc-btn def">返回首页</button>
-    </div>
-</div>
-</div>
-</div>
+// ========== 账号切换 ==========
+function switchAccount(acct) {
+    currentAcct = acct;
+    document.querySelectorAll('.acct-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`[data-acct="${acct}"]`).classList.add('active');
 
+    if(acct === 'payer') {
+        // 切换到支付账号 → 默认显示代付确认页
+        goToPage('page-payer-confirm');
+        showToast('已切换到支付账号（王建国）');
+    } else {
+        // 切回订单账号
+        goToPage('page-product');
+        showToast('已切换回订单账号（李小新）');
+    }
+}
+
+// ========== Toast ==========
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+</script>
 
 </body>
 </html>
