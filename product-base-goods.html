@@ -84,6 +84,18 @@
             background: #fff; border-radius: 6px; padding: 16px 20px; margin-bottom: 16px;
             display: flex; align-items: center; flex-wrap: wrap; gap: 12px;
         }
+        /* ========== 筛选区 ========== */
+        .filter-bar {
+            background: #fff; border-radius: 6px; padding: 16px 20px; margin-bottom: 16px;
+            display: flex; align-items: flex-end; flex-wrap: wrap; gap: 16px;
+        }
+        .filter-item { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #666; }
+        .filter-item label { font-size: 12px; color: #999; font-weight: 500; }
+        .filter-item input, .filter-item select {
+            height: 32px; padding: 0 10px; border: 1px solid #e0e0e0; border-radius: 4px;
+            font-size: 13px; outline: none; background: #fff;
+        }
+        .filter-item input:focus, .filter-item select:focus { border-color: #4a90e2; }
         .search-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #666; }
         .search-item input, .search-item select {
             height: 32px; padding: 0 10px; border: 1px solid #e0e0e0; border-radius: 4px;
@@ -482,14 +494,14 @@
 <div class="sidebar">
     <div class="sidebar-menu">
         <div class="sidebar-group-title">商品管理</div>
-        <div class="sidebar-item active" onclick="switchPage('list')"><span class="icon">📋</span>商品列表</div>
+        <div class="sidebar-item" onclick="switchPage('list'))"><span class="icon">📋</span>商品列表</div>
         <div class="sidebar-item" onclick="switchPage('add')"><span class="icon">➕</span>新增商品</div>
         <div class="sidebar-item"><span class="icon">📁</span>分类管理</div>
     </div>
     <div class="sidebar-menu">
         <div class="sidebar-group-title">订单中心</div>
         <div class="sidebar-item" onclick="switchPage('order-detail')"><span class="icon">📦</span>订单管理</div>
-        <div class="sidebar-item" onclick="switchPage('after-sale')"><span class="icon">↩️</span>售后管理</div>
+        <div class="sidebar-item active" onclick="switchPage('after-sale')"><span class="icon">↩️</span>售后管理</div>
     </div>
 </div>
 
@@ -497,7 +509,7 @@
 <div class="main">
 
     <!-- ====== 页面1：商品列表 ====== -->
-    <div class="page active" id="page-list">
+    <div class="page" id="page-list">
         <div class="breadcrumb">
             <a>首页</a><span>/</span><a>商品管理</a><span>/</span><span class="current">商品列表</span>
         </div>
@@ -654,7 +666,7 @@
     </div>
 
     <!-- ========== 页面4: 售后管理 ========== -->
-    <div class="page" id="page-after-sale">
+    <div class="page active" id="page-after-sale">
         <div class="breadcrumb">
             <a onclick="switchPage('list')">首页</a><span>/</span><a>订单中心</a><span>/</span><span class="current">售后管理</span>
         </div>
@@ -1971,7 +1983,15 @@ function renderRefundBaseTab() {
     const spec = '240粒/瓶';
     const bindings = currentBaseProductMap[spec] || [];
     const orderQty = 10;
+    const orderPayment = 2980;
+    const alreadyRefunded = 0;
+    const maxRefundable = orderPayment - alreadyRefunded;
     document.getElementById('refund-content').innerHTML = `
+        <div style="margin-bottom:12px; padding:12px 16px; background:#fff; border:1px solid #e8e8e8; border-radius:6px; display:flex; gap:32px; font-size:13px; flex-wrap:wrap;">
+            <div><span style="color:#999;">订单实付金额：</span><b style="color:#333;">¥${orderPayment.toFixed(2)}</b></div>
+            <div><span style="color:#999;">已退基础商品金额：</span><b style="color:#4a90e2;">¥${alreadyRefunded.toFixed(2)}</b></div>
+            <div><span style="color:#999;">剩余可退金额：</span><b style="color:#ff6b7a;">¥${maxRefundable.toFixed(2)}</b></div>
+        </div>
         <table class="data-table" style="font-size:12px;">
             <thead><tr><th>基础产品</th><th>规格</th><th>基础单价</th><th>已退款/购买总数</th><th>可退金额</th><th>本次退款数量</th><th>本次退款金额</th></tr></thead>
             <tbody>
@@ -1986,13 +2006,19 @@ function renderRefundBaseTab() {
                         <td>0/${totalQty}</td>
                         <td>¥${totalAmount.toFixed(2)}</td>
                         <td><input type="number" value="0" min="0" max="${totalQty}" style="width:50px; padding:4px; border:1px solid #e0e0e0; border-radius:4px;" oninput="calcBaseRefund(this, ${b.price})"></td>
-                        <td><input type="number" value="0" class="refund-amt-input" style="width:60px; padding:4px; border:1px solid #e0e0e0; border-radius:4px;" readonly></td>
+                        <td><input type="number" value="0" class="refund-amt-input" style="width:70px; padding:4px; border:1px solid #e0e0e0; border-radius:4px;" readonly></td>
                     </tr>`;
                 }).join('')}
             </tbody>
         </table>
-        <div style="margin-top:12px; padding:10px; background:#fff8e6; border-radius:6px; font-size:12px; color:#ad6800;">
-            <b>💡 退款说明：</b>基础产品退款金额 = 退款数量 × 基础单价。例如：退3个玉米 = 3 × ¥2.5 = ¥7.5
+        <div id="refund-warning" style="margin-top:10px; display:none; padding:10px 14px; background:#fff2f0; border:1px solid #ffccc7; border-radius:4px; font-size:12px; color:#ff4d4f; font-weight:500;">
+            ⚠️ 基础商品退款金额合计（<span id="warning-total"></span>）已超过订单实付金额 ¥${orderPayment.toFixed(2)}，请调整退款数量后重新提交！
+        </div>
+        <div style="margin-top:12px; padding:12px; background:#fff8e6; border-radius:6px; font-size:12px; color:#ad6800; line-height:1.9;">
+            <b>💡 退款规则：</b><br>
+            1. 基础产品退款金额 = 退款数量 × 基础单价（如：退3个玉米 = 3 × ¥2.5 = ¥7.5）<br>
+            2. <b style="color:#ff6b7a;">所有基础商品退款金额合计不能超过订单实际支付金额 ¥${orderPayment.toFixed(2)}</b><br>
+            3. 系统自动累计已退基础商品金额进行校验
         </div>
     `;
     updateRefundTotal();
@@ -2013,20 +2039,47 @@ function updateRefundTotal() {
     });
     const el = document.getElementById('refund-total-amount');
     if (el) el.textContent = '¥' + total.toFixed(2);
+
+    // 金额上限校验：基础商品退款金额合计 ≤ 订单实际支付金额
+    const orderPayment = 2980;
+    const alreadyRefunded = 0;
+    const maxRefundable = orderPayment - alreadyRefunded;
+    const warningEl = document.getElementById('refund-warning');
+    const warningTotalEl = document.getElementById('warning-total');
+    if (warningEl && warningTotalEl) {
+        if (total > maxRefundable) {
+            warningEl.style.display = 'block';
+            warningTotalEl.textContent = '¥' + total.toFixed(2);
+        } else {
+            warningEl.style.display = 'none';
+        }
+    }
 }
 
 function confirmRefund() {
     const reason = document.getElementById('refund-reason').value;
     if (!reason) { showToast('请选择退款原因'); return; }
-    const total = document.getElementById('refund-total-amount').textContent;
+    const totalText = document.getElementById('refund-total-amount').textContent;
+    const totalAmount = parseFloat(totalText.replace('¥', '')) || 0;
+
+    // 校验：基础商品退款金额合计不能超过订单实际支付金额
+    const orderPayment = 2980;
+    if (totalAmount > orderPayment) {
+        showToast('⚠️ 基础商品退款金额合计超过订单实付金额 ¥' + orderPayment + '，请调整后重试');
+        return;
+    }
+    if (totalAmount <= 0) {
+        showToast('请至少填写一项退款金额');
+        return;
+    }
+
     document.getElementById('refund-confirm-detail').innerHTML = `
         <div>退款原因：${reason}</div>
-        <div>退款金额：<b style="color:#ff6b7a;">${total}</b></div>
+        <div>退款金额：<b style="color:#ff6b7a;">${totalText}</b></div>
         <div style="margin-top:8px; color:#999;">提交后将进入审核流程，请耐心等待</div>
     `;
     document.getElementById('refund-confirm-modal').classList.add('show');
 }
-
 function submitRefund() {
     document.getElementById('refund-confirm-modal').classList.remove('show');
     document.getElementById('refund-modal').classList.remove('show');
