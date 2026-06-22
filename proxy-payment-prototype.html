@@ -190,14 +190,6 @@ body {
 .deduct-hint { font-size: 12px; color: #e64340; }
 .deduct-check { width: 20px; height: 20px; border-radius: 50%; background: #07c160; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .deduct-check::after { content:"\2713"; color:#fff; font-size:12px; font-weight:700; }
-.balance-slider-section { padding: 10px 0; }
-.bs-range { font-size: 12px; color: #888; margin-bottom: 8px; }
-.bs-slider-wrap { display: flex; align-items: center; gap: 10px; }
-.bs-label { font-size: 14px; color: #333; font-weight: 500; white-space: nowrap; }
-.bs-amount { font-size: 18px; color: #222; font-weight: 700; }
-.bs-deduction { font-size: 13px; color: #e64340; }
-input[type=range] { flex: 1; -webkit-appearance: none; height: 4px; background: linear-gradient(to right,#07c160 var(--progress,0%),#ddd var(--progress,0%)); border-radius: 2px; outline: none; }
-input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #07c160; box-shadow: 0 1px 4px rgba(0,0,0,.2); cursor: pointer; }
 
 .co-total-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0 6px; border-top: 1px dashed #eee; margin-top: 4px; }
 .co-total-lbl { font-size: 13px; color: #666; }
@@ -494,11 +486,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px;
         <div class="co-amt-row"><span>专享优惠</span><span style="color:#07c600;">- ¥0.25</span></div>
         <div class="coupon-row"><div class="coupon-left">优惠券抵扣<span class="coupon-count">(可用优惠券0)</span></div><div class="coupon-radio"></div></div>
         <div class="deduct-row"><div class="deduct-left">电子币抵扣<span class="deduct-count">(可用电子币0)</span></div><span class="deduct-hint">电子币不足，暂不可抵扣</span></div>
-        <div class="deduct-row"><div class="deduct-left">余额抵扣<span class="deduct-count">(可用余额9350)</span></div><div class="deduct-check"></div></div>
-        <div class="balance-slider-section">
-            <div class="bs-range">可抵扣范围：<span>¥0 - ¥0.75</span></div>
-            <div class="bs-slider-wrap"><span class="bs-label">使用</span><input type="range" min="0" max="75" value="75" oninput="this.style.setProperty('--progress',this.value/75*100+'%');document.getElementById('bsAmt').textContent=(this.value/100).toFixed(2);document.getElementById('bsDd').textContent='¥'+(this.value/100).toFixed(2)" style="--progress:100%;"><span class="bs-amount" id="bsAmt">0.75</span><span class="bs-deduction">余额，抵<span id="bsDd">¥0.75</span></span></div>
-        </div>
+        <div class="co-amt-row"><span>余额抵扣(可用9350)</span><span style="color:#07c600;">- ¥0.75</span></div>
         <div class="co-total-row"><span class="co-total-lbl">实付金额</span><span class="co-total-val">0.00</span></div>
     </div>
 </div>
