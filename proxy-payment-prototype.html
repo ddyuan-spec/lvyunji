@@ -51,6 +51,12 @@ body {
 .page-scroll {
     flex: 1; overflow-y: auto; overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+    display: flex; flex-direction: column;
+}
+/* 底部操作栏在 page-scroll 内始终沉底 */
+.page-scroll .bottom-bar,
+.page-scroll .confirm-buy-bar {
+    margin-top: auto;
 }
 .page.active {
     opacity: 1; visibility: visible; pointer-events: auto;
@@ -139,7 +145,6 @@ body {
     background: #fff; border-top: 1px solid #eee;
     display: flex; align-items: center; padding: 6px 12px;
     padding-bottom: calc(6px + env(safe-area-inset-bottom));
-    flex-shrink: 0; position: relative; z-index: 20;
 }
 .icon-btns { display: flex; gap: 16px; padding-right: 12px; }
 .icon-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; color: #555; cursor: pointer; user-select: none; }
@@ -196,11 +201,10 @@ body {
 .co-total-val::before { content: "\00A5"; font-size: 13px; font-weight: 500; }
 
 .confirm-buy-bar {
-    background: #fff; border-top: 1px solid #eee;
+    background: #fff;
     display: flex; align-items: center; justify-content: space-between;
     padding: 10px 16px;
     padding-bottom: calc(10px + env(safe-area-inset-bottom));
-    flex-shrink: 0; position: relative; z-index: 20;
 }
 .cbb-left { display: flex; align-items: baseline; gap: 4px; }
 .cbb-text { font-size: 14px; color: #333; }
@@ -477,10 +481,10 @@ body {
         <div style="font-size:15px;font-weight:600;color:#222;">用户评价<span style="color:#666;font-weight:400;font-size:13px;">(243)</span></div>
         <span style="font-size:13px;color:#999;cursor:pointer;">查看更多 ›</span>
     </div>
-</div>
-<div class="bottom-bar">
-    <div class="icon-btns"><div class="icon-btn"><span class="emoji">🏠</span>首页</div><div class="icon-btn"><span class="emoji">👩‍💻</span>客服</div><div class="icon-btn"><span class="emoji">🛒</span>购物车</div></div>
-    <div class="action-btns"><button class="btn btn-cart">加入购物车</button><button class="btn btn-buy" onclick="goToPage('page-confirm-order')">立即购买</button></div>
+    <div class="bottom-bar" style="border-top:1px solid #eee;margin-top:16px;">
+        <div class="icon-btns"><div class="icon-btn"><span class="emoji">🏠</span>首页</div><div class="icon-btn"><span class="emoji">👩‍💻</span>客服</div><div class="icon-btn"><span class="emoji">🛒</span>购物车</div></div>
+        <div class="action-btns"><button class="btn btn-cart">加入购物车</button><button class="btn btn-buy" onclick="goToPage('page-confirm-order')">立即购买</button></div>
+    </div>
 </div>
 </div>
 
@@ -514,12 +518,11 @@ body {
         <div class="deduct-row"><div class="deduct-left">电子币抵扣<span class="deduct-count">(可用电子币0)</span></div><span class="deduct-hint">电子币不足，暂不可抵扣</span></div>
         <div class="co-amt-row"><span>余额抵扣(可用9350)</span><span style="color:#07c600;">- ¥0.75</span></div>
         <div class="co-total-row"><span class="co-total-lbl">实付金额</span><span class="co-total-val">0.00</span></div>
+        <div class="confirm-buy-bar" style="margin-top:16px;border-top:1px solid #eee;padding-top:12px;">
+            <div class="cbb-left"><span class="cbb-text">合计：</span><span class="cbb-amount">0.00</span><span class="cbb-fire">🔥 1.0</span></div>
+            <button class="btn-confirm-buy" onclick="goToPage('page-checkout')">确认购买</button>
+        </div>
     </div>
-</div>
-<div class="confirm-buy-bar">
-    <div class="cbb-left"><span class="cbb-text">合计：</span><span class="cbb-amount">0.00</span><span class="cbb-fire">🔥 1.0</span></div>
-    <button class="btn-confirm-buy" onclick="goToPage('page-checkout')">确认购买</button>
-</div>
 </div>
 
 
