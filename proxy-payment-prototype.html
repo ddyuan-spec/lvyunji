@@ -258,12 +258,25 @@ body {
 /* ========== 代付人输入页 ========== */
 .input-section { background: #fff; margin-top: 8px; padding: 20px 16px; }
 .input-label { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px; }
+.phone-input-wrap { position: relative; }
 .phone-input {
     width: 100%; height: 48px; border: 1px solid #ddd; border-radius: 8px;
     padding: 0 16px; font-size: 16px; color: #333; outline: none;
     background: #fafafa; display: flex; align-items: center;
 }
 .phone-input input { flex: 1; border: none; background: none; outline: none; font-size: 16px; }
+.search-suggest {
+    position: absolute; top: 100%; left: 0; right: 0;
+    background: #fff; border: 1px solid #e5e5e5; border-top: none;
+    border-radius: 0 0 8px 8px; box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    z-index: 50; overflow: hidden;
+}
+.ss-item { display: flex; align-items: center; padding: 12px 16px; gap: 10px; cursor: pointer; border-bottom: 1px solid #f5f5f5; }
+.ss-item:last-child { border-bottom: none; }
+.ss-item:active { background: #f7f7f7; }
+.ss-name { font-size: 15px; font-weight: 600; color: #222; }
+.ss-phone { font-size: 13px; color: #888; margin-left: auto; }
+.ss-tag { font-size: 11px; color: #fff; background: #ff6b35; padding: 1px 6px; border-radius: 8px; margin-left: 8px; }
 .input-hint { font-size: 12px; color: #aaa; margin-top: 8px; line-height: 1.6; }
 
 /* 历史用户列表 */
@@ -558,6 +571,21 @@ body {
 <div class="page-scroll">
     <div style="text-align:center;padding:20px 16px 0;"><div style="font-size:40px;margin-bottom:12px;">🤝</div><div style="font-size:17px;font-weight:700;color:#222;margin-bottom:6px;">请输入代付人信息</div><div style="font-size:13px;color:#999;line-height:1.6;">系统将校验对方是否与您在同一关系链内</div></div>
 
+    <!-- 手机号输入（置顶） -->
+    <div class="input-section">
+        <div class="input-label">📱 输入同链路账号</div>
+        <div class="phone-input-wrap">
+            <input type="tel" id="phIn" placeholder="请输入老会员手机号" maxlength="11" oninput="onPhIn()" autocomplete="off">
+            <!-- 搜索联想下拉 -->
+            <div class="search-suggest" id="searchSuggest" style="display:none;">
+                <div class="ss-item" onclick="pickSuggest(this,'王建国','138****1234')"><span class="ss-name">王建国</span><span class="ss-phone">138****1234</span><span class="ss-tag">上级</span></div>
+                <div class="ss-item" onclick="pickSuggest(this,'张薇','139****5678')"><span class="ss-name">张薇</span><span class="ss-phone">139****5678</span><span class="ss-tag">平级</span></div>
+                <div class="ss-item" onclick="pickSuggest(this,'李强','137****9012')"><span class="ss-name">李强</span><span class="ss-phone">137****9012</span><span class="ss-tag">下级</span></div>
+            </div>
+        </div>
+        <div class="input-hint">请确保对方与您在同一推荐关系链内</div>
+    </div>
+
     <!-- 历史请求过的代付人 -->
     <div class="history-users">
         <div class="hu-title">🕐 最近请求过的代付人（可直接选择）</div>
@@ -572,13 +600,6 @@ body {
                 <div class="hu-avatar">👩</div><div class="hu-info"><div class="hu-name">刘芳</div><div class="hu-time">3天前 请求过</div></div><span class="hu-arrow">›</span>
             </div>
         </div>
-    </div>
-
-    <!-- 手动输入 -->
-    <div class="input-section">
-        <div class="input-label">📱 或手动输入手机号</div>
-        <div class="phone-input"><input type="tel" id="phIn" placeholder="请输入老会员手机号" maxlength="11" oninput="onPhIn()"></div>
-        <div class="input-hint">请确保对方与您在同一推荐关系链内</div>
     </div>
 
     <!-- 默认显示校验通过 -->
@@ -923,7 +944,20 @@ function selHu(el,name,phone){
     selUser={name,phone}; document.getElementById('vcN').textContent=name+'（老会员）';
     document.getElementById('phIn').value='';
 }
-function onPhIn(){ document.getElementById('vcN').textContent=document.getElementById('phIn').value||'未填写'; document.querySelectorAll('.hu-item').forEach(i=>i.classList.remove('sel')); }
+function onPhIn(){
+    const v = document.getElementById('phIn').value;
+    const ss = document.getElementById('searchSuggest');
+    if(v.length > 0) ss.style.display = 'block';
+    else ss.style.display = 'none';
+    document.getElementById('vcN').textContent = v || '未填写';
+    document.querySelectorAll('.hu-item').forEach(i => i.classList.remove('sel'));
+}
+function pickSuggest(el, name, phone){
+    document.getElementById('phIn').value = phone.replace(/\*/g,'0');
+    document.getElementById('searchSuggest').style.display = 'none';
+    document.getElementById('vcN').textContent = name + '(' + phone + ')';
+    document.querySelectorAll('.hu-item').forEach(i => i.classList.remove('sel'));
+}
 function submitProxy(){ showToast('代付请求已发送至 '+selUser.name); document.getElementById('wtNm').textContent=selUser.name; document.getElementById('wtPn').textContent=selUser.name+'（'+selUser.phone+'）'; goToPage('page-waiting'); }
 function cancelProxy(){ if(confirm('确定取消？')){showToast('已取消'); goBack();goBack();} }
 
