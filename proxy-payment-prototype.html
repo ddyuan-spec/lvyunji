@@ -211,13 +211,15 @@ body {
 .btn-confirm-buy:active { opacity: .85; }
 
 /* ========== 收银台 ========== */
-.pay-area { background: #fff; text-align: center; padding: 26px 0 20px; }
-.cd-label { font-size: 13px; color: #999; margin-bottom: 6px; }
-.cd-amount { font-size: 40px; color: #222; font-weight: 600; letter-spacing: -1px; }
-.cd-amount::before { content: "\00A5"; font-size: 22px; font-weight: 500; margin-right: 2px; }
+.pay-area { background: #fff; text-align: center; padding: 30px 0 28px; border-bottom: 8px solid #f5f5f5; }
+.cd-label { font-size: 13px; color: #e64340; margin-bottom: 6px; font-weight: 500; }
+.cd-label span { color: #e64340; }
+.cd-amount { font-size: 42px; color: #222; font-weight: 700; letter-spacing: -1px; }
+.cd-amount::before { content: "\00A5"; font-size: 24px; font-weight: 600; margin-right: 2px; }
 
-.pm-title { padding: 16px 16px 8px; font-size: 14px; color: #888; font-weight: 400; }
-.pm-list { background: #fff; margin: 0 12px; border-radius: 10px; overflow: hidden; }
+.pm-section { padding: 16px 12px 0; }
+.pm-title { padding: 0 4px 10px; font-size: 14px; color:#666; font-weight: 500; }
+.pm-list { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
 .pm-item {
     display: flex; align-items: center; padding: 14px 14px;
     border-bottom: 1px solid #f5f5f5; cursor: pointer; user-select: none;
@@ -505,6 +507,7 @@ body {
         <div class="cd-label">支付剩余时间 <span id="cdT">29:57</span></div>
         <div class="cd-amount" id="cdA">0.72</div>
     </div>
+    <div class="pm-section">
     <div class="pm-title">选择支付方式</div>
     <div class="pm-list" id="pmListB">
         <div class="pm-item" onclick="selPay(this,false)">
@@ -519,6 +522,7 @@ body {
         <div class="pm-item" onclick="selPay(this,false)">
             <div class="pm-icon b">💳</div><div class="pm-text"><div class="pm-name">银行卡支付</div></div><div class="pm-radio"></div>
         </div>
+    </div>
     </div>
 </div>
 <div class="pay-bar"><button class="btn-pay" id="chkBtn" onclick="onCheckoutPay()">确认支付</button></div>
@@ -660,11 +664,13 @@ body {
         <div class="cd-label">支付剩余时间 <span id="pcdT">29:57</span></div>
         <div class="cd-amount">0.72</div>
     </div>
+    <div class="pm-section">
     <div class="pm-title">选择支付方式</div>
     <div class="pm-list">
         <div class="pm-item" onclick="selPayerP(this)"><div class="pm-icon o">💰</div><div class="pm-text"><div class="pm-name">储值支付</div><div class="pm-bal">¥ 97,992.82</div></div><div class="pm-radio on"></div></div>
         <div class="pm-item" onclick="selPayerP(this)"><div class="pm-icon g">微</div><div class="pm-text"><div class="pm-name">微信支付</div></div><div class="pm-radio"></div></div>
         <div class="pm-item" onclick="selPayerP(this)"><div class="pm-icon b">💳</div><div class="pm-text"><div class="pm-name">银行卡支付</div></div><div class="pm-radio"></div></div>
+    </div>
     </div>
 </div>
 <div class="pay-bar"><button class="btn-pay" onclick="doPayerPay()">确认支付</button></div>
