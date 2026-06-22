@@ -41,10 +41,15 @@ body {
 .pages-container { flex: 1; overflow: hidden; position: relative; }
 .page {
     position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    overflow-y: auto; overflow-x: hidden;
+    overflow: hidden;
     background: #f2f2f2;
+    display: flex; flex-direction: column;
     opacity: 0; visibility: hidden; pointer-events: none;
     transform: translateX(30px); transition: opacity .25s, transform .35s ease, visibility .25s;
+}
+.page > .header { flex-shrink: 0; }
+.page-scroll {
+    flex: 1; overflow-y: auto; overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
 }
 .page.active {
@@ -134,6 +139,7 @@ body {
     background: #fff; border-top: 1px solid #eee;
     display: flex; align-items: center; padding: 6px 12px;
     padding-bottom: calc(6px + env(safe-area-inset-bottom));
+    flex-shrink: 0; position: relative; z-index: 20;
 }
 .icon-btns { display: flex; gap: 16px; padding-right: 12px; }
 .icon-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; color: #555; cursor: pointer; user-select: none; }
@@ -194,7 +200,7 @@ body {
     display: flex; align-items: center; justify-content: space-between;
     padding: 10px 16px;
     padding-bottom: calc(10px + env(safe-area-inset-bottom));
-    flex-shrink: 0;
+    flex-shrink: 0; position: relative; z-index: 20;
 }
 .cbb-left { display: flex; align-items: baseline; gap: 4px; }
 .cbb-text { font-size: 14px; color: #333; }
@@ -238,6 +244,7 @@ body {
 .pay-bar {
     background: #fff; border-top: 1px solid #eee; padding: 10px 20px;
     padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    flex-shrink: 0; position: relative; z-index: 20;
 }
 .btn-pay {
     width: 100%; height: 46px; border-radius: 23px; border: none;
@@ -449,7 +456,7 @@ body {
 <!-- ==================== PAGE 01 商品详情 ==================== -->
 <div class="page active" id="page-product" data-step="1">
 <div class="header"><span class="back" onclick="goBack()">‹</span>商品详情<span class="right"><span style="font-size:18px;">♡</span></span></div>
-<div style="padding-bottom:58px;">
+<div class="page-scroll">
     <div class="swiper-area">🧴<div class="swiper-dots"><span>1/3</span></div></div>
     <div class="price-section">
         <div class="price-row"><span class="current-price">298</span><span class="original-price">¥398</span><span class="sales-tag">已售4500+</span></div>
@@ -479,9 +486,9 @@ body {
 
 
 <!-- ==================== PAGE 02 确认订单 ==================== -->
-<div class="page" id="page-confirm-order" data-step="2" style="display:flex;flex-direction:column;">
+<div class="page" id="page-confirm-order" data-step="2">
 <div class="header"><span class="back" onclick="goBack()">‹</span>确认订单<span class="right"><span class="dot-btn">···</span><span class="dot-btn">⊙</span></span></div>
-<div style="padding-bottom:16px;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+<div class="page-scroll">
     <div class="addr-card-confirm" onclick="showToast('编辑地址')">
         <div class="addr-row"><span style="font-size:18px;color:#e64340;">📍</span><span class="addr-name">湖南省长沙市岳麓区 中电科技园二期</span><span style="margin-left:auto;color:#ccc;font-size:18px;">›</span></div>
         <div style="display:flex;gap:8px;margin-top:4px;"><span class="addr-name" style="font-size:15px;">宋健</span><span class="addr-phone">18307448442</span></div>
@@ -519,7 +526,7 @@ body {
 <!-- ==================== PAGE 03 收银台（买家视角）==================== -->
 <div class="page" id="page-checkout" data-step="3">
 <div class="header"><span class="back" onclick="goBack()">‹</span>收银台<span class="right"><span class="dot-btn">···</span><span class="dot-btn">⊙</span></span></div>
-<div style="padding-bottom:68px;">
+<div class="page-scroll">
     <div class="pay-area">
         <div class="cd-label">支付剩余时间 <span id="cdT">29:57</span></div>
         <div class="cd-amount" id="cdA">0.72</div>
@@ -549,7 +556,7 @@ body {
 <!-- ==================== PAGE 04 代付人信息（精简版）==================== -->
 <div class="page" id="page-input-proxy" data-step="4">
 <div class="header"><span class="back" onclick="goBack()">‹</span>代付人信息<span class="right"><span class="dot-btn">···</span></span></div>
-<div style="padding-bottom:68px;">
+<div class="page-scroll">
     <div style="text-align:center;padding:20px 16px 0;"><div style="font-size:40px;margin-bottom:12px;">🤝</div><div style="font-size:17px;font-weight:700;color:#222;margin-bottom:6px;">请输入代付人信息</div><div style="font-size:13px;color:#999;line-height:1.6;">系统将校验对方是否与您在同一关系链内</div></div>
 
     <!-- 历史请求过的代付人 -->
@@ -595,7 +602,7 @@ body {
 <!-- ==================== PAGE 05 等待确认 ==================== -->
 <div class="page" id="page-waiting" data-step="5">
 <div class="header"><span class="back" onclick="goBack()">‹</span>代付进度<span class="right"><span class="dot-btn">···</span></span></div>
-<div style="padding-bottom:68px;">
+<div class="page-scroll">
     <div class="waiting-body">
         <div class="wait-circle">⏳</div>
         <div class="wait-title">代付请求已发送</div>
@@ -766,7 +773,7 @@ body {
 <!-- ==================== PAGE 09 支付账号-收银台 ==================== -->
 <div class="page" id="page-payer-checkout" data-step="">
 <div class="header"><span class="back" onclick="goBack()">‹</span>收银台<span class="right"><span class="dot-btn">···</span><span class="dot-btn">⊙</span></span></div>
-<div style="padding-bottom:68px;">
+<div class="page-scroll">
     <div class="pay-area">
         <div class="cd-label">支付剩余时间 <span id="pcdT">29:57</span></div>
         <div class="cd-amount">0.72</div>
