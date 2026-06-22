@@ -316,32 +316,65 @@ body {
 .ol-addr { font-size: 13px; color:#999; margin-top:4px; line-height:1.5;}
 .ol-divider { height:4px; width:100%;margin-top:12px; background: repeating-linear-gradient(90deg, #07c160 0,#07c600 10px,transparent 10px,transparent 13px, #1890ff 13px,#1890ff 23px, transparent 23px,transparent 26px, #faad14 26px,#faad14 36px, transparent 36px,transparent 39px, #ff4d4f 39px,#ff4d4f 49px, transparent 49px,transparent 52px); opacity:.45;}
 
-.proxy-badge {
-    display: inline-flex; align-items: center; gap: 3px;
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-    color: #92400e; font-size: 11px; font-weight: 600;
-    padding: 2px 8px; border-radius: 8px; border: 1px solid #fcd34d;
+/* ==================== 订单列表页（新）==================== */
+.ol-header-bar {
+    background: #fff; padding: 8px 12px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid #f0f0f0; position: sticky; top: 0; z-index: 90;
 }
+.ol-hb-back { font-size: 26px; color:#333; cursor:pointer; line-height:1; user-select:none; flex-shrink:0;}
+.ol-hb-search {
+    flex: 1; height:34px; background:#f5f5f5; border-radius:17px;
+    display:flex; align-items:center; padding:0 12px; gap:6px;
+    font-size:13px; color:#bbb;
+}
+.ol-hb-right { display:flex; align-items:center; gap:10px; flex-shrink:0;}
+.ol-hb-score { font-size:14px; color:#333; font-weight:600; }
+.ol-hb-avatar { width:28px; height:28px; border-radius:50%; background:#eee; display:flex;align-items:center;justify-content:center; font-size:15px;}
 
-.order-card { background: #fff; margin: 8px 16px; border-radius: 12px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.04); }
-.oc-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.oc-st { font-size: 15px; font-weight: 700; color: #222; }
-.oc-goods { display: flex; gap: 12px; align-items: flex-start; }
-.oc-thumb { width: 70px; height: 70px; background: #f7f7f7; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; }
-.oc-gi { flex: 1; display: flex; flex-direction: column; justify-content: space-between; min-height: 70px; }
-.oc-gn { font-size: 14px; font-weight: 600; color: #222; line-height: 1.4; }
-.oc-sp { font-size: 12px; color: #999; margin-top: 2px; }
-.oc-gbot { display: flex; justify-content: space-between; align-items: baseline; margin-top: auto; }
-.oc-gp { font-size: 15px; color: #e64340; font-weight: 700; }
-.oc-gp::before { content:"\00A5";font-size:11px; }
-.oc-gq { font-size: 13px; color: #666; }
-.oc-amts { padding-top: 12px; border-top: 1px solid #f5f5f5; }
-.oc-ar { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; }
-.oc-al { color: #666; } .oc-av { color: #333; font-weight: 500; }
-.oc-av.r { color: #e64340; font-weight: 700; }
-.oc-meta { padding-top: 10px; border-top: 1px solid #f5f5f5; }
-.oc-mr { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; color: #888; }
-.oc-copy { color: #1890ff; cursor: pointer; }
+.ol-tabs {
+    display:flex; background:#fff; padding:0 8px;
+    border-bottom:1px solid #f0f0f0; overflow-x:auto; position:sticky; top:51px; z-index:89;
+    -webkit-overflow-scrolling:touch;
+}
+.ol-tab { flex:1; text-align:center; padding:12px 4px; font-size:14px; color:#666; font-weight:500; cursor:pointer; white-space:nowrap; position:relative; transition:color .2s;}
+.ol-tab.active { color:#07c160; font-weight:700; }
+.ol-tab.active::after { content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:20px; height:3px; background:#07c160; border-radius:2px; }
+
+/* 订单卡片（列表样式） */
+.ol-card { background:#fff; margin:8px 16px; border-radius:12px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.04); cursor:pointer; }
+.ol-card:active { opacity:.9; }
+.olc-top { display:flex; justify-content:space-between; align-items:center; padding:14px 16px 10px; }
+.olc-no { font-size:14px; color:#333; font-weight:500; }
+.olc-status { font-size:14px; color:#999; font-weight:400; }
+.olc-status.wait-pay { color:#e64340; }
+.olc-status.cancelled { color:#999; }
+
+.olc-goods { display:flex; gap:12px; padding:0 16px 12px; align-items:flex-start; }
+.olc-thumb { width:80px;height:80px; background:#fff7e6; border-radius:8px; display:flex;align-items:center;justify-content:center; font-size:32px; flex-shrink:0; position:relative; overflow:hidden; border:1px solid #ffe7ba; }
+.olc-thumb-tag { position:absolute; bottom:0;left:0;right:0;background:rgba(255,107,53,.85); color:#fff; font-size:9px; padding:1px 0; text-align:center; letter-spacing:.5px;}
+.olc-info { flex:1; display:flex; flex-direction:column; min-height:80px; }
+.olc-name-row { display:flex; align-items:center; gap:4px; }
+.olc-self { display:inline-block; background:#ff6b35; color:#fff; font-size:10px; padding:1px 5px; border-radius:3px; font-weight:600; }
+.olc-name { font-size:14px; font-weight:600; color:#222; line-height:1.4; }
+.olc-spec { font-size:12px; color:#999; margin-top:3px; }
+.olc-price-row { display:flex; justify-content:space-between; align-items:baseline; margin-top:auto; }
+.olc-price-fire { font-size:12px; color:#e64340; }
+.olc-price-val { font-size:16px; color:#e64340; font-weight:700; }
+.olc-price-val::before { content:'\00A5'; font-size:11px; margin-right:1px; }
+.olc-qty { font-size:14px; color:#333; }
+
+.olc-summary { display:flex; justify-content:space-between; align-items:center; padding:10px 16px; border-top:1px solid #f5f5f5; font-size:12px; color:#888; }
+.olcs-time { }
+.olcs-total span { color:#e64340; font-weight:700; font-size:15px; }
+.olcs-total span::before { content:'\00A5'; font-size:11px; }
+
+.olc-actions { display:flex; justify-content:flex-end; gap:10px; padding:10px 16px 14px; }
+.olc-btn { padding:6px 18px; border-radius:18px; font-size:13px; font-weight:500; cursor:pointer; border:none; user-select:none; }
+.olc-btn-outline { background:#fff; border:1px solid #ddd; color:#666; }
+.olc-btn-outline:active { background:#f5f5f5; }
+.olc-btn-green { background:transparent; border:1px solid #07c160; color:#07c160; }
+.olc-btn-green:active { background:#f0fdf4; }
 .rec-section { background: #fff; margin: 16px 0; padding: 16px; }
 .rec-grid { display: flex; gap: 10px; }
 .rec-itm { flex: 1; }
@@ -607,16 +640,106 @@ body {
 
 <!-- ==================== PAGE 07 支付账号-订单列表 ==================== -->
 <div class="page" id="page-payer-orders" data-step="">
-<div class="header"><span class="back" onclick="goBack()">‹</span>我的订单<span class="right"><span class="dot-btn">···</span></span></div>
-<div style="padding-bottom:68px;">
-    <div style="background:linear-gradient(135deg,#fef3c7,#fde68a);border:1px solid #fcd34d;margin:12px 16px 0;padding:12px 14px;border-radius:10px;display:flex;align-items:center;gap:8px;"><span style="font-size:18px;">🔔</span><span style="font-size:13px;color:#92400e;">您有一条<strong style="color:#e64340;">待处理代付请求</strong>，请及时处理</span></div>
-    <div class="order-card" onclick="goToPage('page-payer-detail')">
-        <div class="oc-hdr"><div class="oc-st" style="display:flex;align-items:center;gap:8px;">待付款<span class="proxy-badge">🤝 代付请求</span></div></div>
-        <div class="oc-goods"><div class="oc-thumb">🧴</div><div class="oc-gi"><div style="display:flex;align-items:center;gap:4px;"><span style="display:inline-block;background:#ff6b35;color:#fff;font-size:9px;padding:1px 5px;border-radius:3px;">自营</span><span class="oc-gn">赛隆瑶乐饮品</span></div><div class="oc-sp">2盒</div><div class="oc-gbot"><div><span style="font-size:12px;color:#e64340;">🔥1</span><span class="oc-gp">1.00</span></div><span class="oc-gq">×1</span></div></div></div>
-        <div class="oc-amts"><div class="oc-ar"><span class="oc-al">商品总额(含运费)</span><span class="oc-av r">🔥1　<span style="font-size:16px;">¥1</span></span></div></div>
-        <div class="oc-meta"><div class="oc-mr"><span class="oc-al">订单编号</span><span><span style="color:#333;">605446</span> <span class="oc-copy" onclick="event.stopPropagation();cpNo('605446')">| 复制</span></span></div><div class="oc-mr"><span class="oc-al">下单时间</span><span>2026-06-22 18:08:35</span></div><div style="padding:8px 0;cursor:pointer;font-size:13px;color:#999;" onclick="event.stopPropagation();const d=this.nextElementSibling;d.style.display=d.style.display==='block'?'none':'block';">订单备注 ∨</div><div style="display:none;padding:10px 0 0;font-size:13px;color:#666;border-top:1px dashed #eee;">暂无</div></div>
+<!-- 顶部搜索栏 -->
+<div class="ol-header-bar">
+    <span class="ol-hb-back" onclick="goBack()">‹</span>
+    <div class="ol-hb-search"><span style="font-size:15px;">🔍</span> 搜索商品名称/订单号</div>
+    <div class="ol-hb-right">
+        <div class="ol-hb-score">⭐ 4.8</div>
+        <div class="ol-hb-avatar">👤</div>
     </div>
-    <div class="rec-section"><div class="rec-grid"><div class="rec-itm"><div class="rec-img" style="background:linear-gradient(135deg,#d1fae5,#a7f3d0);">💊<div class="rec-sold">已售罄</div></div><div class="rec-nm">黄精复合益生菌冻干粉</div><div class="rec-pr">218.00</div></div><div class="rec-itm"><div class="rec-img" style="background:linear-gradient(135deg,#e0f2fe,#bae6fd);">🧴</div><div class="rec-nm">绿韵兰茵益齿健牙膏</div><div class="rec-pr">9.9</div></div></div></div>
+</div>
+
+<!-- Tab栏 -->
+<div class="ol-tabs">
+    <div class="ol-tab active" onclick="switchOlTab(this)">全部</div>
+    <div class="ol-tab" onclick="switchOlTab(this)">待付款</div>
+    <div class="ol-tab" onclick="switchOlTab(this)">待发货/待核销</div>
+    <div class="ol-tab" onclick="switchOlTab(this)">待收货</div>
+    <div class="ol-tab" onclick="switchOlTab(this)">已完成</div>
+</div>
+
+<div style="padding-bottom:16px;">
+
+    <!-- 订单卡片1：代付请求（待付款）-->
+    <div class="ol-card" onclick="goToPage('page-payer-detail')">
+        <div class="olc-top">
+            <div class="olc-no">订单号：605447</div>
+            <div class="olc-status wait-pay">待发货</div>
+        </div>
+        <div class="olc-goods">
+            <div class="olc-thumb">🧴<div class="olc-thumb-tag">上海发货·极速达</div></div>
+            <div class="olc-info">
+                <div class="olc-name-row"><span class="olc-self">自营</span><span class="olc-name">赛隆瑶乐饮品</span></div>
+                <div class="olc-spec">2盒</div>
+                <div class="olc-price-row">
+                    <div><span class="olc-price-fire">🔥1</span><span class="olc-price-val">1.00</span></div>
+                    <div class="olc-qty">×</div>1
+                </div>
+            </div>
+        </div>
+        <div class="olc-summary">
+            <div class="olcs-time">支付时间：2026-06-22 18:16:32</div>
+            <div class="olcs-total">共1件，实付款：<span>0.00</span></div>
+        </div>
+        <div class="olc-actions">
+            <button class="olc-btn olc-btn-green" onclick="event.stopPropagation();showToast('联系客服')">联系客服</button>
+            <button class="olc-btn olc-btn-outline" onclick="event.stopPropagation();showToast('取消订单')">取消订单</button>
+        </div>
+    </div>
+
+    <!-- 订单卡片2：已取消 -->
+    <div class="ol-card">
+        <div class="olc-top">
+            <div class="olc-no">订单号：605446</div>
+            <div class="olc-status cancelled">已取消</div>
+        </div>
+        <div class="olc-goods">
+            <div class="olc-thumb">🧴<div class="olc-thumb-tag">上海发货·极速达</div></div>
+            <div class="olc-info">
+                <div class="olc-name-row"><span class="olc-self">自营</span><span class="olc-name">赛隆瑶乐饮品</span></div>
+                <div class="olc-spec">2盒</div>
+                <div class="olc-price-row">
+                    <div><span class="olc-price-fire">🔥1</span><span class="olc-price-val">1.00</span></div>
+                    <div class="olc-qty">×</div>1
+                </div>
+            </div>
+        </div>
+        <div class="olc-summary">
+            <div class="olcs-time"></div>
+            <div class="olcs-total">共1件，实付款：<span>0.72</span></div>
+        </div>
+        <div class="olc-actions">
+            <button class="olc-btn olc-btn-green" onclick="event.stopPropagation();showToast('联系客服')">联系客服</button>
+        </div>
+    </div>
+
+    <!-- 订单卡片3：已取消 -->
+    <div class="ol-card">
+        <div class="olc-top">
+            <div class="olc-no">订单号：605445</div>
+            <div class="olc-status cancelled">已取消</div>
+        </div>
+        <div class="olc-goods">
+            <div class="olc-thumb">🧴<div class="olc-thumb-tag">上海发货·极速达</div></div>
+            <div class="olc-info">
+                <div class="olc-name-row"><span class="olc-self">自营</span><span class="olc-name">赛隆瑶乐饮品</span></div>
+                <div class="olc-spec">2盒</div>
+                <div class="olc-price-row">
+                    <div><span class="olc-price-fire">🔥1</span><span class="olc-price-val">1.00</span></div>
+                    <div class="olc-qty">×</div>1
+                </div>
+            </div>
+        </div>
+        <div class="olc-summary">
+            <div class="olcs-time"></div>
+            <div class="olcs-total">共1件，实付款：<span>0.26</span></div>
+        </div>
+        <div class="olc-actions">
+            <button class="olc-btn olc-btn-green" onclick="event.stopPropagation();showToast('联系客服')">联系客服</button>
+        </div>
+    </div>
+
 </div>
 </div>
 
@@ -739,6 +862,7 @@ function cancelProxy(){ if(confirm('确定取消？')){showToast('已取消'); g
 
 // 支付账号收银台
 function selPayerP(el){ document.querySelectorAll('#page-payer-checkout .pm-radio').forEach(r=>r.classList.remove('on')); el.querySelector('.pm-radio').classList.add('on'); }
+function switchOlTab(el){ document.querySelectorAll('.ol-tab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); }
 function doPayerPay(){ showToast('正在处理...'); setTimeout(()=>{renderSc('payer');goToPage('page-success');},800); }
 
 // 切换账号
