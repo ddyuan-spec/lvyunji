@@ -194,7 +194,7 @@ body {
     display: flex; align-items: center; justify-content: space-between;
     padding: 10px 16px;
     padding-bottom: calc(10px + env(safe-area-inset-bottom));
-    position: sticky; bottom: 0; z-index: 90;
+    flex-shrink: 0;
 }
 .cbb-left { display: flex; align-items: baseline; gap: 4px; }
 .cbb-text { font-size: 14px; color: #333; }
@@ -479,9 +479,9 @@ body {
 
 
 <!-- ==================== PAGE 02 确认订单 ==================== -->
-<div class="page" id="page-confirm-order" data-step="2">
+<div class="page" id="page-confirm-order" data-step="2" style="display:flex;flex-direction:column;">
 <div class="header"><span class="back" onclick="goBack()">‹</span>确认订单<span class="right"><span class="dot-btn">···</span><span class="dot-btn">⊙</span></span></div>
-<div style="padding-bottom:68px;">
+<div style="padding-bottom:16px;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;">
     <div class="addr-card-confirm" onclick="showToast('编辑地址')">
         <div class="addr-row"><span style="font-size:18px;color:#e64340;">📍</span><span class="addr-name">湖南省长沙市岳麓区 中电科技园二期</span><span style="margin-left:auto;color:#ccc;font-size:18px;">›</span></div>
         <div style="display:flex;gap:8px;margin-top:4px;"><span class="addr-name" style="font-size:15px;">宋健</span><span class="addr-phone">18307448442</span></div>
