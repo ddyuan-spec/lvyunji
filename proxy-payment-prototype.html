@@ -663,7 +663,34 @@ body {
 
 <div style="padding-bottom:16px;">
 
-    <!-- 订单卡片1：代付请求（待付款）-->
+    <!-- 订单卡片0：代付请求（待付款）-->
+    <div class="ol-card" onclick="goToPage('page-payer-detail-proxy')" style="border:1.5px solid #ff6b35;">
+        <div class="olc-top">
+            <div class="olc-no" style="display:flex;align-items:center;gap:6px;">订单号：605448 <span style="display:inline-flex;align-items:center;background:linear-gradient(135deg,#fef3c7,#fde68a);color:#92400e;font-size:10px;padding:2px 7px;border-radius:8px;border:1px solid #fcd34d;font-weight:600;">🤝 代付请求</span></div>
+            <div class="olc-status wait-pay">待付款</div>
+        </div>
+        <div class="olc-goods">
+            <div class="olc-thumb" style="background:#fff7e6;border-color:#ffe7ba;">🧴<div class="olc-thumb-tag">上海发货·极速达</div></div>
+            <div class="olc-info">
+                <div class="olc-name-row"><span class="olc-self">自营</span><span class="olc-name">赛隆瑶乐饮品</span></div>
+                <div class="olc-spec">2盒</div>
+                <div class="olc-price-row">
+                    <div><span class="olc-price-fire">🔥1</span><span class="olc-price-val">1.00</span></div>
+                    <div class="olc-qty">×</div>1
+                </div>
+            </div>
+        </div>
+        <div class="olc-summary">
+            <div class="olcs-time">下单时间：2026-06-22 19:42:18</div>
+            <div class="olcs-total">共1件，实付款：<span>0.72</span></div>
+        </div>
+        <div class="olc-actions">
+            <button class="olc-btn olc-btn-outline" onclick="event.stopPropagation();showToast('联系客服')">联系客服</button>
+            <button class="olc-btn olc-btn-green" onclick="event.stopPropagation();goToPage('page-payer-checkout')" style="background:#ff6b35;border-color:#ff6b35;color:#fff;">立即代付</button>
+        </div>
+    </div>
+
+    <!-- 订单卡片1：普通订单 -->
     <div class="ol-card" onclick="goToPage('page-payer-detail')">
         <div class="olc-top">
             <div class="olc-no">订单号：605447</div>
@@ -773,6 +800,52 @@ body {
 </div>
 
 
+<!-- ==================== PAGE 08b 代付请求订单详情 ==================== -->
+<div class="page" id="page-payer-detail-proxy" data-step="">
+<div class="header"><span class="back" onclick="goBack()">‹</span>待付款<span class="right"><span class="dot-btn">···</span><span class="dot-btn">⊙</span></span></div>
+<div style="padding-bottom:16px;">
+    <div style="background:#fff;margin-top:8px;padding:14px 16px;position:relative;">
+        <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:18px;color:#e64340;">📍</span><div style="flex:1;"><div style="font-size:15px;font-weight:600;color:#222;">宋健 <span style="font-size:13px;font-weight:400;color:#888;">183****8442</span></div><div style="font-size:13px;color:#999;margin-top:2px;">湖南省长沙市岳麓区中电科技园二期</div></div></div>
+        <div style="height:4px;width:100%;margin-top:12px;background:repeating-linear-gradient(90deg,#07c160 0,#07c600 10px,transparent 10px,transparent 13px,#1890ff 13px,#1890ff 23px,transparent 23px,transparent 26px,#faad14 26px,#faad14 36px,transparent 36px,transparent 39px,#ff4d4f 39px,#ff4d4f 49px,transparent 49px,transparent 52px);opacity:.45;"></div>
+    </div>
+
+    <!-- 代付信息提示 -->
+    <div style="background:linear-gradient(135deg,#fff7ed,#fed7aa);border:1px solid #fdba74;margin:8px 16px 0;padding:12px 14px;border-radius:10px;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:18px;">🤝</span>
+        <div style="flex:1;font-size:12px;color:#92400e;line-height:1.7;">
+            <strong>关系链成员「李小新」</strong>请求您代付此订单<br>
+            商品：<strong>赛隆瑶乐饮品 ×1</strong> · 代付金额：<strong style="color:#e64340;">¥0.72</strong>
+        </div>
+    </div>
+
+    <div class="confirm-goods-row" style="margin-top:8px;">
+        <div class="cg-thumb">🧴<div class="sold-tag">上海发货·极速达</div></div>
+        <div class="cg-info">
+            <div class="cg-name-row"><span class="cg-self-tag">自营</span><span class="cg-name">赛隆瑶乐饮品</span></div>
+            <div class="cg-spec">2盒</div>
+            <div class="cg-bottom"><div class="cg-price-line"><span class="cg-fire">🔥</span><span>1</span><span class="cg-price">1.00</span></div><span class="cg-qty">x1</span></div>
+        </div>
+    </div>
+    <div class="co-amt-box">
+        <div class="co-amt-row"><span>商品总额(含运费)</span><span style="display:flex;align-items:center;gap:4px;"><span class="cg-fire">🔥</span><span>1</span><span style="margin-left:auto;color:#e64340;font-weight:700;">¥1</span></div></div>
+        <div class="co-amt-row"><span>专享优惠</span><span style="color:#07c160;">- ¥0.25</span></div>
+        <div class="co-amt-row"><span>余额抵扣</span><span style="color:#07c160;">- ¥0.03</span></div>
+        <div style="border-top:1px dashed #eee;margin-top:8px;padding-top:10px;display:flex;justify-content:space-between;align-items:baseline;"><span style="font-size:13px;color:#666;">实付款</span><span style="font-size:20px;color:#e64340;font-weight:700;">¥0.72</span></div>
+        <div class="co-amt-row" style="padding-top:8px;border-top:1px solid #f5f5f5;margin-top:4px;"><span>订单编号</span><span style="display:flex;align-items:center;gap:4px;"><span style="color:#333;">605448</span><span style="color:#1890ff;cursor:pointer;" onclick="cpNo('605448')">| 复制</span></span></div>
+        <div class="co-amt-row"><span>下单时间</span><span style="color:#333;">2026-06-22 19:42:18</span></div>
+        <div class="co-amt-row"><span>代付人（请求方）</span><span style="color:#333;">李小新（新人）</span></div>
+    </div>
+    <div class="rec-section"><div class="rec-grid"><div class="rec-itm"><div class="rec-img" style="background:linear-gradient(135deg,#d1fae5,#a7f3d0);">💊<div class="rec-sold">已售罄</div></div><div class="rec-nm">黄精复合益生菌冻干粉</div><div class="rec-pr">218.00</div></div><div class="rec-itm"><div class="rec-img" style="background:linear-gradient(135deg,#e0f2fe,#bae6fd);">🧴</div><div class="rec-nm">绿韵兰茵益齿健牙膏</div><div class="rec-pr">9.9</div></div></div></div>
+
+    <!-- 底部操作栏 -->
+    <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:center;padding:10px 16px;margin-top:16px;">
+        <div><span style="font-size:14px;color:#333;">合计：</span><span style="font-size:22px;color:#e64340;font-weight:700;">0.72</span></div>
+        <button style="padding:0 32px;height:42px;border-radius:21px;border:none;background:#ff6b35;color:#fff;font-size:16px;font-weight:600;cursor:pointer;" onclick="goToPage('page-payer-checkout')">确认代付</button>
+    </div>
+</div>
+</div>
+
+
 <!-- ==================== PAGE 09 支付账号-收银台 ==================== -->
 <div class="page" id="page-payer-checkout" data-step="">
 <div class="header"><span class="back" onclick="goBack()">‹</span>收银台<span class="right"><span class="dot-btn">···</span><span class="dot-btn">⊙</span></span></div>
@@ -826,7 +899,7 @@ setInterval(()=>{ if(cds>0){cds--; const m=Math.floor(cds/60),s=cds%60, t=`${m}:
 // 页面导航
 function goToPage(pid){
     const old=document.querySelector('.page.active');
-    if(old && old.id!==pid){ old.classList.remove('active'); const pg=['page-product','page-confirm-order','page-checkout','page-input-proxy','page-waiting','page-payer-home','page-payer-orders','page-payer-detail','page-payer-checkout','page-success']; const oi=pg.indexOf(old.id),ni=pg.indexOf(pid); if(ni>oi)old.classList.add('slide-left'); else old.classList.add('slide-right'); }
+    if(old && old.id!==pid){ old.classList.remove('active'); const pg=['page-product','page-confirm-order','page-checkout','page-input-proxy','page-waiting','page-payer-home','page-payer-orders','page-payer-detail','page-payer-detail-proxy','page-payer-checkout','page-success']; const oi=pg.indexOf(old.id),ni=pg.indexOf(pid); if(ni>oi)old.classList.add('slide-left'); else old.classList.add('slide-right'); }
     hist.push(curPg); curPg=pid;
     const np=document.getElementById(pid); np.classList.remove('slide-left','slide-right'); requestAnimationFrame(()=>np.classList.add('active')); updStep();
 }
