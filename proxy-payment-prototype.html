@@ -38,13 +38,13 @@ body {
 .acct-btn .role-tag { font-size: 9px; opacity: 0.65; margin-top: 1px; }
 
 /* ========== 页面容器（关键修复）========== */
-.pages-container { flex: 1; overflow: hidden; position: relative; }
+.pages-container { flex: 1; overflow: hidden; position: relative; max-width: 100%; width: 100%; }
 .page {
     position: absolute; top: 0; left: 0; right: 0; bottom: 0;
     overflow: hidden; overflow-x: hidden;
     background: #f2f2f2;
     display: flex; flex-direction: column;
-    max-width: 100%;
+    max-width: 100%; width: 100%;
     opacity: 0; visibility: hidden; pointer-events: none;
     transform: translateX(30px); transition: opacity .25s, transform .35s ease, visibility .25s;
 }
@@ -52,7 +52,7 @@ body {
 .page-scroll {
     flex: 1; overflow-y: auto; overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    max-width: 100%;
+    max-width: 100%; width: 100%;
 }
 .page.active {
     opacity: 1; visibility: visible; pointer-events: auto;
@@ -455,6 +455,12 @@ body {
 .rb-t { font-size: 14px; font-weight: 600; color: #222; margin-bottom: 10px; }
 .rb-i { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; font-size: 12px; color: #666; line-height: 1.7; }
 .rb-d { width: 4px; height: 4px; border-radius: 50%; background: #ccc; margin-top: 7px; flex-shrink: 0; }
+
+/* ========== 全局宽度约束兜底 ========== */
+.phone-frame *, .page * {
+    max-width: 100%;
+    box-sizing: border-box;
+}
 </style>
 </head>
 <body>
