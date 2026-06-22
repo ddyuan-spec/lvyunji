@@ -494,8 +494,7 @@
 <div class="sidebar">
     <div class="sidebar-menu">
         <div class="sidebar-group-title">商品管理</div>
-        <div class="sidebar-item" onclick="switchPage('list'))"><span class="icon">📋</span>商品列表</div>
-        <div class="sidebar-item" onclick="switchPage('add')"><span class="icon">➕</span>新增商品</div>
+        <div class="sidebar-item" onclick="switchPage('list')"><span class="icon">📋</span>商品列表</div>
         <div class="sidebar-item"><span class="icon">📁</span>分类管理</div>
     </div>
     <div class="sidebar-menu">
@@ -1631,7 +1630,7 @@ function switchPage(pageName) {
     document.getElementById('page-' + pageName).classList.add('active');
     document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
     if (pageName === 'list') { document.querySelectorAll('.sidebar-item')[0].classList.add('active'); renderProductList(); }
-    if (pageName === 'add') { document.querySelectorAll('.sidebar-item')[1].classList.add('active'); renderGiftList(); }
+    if (pageName === 'add') { renderGiftList(); }
     if (pageName === 'order-detail') { document.querySelectorAll('.sidebar-item')[2].classList.add('active'); renderOrderItems(); }
     if (pageName === 'after-sale') { document.querySelectorAll('.sidebar-item')[3].classList.add('active'); }
     window.scrollTo(0, 0);
