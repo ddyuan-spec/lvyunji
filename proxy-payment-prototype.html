@@ -9,28 +9,21 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
     background: #f2f2f2; color: #333; font-size: 14px; line-height: 1.5;
-    display: flex; justify-content: center; align-items: flex-start;
-    min-height: 100vh; padding: 20px 12px;
+    display: flex; justify-content: center;
+    min-height: 100vh;
 }
 
-/* ========== 手机外框 ========== */
+/* ========== 容器 ========== */
 .phone-frame {
-    width: 375px; min-height: 812px; max-height: calc(100vh - 40px);
-    background: #f2f2f2; border-radius: 40px;
+    width: 375px; min-height: 812px;
+    background: #f2f2f2;
     overflow: hidden; position: relative;
-    box-shadow: 0 0 0 10px #222, 0 0 0 12px #444,
-                0 24px 60px rgba(0,0,0,0.3);
     display: flex; flex-direction: column;
-}
-.notch {
-    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-    width: 150px; height: 28px; background: #222;
-    border-radius: 0 0 18px 18px; z-index: 999;
 }
 
 /* 账号切换栏 */
 .account-bar {
-    background: linear-gradient(135deg,#1a1a2e,#16213e); padding: 34px 14px 10px;
+    background: linear-gradient(135deg,#1a1a2e,#16213e); padding: 10px 14px;
     display: flex; gap: 6px; z-index: 100; position: relative; flex-shrink: 0;
 }
 .acct-btn {
@@ -419,7 +412,6 @@ body {
 <div class="desktop-tip" id="desktopTip">💡 手机模拟器 — 点击按钮体验完整交互流程</div>
 
 <div class="phone-frame">
-<div class="notch"></div>
 
 <!-- 账号切换 -->
 <div class="account-bar" id="accountBar">
