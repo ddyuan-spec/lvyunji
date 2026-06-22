@@ -702,11 +702,10 @@
             </div>
         </div>
 
-        <!-- 赠品汇总 -->
-        <div class="gift-summary-card">
-            <div class="gift-summary-title">🎁 本单赠品（共2件）</div>
-            <div class="gift-summary-item">· 条件1（满10件）：赠「草本护发精油小样」×1</div>
-            <div class="gift-summary-item">· 条件2（满¥100）：赠「植物手工皂」×1</div>
+        <!-- ⚠️ 售后提示（替换原赠品汇总卡片位置） -->
+        <div class="od-after-sale-tip">
+            <span class="tip-icon">⚠️</span>
+            <span class="tip-text">赠品不支持单独售后，如需退换货请与主商品一并处理</span>
         </div>
 
         <!-- 赠品明细 -->
@@ -761,7 +760,7 @@
     </div>
 </div>
 
-<!-- ==================== 页面4: 订单详情（复刻截图2风格） ==================== -->
+<!-- ==================== 页面4: 订单详情（复刻截图3风格 - 多主商品+多赠品） ==================== -->
 <div class="page" id="page-order">
     <div class="order-detail-header">
         <span class="back" onclick="switchPage('product')">‹</span>
@@ -779,7 +778,7 @@
             <div class="address-divider"></div>
         </div>
 
-        <!-- 商品卡片 -->
+        <!-- ====== 主商品1 ====== -->
         <div class="od-goods-card">
             <div class="od-goods-main">
                 <div class="od-goods-left">
@@ -796,13 +795,101 @@
                     </div>
                 </div>
             </div>
-            <div class="od-amount-row">
-                <span class="od-amount-label">商品总额(含运费) <span class="fire">🔥</span>2980</span>
-                <span class="od-amount-value">2,980</span>
+        </div>
+
+        <!-- ====== 赠品1-3（跟随主商品1） ====== -->
+        <div style="background:#fff; margin:0 0 8px; padding:0;">
+            <!-- 赠品1 -->
+            <div class="order-item-row gift-row" style="margin:0; padding:10px 16px; border-bottom:1px solid #f5f5f5;">
+                <div class="order-item-img gift" style="width:50px;height:50px;border-radius:6px;font-size:24px;">🧴</div>
+                <div class="order-item-detail">
+                    <div class="order-item-name" style="font-size:13px;">草本护发精油（小样）<span class="gift-tag">赠品</span></div>
+                    <div class="order-item-spec">规格：10ml小样 · 触发：满10件</div>
+                </div>
+                <div class="order-item-price">
+                    <div class="current" style="color:#bbb;font-size:12px;">¥0</div>
+                    <div class="qty" style="font-size:11px;">×1</div>
+                </div>
+            </div>
+            <!-- 赠品2 -->
+            <div class="order-item-row gift-row" style="margin:0; padding:10px 16px; border-bottom:1px solid #f5f5f5;">
+                <div class="order-item-img gift" style="width:50px;height:50px;border-radius:6px;font-size:24px;">🧼</div>
+                <div class="order-item-detail">
+                    <div class="order-item-name" style="font-size:13px;">植物手工皂<span class="gift-tag">赠品</span></div>
+                    <div class="order-item-spec">规格：薰衣草 · 触发：满¥100</div>
+                </div>
+                <div class="order-item-price">
+                    <div class="current" style="color:#bbb;font-size:12px;">¥0</div>
+                    <div class="qty" style="font-size:11px;">×2</div>
+                </div>
+            </div>
+            <!-- 赠品3 -->
+            <div class="order-item-row gift-row" style="margin:0; padding:10px 16px;">
+                <div class="order-item-img gift" style="width:50px;height:50px;border-radius:6px;font-size:24px;">🧖</div>
+                <div class="order-item-detail">
+                    <div class="order-item-name" style="font-size:13px;">绿韵草本面膜<span class="gift-tag">赠品</span></div>
+                    <div class="order-item-spec">规格：5片装(补水) · 触发：满¥2000</div>
+                </div>
+                <div class="order-item-price">
+                    <div class="current" style="color:#bbb;font-size:12px;">¥0</div>
+                    <div class="qty" style="font-size:11px;">×1</div>
+                </div>
             </div>
         </div>
 
-        <!-- ⚠️ 赠品不支持单独售后提示（替换原赠品触发条件卡片位置） -->
+        <!-- ====== 主商品2 ====== -->
+        <div class="od-goods-card">
+            <div class="od-goods-main">
+                <div class="od-goods-left">
+                    🕯️
+                </div>
+                <div class="od-goods-right">
+                    <div class="od-goods-name">绿茶草本香薰蜡烛</div>
+                    <div class="od-goods-code">SP20260604007</div>
+                    <div class="od-goods-meta">
+                        <span class="od-sales-tag">890</span>
+                        <span class="od-goods-price">68.00</span>
+                        <span class="od-goods-qty">x3</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== 赠品4-5（跟随主商品2） ====== -->
+        <div style="background:#fff; margin:0 0 8px; padding:0;">
+            <div class="order-item-row gift-row" style="margin:0; padding:10px 16px; border-bottom:1px solid #f5f5f5;">
+                <div class="order-item-img gift" style="width:50px;height:50px;border-radius:6px;font-size:24px;">👜</div>
+                <div class="order-item-detail">
+                    <div class="order-item-name" style="font-size:13px;">精美定制手提袋<span class="gift-tag">赠品</span></div>
+                    <div class="order-item-spec">规格：中号 · 触发：满3件</div>
+                </div>
+                <div class="order-item-price">
+                    <div class="current" style="color:#bbb;font-size:12px;">¥0</div>
+                    <div class="qty" style="font-size:11px;">×1</div>
+                </div>
+            </div>
+            <div class="order-item-row gift-row" style="margin:0; padding:10px 16px;">
+                <div class="order-item-img gift" style="width:50px;height:50px;border-radius:6px;font-size:24px;">🔖</div>
+                <div class="order-item-detail">
+                    <div class="order-item-name" style="font-size:13px;">品牌定制书签<span class="gift-tag">赠品</span></div>
+                    <div class="order-item-spec">规格：经典款 · 触发：满¥150</div>
+                </div>
+                <div class="order-item-price">
+                    <div class="current" style="color:#bbb;font-size:12px;">¥0</div>
+                    <div class="qty" style="font-size:11px;">×1</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 金额汇总行 -->
+        <div class="od-goods-card" style="padding:12px 16px;">
+            <div class="od-amount-row">
+                <span class="od-amount-label">商品总额(含运费) <span class="fire">🔥</span>3184</span>
+                <span class="od-amount-value">3,184</span>
+            </div>
+        </div>
+
+        <!-- ⚠️ 赠品不支持单独售后提示 -->
         <div class="od-after-sale-tip">
             <span class="tip-icon">⚠️</span>
             <span class="tip-text">赠品不支持单独售后，主商品退货时赠品需一并退回</span>
@@ -837,10 +924,10 @@
 
         <!-- 金额汇总 -->
         <div class="amount-summary">
-            <div class="amount-row"><span>商品金额</span><span>¥2,980.00</span></div>
+            <div class="amount-row"><span>商品金额</span><span>¥3,184.00</span></div>
             <div class="amount-row"><span>运费</span><span style="color:#07c160;">免运费</span></div>
-            <div class="amount-row"><span>赠品价值</span><span class="gift-value">¥97.00（赠送）</span></div>
-            <div class="amount-row total"><span>实付金额</span><span class="price">2,980</span></div>
+            <div class="amount-row"><span>赠品价值</span><span class="gift-value">¥229.00（赠送）</span></div>
+            <div class="amount-row total"><span>实付金额</span><span class="price">3,184</span></div>
         </div>
     </div>
 
