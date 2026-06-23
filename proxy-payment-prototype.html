@@ -17,11 +17,14 @@ body {
 
 /* ========== 容器 ========== */
 .phone-frame {
-    width: 100%; max-width: 375px; min-height: 100vh;
+    width: 375px; min-height: 100vh;
     background: #f2f2f2;
     overflow: hidden; position: relative;
     display: flex; flex-direction: column;
     margin: 0 auto;
+}
+@media (max-width: 375px) {
+    .phone-frame { width: 100%; margin: 0; }
 }
 
 /* 账号切换栏 */
@@ -456,6 +459,25 @@ body {
 .rb-t { font-size: 14px; font-weight: 600; color: #222; margin-bottom: 10px; }
 .rb-i { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; font-size: 12px; color: #666; line-height: 1.7; }
 .rb-d { width: 4px; height: 4px; border-radius: 50%; background: #ccc; margin-top: 7px; flex-shrink: 0; }
+
+/* ========== 智连消息页 ========== */
+.conn-tabs { display: flex; background: #fff; border-bottom: 1px solid #f0f0f0; position: sticky; top: 0; z-index: 89; }
+.conn-tab { flex: 1; text-align: center; padding: 13px 0; font-size: 14px; color: #666; cursor: pointer; position: relative; transition: color .2s; }
+.conn-tab.active { color: #07c160; font-weight: 700; }
+.conn-tab.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 22px; height: 3px; background: #07c160; border-radius: 2px; }
+.conn-tab .badge { background: #e64340; color: #fff; font-size: 10px; padding: 1px 6px; border-radius: 8px; margin-left: 4px; font-weight: 400; }
+.conn-msg-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: #fff; border-bottom: 1px solid #f5f5f5; cursor: pointer; transition: background .15s; }
+.conn-msg-item:active { background: #f7f7f7; }
+.conn-msg-item.unread { background: #fafffe; }
+.conn-msg-avatar { width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; position: relative; }
+.conn-msg-avatar .dot { position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; border-radius: 50%; background: #e64340; border: 2px solid #fff; }
+.conn-msg-body { flex: 1; overflow: hidden; }
+.conn-msg-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+.conn-msg-name { font-size: 15px; font-weight: 600; color: #222; }
+.conn-msg-time { font-size: 11px; color: #bbb; flex-shrink: 0; }
+.conn-msg-content { font-size: 13px; color: #999; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.5; }
+.conn-msg-tag { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 4px; margin-right: 6px; font-weight: 600; }
+.conn-msg-tag.urgent { background: #fef2f2; color: #e64340; }
 </style>
 </head>
 <body>
@@ -650,8 +672,73 @@ body {
     <div style="font-size:13px;color:#999;margin-top:4px;">老会员 · 138****1234</div>
     <div style="margin-top:24px;background:#fff;border-radius:12px;padding:16px;text-align:left;">
         <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f5f5f5;cursor:pointer;" onclick="goToPage('page-payer-orders')"><span style="font-size:14px;color:#333;">📦 我的订单</span><span style="color:#ccc;">›</span></div>
+        <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f5f5f5;cursor:pointer;" onclick="goToPage('page-connect-msg')"><span style="font-size:14px;color:#333;">💬 智连 · 交易消息</span><span style="display:inline-block;background:#e64340;color:#fff;font-size:10px;padding:1px 7px;border-radius:8px;margin-right:6px;">2新</span><span style="color:#ccc;">›</span></div>
         <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f5f5f5;cursor:pointer;"><span style="font-size:14px;color:#333;">💼 我的钱包</span><span style="color:#ccc;">›</span></div>
         <div style="display:flex;justify-content:space-between;padding:12px 0;cursor:pointer;"><span style="font-size:14px;color:#333;">🔗 我的关系链</span><span style="color:#ccc;">›</span></div>
+    </div>
+</div>
+</div>
+
+
+<!-- ==================== PAGE 06b 智连 · 交易消息 ==================== -->
+<div class="page" id="page-connect-msg" data-step="">
+<div class="header"><span class="back" onclick="goBack()">‹</span>智连<span class="right"><span class="dot-btn">···</span></span></div>
+
+<!-- Tab栏 -->
+<div class="conn-tabs">
+    <div class="conn-tab active" onclick="switchConnTab(this)">交易<span class="badge">2</span></div>
+    <div class="conn-tab" onclick="switchConnTab(this)">消息</div>
+    <div class="conn-tab" onclick="switchConnTab(this)">通知</div>
+    <div class="conn-tab" onclick="switchConnTab(this)">服务</div>
+</div>
+
+<div class="page-scroll">
+    <!-- 消息1：代付待处理 (未读) -->
+    <div class="conn-msg-item unread" onclick="goToPage('page-payer-detail-proxy')">
+        <div class="conn-msg-avatar" style="background:linear-gradient(135deg,#fff7ed,#fed7aa);">🤝<div class="dot"></div></div>
+        <div class="conn-msg-body">
+            <div class="conn-msg-top">
+                <span class="conn-msg-name">代付请求</span>
+                <span class="conn-msg-time">今天 19:42</span>
+            </div>
+            <div class="conn-msg-content"><span class="conn-msg-tag urgent">待处理</span>关系链成员 <strong>李小新</strong> 请求您代付订单 605448 · ¥0.72</div>
+        </div>
+    </div>
+
+    <!-- 消息2：代付已完成 -->
+    <div class="conn-msg-item" onclick="showToast('查看代付详情')">
+        <div class="conn-msg-avatar" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);">✅</div>
+        <div class="conn-msg-body">
+            <div class="conn-msg-top">
+                <span class="conn-msg-name">代付完成</span>
+                <span class="conn-msg-time">昨天 18:16</span>
+            </div>
+            <div class="conn-msg-content">您已成功为 <strong>张薇</strong> 完成代付 · ¥158.00</div>
+        </div>
+    </div>
+
+    <!-- 消息3：系统通知 -->
+    <div class="conn-msg-item" onclick="showToast('查看通知')">
+        <div class="conn-msg-avatar" style="background:linear-gradient(135deg,#eff6ff,#dbeafe);">📢</div>
+        <div class="conn-msg-body">
+            <div class="conn-msg-top">
+                <span class="conn-msg-name">系统通知</span>
+                <span class="conn-msg-time">06-21 10:00</span>
+            </div>
+            <div class="conn-msg-content">您的会员等级已提升至 <strong>黄金会员</strong>，享有更多专属权益</div>
+        </div>
+    </div>
+
+    <!-- 消息4：活动通知 -->
+    <div class="conn-msg-item" onclick="showToast('查看活动')">
+        <div class="conn-msg-avatar" style="background:linear-gradient(135deg,#fef2f2,#fecaca);">🎁</div>
+        <div class="conn-msg-body">
+            <div class="conn-msg-top">
+                <span class="conn-msg-name">活动通知</span>
+                <span class="conn-msg-time">06-20 14:30</span>
+            </div>
+            <div class="conn-msg-content">绿韵家618年中大促，全场低至5折！点击查看优惠详情</div>
+        </div>
     </div>
 </div>
 </div>
@@ -681,10 +768,10 @@ body {
 <div style="padding-bottom:16px;">
 
     <!-- 订单卡片0：代付请求（待付款）-->
-    <div class="ol-card" onclick="goToPage('page-payer-detail-proxy')" style="border:1.5px solid #ff6b35;">
+    <div class="ol-card" id="proxyCardPending" onclick="goToPage('page-payer-detail-proxy')" style="border:1.5px solid #ff6b35;">
         <div class="olc-top">
             <div class="olc-no" style="display:flex;align-items:center;gap:6px;">订单号：605448 <span style="display:inline-flex;align-items:center;background:linear-gradient(135deg,#fef3c7,#fde68a);color:#92400e;font-size:10px;padding:2px 7px;border-radius:8px;border:1px solid #fcd34d;font-weight:600;">🤝 代付请求</span></div>
-            <div class="olc-status wait-pay">待付款</div>
+            <div class="olc-status wait-pay" id="proxyCardStatus">待付款</div>
         </div>
         <div class="olc-goods">
             <div class="olc-thumb" style="background:#fff7e6;border-color:#ffe7ba;">🧴<div class="olc-thumb-tag">上海发货·极速达</div></div>
@@ -966,9 +1053,31 @@ function submitProxy(){ showToast('代付请求已发送至 '+selUser.name); doc
 function cancelProxy(){ if(confirm('确定取消？')){showToast('已取消'); goBack();goBack();} }
 
 // 支付账号收银台
+let proxyOrderPaid = false;
 function selPayerP(el){ document.querySelectorAll('#page-payer-checkout .pm-radio').forEach(r=>r.classList.remove('on')); el.querySelector('.pm-radio').classList.add('on'); }
 function switchOlTab(el){ document.querySelectorAll('.ol-tab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); }
-function doPayerPay(){ showToast('正在处理...'); setTimeout(()=>{renderSc('payer');goToPage('page-success');},800); }
+function switchConnTab(el){ document.querySelectorAll('.conn-tab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); }
+function doPayerPay(){ 
+    showToast('正在处理...'); 
+    setTimeout(()=>{
+        proxyOrderPaid = true;
+        // 更新订单列表中代付订单状态的函数
+        function updateProxyCard(){
+            const card = document.getElementById('proxyCardPending');
+            if(!card) return;
+            card.style.border = 'none';
+            card.onclick = function(){ showToast('代付已完成，订单详情仅供查看'); };
+            const status = document.getElementById('proxyCardStatus');
+            if(status){ status.textContent = '已完成'; status.className = 'olc-status'; status.style.color = '#07c160'; }
+            const tag = card.querySelector('.olc-no span');
+            if(tag){ tag.textContent = '🤝 代付(已完成)'; tag.style.background = 'linear-gradient(135deg,#f0fdf4,#dcfce7)'; tag.style.color = '#166534'; tag.style.borderColor = '#86efac'; }
+            const actions = card.querySelector('.olc-actions');
+            if(actions) actions.style.display = 'none';
+        }
+        updateProxyCard();
+        renderSc('payer'); goToPage('page-success');
+    },800);
+}
 
 // 切换账号
 function switchAccount(ac){
@@ -983,10 +1092,10 @@ function switchToPayer(){ switchAccount('payer'); setTimeout(()=>goToPage('page-
 function cpNo(no){ if(navigator.clipboard)navigator.clipboard.writeText(no); showToast('已复制 '+no); }
 function renderSc(vf){
     const p=vf==='payer';
-    document.getElementById('scTitle').textContent='代付成功！';
-    document.getElementById('scDesc').innerHTML=p?'您已成功为 <strong>李小新</strong> 完成代付<br>订单已生成，对方无需再操作':'<strong>王建国</strong> 已为您完成代付<br>您的订单已生成并支付成功';
-    document.getElementById('scCard').innerHTML=`<div class="sc-r"><span class="sc-k">订单编号</span><span class="sc-v">ORD2026062200886</span></div><div class="sc-r"><span class="sc-k">下单人</span><span class="sc-v">李小新（新人）</span></div><div class="sc-r"><span class="sc-k">代付人</span><span class="sc-v">${p?'王建国（您）':'王建国'}</span></div><div class="sc-r"><span class="sc-k">代付金额</span><span class="sc-v hi">¥${p?'0.72':(qty*298).toLocaleString()+'.00'}</span></div><div class="sc-r"><span class="sc-k">支付时间</span><span class="sc-v">${new Date().toLocaleString()}</span></div><div class="sc-r"><span class="sc-k">状态</span><span class="sc-gr">✓ 已支付 · 待发货</span></div>`;
-    document.getElementById('scBtns').innerHTML=`<button class="sc-btn pri" onclick="showToast('跳转...')">查看订单</button><button class="sc-btn def" onclick="goToPage('page-product')">返回首页</button>`;
+    document.getElementById('scTitle').textContent=p?'代付成功！':'支付成功！';
+    document.getElementById('scDesc').innerHTML=p?'您已成功为 <strong>李小新</strong> 完成代付<br>订单已生成，买家自行管理后续流程':'<strong>王建国</strong> 已为您完成代付<br>您的订单已支付成功，请关注物流';
+    document.getElementById('scCard').innerHTML=`<div class="sc-r"><span class="sc-k">订单编号</span><span class="sc-v">ORD2026062200886</span></div><div class="sc-r"><span class="sc-k">下单人</span><span class="sc-v">李小新（新人）</span></div><div class="sc-r"><span class="sc-k">代付人</span><span class="sc-v">${p?'王建国（您）':'王建国'}</span></div><div class="sc-r"><span class="sc-k">实付金额</span><span class="sc-v hi">¥0.72</span></div><div class="sc-r"><span class="sc-k">支付时间</span><span class="sc-v">${new Date().toLocaleString()}</span></div><div class="sc-r"><span class="sc-k">${p?'订单状态（你的视角）':'订单状态'}</span><span class="sc-v gr">${p?'✅ 已完成 · 代付订单（仅展示）':'✓ 已支付 · 待发货'}</span></div>`;
+    document.getElementById('scBtns').innerHTML=`<button class="sc-btn pri" onclick="${p?'goToPage(\'page-payer-orders\')':'showToast(\'请到订单账号-我的订单查看物流\')'}">${p?'查看代付记录':'查看订单'}</button><button class="sc-btn def" onclick="goToPage('page-product')">返回首页</button>`;
 }
 function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._tm); t._tm=setTimeout(()=>t.classList.remove('show'),1800); }
 </script>
