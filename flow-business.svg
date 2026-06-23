@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 600" width="100%" height="100%" style="max-width:860px;">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#666"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#07c160"/>
+    </marker>
+    <linearGradient id="header-grad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#07c160"/>
+      <stop offset="100%" stop-color="#059b4e"/>
+    </linearGradient>
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+
+  <rect width="860" height="600" fill="#fafafa" rx="8"/>
+
+  <rect x="0" y="0" width="860" height="52" fill="url(#header-grad)" rx="8"/>
+  <rect x="0" y="26" width="860" height="26" fill="url(#header-grad)"/>
+  <text x="430" y="34" text-anchor="middle" fill="#fff" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="18" font-weight="bold">同关系链代付业务流程</text>
+
+  <rect x="30" y="72" width="230" height="36" fill="#e8f5e9" rx="6"/>
+  <text x="145" y="95" text-anchor="middle" fill="#2e7d32" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="13" font-weight="bold">订单账号（新会员）</text>
+
+  <rect x="315" y="72" width="230" height="36" fill="#e3f2fd" rx="6"/>
+  <text x="430" y="95" text-anchor="middle" fill="#1565c0" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="13" font-weight="bold">系统</text>
+
+  <rect x="600" y="72" width="230" height="36" fill="#fff3e0" rx="6"/>
+  <text x="715" y="95" text-anchor="middle" fill="#e65100" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="13" font-weight="bold">支付账号（老会员）</text>
+
+  <!-- Order account steps -->
+  <rect x="30" y="125" width="230" height="40" fill="#fff" rx="8" filter="url(#shadow)" stroke="#c8e6c9" stroke-width="1"/>
+  <text x="145" y="150" text-anchor="middle" fill="#333" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="13">浏览商品 -> 确认订单</text>
+
+  <rect x="30" y="180" width="230" height="40" fill="#fff" rx="8" filter="url(#shadow)" stroke="#c8e6c9" stroke-width="1"/>
+  <text x="145" y="205" text-anchor="middle" fill="#333" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="13">收银台选择「找人代付」</text>
+
+  <rect x="30" y="235" width="230" height="40" fill="#fff" rx="8" filter="url(#shadow)" stroke="#c8e6c9" stroke-width="1"/>
+  <text x="145" y="260" text-anchor="middle" fill="#333" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="13">输入账号 -> 关系链校验通过</text>
+
+  <!-- Arrow: order -> system -->
+  <line x1="260" y1="310" x2="315" y2="310" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)" stroke-dasharray="4,2"/>
+  <text x="288" y="302" text-anchor="middle" fill="#888" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="10">发起代付请求</text>
+
+  <!-- System -->
+  <rect x="315" y="285" width="230" height="50" fill="#fff" rx="8" filter="url(#shadow)" stroke="#bbdefb" stroke-width="1"/>
+  <text x="430" y="308" text-anchor="middle" fill="#333" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="13">推送智连交易消息</text>
+  <text x="430" y="324" text-anchor="middle" fill="#888" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="11">您有一条代付请求，请尽快处理</text>
+
+  <!-- Arrow: system -> payer -->
+  <line x1="545" y1="310" x2="600" y2="310" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)" stroke-dasharray="4,2"/>
+  <text x="573" y="302" text-anchor="middle" fill="#888" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="10">推送通知</text>
+
+  <!-- Payer steps -->
+  <rect x="600" y="235" width="230" height="40" fill="#fff" rx="8" filter="url(#shadow)" stroke="#ffe0b2" stroke-width="1"/>
+  <text x="715" y="260" text-anchor="middle" fill="#333" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="13">查看智连消息 / 订单列表</text>
+
+  <rect x="600" y="290" width="230" height="40" fill="#fff" rx="8" filter="url(#shadow)" stroke="#ffe0b2" stroke-width="1"/>
+  <text x="715" y="315" text-anchor="middle" fill="#333" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="13">进入代付订单详情</text>
+
+  <rect x="600" y="345" width="230" height="40" fill="#fff" rx="8" filter="url(#shadow)" stroke="#ffe0b2" stroke-width="1"/>
+  <text x="715" y="365" text-anchor="middle" fill="#333" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="13">确认代付并支付</text>
+  <text x="715" y="379" text-anchor="middle" fill="#e65100" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="10">70%电子钱包 + 30%储值钱包</text>
+
+  <!-- Payment success -->
+  <rect x="315" y="410" width="230" height="36" fill="#e8f5e9" rx="8" stroke="#07c160" stroke-width="1.5"/>
+  <text x="430" y="433" text-anchor="middle" fill="#2e7d32" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="13" font-weight="bold">支付成功</text>
+
+  <line x1="600" y1="428" x2="545" y2="428" stroke="#07c160" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+  <text x="573" y="448" text-anchor="middle" fill="#07c160" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="10">支付确认</text>
+
+  <line x1="315" y1="428" x2="260" y2="428" stroke="#07c160" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+  <text x="288" y="448" text-anchor="middle" fill="#07c160" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="10">推送结果</text>
+
+  <!-- Post payment -->
+  <rect x="30" y="470" width="230" height="50" fill="#f1f8e9" rx="8" filter="url(#shadow)" stroke="#a5d6a7" stroke-width="1"/>
+  <text x="145" y="492" text-anchor="middle" fill="#333" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="13">订单状态流转</text>
+  <text x="145" y="511" text-anchor="middle" fill="#888" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="11">待发货 -> 待收货 -> 已完成</text>
+
+  <rect x="600" y="470" width="230" height="50" fill="#fff8e1" rx="8" filter="url(#shadow)" stroke="#ffe0b2" stroke-width="1"/>
+  <text x="715" y="492" text-anchor="middle" fill="#333" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="13">代付记录（仅展示）</text>
+  <text x="715" y="511" text-anchor="middle" fill="#888" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="11">标识「已完成」无任何操作</text>
+</svg>

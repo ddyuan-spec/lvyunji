@@ -102,6 +102,18 @@
     color: #07c160;
     font-weight: 600;
   }
+  .flow-img {
+    text-align: center;
+    margin: 16px 0 24px;
+    overflow-x: auto;
+  }
+  .flow-img img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 4px;
+  }
   @media print {
     body { padding: 20px 24px; }
     h2 { break-before: page; }
@@ -152,38 +164,14 @@
 <p>原型包含 11 个页面，覆盖订单账号和支付账号的完整交互链路。</p>
 <hr />
 <h2>四、业务流程图</h2>
-<pre><code>┌──────────┐
-│                        同关系链代付业务流程                            │
-├──────────┤
-│                                                                           │
-│  [订单账号]              [系统]                 [支付账号]              │
-│      │                       │                        │                 │
-│      │── 下单 → 确认订单                                │                 │
-│      │── 收银台选择&quot;找人代付&quot;                         │                 │
-│      │── 输入关系链账号 → 校验通过                     │                 │
-│      │── 发起代付请求 ─────→ 推送智连消息 ─────→ │                 │
-│      │                       │              │                 │
-│      │                       │    │── 查看消息/订单列表                 │
-│      │                       │    │── 查看代付订单详情                 │
-│      │                       │    │── 确认并支付（70%电子+30%储值）    │
-│      │   ←── 支付成功 ──────── 推送通知 ←─── │                 │
-│      │                       │                        │                 │
-│      │── 查看订单（待发货→待收货→已完成）             │                 │
-│      │                       │    │── 查看代付记录（仅展示无操作）       │
-│                                                                           │
-└──────────┘
-</code></pre>
+<div class="flow-img"><img src="flow-business.svg" alt="同关系链代付业务流程" /></div>
 <hr />
 <h2>五、需求说明</h2>
 <h3>5.1 状态流转图</h3>
 <p><strong>代付请求状态流转：</strong></p>
-<pre><code>[待确认] ── 支付账号点击&quot;立即代付&quot; → [支付中] ── 支付成功 → [已完成]
-    │
-    └── 订单账号取消代付请求 → [已取消]
-</code></pre>
+<div class="flow-img"><img src="flow-proxy-state.svg" alt="代付请求状态流转" /></div>
 <p><strong>订单状态流转（支付完成后）：</strong></p>
-<pre><code>[已支付·待发货] → [待收货] → [已完成]
-</code></pre>
+<div class="flow-img"><img src="flow-order-state.svg" alt="支付后订单状态流转" /></div>
 <hr />
 <h3>5.2 涉及页面及功能说明</h3>
 <h4>PAGE 01：商品详情（订单账号视角）</h4>
