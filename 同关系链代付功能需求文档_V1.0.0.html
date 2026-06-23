@@ -102,17 +102,19 @@
     color: #07c160;
     font-weight: 600;
   }
-  .flow-img {
-    text-align: center;
-    margin: 16px 0 24px;
-    overflow-x: auto;
-  }
-  .flow-img img {
+  img {
     max-width: 100%;
-    height: auto;
-    display: block;
-    margin: 0 auto;
-    border-radius: 4px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    margin: 8px 0;
+  }
+  blockquote {
+    border-left: 3px solid #07c160;
+    padding: 8px 16px;
+    margin: 12px 0;
+    background: #f0faf4;
+    color: #666;
+    border-radius: 0 6px 6px 0;
   }
   @media print {
     body { padding: 20px 24px; }
@@ -164,14 +166,14 @@
 <p>原型包含 11 个页面，覆盖订单账号和支付账号的完整交互链路。</p>
 <hr />
 <h2>四、业务流程图</h2>
-<div class="flow-img"><img src="flow-business.svg" alt="同关系链代付业务流程" /></div>
+<p><img alt="同关系链代付业务流程" src="flow-business.svg" /></p>
 <hr />
 <h2>五、需求说明</h2>
 <h3>5.1 状态流转图</h3>
 <p><strong>代付请求状态流转：</strong></p>
-<div class="flow-img"><img src="flow-proxy-state.svg" alt="代付请求状态流转" /></div>
+<p><img alt="代付请求状态流转" src="flow-proxy-state.svg" /></p>
 <p><strong>订单状态流转（支付完成后）：</strong></p>
-<div class="flow-img"><img src="flow-order-state.svg" alt="支付后订单状态流转" /></div>
+<p><img alt="支付后订单状态流转" src="flow-order-state.svg" /></p>
 <hr />
 <h3>5.2 涉及页面及功能说明</h3>
 <h4>PAGE 01：商品详情（订单账号视角）</h4>
@@ -382,6 +384,35 @@
 </table>
 <hr />
 <h4>PAGE 06b：智连 · 交易消息（支付账号视角）</h4>
+<p><strong>消息推送触发节点：</strong></p>
+<table>
+<thead>
+<tr>
+<th>触发节点</th>
+<th>触发时机</th>
+<th>推送文案</th>
+<th>点击行为</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>代付请求发起</td>
+<td>订单账号在代付人信息页（PAGE 04）点击「发起代付请求」后，系统立即推送</td>
+<td>标题「平台消息」<br>内容「您有一条代付请求，请尽快处理」</td>
+<td>跳转至代付订单详情页（PAGE 09）</td>
+</tr>
+<tr>
+<td>代付完成</td>
+<td>支付账号完成代付支付后，系统推送完成通知</td>
+<td>标题「平台消息」<br>内容「您有一条代付请求已完成，点击查看详情」</td>
+<td>跳转至代付订单详情页（仅展示）</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>说明</strong>：消息推送的触发在「代付请求发起」之前——即订单账号点击发起瞬间，系统生成代付请求并同步推送智连消息至支付账号。</p>
+</blockquote>
+<p><strong>消息列表内容：</strong></p>
 <table>
 <thead>
 <tr>
@@ -394,7 +425,7 @@
 <tr>
 <td>Tab 栏</td>
 <td>四个 Tab：交易 / 消息 / 通知 / 服务，默认选中「交易」</td>
-<td></td>
+<td>交易 Tab 展示代付相关消息</td>
 </tr>
 <tr>
 <td>消息列表</td>
@@ -404,17 +435,17 @@
 <tr>
 <td>消息1（未读）</td>
 <td>标题「平台消息」，内容「您有一条代付请求，请尽快处理」，点击跳转代付订单详情页</td>
-<td>图标：蓝色¥方块</td>
+<td>图标：蓝色¥方块；左侧蓝色未读圆点</td>
 </tr>
 <tr>
-<td>消息2</td>
+<td>消息2（已读）</td>
 <td>标题「平台消息」，内容「您有一条代付请求已完成，点击查看详情」，点击跳转代付订单详情页</td>
-<td></td>
+<td>已读消息无未读圆点</td>
 </tr>
 <tr>
-<td>消息3</td>
-<td>标题「平台消息」，内容「您的会员等级已提升至黄金会员…」</td>
-<td></td>
+<td>消息3（已读）</td>
+<td>标题「平台消息」，内容「您的会员等级已提升至黄金会员，享有更多专属权益」</td>
+<td>普通通知</td>
 </tr>
 </tbody>
 </table>
@@ -422,7 +453,8 @@
 - 消息行高：56px，行内间距 10px；
 - 图标：40×40px，蓝色（#3b82f6）圆角方块，白色¥符号；
 - 未读消息：左侧蓝色圆点标识（8×8px）；
-- 日期格式：<code>YYYY-MM-DD</code>（如 2026-01-23）。</p>
+- 日期格式：<code>YYYY-MM-DD</code>（如 2026-01-23）；
+- 消息标题统一为「平台消息」，内容文案按上表推送节点对应。</p>
 <hr />
 <h4>PAGE 07：支付账号-订单列表</h4>
 <table>
@@ -527,11 +559,38 @@
 </tr>
 </tbody>
 </table>
-<p><strong>支付比例规则（当前版本）：</strong>
-- 电子钱包扣款比例：70%
-- 储值钱包扣款比例：30%
-- 两种钱包余额均不足时，支付失败并 toast 提示；
-- 单一钱包余额不足时，优先从另一钱包扣取差额（具体规则可与后端确认）。</p>
+<p><strong>支付比例与余额规则（当前版本）：</strong></p>
+<table>
+<thead>
+<tr>
+<th>钱包类型</th>
+<th>扣款比例</th>
+<th>余额不足处理</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>电子钱包 + 奖金钱包</td>
+<td>≤ 70%</td>
+<td>合计不高于应付金额的 70%，不足时不可从储值钱包补足</td>
+</tr>
+<tr>
+<td>储值钱包</td>
+<td>≥ 30%</td>
+<td>不低于应付金额的 30%，不足时提示余额不足</td>
+</tr>
+<tr>
+<td>其他支付方式</td>
+<td>不受限</td>
+<td>无比例约束，用户可自由选择组合</td>
+</tr>
+</tbody>
+</table>
+<p><strong>规则说明：</strong>
+- 电子钱包和奖金钱包合计扣款 <strong>不高于 70%</strong>，储值钱包扣款 <strong>不低于 30%</strong>；
+- 电子钱包/奖金钱包余额不足 70% 时，不可从储值钱包补足差额，支付失败并 toast 提示余额不足；
+- 储值钱包余额不足 30% 时，同样支付失败并 toast 提示；
+- 其他支付方式（如银行卡、零钱等）不受此比例限制，用户可自由组合使用。</p>
 <hr />
 <h4>PAGE 10/11：支付成功页</h4>
 <table>
@@ -822,11 +881,15 @@
 </table>
 <h3>6.2 待确认事项</h3>
 <ol>
-<li><strong>支付比例规则</strong>：当前原型固定为 70% 电子钱包 + 30% 储值钱包，是否需要在后台支持配置？</li>
-<li><strong>代付请求有效期</strong>：代付请求发起后，支付账号多久内需处理？超时是否自动取消？</li>
-<li><strong>智连消息推送</strong>：消息推送的实际触发节点和文案是否需要单独评审？</li>
-<li><strong>钱包余额不足</strong>：单一钱包余额不足时的扣款策略，需与财务/后端确认。</li>
+<li><strong>支付比例规则</strong>：当前版本固定比例（电子+奖金 ≤70%，储值 ≥30%），是否需要在后台支持配置？</li>
 <li><strong>关系链校验</strong>：校验接口的数据来源和系统对接方式，需与关系链模块负责人确认。</li>
+<li><strong>其他支付方式</strong>：银行卡、零钱等支付方式的具体对接方案，需与支付网关/财务确认。</li>
+</ol>
+<h3>6.3 已确认事项</h3>
+<ol>
+<li>✅ <strong>代付请求有效期</strong>：代付请求发起后，正常计算订单支付时间。超时未支付，订单自动取消（与普通订单超时规则一致）。</li>
+<li>✅ <strong>智连消息推送</strong>：触发节点为「订单账号点击发起代付请求」瞬间，文案按原型执行——代付发起推送「您有一条代付请求，请尽快处理」；代付完成推送「您有一条代付请求已完成，点击查看详情」。</li>
+<li>✅ <strong>钱包余额不足</strong>：遵循规则——储值钱包不低于应付款的 30%，电子钱包+奖金钱包合计不高于 70%；其他支付方式不受此比例限制。</li>
 </ol>
 <hr />
 <p><em>文档创建时间：2026-06-23</em>
