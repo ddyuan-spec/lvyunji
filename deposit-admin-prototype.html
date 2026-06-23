@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>储值管理系统 - 后台原型</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px; color: #333; background: #f5f7fa; }
+
+/* ===== 顶部导航栏 ===== */
+.top-nav { height: 50px; background: #2d2d3a; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: #fff; }
+.top-nav .left { display: flex; align-items: center; gap: 24px; }
+.top-nav .logo { font-size: 16px; font-weight: 600; }
+.top-nav .nav-tabs { display: flex; gap: 8px; }
+.top-nav .nav-tab { padding: 6px 16px; border-radius: 4px; cursor: pointer; color: #b0b0b8; transition: all 0.2s; }
+.top-nav .nav-tab:hover { color: #fff; }
+.top-nav .nav-tab.active { background: #e65a5a; color: #fff; }
+.top-nav .right { display: flex; align-items: center; gap: 16px; color: #b0b0b8; }
+
+/* ===== 左侧边栏 ===== */
+.layout { display: flex; height: calc(100vh - 50px); }
+.sidebar { width: 180px; background: #fff; border-right: 1px solid #e8e8e8; overflow-y: auto; }
+.sidebar-group { margin-bottom: 8px; }
+.sidebar-title { padding: 12px 16px 8px; font-size: 12px; color: #999; font-weight: 500; }
+.sidebar-item { padding: 10px 16px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: #666; transition: all 0.2s; }
+.sidebar-item:hover { background: #f5f7fa; color: #333; }
+.sidebar-item.active { background: #fef0f0; color: #e65a5a; border-right: 3px solid #e65a5a; }
+.sidebar-item .icon { font-size: 14px; width: 16px; text-align: center; }
+
+/* ===== 主内容区 ===== */
+.main { flex: 1; overflow: auto; padding: 16px 20px; }
+
+/* 子标签页 */
+.sub-tabs { display: flex; gap: 24px; border-bottom: 1px solid #e8e8e8; margin-bottom: 16px; background: #fff; padding: 0 16px; }
+.sub-tab { padding: 12px 4px; cursor: pointer; color: #666; position: relative; }
+.sub-tab:hover { color: #333; }
+.sub-tab.active { color: #e65a5a; font-weight: 500; }
+.sub-tab.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: #e65a5a; }
+.sub-tab .badge { display: inline-block; background: #e65a5a; color: #fff; font-size: 11px; padding: 1px 6px; border-radius: 10px; margin-left: 4px; }
+
+/* 搜索区 */
+.search-bar { background: #fff; padding: 16px; border-radius: 4px; margin-bottom: 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.search-input { height: 32px; padding: 0 12px; border: 1px solid #d9d9d9; border-radius: 4px; min-width: 160px; font-size: 13px; }
+.search-input:focus { outline: none; border-color: #e65a5a; }
+.btn { height: 32px; padding: 0 16px; border-radius: 4px; border: none; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
+.btn-primary { background: #e65a5a; color: #fff; }
+.btn-primary:hover { background: #d04a4a; }
+.btn-default { background: #fff; color: #666; border: 1px solid #d9d9d9; }
+.btn-default:hover { border-color: #999; color: #333; }
+.btn-sm { height: 28px; padding: 0 12px; font-size: 12px; }
+
+/* 表格 */
+.table-card { background: #fff; border-radius: 4px; }
+.table-header { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+.table-title { font-size: 14px; font-weight: 500; color: #333; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+th { background: #fafafa; font-weight: 500; color: #333; font-size: 12px; }
+tr:hover { background: #fafafa; }
+.td-avatar { width: 32px; height: 32px; border-radius: 50%; background: #e8e8e8; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; color: #666; }
+.td-img { width: 40px; height: 40px; border-radius: 4px; background: #f5f5f5; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; }
+.status-pass { color: #52c41a; }
+.status-pending { color: #faad14; }
+.status-reject { color: #ff4d4f; }
+.link { color: #1890ff; cursor: pointer; }
+.link:hover { text-decoration: underline; }
+
+/* 分页 */
+.pagination { padding: 16px; display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
+.page-info { color: #999; margin-right: 8px; }
+.page-btn { min-width: 28px; height: 28px; padding: 0 8px; border: 1px solid #d9d9d9; background: #fff; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+.page-btn:hover { border-color: #e65a5a; color: #e65a5a; }
+.page-btn.active { background: #e65a5a; border-color: #e65a5a; color: #fff; }
+.page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.page-size { height: 28px; padding: 0 8px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 12px; }
+
+/* ===== 弹窗 ===== */
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.45); z-index: 1000; display: none; align-items: center; justify-content: center; }
+.modal-overlay.show { display: flex; }
+.modal { background: #fff; border-radius: 4px; width: 560px; max-height: 90vh; overflow: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.modal-header { padding: 16px 20px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+.modal-title { font-size: 16px; font-weight: 500; color: #333; }
+.modal-close { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #999; font-size: 18px; }
+.modal-close:hover { color: #666; }
+.modal-body { padding: 20px; }
+.modal-footer { padding: 16px 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 12px; }
+
+/* 表单 */
+.form-row { display: flex; margin-bottom: 16px; align-items: flex-start; }
+.form-row:last-child { margin-bottom: 0; }
+.form-label { width: 100px; color: #666; text-align: right; padding-right: 12px; padding-top: 6px; flex-shrink: 0; }
+.form-label.required::before { content: '*'; color: #ff4d4f; margin-right: 4px; }
+.form-content { flex: 1; }
+.form-input, .form-textarea { width: 100%; padding: 6px 12px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 13px; transition: all 0.2s; }
+.form-input { height: 32px; }
+.form-textarea { min-height: 80px; resize: vertical; font-family: inherit; }
+.form-input:focus, .form-textarea:focus { outline: none; border-color: #e65a5a; }
+.form-text { padding: 6px 0; color: #333; }
+.form-img { width: 80px; height: 80px; border-radius: 4px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 1px solid #e8e8e8; }
+.radio-group { display: flex; gap: 24px; }
+.radio { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.radio input { width: 16px; height: 16px; accent-color: #e65a5a; }
+.text-count { text-align: right; color: #999; font-size: 12px; margin-top: 4px; }
+
+/* 奖励金额提示 */
+.reward-info { background: #f6ffed; border: 1px solid #b7eb8f; padding: 8px 12px; border-radius: 4px; margin-top: 8px; font-size: 12px; color: #52c41a; }
+.reward-info.hidden { display: none; }
+.reward-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #e8e8e8; }
+.reward-row:last-child { border-bottom: none; }
+.reward-total { font-size: 16px; font-weight: 600; color: #e65a5a; }
+
+/* 二次确认弹窗 */
+.confirm-modal { width: 400px; }
+.confirm-body { padding: 24px; }
+.confirm-text { color: #666; margin-bottom: 16px; line-height: 1.6; }
+.confirm-input { width: 100%; height: 36px; padding: 0 12px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 14px; text-align: center; }
+.confirm-input:focus { outline: none; border-color: #e65a5a; }
+.confirm-detail { background: #fafafa; padding: 16px; border-radius: 4px; margin-top: 16px; }
+</style>
+</head>
+<body>
+<!-- 顶部导航 -->
+<div class="top-nav">
+    <div class="left">
+        <div class="logo">绿韵家管理系统</div>
+        <div class="nav-tabs">
+            <div class="nav-tab">首页</div>
+            <div class="nav-tab">店铺</div>
+            <div class="nav-tab">营销中心</div>
+            <div class="nav-tab active">结算中心</div>
+        </div>
+    </div>
+    <div class="right">
+        <span>admin</span>
+        <span>退出</span>
+    </div>
+</div>
+
+<!-- 主体布局 -->
+<div class="layout">
+    <!-- 左侧边栏 -->
+    <div class="sidebar">
+        <div class="sidebar-group">
+            <div class="sidebar-title">用户收益</div>
+            <div class="sidebar-item"><span class="icon">&#128176;</span>商家收益</div>
+        </div>
+        <div class="sidebar-group">
+            <div class="sidebar-title">交易中心</div>
+            <div class="sidebar-item"><span class="icon">&#128260;</span>转账中心</div>
+        </div>
+        <div class="sidebar-group">
+            <div class="sidebar-title">会员中心</div>
+            <div class="sidebar-item active"><span class="icon">&#128221;</span>申请管理</div>
+            <div class="sidebar-item"><span class="icon">&#128100;</span>会员管理</div>
+            <div class="sidebar-item"><span class="icon">&#128200;</span>储值流水</div>
+        </div>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="main">
+        <!-- 子标签页 -->
+        <div class="sub-tabs">
+            <div class="sub-tab">全部</div>
+            <div class="sub-tab active">待审核<span class="badge">12</span></div>
+            <div class="sub-tab">已通过</div>
+            <div class="sub-tab">已驳回</div>
+        </div>
+
+        <!-- 搜索区 -->
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="请输入用户昵称">
+            <input type="text" class="search-input" placeholder="请输入用户账号">
+            <input type="text" class="search-input" placeholder="请输入交易单号">
+            <input type="text" class="search-input" placeholder="指定合作商编号">
+            <button class="btn btn-primary">搜索</button>
+            <button class="btn btn-default">重置</button>
+        </div>
+
+        <!-- 表格 -->
+        <div class="table-card">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>用户昵称</th>
+                            <th>用户账号</th>
+                            <th>会员等级</th>
+                            <th>申请凭证</th>
+                            <th>交易单号</th>
+                            <th>储值金额</th>
+                            <th>状态</th>
+                            <th>原因</th>
+                            <th>申请时间</th>
+                            <th>审批时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><div style="display:flex;align-items:center;gap:8px;"><span class="td-avatar">团</span> 团购大管旅游</div></td>
+                            <td>18373220001</td>
+                            <td>经验达人</td>
+                            <td><span class="td-img">&#128196;</span></td>
+                            <td>155155151</td>
+                            <td>983.23</td>
+                            <td class="status-pass">已通过</td>
+                            <td>规范庞大的爸爸</td>
+                            <td>2025-06-02 10:18</td>
+                            <td>2025-06-02 10:18</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td><div style="display:flex;align-items:center;gap:8px;"><span class="td-avatar">团</span> 团购大管旅游</div></td>
+                            <td>18373220001</td>
+                            <td>经验达人</td>
+                            <td><span class="td-img">&#128172;</span></td>
+                            <td>145015150151</td>
+                            <td>1000</td>
+                            <td class="status-pass">已通过</td>
+                            <td>涂先瓜游荡萨萨萨</td>
+                            <td>2025-06-02 10:17</td>
+                            <td>2025-06-02 10:17</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td><div style="display:flex;align-items:center;gap:8px;"><span class="td-avatar">C</span> C小娟</div></td>
+                            <td>12074201850</td>
+                            <td>分享达人</td>
+                            <td><span class="td-img" style="background:#e6f7ff;color:#1890ff;">&#127968;</span></td>
+                            <td>12581581</td>
+                            <td>100</td>
+                            <td class="status-pass">已通过</td>
+                            <td>853242</td>
+                            <td>2025-05-28 17:29</td>
+                            <td>2025-05-28 17:29</td>
+                            <td>-</td>
+                        </tr>
+                        <tr style="background:#fffbe6;">
+                            <td><div style="display:flex;align-items:center;gap:8px;"><span class="td-avatar">G</span> George Tan</div></td>
+                            <td>18569596673</td>
+                            <td>店主</td>
+                            <td><span class="td-img">&#128247;</span></td>
+                            <td>-</td>
+                            <td class="status-pending">待审核</td>
+                            <td>-</td>
+                            <td>2025-04-21 13:47</td>
+                            <td>-</td>
+                            <td><span class="link" onclick="openModal()">处理</span></td>
+                        </tr>
+                        <tr>
+                            <td><div style="display:flex;align-items:center;gap:8px;"><span class="td-avatar">平</span> 平平安安</div></td>
+                            <td>15115411357</td>
+                            <td>普通用户</td>
+                            <td><span class="td-img" style="font-size:10px;">YUU.UU</span></td>
+                            <td>-</td>
+                            <td>9.9</td>
+                            <td class="status-pass">已通过</td>
+                            <td>1</td>
+                            <td>2025-03-23 17:08</td>
+                            <td>2025-03-23 17:23</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td><div style="display:flex;align-items:center;gap:8px;"><span class="td-avatar">亮</span> 亮红</div></td>
+                            <td>15811977020</td>
+                            <td>普通用户</td>
+                            <td><span class="td-img" style="font-size:12px;">-15.00</span></td>
+                            <td>-</td>
+                            <td>600</td>
+                            <td class="status-pass">已通过</td>
+                            <td>1</td>
+                            <td>2025-03-23 17:02</td>
+                            <td>2025-03-23 17:23</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- 分页 -->
+            <div class="pagination">
+                <span class="page-info">共 86 条，10条/页</span>
+                <button class="page-btn" disabled>&lt;</button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn">4</button>
+                <button class="page-btn">5</button>
+                <button class="page-btn">6</button>
+                <button class="page-btn">7</button>
+                <button class="page-btn">8</button>
+                <button class="page-btn">9</button>
+                <button class="page-btn">&gt;</button>
+                <select class="page-size">
+                    <option>10条/页</option>
+                    <option>20条/页</option>
+                    <option>50条/页</option>
+                </select>
+                <span style="color:#666;">前往</span>
+                <input type="text" style="width:40px;height:28px;border:1px solid #d9d9d9;border-radius:4px;text-align:center;" value="1">
+                <span style="color:#666;">页</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 审批处理弹窗 -->
+<div class="modal-overlay" id="auditModal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title">审批处理</div>
+            <div class="modal-close" onclick="closeModal()">&times;</div>
+        </div>
+        <div class="modal-body">
+            <div class="form-row">
+                <div class="form-label">用户昵称</div>
+                <div class="form-content">
+                    <div class="form-text">George Tan</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-label">用户账号</div>
+                <div class="form-content">
+                    <div class="form-text">18569596673</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-label">会员等级</div>
+                <div class="form-content">
+                    <div class="form-text" id="memberLevel">店主</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-label">储值凭证</div>
+                <div class="form-content">
+                    <div class="form-img">&#128247;</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-label">当前余额</div>
+                <div class="form-content">
+                    <div class="form-text">10117472.87</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-label">操作</div>
+                <div class="form-content">
+                    <div class="radio-group">
+                        <label class="radio"><input type="radio" name="action" value="pass" checked> <span style="color:#e65a5a;">通过</span></label>
+                        <label class="radio"><input type="radio" name="action" value="reject"> 驳回</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-label required">交易单号</div>
+                <div class="form-content">
+                    <input type="text" class="form-input" placeholder="请输入交易单号后8位" id="tradeNo">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-label required">储值金额</div>
+                <div class="form-content">
+                    <input type="number" class="form-input" placeholder="0.00" id="depositAmount" oninput="calculateReward()">
+                    <div class="reward-info hidden" id="rewardInfo">
+                        <div class="reward-row">
+                            <span>储值金额</span>
+                            <span id="showDeposit">&yen;0.00</span>
+                        </div>
+                        <div class="reward-row">
+                            <span>奖励金额</span>
+                            <span id="rewardAmount" style="color:#52c41a;">&yen;0.00</span>
+                        </div>
+                        <div class="reward-row" style="border-top:1px solid #b7eb8f;margin-top:8px;padding-top:8px;">
+                            <span>合计金额</span>
+                            <span class="reward-total" id="totalAmount">&yen;0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-label required">原因说明</div>
+                <div class="form-content">
+                    <textarea class="form-textarea" placeholder="请输入"></textarea>
+                    <div class="text-count">0/200</div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-default" onclick="closeModal()">取消</button>
+            <button class="btn btn-primary" onclick="openConfirmModal()">确定</button>
+        </div>
+    </div>
+</div>
+
+<!-- 二次确认弹窗 -->
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal confirm-modal">
+        <div class="modal-header">
+            <div class="modal-title">操作确认</div>
+            <div class="modal-close" onclick="closeConfirmModal()">&times;</div>
+        </div>
+        <div class="confirm-body">
+            <div class="confirm-text">请在下方输入框输入储值金额以确认</div>
+            <input type="number" class="confirm-input" id="confirmInput" value="0.00" oninput="updateConfirmDetail()">
+            <div class="confirm-detail">
+                <div class="reward-row">
+                    <span style="color:#666;">储值金额</span>
+                    <span id="confirmDeposit">&yen;0.00</span>
+                </div>
+                <div class="reward-row">
+                    <span style="color:#666;">奖励金额</span>
+                    <span id="confirmReward" style="color:#52c41a;">&yen;0.00</span>
+                </div>
+                <div class="reward-row" style="margin-top:8px;padding-top:8px;border-top:1px solid #e8e8e8;">
+                    <span style="color:#333;font-weight:500;">合计金额</span>
+                    <span id="confirmTotal" style="color:#e65a5a;font-size:16px;font-weight:600;">&yen;0.00</span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer" style="justify-content:center;">
+            <button class="btn btn-default" onclick="closeConfirmModal()">取消</button>
+            <button class="btn btn-primary" onclick="submitConfirm()">确认</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// 会员等级配置（演示用）
+const memberLevel = '店主';
+const REWARD_THRESHOLD = 5000;
+const REWARD_RATE = 0.02;
+
+// 打开审批弹窗
+function openModal() {
+    document.getElementById('auditModal').classList.add('show');
+    // 根据会员等级判断是否显示奖励
+    if (memberLevel === '店主') {
+        document.getElementById('rewardInfo').classList.remove('hidden');
+    }
+}
+
+// 关闭审批弹窗
+function closeModal() {
+    document.getElementById('auditModal').classList.remove('show');
+}
+
+// 计算奖励金额
+function calculateReward() {
+    const amount = parseFloat(document.getElementById('depositAmount').value) || 0;
+    let reward = 0;
+    
+    if (memberLevel === '店主' && amount >= REWARD_THRESHOLD) {
+        reward = amount * REWARD_RATE;
+    }
+    
+    const total = amount + reward;
+    
+    document.getElementById('showDeposit').textContent = '¥' + amount.toFixed(2);
+    document.getElementById('rewardAmount').textContent = '¥' + reward.toFixed(2);
+    document.getElementById('totalAmount').textContent = '¥' + total.toFixed(2);
+}
+
+// 打开二次确认弹窗
+function openConfirmModal() {
+    const amount = parseFloat(document.getElementById('depositAmount').value) || 0;
+    document.getElementById('confirmInput').value = amount.toFixed(2);
+    updateConfirmDetail();
+    document.getElementById('confirmModal').classList.add('show');
+}
+
+// 关闭二次确认弹窗
+function closeConfirmModal() {
+    document.getElementById('confirmModal').classList.remove('show');
+}
+
+// 更新确认弹窗详情
+function updateConfirmDetail() {
+    const amount = parseFloat(document.getElementById('confirmInput').value) || 0;
+    let reward = 0;
+    
+    if (memberLevel === '店主' && amount >= REWARD_THRESHOLD) {
+        reward = amount * REWARD_RATE;
+    }
+    
+    const total = amount + reward;
+    
+    document.getElementById('confirmDeposit').textContent = '¥' + amount.toFixed(2);
+    document.getElementById('confirmReward').textContent = '¥' + reward.toFixed(2);
+    document.getElementById('confirmTotal').textContent = '¥' + total.toFixed(2);
+}
+
+// 提交确认
+function submitConfirm() {
+    const amount = parseFloat(document.getElementById('confirmInput').value) || 0;
+    alert('提交成功！实际充值金额：¥' + amount.toFixed(2));
+    closeConfirmModal();
+    closeModal();
+}
+
+// 点击遮罩关闭
+window.onclick = function(e) {
+    if (e.target.classList.contains('modal-overlay')) {
+        e.target.classList.remove('show');
+    }
+}
+</script>
+</body>
+</html>
