@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page 08b/09/10 · 一键复制源码</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", monospace;
+    background: #1e1e2e; color: #cdd6f4; padding: 0; min-height: 100vh;
+}
+.copy-bar {
+    position: sticky; top: 0; z-index: 100;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    padding: 14px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid #313244;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+}
+.copy-bar .title { font-size: 16px; font-weight: 700; color: #f5f5f5; display: flex; align-items: center; gap: 8px; }
+.copy-bar .title .icon { font-size: 22px; }
+.copy-bar .info { font-size: 13px; color: #a6adc8; }
+.copy-btn {
+    padding: 10px 28px; border-radius: 24px; border: none;
+    background: linear-gradient(135deg, #07c160, #06ad56);
+    color: #fff; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all .2s;
+    display: flex; align-items: center; gap: 6px;
+    box-shadow: 0 4px 14px rgba(7,193,96,0.3);
+}
+.copy-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(7,193,96,0.4); }
+.copy-btn:active { transform: scale(0.96); }
+.copy-btn.copied { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 4px 14px rgba(245,158,11,0.3); }
+.code-wrap { padding: 20px; max-width: 960px; margin: 0 auto; }
+.code-wrap pre {
+    background: #181825; border: 1px solid #313244;
+    border-radius: 12px; padding: 20px; overflow-x: auto;
+    font-size: 13px; line-height: 1.65; white-space: pre-wrap; word-break: break-all;
+    font-family: "SF Mono", "Fira Code", "Cascadia Code", Menlo, monospace;
+    color: #cdd6f4;
+}
+</style>
+</head>
+<body>
+
+<div class="copy-bar">
+    <div>
+        <div class="title"><span class="icon">📑</span>Page 08b / 09 / 10 · 横向平铺（修复版）· 完整源码</div>
+        <div class="info">共 15855 字符 / 233 行 · 代付请求详情 + 收银台 + 支付成功</div>
+    </div>
+    <button class="copy-btn" id="copyBtn" onclick="doCopy()">
+        <span>📋</span> 一键复制源码
+    </button>
+</div>
+
+<div class="code-wrap">
+<pre><code id="sourceCode">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;zh-CN&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;Page 08b/09/10 · 代付请求详情 + 收银台 + 支付成功&lt;/title&gt;
+&lt;style&gt;
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, sans-serif;
+    background: #f2f2f2; color: #333; font-size: 14px; line-height: 1.5;
+    display: flex; justify-content: center;
+    min-height: 100vh; padding: 0;
+}
+.phone-frame {
+    width: 375px; min-height: 100vh;
+    background: #f2f2f2;
+    overflow: hidden; position: relative;
+    display: flex; flex-direction: column;
+    margin: 0 auto;
+}
+.page {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #f2f2f2;
+    display: flex; flex-direction: column;
+    opacity: 1; visibility: visible; pointer-events: auto;
+    transform: none; transition: none; z-index: 1;
+}
+
+/* ========== 顶部导航栏 ========== */
+.header {
+    background: #fff; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    border-bottom: 1px solid #eee; font-size: 17px; font-weight: 500; color: #333;
+    position: sticky; top: 0; z-index: 90;
+}
+.header .back {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    display: flex; align-items: center; padding-left: 14px; font-size: 26px; color: #333;
+    cursor: pointer; line-height: 1; user-select: none;
+}
+.header .right { position: absolute; right: 12px; display: flex; gap: 16px; align-items: center; }
+.header .right .dot-btn { font-size: 20px; color: #666; cursor: pointer; letter-spacing: -2px; }
+
+/* 确认订单 */
+.confirm-goods-row { background: #fff; margin-top: 8px; padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start; }
+.cg-thumb { width: 80px; height: 80px; background: #f7f7f7; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 34px; flex-shrink: 0; position: relative; }
+.cg-thumb .sold-tag { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,.55); color: #fff; font-size: 9px; text-align: center; padding: 2px 0; border-radius: 0 0 8px 8px; }
+.cg-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; min-height: 80px; }
+.cg-name-row { display: flex; align-items: center; gap: 6px; }
+.cg-self-tag { display: inline-block; background: #ff6b35; color: #fff; font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 3px; flex-shrink: 0; }
+.cg-name { font-size: 14px; font-weight: 600; color: #222; line-height: 1.4; }
+.cg-spec { font-size: 12px; color: #999; margin-top: 4px; }
+.cg-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+.cg-price-line { display: flex; align-items: baseline; gap: 4px; }
+.cg-fire { font-size: 13px; color: #e64340; }
+.cg-price { font-size: 16px; color: #e64340; font-weight: 700; }
+.cg-price::before { content: &quot;¥&quot;; font-size: 12px; }
+.cg-qty { font-size: 13px; color: #666; }
+
+.co-amt-box { background: #fff; margin-top: 8px; padding: 12px 16px; }
+.co-amt-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 13px; color: #555; }
+
+/* 收银台 */
+.pay-area { background: #fff; text-align: center; padding: 30px 16px 28px; border-bottom: 8px solid #f5f5f5; }
+.cd-label { font-size: 13px; color: #e64340; margin-bottom: 6px; font-weight: 500; }
+.cd-amount { font-size: 42px; color: #222; font-weight: 700; letter-spacing: -1px; }
+.cd-amount::before { content: &quot;¥&quot;; font-size: 24px; font-weight: 600; margin-right: 2px; }
+
+.pm-section { padding: 16px 12px 0; }
+.pm-title { padding: 0 4px 10px; font-size: 14px; color:#666; font-weight: 500; }
+.pm-list { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+.pm-item { display: flex; align-items: center; padding: 14px 14px; border-bottom: 1px solid #f5f5f5; cursor: pointer; user-select: none; }
+.pm-item:last-child { border-bottom: none; }
+.pm-icon { width: 32px; height: 32px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; margin-right: 12px; }
+.pm-icon.o { background: linear-gradient(135deg, #ff9a56, #ff6b35); color: #fff; }
+.pm-icon.g { background: #e8f5e9; color: #07c160; }
+.pm-icon.b { background: #e8f0fe; color: #4285f4; }
+.pm-text { flex: 1; }
+.pm-name { font-size: 15px; color: #333; font-weight: 500; }
+.pm-bal { font-size: 13px; color: #ff6b35; margin-top: 1px; }
+.pm-radio { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid #ccc; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .2s; }
+.pm-radio.on { border-color: #07c160; background: #07c160; }
+.pm-radio.on::after { content: &quot;&quot;; width: 6px; height: 10px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg) translateY(-1px); }
+
+.pay-bar { background: #fff; border-top: 1px solid #eee; padding: 10px 20px; padding-bottom: calc(10px + env(safe-area-inset-bottom)); flex-shrink: 0; position: relative; z-index: 20; }
+.btn-pay { width: 100%; height: 46px; border-radius: 23px; border: none; background: #07c160; color: #fff; font-size: 17px; font-weight: 500; cursor: pointer; user-select: none; display: flex; align-items: center; justify-content: center; }
+
+/* 推荐 */
+.rec-section { background: #fff; margin: 16px 0; padding: 16px; }
+.rec-grid { display: flex; gap: 10px; }
+.rec-itm { flex: 1; }
+.rec-img { width: 100%; aspect-ratio:1; background: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 30px; position: relative; overflow: hidden; }
+.rec-sold { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:56px;height:56px;border-radius:50%;border:2px solid rgba(255,255,255,.6);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.7);font-size:14px;font-weight:700;z-index:2;}
+.rec-nm { font-size: 12px; color: #333; font-weight: 500; margin-top: 6px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.rec-pr { font-size: 14px; color: #e64340; font-weight: 700; margin-top: 4px; }
+.rec-pr::before { content: &quot;¥&quot;; font-size: 11px; }
+
+/* 成功页 */
+.success-body { text-align: center; padding: 42px 20px 30px; }
+.sc-icon { width: 84px; height: 84px; border-radius: 50%; background: linear-gradient(135deg, #dcfce7, #bbf7d0); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; font-size: 40px; animation: popIn .4s ease; }
+@keyframes popIn { from{transform:scale(.5);opacity:0;} to{transform:scale(1);opacity:1;} }
+.sc-title { font-size: 20px; font-weight: 700; color: #222; margin-bottom: 8px; }
+.sc-desc { font-size: 14px; color: #666; margin-bottom: 26px; line-height: 1.6; }
+.sc-card { background: #fff; border-radius: 14px; padding: 16px 20px; text-align: left; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
+.sc-r { display: flex; justify-content: space-between; padding: 9px 0; font-size: 13px; border-bottom: 1px solid #f5f5f5; }
+.sc-r:last-child { border-bottom: none; }
+.sc-k { color: #999; } .sc-v { color: #333; font-weight: 500; }
+.sc-v.hi { color: #e64340; font-weight: 700; font-size: 15px; }
+.sc-v.gr { color: #07c160; font-weight: 700; }
+.sc-btns { margin-top: 26px; display: flex; flex-direction: column; gap: 12px; }
+.sc-btn { height: 46px; border-radius: 23px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; user-select: none; display: flex; align-items: center; justify-content: center; }
+.sc-btn.pri { background: #07c160; color: #fff; }
+.sc-btn.def { background: #fff; color: #555; border: 1px solid #ddd; }
+
+/* FLAT */
+body.flat-body { background: #e0e0e0; margin: 0; padding: 12px; overflow-x: auto; }
+.flat-scroll { display: flex; flex-direction: row; flex-wrap: nowrap; gap: 16px; min-height: 100vh; align-items: flex-start; }
+.flat-col { display: flex; flex-direction: column; width: 375px; flex-shrink: 0; }
+.page-label { background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; padding: 8px 14px; font-size: 12px; font-weight: 700; text-align: center; border-radius: 10px 10px 0 0; letter-spacing: 0.5px; }
+.flat-scroll .phone-frame { width: 375px; min-height: 820px; background: #f2f2f2; overflow: hidden; position: relative; display: flex; flex-direction: column; margin: 0; border-radius: 0 0 10px 10px; box-shadow: 0 4px 24px rgba(0,0,0,0.10); flex-shrink: 0; }
+.flat-scroll .page { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow-y: auto; background: #f2f2f2; display: flex; flex-direction: column; }
+.flat-scroll .header .back { display: none; }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body class=&quot;flat-body&quot;&gt;
+&lt;div class=&quot;flat-scroll&quot;&gt;
+
+    &lt;!-- PAGE 08b: 代付请求详情（支付账号） --&gt;
+    &lt;div class=&quot;flat-col&quot;&gt;
+        &lt;div class=&quot;page-label&quot;&gt;PAGE 08b 代付请求详情（支付账号）&lt;/div&gt;
+        &lt;div class=&quot;phone-frame&quot;&gt;
+            &lt;div class=&quot;page&quot; id=&quot;page-payer-detail-proxy&quot;&gt;
+&lt;div class=&quot;header&quot;&gt;&lt;span class=&quot;back&quot;&gt;‹&lt;/span&gt;待付款&lt;span class=&quot;right&quot;&gt;&lt;span class=&quot;dot-btn&quot;&gt;···&lt;/span&gt;&lt;span class=&quot;dot-btn&quot;&gt;⊙&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;
+&lt;div style=&quot;padding-bottom:16px;&quot;&gt;
+    &lt;div style=&quot;background:#fff;margin-top:8px;padding:14px 16px;position:relative;&quot;&gt;
+        &lt;div style=&quot;display:flex;align-items:center;gap:8px;&quot;&gt;&lt;span style=&quot;font-size:18px;color:#e64340;&quot;&gt;📍&lt;/span&gt;&lt;div style=&quot;flex:1;&quot;&gt;&lt;div style=&quot;font-size:15px;font-weight:600;color:#222;&quot;&gt;宋健 &lt;span style=&quot;font-size:13px;font-weight:400;color:#888;&quot;&gt;183****8442&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;font-size:13px;color:#999;margin-top:2px;&quot;&gt;湖南省长沙市岳麓区中电科技园二期&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div style=&quot;height:4px;width:100%;margin-top:12px;background:repeating-linear-gradient(90deg,#07c160 0,#07c600 10px,transparent 10px,transparent 13px,#1890ff 13px,#1890ff 23px,transparent 23px,transparent 26px,#faad14 26px,#faad14 36px,transparent 36px,transparent 39px,#ff4d4f 39px,#ff4d4f 49px,transparent 49px,transparent 52px);opacity:.45;&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- 代付信息提示 --&gt;
+    &lt;div style=&quot;background:linear-gradient(135deg,#fff7ed,#fed7aa);border:1px solid #fdba74;margin:8px 16px 0;padding:12px 14px;border-radius:10px;display:flex;align-items:center;gap:8px;&quot;&gt;
+        &lt;span style=&quot;font-size:18px;&quot;&gt;🤝&lt;/span&gt;
+        &lt;div style=&quot;flex:1;font-size:12px;color:#92400e;line-height:1.7;&quot;&gt;
+            &lt;strong&gt;关系链成员「李小新」&lt;/strong&gt;请求您代付此订单&lt;br&gt;
+            商品：&lt;strong&gt;赛隆瑶乐饮品 ×1&lt;/strong&gt; · 代付金额：&lt;strong style=&quot;color:#e64340;&quot;&gt;¥0.72&lt;/strong&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;confirm-goods-row&quot; style=&quot;margin-top:8px;&quot;&gt;
+        &lt;div class=&quot;cg-thumb&quot;&gt;🧴&lt;div class=&quot;sold-tag&quot;&gt;上海发货·极速达&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;cg-info&quot;&gt;
+            &lt;div class=&quot;cg-name-row&quot;&gt;&lt;span class=&quot;cg-self-tag&quot;&gt;自营&lt;/span&gt;&lt;span class=&quot;cg-name&quot;&gt;赛隆瑶乐饮品&lt;/span&gt;&lt;/div&gt;
+            &lt;div class=&quot;cg-spec&quot;&gt;2盒&lt;/div&gt;
+            &lt;div class=&quot;cg-bottom&quot;&gt;&lt;div class=&quot;cg-price-line&quot;&gt;&lt;span class=&quot;cg-fire&quot;&gt;🔥&lt;/span&gt;&lt;span&gt;1&lt;/span&gt;&lt;span class=&quot;cg-price&quot;&gt;1.00&lt;/span&gt;&lt;/div&gt;&lt;span class=&quot;cg-qty&quot;&gt;x1&lt;/span&gt;&lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;co-amt-box&quot;&gt;
+        &lt;div class=&quot;co-amt-row&quot;&gt;&lt;span&gt;商品总额(含运费)&lt;/span&gt;&lt;span style=&quot;display:flex;align-items:center;gap:4px;&quot;&gt;&lt;span class=&quot;cg-fire&quot;&gt;🔥&lt;/span&gt;&lt;span&gt;1&lt;/span&gt;&lt;span style=&quot;margin-left:auto;color:#e64340;font-weight:700;&quot;&gt;¥1&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;co-amt-row&quot;&gt;&lt;span&gt;专享优惠&lt;/span&gt;&lt;span style=&quot;color:#07c160;&quot;&gt;- ¥0.25&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;co-amt-row&quot;&gt;&lt;span&gt;余额抵扣&lt;/span&gt;&lt;span style=&quot;color:#07c160;&quot;&gt;- ¥0.03&lt;/span&gt;&lt;/div&gt;
+        &lt;div style=&quot;border-top:1px dashed #eee;margin-top:8px;padding-top:10px;display:flex;justify-content:space-between;align-items:baseline;&quot;&gt;&lt;span style=&quot;font-size:13px;color:#666;&quot;&gt;实付款&lt;/span&gt;&lt;span style=&quot;font-size:20px;color:#e64340;font-weight:700;&quot;&gt;¥0.72&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;co-amt-row&quot; style=&quot;padding-top:8px;border-top:1px solid #f5f5f5;margin-top:4px;&quot;&gt;&lt;span&gt;订单编号&lt;/span&gt;&lt;span style=&quot;display:flex;align-items:center;gap:4px;&quot;&gt;&lt;span style=&quot;color:#333;&quot;&gt;605448&lt;/span&gt;&lt;span style=&quot;color:#1890ff;cursor:pointer;&quot;&gt;| 复制&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;co-amt-row&quot;&gt;&lt;span&gt;下单时间&lt;/span&gt;&lt;span style=&quot;color:#333;&quot;&gt;2026-06-22 19:42:18&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;co-amt-row&quot;&gt;&lt;span&gt;代付人（请求方）&lt;/span&gt;&lt;span style=&quot;color:#333;&quot;&gt;李小新（新人）&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;rec-section&quot;&gt;&lt;div class=&quot;rec-grid&quot;&gt;&lt;div class=&quot;rec-itm&quot;&gt;&lt;div class=&quot;rec-img&quot; style=&quot;background:linear-gradient(135deg,#d1fae5,#a7f3d0);&quot;&gt;💊&lt;div class=&quot;rec-sold&quot;&gt;已售罄&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;rec-nm&quot;&gt;黄精复合益生菌冻干粉&lt;/div&gt;&lt;div class=&quot;rec-pr&quot;&gt;218.00&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;rec-itm&quot;&gt;&lt;div class=&quot;rec-img&quot; style=&quot;background:linear-gradient(135deg,#e0f2fe,#bae6fd);&quot;&gt;🧴&lt;/div&gt;&lt;div class=&quot;rec-nm&quot;&gt;绿韵兰茵益齿健牙膏&lt;/div&gt;&lt;div class=&quot;rec-pr&quot;&gt;9.9&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+
+    &lt;!-- 底部操作栏 --&gt;
+    &lt;div style=&quot;position:sticky;bottom:0;background:#fff;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:center;padding:10px 16px;margin-top:16px;&quot;&gt;
+        &lt;div&gt;&lt;span style=&quot;font-size:14px;color:#333;&quot;&gt;合计：&lt;/span&gt;&lt;span style=&quot;font-size:22px;color:#e64340;font-weight:700;&quot;&gt;0.72&lt;/span&gt;&lt;/div&gt;
+        &lt;button style=&quot;padding:0 32px;height:42px;border-radius:21px;border:none;background:#ff6b35;color:#fff;font-size:16px;font-weight:600;cursor:pointer;&quot;&gt;确认代付&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- PAGE 09: 收银台（支付账号） --&gt;
+    &lt;div class=&quot;flat-col&quot;&gt;
+        &lt;div class=&quot;page-label&quot;&gt;PAGE 09 收银台（支付账号）&lt;/div&gt;
+        &lt;div class=&quot;phone-frame&quot;&gt;
+            &lt;div class=&quot;page&quot; id=&quot;page-payer-checkout&quot;&gt;
+&lt;div class=&quot;header&quot;&gt;&lt;span class=&quot;back&quot;&gt;‹&lt;/span&gt;收银台&lt;span class=&quot;right&quot;&gt;&lt;span class=&quot;dot-btn&quot;&gt;···&lt;/span&gt;&lt;span class=&quot;dot-btn&quot;&gt;⊙&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;pay-area&quot;&gt;
+        &lt;div class=&quot;cd-label&quot;&gt;支付剩余时间 &lt;span id=&quot;pcdT&quot;&gt;29:57&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;cd-amount&quot;&gt;0.72&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;pm-section&quot;&gt;
+    &lt;div class=&quot;pm-title&quot;&gt;选择支付方式&lt;/div&gt;
+    &lt;div class=&quot;pm-list&quot;&gt;
+        &lt;div class=&quot;pm-item&quot;&gt;&lt;div class=&quot;pm-icon o&quot;&gt;💰&lt;/div&gt;&lt;div class=&quot;pm-text&quot;&gt;&lt;div class=&quot;pm-name&quot;&gt;储值支付&lt;/div&gt;&lt;div class=&quot;pm-bal&quot;&gt;¥ 97,992.82&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;pm-radio on&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;pm-item&quot;&gt;&lt;div class=&quot;pm-icon g&quot;&gt;微&lt;/div&gt;&lt;div class=&quot;pm-text&quot;&gt;&lt;div class=&quot;pm-name&quot;&gt;微信支付&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;pm-radio&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;pm-item&quot;&gt;&lt;div class=&quot;pm-icon b&quot;&gt;💳&lt;/div&gt;&lt;div class=&quot;pm-text&quot;&gt;&lt;div class=&quot;pm-name&quot;&gt;银行卡支付&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;pm-radio&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;/div&gt;
+&lt;div class=&quot;pay-bar&quot;&gt;&lt;button class=&quot;btn-pay&quot;&gt;确认支付&lt;/button&gt;&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- PAGE 10: 支付成功 --&gt;
+    &lt;div class=&quot;flat-col&quot;&gt;
+        &lt;div class=&quot;page-label&quot;&gt;PAGE 10 支付成功&lt;/div&gt;
+        &lt;div class=&quot;phone-frame&quot;&gt;
+            &lt;div class=&quot;page&quot; id=&quot;page-success&quot;&gt;
+&lt;div class=&quot;header&quot;&gt;&lt;span class=&quot;back&quot;&gt;‹&lt;/span&gt;支付结果&lt;span class=&quot;right&quot;&gt;&lt;span class=&quot;dot-btn&quot;&gt;···&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;
+&lt;div class=&quot;success-body&quot;&gt;
+    &lt;div class=&quot;sc-icon&quot;&gt;✅&lt;/div&gt;
+    &lt;div class=&quot;sc-title&quot;&gt;代付成功！&lt;/div&gt;
+    &lt;div class=&quot;sc-desc&quot;&gt;您已成功为李小新代付此订单&lt;/div&gt;
+    &lt;div class=&quot;sc-card&quot;&gt;
+        &lt;div class=&quot;sc-r&quot;&gt;&lt;span class=&quot;sc-k&quot;&gt;商品&lt;/span&gt;&lt;span class=&quot;sc-v&quot;&gt;赛隆瑶乐饮品 ×1&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;sc-r&quot;&gt;&lt;span class=&quot;sc-k&quot;&gt;代付人（请求方）&lt;/span&gt;&lt;span class=&quot;sc-v&quot;&gt;李小新&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;sc-r&quot;&gt;&lt;span class=&quot;sc-k&quot;&gt;代付金额&lt;/span&gt;&lt;span class=&quot;sc-v hi&quot;&gt;¥0.72&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;sc-r&quot;&gt;&lt;span class=&quot;sc-k&quot;&gt;支付方式&lt;/span&gt;&lt;span class=&quot;sc-v&quot;&gt;储值支付&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;sc-r&quot;&gt;&lt;span class=&quot;sc-k&quot;&gt;支付时间&lt;/span&gt;&lt;span class=&quot;sc-v&quot;&gt;2026-06-22 19:43:05&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;sc-r&quot;&gt;&lt;span class=&quot;sc-k&quot;&gt;状态&lt;/span&gt;&lt;span class=&quot;sc-v gr&quot;&gt;代付已完成&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;sc-btns&quot;&gt;
+        &lt;button class=&quot;sc-btn def&quot;&gt;查看其他代付请求&lt;/button&gt;
+        &lt;button class=&quot;sc-btn pri&quot;&gt;返回首页&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+
+<script>
+function doCopy() {
+    var code = document.getElementById('sourceCode').textContent;
+    var btn = document.getElementById('copyBtn');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(function() {
+            btn.innerHTML = '<span>✅</span> 复制成功！';
+            btn.classList.add('copied');
+            setTimeout(function() {
+                btn.innerHTML = '<span>📋</span> 一键复制源码';
+                btn.classList.remove('copied');
+            }, 2000);
+        }).catch(function() { fallbackCopy(code); });
+    } else { fallbackCopy(code); }
+}
+function fallbackCopy(code) {
+    var ta = document.createElement('textarea');
+    ta.value = code; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); var btn = document.getElementById('copyBtn');
+        btn.innerHTML = '<span>✅</span> 复制成功！'; btn.classList.add('copied');
+        setTimeout(function() { btn.innerHTML = '<span>📋</span> 一键复制源码'; btn.classList.remove('copied'); }, 2000);
+    } catch(e) { alert('复制失败，请手动全选复制'); }
+    document.body.removeChild(ta);
+}
+</script>
+</body>
+</html>
