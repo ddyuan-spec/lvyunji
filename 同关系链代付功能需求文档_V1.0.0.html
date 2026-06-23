@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>同关系链代付功能需求文档 V1.0.0</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "SimSun", sans-serif;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #333;
+    background: #fff;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 22px;
+    color: #1a1a1a;
+    text-align: center;
+    padding: 24px 0 16px;
+    border-bottom: 2px solid #07c160;
+    margin-bottom: 32px;
+  }
+  h2 {
+    font-size: 17px;
+    color: #07c160;
+    margin: 28px 0 12px;
+    padding: 8px 12px;
+    background: #f0faf4;
+    border-left: 4px solid #07c160;
+    border-radius: 0 6px 6px 0;
+  }
+  h3 {
+    font-size: 15px;
+    color: #222;
+    margin: 20px 0 8px;
+    font-weight: 600;
+  }
+  p {
+    margin: 8px 0;
+    text-align: justify;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 20px;
+    font-size: 13px;
+  }
+  th {
+    background: #07c160;
+    color: #fff;
+    padding: 9px 12px;
+    text-align: left;
+    font-weight: 600;
+  }
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td {
+    background: #f9f9f9;
+  }
+  code {
+    background: #f5f5f5;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #e64340;
+  }
+  pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 16px 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 12px 0;
+  }
+  pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+  }
+  hr {
+    border: none;
+    border-top: 1px dashed #ddd;
+    margin: 24px 0;
+  }
+  ul, ol {
+    padding-left: 24px;
+    margin: 8px 0;
+  }
+  li {
+    margin: 4px 0;
+  }
+  strong {
+    color: #07c160;
+    font-weight: 600;
+  }
+  @media print {
+    body { padding: 20px 24px; }
+    h2 { break-before: page; }
+  }
+</style>
+</head>
+<body>
+<h1>需求文档——同关系链代付功能</h1>
+<hr />
+<h2>一、文档信息</h2>
+<table>
+<thead>
+<tr>
+<th>时间</th>
+<th>版本号</th>
+<th>变更人</th>
+<th>主要变更内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026-06-23</td>
+<td>V1.0.0</td>
+<td>—</td>
+<td>新建需求文档，基于交互原型输出</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>二、需求背景</h2>
+<p>当前绿韵家电商平台中，老会员（有 wallet 余额）无法直接为关系链内的新会员代付订单，新会员需自行完成支付，流程不够便捷。</p>
+<p>本次新增「同关系链代付功能」，实现以下目标：
+1. 订单账号（新会员）下单后，可发起代付请求，指定关系链内的老会员（支付账号）代为支付；
+2. 支付账号收到代付请求后，可在 App 内完成确认并支付，支付规则为 <strong>70% 电子钱包 + 30% 储值钱包</strong>；
+3. 支付完成后，订单在两端正常流转：订单账号可查看发货/收货状态，支付账号仅展示代付记录无操作权限；
+4. 代付请求通过「智连 · 交易消息」推送，支付账号可点击消息直接跳转至对应代付订单详情。</p>
+<hr />
+<h2>三、原型地址</h2>
+<blockquote>
+<p>交互原型（HTML）：<code>https://ddyuan-spec.github.io/lvyunji/proxy-payment-prototype.html</code></p>
+</blockquote>
+<p>原型包含 11 个页面，覆盖订单账号和支付账号的完整交互链路。</p>
+<hr />
+<h2>四、业务流程图</h2>
+<pre><code>┌──────────┐
+│                        同关系链代付业务流程                            │
+├──────────┤
+│                                                                           │
+│  [订单账号]              [系统]                 [支付账号]              │
+│      │                       │                        │                 │
+│      │── 下单 → 确认订单                                │                 │
+│      │── 收银台选择&quot;找人代付&quot;                         │                 │
+│      │── 输入关系链账号 → 校验通过                     │                 │
+│      │── 发起代付请求 ─────→ 推送智连消息 ─────→ │                 │
+│      │                       │              │                 │
+│      │                       │    │── 查看消息/订单列表                 │
+│      │                       │    │── 查看代付订单详情                 │
+│      │                       │    │── 确认并支付（70%电子+30%储值）    │
+│      │   ←── 支付成功 ──────── 推送通知 ←─── │                 │
+│      │                       │                        │                 │
+│      │── 查看订单（待发货→待收货→已完成）             │                 │
+│      │                       │    │── 查看代付记录（仅展示无操作）       │
+│                                                                           │
+└──────────┘
+</code></pre>
+<hr />
+<h2>五、需求说明</h2>
+<h3>5.1 状态流转图</h3>
+<p><strong>代付请求状态流转：</strong></p>
+<pre><code>[待确认] ── 支付账号点击&quot;立即代付&quot; → [支付中] ── 支付成功 → [已完成]
+    │
+    └── 订单账号取消代付请求 → [已取消]
+</code></pre>
+<p><strong>订单状态流转（支付完成后）：</strong></p>
+<pre><code>[已支付·待发货] → [待收货] → [已完成]
+</code></pre>
+<hr />
+<h3>5.2 涉及页面及功能说明</h3>
+<h4>PAGE 01：商品详情（订单账号视角）</h4>
+<table>
+<thead>
+<tr>
+<th>字段/功能</th>
+<th>需求说明</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>商品展示</td>
+<td>展示商品图片、名称、规格、价格（🔥价）、运费</td>
+<td>参考现有商品详情页样式</td>
+</tr>
+<tr>
+<td>立即购买</td>
+<td>点击进入确认订单页（page-confirm-order）</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h4>PAGE 02：确认订单（订单账号视角）</h4>
+<table>
+<thead>
+<tr>
+<th>字段/功能</th>
+<th>需求说明</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>收货地址</td>
+<td>展示收货人姓名、手机号、收货地址</td>
+<td></td>
+</tr>
+<tr>
+<td>商品信息</td>
+<td>展示商品缩略图、名称、规格、单价、数量</td>
+<td></td>
+</tr>
+<tr>
+<td>商品总额</td>
+<td>商品金额 + 运费，合计展示</td>
+<td></td>
+</tr>
+<tr>
+<td>确认购买</td>
+<td>点击进入收银台（page-checkout）</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h4>PAGE 03：收银台（订单账号视角）</h4>
+<table>
+<thead>
+<tr>
+<th>字段/功能</th>
+<th>需求说明</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>应付金额</td>
+<td>居中大字体展示订单应付总额（¥符号前缀）</td>
+<td></td>
+</tr>
+<tr>
+<td>支付方式</td>
+<td>支持选择：电子钱包、储值钱包（比例规则由后端控制）</td>
+<td></td>
+</tr>
+<tr>
+<td>找人代付</td>
+<td><strong>新增按钮</strong>，点击进入代付人信息输入页（page-input-proxy）</td>
+<td>红色/橙色高亮按钮</td>
+</tr>
+<tr>
+<td>确认支付</td>
+<td>直接支付（不使用代付）时点击，支付成功后跳转成功页</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h4>PAGE 04：代付人信息输入（订单账号视角）</h4>
+<table>
+<thead>
+<tr>
+<th>字段/功能</th>
+<th>需求说明</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>页面标题</td>
+<td>「输入同链路账号」</td>
+<td></td>
+</tr>
+<tr>
+<td>手机号输入</td>
+<td>输入框，支持输入老会员手机号，最多11位</td>
+<td>输入时实时触发搜索联想</td>
+</tr>
+<tr>
+<td>搜索联想</td>
+<td>输入任意字符后，下拉展示关系链内匹配用户（上级/平级/下级），点击自动填充</td>
+<td>联想数据来自关系链系统</td>
+</tr>
+<tr>
+<td>历史代付人</td>
+<td>输入框下方展示「最近请求过的代付人」，可直接点击选择</td>
+<td></td>
+</tr>
+<tr>
+<td>关系链校验</td>
+<td>点击「发起代付请求」后，校验输入账号是否在当前用户关系链内</td>
+<td>校验通过显示「✅ 关系链校验通过」</td>
+</tr>
+<tr>
+<td>发起代付请求</td>
+<td>校验通过后点击，生成代付请求并推送消息至支付账号，跳转等待确认页</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>关系链校验规则：</strong>
+- 仅同关系链（上级、平级、下级）内的老会员可被指定为代付人；
+- 校验不通过时 toast 提示"该用户不在您的关系链内，无法发起代付"；
+- 校验通过后，按钮变为「发起代付请求」。</p>
+<hr />
+<h4>PAGE 05：等待确认（订单账号视角）</h4>
+<table>
+<thead>
+<tr>
+<th>字段/功能</th>
+<th>需求说明</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>状态展示</td>
+<td>展示"代付请求已发送，正在等待 XX 确认代付"</td>
+<td></td>
+</tr>
+<tr>
+<td>请求详情</td>
+<td>展示代付人、商品、代付金额、当前状态</td>
+<td></td>
+</tr>
+<tr>
+<td>取消代付请求</td>
+<td>点击后弹出确认弹窗，确认后取消代付请求，订单恢复为待支付状态</td>
+<td></td>
+</tr>
+<tr>
+<td>切换提示</td>
+<td>展示"点击切换到「支付账号」去确认代付"（仅供原型演示，实际为推送通知）</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h4>PAGE 06：支付账号首页</h4>
+<table>
+<thead>
+<tr>
+<th>字段/功能</th>
+<th>需求说明</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用户信息</td>
+<td>展示头像、昵称、会员等级、手机号</td>
+<td></td>
+</tr>
+<tr>
+<td>我的订单</td>
+<td>点击进入支付账号订单列表（page-payer-orders）</td>
+<td></td>
+</tr>
+<tr>
+<td>智连 · 交易消息</td>
+<td><strong>新增入口</strong>，点击进入智连消息列表页（page-connect-msg），有未读消息时展示红点</td>
+<td>红点数字表示未处理代付请求数量</td>
+</tr>
+<tr>
+<td>我的钱包</td>
+<td>点击进入钱包页（已有功能）</td>
+<td></td>
+</tr>
+<tr>
+<td>我的关系链</td>
+<td>点击进入关系链页（已有功能）</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h4>PAGE 06b：智连 · 交易消息（支付账号视角）</h4>
+<table>
+<thead>
+<tr>
+<th>字段/功能</th>
+<th>需求说明</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tab 栏</td>
+<td>四个 Tab：交易 / 消息 / 通知 / 服务，默认选中「交易」</td>
+<td></td>
+</tr>
+<tr>
+<td>消息列表</td>
+<td>每条消息展示：蓝色图标、消息标题、时间、内容摘要</td>
+<td></td>
+</tr>
+<tr>
+<td>消息1（未读）</td>
+<td>标题「平台消息」，内容「您有一条代付请求，请尽快处理」，点击跳转代付订单详情页</td>
+<td>图标：蓝色¥方块</td>
+</tr>
+<tr>
+<td>消息2</td>
+<td>标题「平台消息」，内容「您有一条代付请求已完成，点击查看详情」，点击跳转代付订单详情页</td>
+<td></td>
+</tr>
+<tr>
+<td>消息3</td>
+<td>标题「平台消息」，内容「您的会员等级已提升至黄金会员…」</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>消息列表样式规范：</strong>
+- 消息行高：56px，行内间距 10px；
+- 图标：40×40px，蓝色（#3b82f6）圆角方块，白色¥符号；
+- 未读消息：左侧蓝色圆点标识（8×8px）；
+- 日期格式：<code>YYYY-MM-DD</code>（如 2026-01-23）。</p>
+<hr />
+<h4>PAGE 07：支付账号-订单列表</h4>
+<table>
+<thead>
+<tr>
+<th>字段/功能</th>
+<th>需求说明</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tab 栏</td>
+<td>全部 / 待付款 / 待发货·待核销 / 待收货 / 已完成</td>
+<td></td>
+</tr>
+<tr>
+<td>代付请求卡片</td>
+<td>边框高亮（橙色），标签「🤝 代付请求」，状态「待付款」，点击进入代付订单详情（page-payer-detail-proxy）</td>
+<td></td>
+</tr>
+<tr>
+<td>已完成代付卡片</td>
+<td>标签「🤝 代付(已完成)」，状态「已完成」，点击进入详情（仅展示无操作）</td>
+<td>支付成功后自动更新</td>
+</tr>
+<tr>
+<td>普通订单卡片</td>
+<td>展示普通订单信息，点击进入订单详情（page-payer-detail）</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h4>PAGE 08：待付款订单详情（支付账号视角）</h4>
+<blockquote>
+<p>此页面为普通订单详情，略。</p>
+</blockquote>
+<hr />
+<h4>PAGE 09：代付请求订单详情（支付账号视角）</h4>
+<table>
+<thead>
+<tr>
+<th>字段/功能</th>
+<th>需求说明</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>代付标识</td>
+<td>页面顶部展示「🤝 代付请求」标签，明确区分代付订单与普通订单</td>
+<td></td>
+</tr>
+<tr>
+<td>订单信息</td>
+<td>展示订单号、商品信息、代付金额</td>
+<td></td>
+</tr>
+<tr>
+<td>下单人信息</td>
+<td>展示下单人（新会员）昵称、手机号</td>
+<td></td>
+</tr>
+<tr>
+<td>立即代付</td>
+<td>点击进入支付账号收银台（page-payer-checkout）</td>
+<td>橙色高亮按钮</td>
+</tr>
+<tr>
+<td>联系客服</td>
+<td>点击 toast 提示"联系客服"</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h4>PAGE 09b：支付账号-收银台（代付支付）</h4>
+<table>
+<thead>
+<tr>
+<th>字段/功能</th>
+<th>需求说明</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>应付金额</td>
+<td>居中大字体展示代付金额</td>
+<td></td>
+</tr>
+<tr>
+<td>支付方式</td>
+<td><strong>固定比例</strong>：70% 电子钱包 + 30% 储值钱包，用户不可修改比例</td>
+<td>支付规则由产品确定，后续可在后台配置</td>
+</tr>
+<tr>
+<td>确认支付</td>
+<td>点击后模拟支付处理，成功后跳转成功页（page-success）</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>支付比例规则（当前版本）：</strong>
+- 电子钱包扣款比例：70%
+- 储值钱包扣款比例：30%
+- 两种钱包余额均不足时，支付失败并 toast 提示；
+- 单一钱包余额不足时，优先从另一钱包扣取差额（具体规则可与后端确认）。</p>
+<hr />
+<h4>PAGE 10/11：支付成功页</h4>
+<table>
+<thead>
+<tr>
+<th>字段/功能</th>
+<th>需求说明</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>成功图标</td>
+<td>绿色圆形背景 + ✓ 图标</td>
+<td></td>
+</tr>
+<tr>
+<td>成功提示</td>
+<td>订单账号视角：「XX 已为您完成代付，您的订单已生成并支付成功」；支付账号视角：「您已成功为 XX 完成代付，订单已生成」</td>
+<td></td>
+</tr>
+<tr>
+<td>订单信息卡</td>
+<td>展示订单编号、下单人、代付人、代付金额、支付时间、状态</td>
+<td></td>
+</tr>
+<tr>
+<td>查看订单</td>
+<td>点击跳转至对应订单详情</td>
+<td></td>
+</tr>
+<tr>
+<td>返回首页</td>
+<td>点击返回商品详情页</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3>5.3 订单在两端的状态同步</h3>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>订单账号视角</th>
+<th>支付账号视角</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>代付请求已发起，待支付账号确认</td>
+<td>订单状态：待付款（代付中）；可取消代付请求</td>
+<td>智连消息：待处理；订单列表：待付款</td>
+</tr>
+<tr>
+<td>支付账号已支付</td>
+<td>订单状态：已支付·待发货；可查看物流</td>
+<td>订单状态：已完成·代付(已完成)；仅展示无操作</td>
+</tr>
+<tr>
+<td>商家发货</td>
+<td>订单状态：待收货；可确认收货</td>
+<td>订单状态：待收货（仅展示）；无操作按钮</td>
+</tr>
+<tr>
+<td>订单账号确认收货</td>
+<td>订单状态：已完成</td>
+<td>订单状态：已完成（仅展示）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>支付账号视角订单操作权限：</strong>
+- 代付请求「待付款」状态：支持「立即代付」操作；
+- 代付完成后：订单仅展示，无任何操作按钮（联系客服除外）；
+- 标识：订单详情页顶部展示「🤝 代付订单」标签，区别于普通订单。</p>
+<hr />
+<h3>5.4 权限说明</h3>
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>权限说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>订单账号（新会员）</td>
+<td>可发起代付请求、取消代付请求、查看订单流转状态</td>
+</tr>
+<tr>
+<td>支付账号（老会员）</td>
+<td>可查看代付请求、完成代付支付、查看代付记录（仅展示）</td>
+</tr>
+<tr>
+<td>关系链限制</td>
+<td>仅同关系链内的老会员可被指定为代付人，跨关系链不可代付</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3>5.5 接口说明（待后端补充）</h3>
+<blockquote>
+<p>以下接口为预估，需与后端确认具体入参/出参。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>接口名称</th>
+<th>接口说明</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>校验关系链</td>
+<td>传入订单账号ID + 输入手机号，返回是否在关系链内及关系类型（上级/平级/下级）</td>
+<td></td>
+</tr>
+<tr>
+<td>发起代付请求</td>
+<td>生成代付请求记录，推送智连消息至支付账号</td>
+<td></td>
+</tr>
+<tr>
+<td>查询代付请求列表</td>
+<td>支付账号查询待处理/已完成的代付请求</td>
+<td></td>
+</tr>
+<tr>
+<td>确认代付支付</td>
+<td>支付账号确认代付，按 70%/30% 比例从两个钱包扣款</td>
+<td></td>
+</tr>
+<tr>
+<td>取消代付请求</td>
+<td>订单账号取消代付请求，恢复订单为待支付状态</td>
+<td></td>
+</tr>
+<tr>
+<td>查询订单状态</td>
+<td>两端查询订单最新状态</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3>5.6 数据字段说明</h3>
+<p><strong>代付请求表（预估）：</strong></p>
+<table>
+<thead>
+<tr>
+<th>字段名称</th>
+<th>说明</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>代付请求ID</td>
+<td>唯一标识</td>
+<td>BigInt</td>
+</tr>
+<tr>
+<td>订单号</td>
+<td>关联的订单编号</td>
+<td>Varchar</td>
+</tr>
+<tr>
+<td>订单账号ID</td>
+<td>发起代付的用户ID</td>
+<td>BigInt</td>
+</tr>
+<tr>
+<td>订单账号名称</td>
+<td>发起代付的用户名称</td>
+<td>Varchar</td>
+</tr>
+<tr>
+<td>支付账号ID</td>
+<td>被指定代付的用户ID</td>
+<td>BigInt</td>
+</tr>
+<tr>
+<td>支付账号名称</td>
+<td>被指定代付的用户名称</td>
+<td>Varchar</td>
+</tr>
+<tr>
+<td>代付金额</td>
+<td>需代付的金额</td>
+<td>Decimal(10,2)</td>
+</tr>
+<tr>
+<td>钱包扣款比例</td>
+<td>电子钱包比例%/储值钱包比例%（当前固定70/30）</td>
+<td>Varchar</td>
+</tr>
+<tr>
+<td>状态</td>
+<td>待确认 / 支付中 / 已完成 / 已取消</td>
+<td>Enum</td>
+</tr>
+<tr>
+<td>创建时间</td>
+<td>代付请求创建时间</td>
+<td>Datetime</td>
+</tr>
+<tr>
+<td>支付时间</td>
+<td>代付完成时间</td>
+<td>Datetime</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>六、附录</h2>
+<h3>6.1 原型页面清单</h3>
+<table>
+<thead>
+<tr>
+<th>页面编号</th>
+<th>页面名称</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PAGE 01</td>
+<td>商品详情</td>
+<td>订单账号视角，发起代付的起点</td>
+</tr>
+<tr>
+<td>PAGE 02</td>
+<td>确认订单</td>
+<td>订单账号视角</td>
+</tr>
+<tr>
+<td>PAGE 03</td>
+<td>收银台（订单账号）</td>
+<td>含「找人代付」入口</td>
+</tr>
+<tr>
+<td>PAGE 04</td>
+<td>代付人信息输入</td>
+<td>输入同链路账号，关系链校验</td>
+</tr>
+<tr>
+<td>PAGE 05</td>
+<td>等待确认</td>
+<td>订单账号视角，展示代付进度</td>
+</tr>
+<tr>
+<td>PAGE 06</td>
+<td>支付账号首页</td>
+<td>含「智连·交易消息」入口</td>
+</tr>
+<tr>
+<td>PAGE 06b</td>
+<td>智连·交易消息</td>
+<td>消息列表，点击跳转代付详情</td>
+</tr>
+<tr>
+<td>PAGE 07</td>
+<td>支付账号-订单列表</td>
+<td>含代付请求卡片</td>
+</tr>
+<tr>
+<td>PAGE 08</td>
+<td>待付款订单详情</td>
+<td>支付账号视角普通订单</td>
+</tr>
+<tr>
+<td>PAGE 09</td>
+<td>代付请求订单详情</td>
+<td>支付账号视角，含「立即代付」按钮</td>
+</tr>
+<tr>
+<td>PAGE 09b</td>
+<td>收银台（支付账号）</td>
+<td>固定 70%/30% 扣款比例</td>
+</tr>
+<tr>
+<td>PAGE 10/11</td>
+<td>支付成功</td>
+<td>区分订单账号/支付账号视角</td>
+</tr>
+</tbody>
+</table>
+<h3>6.2 待确认事项</h3>
+<ol>
+<li><strong>支付比例规则</strong>：当前原型固定为 70% 电子钱包 + 30% 储值钱包，是否需要在后台支持配置？</li>
+<li><strong>代付请求有效期</strong>：代付请求发起后，支付账号多久内需处理？超时是否自动取消？</li>
+<li><strong>智连消息推送</strong>：消息推送的实际触发节点和文案是否需要单独评审？</li>
+<li><strong>钱包余额不足</strong>：单一钱包余额不足时的扣款策略，需与财务/后端确认。</li>
+<li><strong>关系链校验</strong>：校验接口的数据来源和系统对接方式，需与关系链模块负责人确认。</li>
+</ol>
+<hr />
+<p><em>文档创建时间：2026-06-23</em>
+<em>文档版本：V1.0.0</em></p>
+</body>
+</html>
