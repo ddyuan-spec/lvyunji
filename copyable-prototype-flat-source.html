@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>关系链代付 · 横向平铺原型 · 一键复制源码</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", monospace;
+    background: #1e1e2e; color: #cdd6f4; padding: 0;
+    min-height: 100vh;
+}
+.copy-bar {
+    position: sticky; top: 0; z-index: 100;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    padding: 14px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid #313244;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+}
+.copy-bar .title { font-size: 16px; font-weight: 700; color: #f5f5f5; display: flex; align-items: center; gap: 8px; }
+.copy-bar .title .icon { font-size: 22px; }
+.copy-bar .info { font-size: 13px; color: #a6adc8; }
+.copy-btn {
+    padding: 10px 28px; border-radius: 24px; border: none;
+    background: linear-gradient(135deg, #07c160, #06ad56);
+    color: #fff; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all .2s;
+    display: flex; align-items: center; gap: 6px;
+    box-shadow: 0 4px 14px rgba(7,193,96,0.3);
+}
+.copy-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(7,193,96,0.4); }
+.copy-btn:active { transform: scale(0.96); }
+.copy-btn.copied { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 4px 14px rgba(245,158,11,0.3); }
+.code-wrap {
+    padding: 20px; max-width: 960px; margin: 0 auto;
+}
+.code-wrap pre {
+    background: #181825; border: 1px solid #313244;
+    border-radius: 12px; padding: 20px; overflow-x: auto;
+    font-size: 13px; line-height: 1.65; white-space: pre-wrap; word-break: break-all;
+    font-family: "SF Mono", "Fira Code", "Cascadia Code", Menlo, monospace;
+    color: #cdd6f4;
+}
+</style>
+</head>
+<body>
+
+<div class="copy-bar">
+    <div>
+        <div class="title"><span class="icon">🗂️</span>关系链代付 · 横向平铺原型（无交互）完整源码</div>
+        <div class="info">共 62681 字符 / 1092 行 · 12 个页面横向展开 · 点击按钮一键复制全部源码</div>
+    </div>
+    <button class="copy-btn" id="copyBtn" onclick="doCopy()">
+        <span>📋</span> 一键复制源码
+    </button>
+</div>
+
+<div class="code-wrap">
+<pre><code id="sourceCode">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;zh-CN&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;关系链代付 · 全页面展开（无交互·可复制）&lt;/title&gt;
+&lt;style&gt;
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, sans-serif;
+    background: #f2f2f2; color: #333; font-size: 14px; line-height: 1.5;
+    display: flex; justify-content: center;
+    min-height: 100vh; padding: 0;
+    overflow-x: hidden;
+}
+
+/* ========== 容器 ========== */
+.phone-frame {
+    width: 375px; min-height: 100vh;
+    background: #f2f2f2;
+    overflow: hidden; position: relative;
+    display: flex; flex-direction: column;
+    margin: 0 auto;
+}
+
+}
+
+/* 账号切换栏 */
+.account-bar {
+    background: linear-gradient(135deg,#1a1a2e,#16213e); padding: 10px 14px;
+    display: flex; gap: 6px; z-index: 100; position: relative; flex-shrink: 0;
+}
+.acct-btn {
+    flex: 1; padding: 7px 0; border-radius: 16px; font-size: 12px; font-weight: 600;
+    text-align: center; cursor: pointer; border: none; color: rgba(255,255,255,0.55);
+    background: rgba(255,255,255,0.08); transition: all .25s;
+}
+.acct-btn.active {
+    background: rgba(255,255,255,0.16); color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.acct-btn .role-tag { font-size: 9px; opacity: 0.65; margin-top: 1px; }
+
+/* ========== 页面容器 ========== */
+.pages-container { flex: 1; overflow: hidden; position: relative; }
+.page {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #f2f2f2;
+    display: flex; flex-direction: column;
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transform: translateX(30px); transition: opacity .25s, transform .35s ease, visibility .25s;
+}
+.page &gt; .header { flex-shrink: 0; }
+.page-scroll {
+    flex: 1; overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.page.active {
+    opacity: 1; visibility: visible; pointer-events: auto;
+    transform: translateX(0); z-index: 10;
+}
+.page.slide-left { transform: translateX(-30px); }
+.page.slide-right { transform: translateX(30px); }
+
+/* ========== 顶部导航栏 ========== */
+.header {
+    background: #fff; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    border-bottom: 1px solid #eee; font-size: 17px; font-weight: 500; color: #333;
+    position: sticky; top: 0; z-index: 90;
+}
+.header .back {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    display: flex; align-items: center; padding-left: 14px; font-size: 26px; color: #333;
+    cursor: pointer; line-height: 1; user-select: none;
+}
+.header .back:active { opacity: 0.5; }
+.header .right {
+    position: absolute; right: 12px; display: flex; gap: 16px; align-items: center;
+}
+.header .right .dot-btn { font-size: 20px; color: #666; cursor: pointer; letter-spacing: -2px; }
+
+/* ========== 弹窗 ========== */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,.45); z-index: 2000;
+    display: none; align-items: center; justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal-box {
+    background: #fff; border-radius: 16px; width: 300px; padding: 28px 24px 24px;
+    text-align: center; animation: modalIn .3s ease;
+}
+@keyframes modalIn { from{opacity:0;transform:scale(.92);} to{opacity:1;transform:scale(1);} }
+.modal-icon { font-size: 48px; margin-bottom: 12px; }
+.modal-title { font-size: 17px; font-weight: 700; color: #222; margin-bottom: 8px; }
+.modal-desc { font-size: 13px; color: #666; line-height: 1.7; margin-bottom: 22px; }
+.modal-btns { display: flex; gap: 10px; }
+.modal-btn { flex: 1; height: 42px; border-radius: 21px; border: none; font-size: 15px; font-weight: 600; cursor: pointer; }
+.modal-btn.primary { background: #ff6b35; color: #fff; }
+.modal-btn.default { background: #f5f5f5; color: #666; }
+
+/* ========== 商品详情页 ========== */
+.swiper-area {
+    width: 100%; height: 340px; background: linear-gradient(135deg, #fff8e6, #ffe8cc);
+    display: flex; align-items: center; justify-content: center; font-size: 80px;
+    position: relative; flex-shrink: 0;
+}
+.swiper-dots { position: absolute; bottom: 10px; right: 14px; background: rgba(0,0,0,.35); padding: 3px 9px; border-radius: 10px; }
+.swiper-dots span { color: #fff; font-size: 11px; }
+
+.price-section { background: #fff; padding: 13px 16px; }
+.price-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.current-price { font-size: 26px; color: #e64340; font-weight: 700; letter-spacing: -.5px; }
+.current-price::before { content: &quot;\00A5&quot;; font-size: 15px; font-weight: 600; }
+.original-price { font-size: 13px; color: #ccc; text-decoration: line-through; }
+.sales-tag { display: inline-flex; align-items: center; gap: 2px; font-size: 11px; color: #ff6b35; font-weight: 500; }
+.sales-tag::before { content: &quot;\u{1F525}&quot;; }
+
+.title-section { background: #fff; padding: 0 16px 13px; border-top: 1px solid #f5f5f5; }
+.title-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.self-tag { display: inline-block; background: #ff6b35; color: #fff; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 3px; flex-shrink: 0; }
+.product-title { font-size: 16px; font-weight: 700; color: #222; line-height: 1.45; }
+
+.info-section { background: #fff; margin-top: 8px; }
+.info-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; border-bottom: 1px solid #f5f5f5; min-height: 48px; }
+.info-row:last-child { border-bottom: none; }
+.info-label { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #333; font-weight: 500; }
+.info-label .icon { font-size: 16px; width: 22px; text-align: center; }
+.info-value { font-size: 13px; color: #666; display: flex; align-items: center; gap: 4px; }
+.info-value .arrow { color: #ccc; font-size: 12px; cursor: pointer; }
+
+.qty-section { background: #fff; padding: 13px 16px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; }
+.qty-label { font-size: 14px; font-weight: 600; color: #333; }
+.qty-control { display: flex; align-items: center; border: 1px solid #e0e0e0; border-radius: 6px; overflow: hidden; }
+.qty-btn { width: 38px; height: 34px; display: flex; align-items: center; justify-content: center; background: #f7f7f7; border: none; font-size: 18px; color: #333; cursor: pointer; user-select: none; }
+.qty-btn:active { background: #e8e8e8; }
+.qty-input { width: 48px; height: 34px; text-align: center; border: none; border-left: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0; font-size: 15px; color: #333; font-weight: 600; outline: none; }
+
+/* 商品详情底栏 */
+.bottom-bar {
+    background: #fff; border-top: 1px solid #eee;
+    display: flex; align-items: center; padding: 6px 12px;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom));
+}
+.icon-btns { display: flex; gap: 16px; padding-right: 12px; }
+.icon-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; color: #555; cursor: pointer; user-select: none; }
+.icon-btn .emoji { font-size: 22px; }
+.action-btns { flex: 1; display: flex; gap: 8px; }
+.btn { flex: 1; height: 38px; border-radius: 19px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; user-select: none; display: flex; align-items: center; justify-content: center; }
+.btn-cart { background: #fff; color: #333; border: 1px solid #ddd; }
+.btn-buy { background: #07c160; color: #fff; border-radius: 19px; }
+.btn-buy:active { background: #06ad56; }
+
+/* ========== 确认订单页 ========== */
+.addr-card-confirm { background: #fff; padding: 14px 16px; position: relative; cursor: pointer; }
+.addr-card-confirm .addr-row { display: flex; align-items: center; gap: 8px; }
+.addr-card-confirm .addr-name { font-size: 15px; font-weight: 600; color: #222; }
+.addr-card-confirm .addr-phone { font-size: 14px; color: #555; }
+.addr-card-confirm .addr-detail { font-size: 13px; color: #888; line-height: 1.5; margin-top: 4px; }
+.addr-line {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
+    background: repeating-linear-gradient(90deg, #07c160 0,#07c600 10px,transparent 10px,transparent 13px, #1890ff 13px,#1890ff 23px, transparent 23px,transparent 26px, #faad14 26px,#faad14 36px, transparent 36px,transparent 39px, #ff4d4f 39px,#ff4d4f 49px, transparent 49px,transparent 52px);
+    opacity: 0.45;
+}
+
+.confirm-goods-row { background: #fff; margin-top: 8px; padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start; }
+.cg-thumb { width: 80px; height: 80px; background: #f7f7f7; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 34px; flex-shrink: 0; position: relative; }
+.cg-thumb .sold-tag { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,.55); color: #fff; font-size: 9px; text-align: center; padding: 2px 0; border-radius: 0 0 8px 8px; }
+.cg-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; min-height: 80px; }
+.cg-name-row { display: flex; align-items: center; gap: 6px; }
+.cg-self-tag { display: inline-block; background: #ff6b35; color: #fff; font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 3px; flex-shrink: 0; }
+.cg-name { font-size: 14px; font-weight: 600; color: #222; line-height: 1.4; }
+.cg-spec { font-size: 12px; color: #999; margin-top: 4px; }
+.cg-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+.cg-price-line { display: flex; align-items: baseline; gap: 4px; }
+.cg-fire { font-size: 13px; color: #e64340; }
+.cg-price { font-size: 16px; color: #e64340; font-weight: 700; }
+.cg-price::before { content: &quot;\00A5&quot;; font-size: 12px; }
+.cg-qty { font-size: 13px; color: #666; }
+
+.co-amt-box { background: #fff; margin-top: 8px; padding: 12px 16px; }
+.co-amt-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; color: #555; align-items: center; }
+.coupon-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
+.coupon-left { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #333; }
+.coupon-count { font-size: 12px; color: #e64340; }
+.coupon-radio { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid #ddd; flex-shrink: 0; }
+.deduct-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
+.deduct-left { font-size: 13px; color: #333; }
+.deduct-count { font-size: 12px; color: #07c160; }
+.deduct-hint { font-size: 12px; color: #e64340; }
+.deduct-check { width: 20px; height: 20px; border-radius: 50%; background: #07c160; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.deduct-check::after { content:&quot;\2713&quot;; color:#fff; font-size:12px; font-weight:700; }
+
+.co-total-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0 6px; border-top: 1px dashed #eee; margin-top: 4px; }
+.co-total-lbl { font-size: 13px; color: #666; }
+.co-total-val { font-size: 20px; color: #e64340; font-weight: 700; }
+.co-total-val::before { content: &quot;\00A5&quot;; font-size: 13px; font-weight: 500; }
+
+.confirm-buy-bar {
+    background: #fff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+}
+.cbb-left { display: flex; align-items: baseline; gap: 4px; }
+.cbb-text { font-size: 14px; color: #333; }
+.cbb-amount { font-size: 22px; color: #e64340; font-weight: 700; }
+.cbb-amount::before { content: &quot;\00A5&quot;; font-size: 14px; }
+.cbb-fire { font-size: 13px; color: #ff6b35; margin-left: 4px; }
+.btn-confirm-buy { padding: 0 32px; height: 42px; border-radius: 21px; border: none; background: #e64340; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; user-select: none; white-space: nowrap; }
+.btn-confirm-buy:active { opacity: .85; }
+
+/* ========== 收银台 ========== */
+.pay-area { background: #fff; text-align: center; padding: 30px 16px 28px; border-bottom: 8px solid #f5f5f5; }
+.cd-label { font-size: 13px; color: #e64340; margin-bottom: 6px; font-weight: 500; }
+.cd-label span { color: #e64340; }
+.cd-amount { font-size: 42px; color: #222; font-weight: 700; letter-spacing: -1px; }
+.cd-amount::before { content: &quot;\00A5&quot;; font-size: 24px; font-weight: 600; margin-right: 2px; }
+
+.pm-section { padding: 16px 12px 0; }
+.pm-title { padding: 0 4px 10px; font-size: 14px; color:#666; font-weight: 500; }
+.pm-list { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+.pm-item {
+    display: flex; align-items: center; padding: 14px 14px;
+    border-bottom: 1px solid #f5f5f5; cursor: pointer; user-select: none;
+}
+.pm-item:active { background: #fafafa; }
+.pm-item:last-child { border-bottom: none; }
+.pm-item:active { background: #fafafa; }
+.pm-item:last-child { border-bottom: none; }
+.pm-icon { width: 32px; height: 32px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; margin-right: 12px; }
+.pm-icon.o { background: linear-gradient(135deg, #ff9a56, #ff6b35); color: #fff; }
+.pm-icon.g { background: #e8f5e9; color: #07c160; }
+.pm-icon.b { background: #e8f0fe; color: #4285f4; }
+.pm-text { flex: 1; }
+.pm-name { font-size: 15px; color: #333; font-weight: 500; }
+.pm-bal { font-size: 13px; color: #ff6b35; margin-top: 1px; }
+.pm-radio {
+    width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid #ccc;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    transition: all .2s;
+}
+.pm-radio.on { border-color: #07c160; background: #07c160; }
+.pm-radio.on::after { content: &quot;&quot;; width: 6px; height: 10px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg) translateY(-1px); }
+
+.pay-bar {
+    background: #fff; border-top: 1px solid #eee; padding: 10px 20px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    flex-shrink: 0; position: relative; z-index: 20;
+}
+.btn-pay {
+    width: 100%; height: 46px; border-radius: 23px; border: none;
+    background: #07c160; color: #fff; font-size: 17px; font-weight: 500;
+    cursor: pointer; user-select: none; display: flex; align-items: center; justify-content: center;
+}
+.btn-pay.o { background: #ff6b35; }
+.btn-pay.g { background: #bbb; }
+.btn-pay:active { opacity: .85; }
+
+/* ========== 代付人输入页 ========== */
+.input-section { background: #fff; margin-top: 8px; padding: 20px 16px; }
+.input-label { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px; }
+.phone-input-wrap { position: relative; }
+.phone-input {
+    width: 100%; height: 48px; border: 1px solid #ddd; border-radius: 8px;
+    padding: 0 16px; font-size: 16px; color: #333; outline: none;
+    background: #fafafa; display: flex; align-items: center;
+}
+.phone-input input { flex: 1; border: none; background: none; outline: none; font-size: 16px; }
+.search-suggest {
+    position: absolute; top: 100%; left: 0; right: 0;
+    background: #fff; border: 1px solid #e5e5e5; border-top: none;
+    border-radius: 0 0 8px 8px; box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    z-index: 50; overflow: hidden;
+}
+.ss-item { display: flex; align-items: center; padding: 12px 16px; gap: 10px; cursor: pointer; border-bottom: 1px solid #f5f5f5; }
+.ss-item:last-child { border-bottom: none; }
+.ss-item:active { background: #f7f7f7; }
+.ss-name { font-size: 15px; font-weight: 600; color: #222; }
+.ss-phone { font-size: 13px; color: #888; margin-left: auto; }
+.ss-tag { font-size: 11px; color: #fff; background: #ff6b35; padding: 1px 6px; border-radius: 8px; margin-left: 8px; }
+.input-hint { font-size: 12px; color: #aaa; margin-top: 8px; line-height: 1.6; }
+
+/* 历史用户列表 */
+.history-users { background: #fff; margin-top: 8px; padding: 16px; }
+.hu-title { font-size: 14px; font-weight: 600; color: #222; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.hu-list { display: flex; flex-direction: column; gap: 10px; }
+.hu-item {
+    display: flex; align-items: center; padding: 10px 12px; border-radius: 8px;
+    background: #f9f9f9; cursor: pointer; transition: background .15s; user-select: none;
+}
+.hu-item:active { background: #f0f0f0; }
+.hu-avatar { width: 36px; height: 36px; border-radius: 50%; background: #e8e8e8; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; margin-right: 10px; }
+.hu-info { flex: 1; }
+.hu-name { font-size: 14px; font-weight: 600; color: #333; }
+.hu-time { font-size: 12px; color: #aaa; margin-top: 2px; }
+.hu-arrow { color: #ccc; font-size: 16px; }
+.hu-item.sel { background: #fff8f5; border: 1.5px solid #ff6b35; }
+
+/* 校验结果 */
+.verify-card { margin: 16px 0; padding: 16px; border-radius: 10px; }
+.verify-card.ok { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 1px solid #86efac; }
+.vc-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.vc-title { font-size: 15px; font-weight: 700; color: #166534; }
+.vc-body { font-size: 13px; color: #555; line-height: 1.8; }
+.vc-body strong { color: #333; }
+
+/* ========== 等待页 ========== */
+.waiting-body { padding: 36px 20px; text-align: center; }
+.wait-circle {
+    width: 76px; height: 76px; border-radius: 50%;
+    background: linear-gradient(135deg, #fff7ed, #fed7aa);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px; font-size: 36px; animation: breathe 2s ease-in-out infinite;
+}
+@keyframes breathe { 0%,100%{transform:scale(1);} 50%{transform:scale(1.05);} }
+.wait-title { font-size: 17px; font-weight: 700; color: #222; margin-bottom: 8px; }
+.wait-desc { font-size: 13px; color: #888; line-height: 1.7; margin-bottom: 22px; }
+.wait-detail-card { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); text-align: left; }
+.wd-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; }
+.wd-lbl { color: #999; } .wd-val { color: #333; font-weight: 500; }
+.wd-val.red { color: #e64340; font-weight: 700; }
+.wd-val.yw { color: #f59e0b; font-weight: 600; }
+.tip-bar {
+    margin-top: 16px; padding: 12px 14px; border-radius: 10px;
+    background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 1px solid #93c5fd;
+    font-size: 12px; color: #1e40af; line-height: 1.7; display: flex; align-items: flex-start; gap: 8px; text-align: left;
+}
+.switch-hint {
+    margin-top: 16px; padding: 12px 14px; border-radius: 10px;
+    background: linear-gradient(135deg, #fef3c7, #fde68a); border: 1px solid #fcd34d;
+    font-size: 12px; color: #92400e; line-height: 1.7; display: flex; align-items: flex-start; gap: 8px; cursor: pointer; user-select: none;
+}
+
+/* ========== 支付账号 ========== */
+.ol-header { background: #fff; padding: 16px; margin-top: 8px; }
+.ol-buyer { font-size: 16px; font-weight: 700; color: #222; margin-bottom: 4px; }
+.ol-phone { font-size: 13px; color: #888; }
+.ol-addr { font-size: 13px; color:#999; margin-top:4px; line-height:1.5;}
+.ol-divider { height:4px; width:100%;margin-top:12px; background: repeating-linear-gradient(90deg, #07c160 0,#07c600 10px,transparent 10px,transparent 13px, #1890ff 13px,#1890ff 23px, transparent 23px,transparent 26px, #faad14 26px,#faad14 36px, transparent 36px,transparent 39px, #ff4d4f 39px,#ff4d4f 49px, transparent 49px,transparent 52px); opacity:.45;}
+
+/* ==================== 订单列表页（新）==================== */
+.ol-header-bar {
+    background: #fff; padding: 8px 12px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid #f0f0f0; position: sticky; top: 0; z-index: 90;
+}
+.ol-hb-back { font-size: 26px; color:#333; cursor:pointer; line-height:1; user-select:none; flex-shrink:0;}
+.ol-hb-search {
+    flex: 1; height:34px; background:#f5f5f5; border-radius:17px;
+    display:flex; align-items:center; padding:0 12px; gap:6px;
+    font-size:13px; color:#bbb;
+}
+.ol-hb-right { display:flex; align-items:center; gap:10px; flex-shrink:0;}
+.ol-hb-score { font-size:14px; color:#333; font-weight:600; }
+.ol-hb-avatar { width:28px; height:28px; border-radius:50%; background:#eee; display:flex;align-items:center;justify-content:center; font-size:15px;}
+
+.ol-tabs {
+    display:flex; background:#fff; padding:0 8px;
+    border-bottom:1px solid #f0f0f0; overflow-x:auto; position:sticky; top:51px; z-index:89;
+    -webkit-overflow-scrolling:touch;
+}
+.ol-tab { flex:1; text-align:center; padding:12px 4px; font-size:14px; color:#666; font-weight:500; cursor:pointer; white-space:nowrap; position:relative; transition:color .2s;}
+.ol-tab.active { color:#07c160; font-weight:700; }
+.ol-tab.active::after { content:&#x27;&#x27;; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:20px; height:3px; background:#07c160; border-radius:2px; }
+
+/* 订单卡片（列表样式） */
+.ol-card { background:#fff; margin:8px 16px; border-radius:12px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.04); cursor:pointer; }
+.ol-card:active { opacity:.9; }
+.olc-top { display:flex; justify-content:space-between; align-items:center; padding:14px 16px 10px; }
+.olc-no { font-size:14px; color:#333; font-weight:500; }
+.olc-status { font-size:14px; color:#999; font-weight:400; }
+.olc-status.wait-pay { color:#e64340; }
+.olc-status.cancelled { color:#999; }
+
+.olc-goods { display:flex; gap:12px; padding:0 16px 12px; align-items:flex-start; }
+.olc-thumb { width:80px;height:80px; background:#fff7e6; border-radius:8px; display:flex;align-items:center;justify-content:center; font-size:32px; flex-shrink:0; position:relative; overflow:hidden; border:1px solid #ffe7ba; }
+.olc-thumb-tag { position:absolute; bottom:0;left:0;right:0;background:rgba(255,107,53,.85); color:#fff; font-size:9px; padding:1px 0; text-align:center; letter-spacing:.5px;}
+.olc-info { flex:1; display:flex; flex-direction:column; min-height:80px; }
+.olc-name-row { display:flex; align-items:center; gap:4px; }
+.olc-self { display:inline-block; background:#ff6b35; color:#fff; font-size:10px; padding:1px 5px; border-radius:3px; font-weight:600; }
+.olc-name { font-size:14px; font-weight:600; color:#222; line-height:1.4; }
+.olc-spec { font-size:12px; color:#999; margin-top:3px; }
+.olc-price-row { display:flex; justify-content:space-between; align-items:baseline; margin-top:auto; }
+.olc-price-fire { font-size:12px; color:#e64340; }
+.olc-price-val { font-size:16px; color:#e64340; font-weight:700; }
+.olc-price-val::before { content:&#x27;\00A5&#x27;; font-size:11px; margin-right:1px; }
+.olc-qty { font-size:14px; color:#333; }
+
+.olc-summary { display:flex; justify-content:space-between; align-items:center; padding:10px 16px; border-top:1px solid #f5f5f5; font-size:12px; color:#888; }
+.olcs-time { }
+.olcs-total span { color:#e64340; font-weight:700; font-size:15px; }
+.olcs-total span::before { content:&#x27;\00A5&#x27;; font-size:11px; }
+
+.olc-actions { display:flex; justify-content:flex-end; gap:10px; padding:10px 16px 14px; }
+.olc-btn { padding:6px 18px; border-radius:18px; font-size:13px; font-weight:500; cursor:pointer; border:none; user-select:none; }
+.olc-btn-outline { background:#fff; border:1px solid #ddd; color:#666; }
+.olc-btn-outline:active { background:#f5f5f5; }
+.olc-btn-green { background:transparent; border:1px solid #07c160; color:#07c160; }
+.olc-btn-green:active { background:#f0fdf4; }
+.rec-section { background: #fff; margin: 16px 0; padding: 16px; }
+.rec-grid { display: flex; gap: 10px; }
+.rec-itm { flex: 1; }
+.rec-img { width: 100%; aspect-ratio:1; background: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 30px; position: relative; overflow: hidden; }
+.rec-sold { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:56px;height:56px;border-radius:50%;border:2px solid rgba(255,255,255,.6);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.7);font-size:14px;font-weight:700;z-index:2;}
+.rec-nm { font-size: 12px; color: #333; font-weight: 500; margin-top: 6px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.rec-pr { font-size: 14px; color: #e64340; font-weight: 700; margin-top: 4px; }
+.rec-pr::before { content: &quot;\00A5&quot;; font-size: 11px; }
+
+.order-bar {
+    background: #fff; border-top: 1px solid #eee;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+}
+.ob-cd { font-size: 13px; color: #e64340; font-weight: 600; }
+.ob-btns { display: flex; gap: 10px; }
+.ob-btn { height: 38px; padding: 0 20px; border-radius: 19px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; user-select: none; }
+.ob-btn.x { background: #fff; color: #666; border: 1px solid #ddd; }
+.ob-btn.p { background: #07c160; color: #fff; }
+
+/* ========== 成功页 ========== */
+.success-body { text-align: center; padding: 42px 20px 30px; }
+.sc-icon { width: 84px; height: 84px; border-radius: 50%; background: linear-gradient(135deg, #dcfce7, #bbf7d0); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; font-size: 40px; animation: popIn .4s ease; flex-shrink: 0; }
+@keyframes popIn { from{transform:scale(.5);opacity:0;} to{transform:scale(1);opacity:1;} }
+.sc-title { font-size: 20px; font-weight: 700; color: #222; margin-bottom: 8px; }
+.sc-desc { font-size: 14px; color: #666; margin-bottom: 26px; line-height: 1.6; }
+.sc-card { background: #fff; border-radius: 14px; padding: 16px 20px; text-align: left; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
+.sc-r { display: flex; justify-content: space-between; padding: 9px 0; font-size: 13px; border-bottom: 1px solid #f5f5f5; }
+.sc-r:last-child { border-bottom: none; }
+.sc-k { color: #999; } .sc-v { color: #333; font-weight: 500; }
+.sc-v.hi { color: #e64340; font-weight: 700; font-size: 15px; }
+.sc-v.gr { color: #07c160; font-weight: 700; }
+.sc-btns { margin-top: 26px; display: flex; flex-direction: column; gap: 12px; }
+.sc-btn { height: 46px; border-radius: 23px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; user-select: none; display: flex; align-items: center; justify-content: center; }
+.sc-btn.pri { background: #07c160; color: #fff; }
+.sc-btn.def { background: #fff; color: #555; border: 1px solid #ddd; }
+
+/* Toast */
+.toast {
+    position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    background: rgba(0,0,0,.78); color: #fff; padding: 10px 22px; border-radius: 20px;
+    font-size: 13px; z-index: 3000; opacity: 0; pointer-events: none;
+    transition: all .3s ease; white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.step-indicator { display: flex; justify-content: center; gap: 6px; padding: 10px 0 4px; background: #f2f2f2; }
+.step-dot { width: 7px; height: 7px; border-radius: 50%; background: #ddd; transition: all .25s; }
+.step-dot.on { background: #07c160; width: 18px; border-radius: 4px; }
+.step-dot.done { background: #07c160; }
+
+.rb-block { background: #fff; margin-top: 8px; padding: 14px 16px; }
+.rb-t { font-size: 14px; font-weight: 600; color: #222; margin-bottom: 10px; }
+.rb-i { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; font-size: 12px; color: #666; line-height: 1.7; }
+.rb-d { width: 4px; height: 4px; border-radius: 50%; background: #ccc; margin-top: 7px; flex-shrink: 0; }
+
+/* ========== 智连消息页 ========== */
+.conn-tabs { display: flex; background: #fff; border-bottom: 1px solid #f0f0f0; position: sticky; top: 0; z-index: 89; }
+.conn-tab { flex: 1; text-align: center; padding: 13px 0; font-size: 14px; color: #666; cursor: pointer; position: relative; transition: color .2s; }
+.conn-tab.active { color: #07c160; font-weight: 700; }
+.conn-tab.active::after { content: &#x27;&#x27;; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 22px; height: 3px; background: #07c160; border-radius: 2px; }
+.conn-tab .badge { background: #e64340; color: #fff; font-size: 10px; padding: 1px 6px; border-radius: 8px; margin-left: 4px; font-weight: 400; }
+.conn-msg-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px 16px; background: #fff; cursor: pointer; transition: background .15s; }
+.conn-msg-item+.conn-msg-item { border-top: 1px solid #f0f0f0; }
+.conn-msg-item:active { background: #f7f7f7; }
+.conn-msg-avatar { width: 40px; height: 40px; border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; position: relative; background: #3b82f6; color: #fff; font-weight: 700; }
+.conn-msg-avatar .dot { position: absolute; top: -4px; right: -4px; width: 8px; height: 8px; border-radius: 50%; background: #e64340; }
+.conn-msg-body { flex: 1; overflow: hidden; min-width: 0; }
+.conn-msg-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.conn-msg-name { font-size: 15px; font-weight: 500; color: #222; }
+.conn-msg-time { font-size: 12px; color: #bbb; flex-shrink: 0; white-space: nowrap; }
+.conn-msg-content { font-size: 13px; color: #999; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+
+
+/* ========== FLAT LAYOUT ========== */
+body.flat-body {
+    font-family: -apple-system, BlinkMacSystemFont, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, sans-serif;
+    background: #e0e0e0; color: #333; font-size: 14px; line-height: 1.5;
+    margin: 0; padding: 12px;
+    overflow-x: auto;
+}
+.flat-scroll {
+    display: flex; flex-direction: row; flex-wrap: nowrap;
+    gap: 16px;
+    min-height: 100vh;
+    align-items: flex-start;
+}
+.flat-col {
+    display: flex; flex-direction: column;
+    width: 375px; flex-shrink: 0;
+}
+.page-label {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    color: #fff;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    border-radius: 10px 10px 0 0;
+    font-family: &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, sans-serif;
+    letter-spacing: 0.5px;
+}
+.flat-scroll .phone-frame {
+    width: 375px; min-height: 820px;
+    background: #f2f2f2;
+    overflow: hidden; position: relative;
+    display: flex; flex-direction: column;
+    margin: 0;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    flex-shrink: 0;
+}
+.flat-scroll .phone-frame .pages-container {
+    flex: 1; overflow: hidden; position: relative;
+}
+.flat-scroll .page {
+    /* Override: all pages visible, no transitions */
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: none !important;
+    transition: none !important;
+    z-index: 1;
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #f2f2f2;
+    display: flex; flex-direction: column;
+}
+.flat-scroll .header { position: sticky; top: 0; z-index: 90; }
+.flat-scroll .header .back { display: none; }
+.flat-scroll .page-scroll {
+    flex: 1; overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.flat-scroll .page.hidden { display: none; }
+.flat-scroll .account-bar { display: none; }
+
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body class=&quot;flat-body&quot;&gt;
+&lt;div class=&quot;flat-scroll&quot;&gt;
+    &lt;div class=&quot;flat-col&quot;&gt;
+        &lt;div class=&quot;page-label&quot;&gt;PAGE 01 商品详情（订单账号）&lt;/div&gt;
+        &lt;div class=&quot;phone-frame&quot;&gt;
+            &lt;div class=&quot;pages-container&quot;&gt;
+&lt;!-- ==================== PAGE 01 商品详情 ==================== --&gt;
+&lt;div class=&quot;page active&quot; id=&quot;page-product&quot; data-step=&quot;1&quot;&gt;
+&lt;div class=&quot;header&quot;&gt;&lt;span class=&quot;back&quot;&gt;‹&lt;/span&gt;商品详情&lt;span class=&quot;right&quot;&gt;&lt;span style=&quot;font-size:18px;&quot;&gt;♡&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;
+&lt;div class=&quot;page-scroll&quot;&gt;
+    &lt;div class=&quot;swiper-area&quot;&gt;🧴&lt;div class=&quot;swiper-dots&quot;&gt;&lt;span&gt;1/3&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;div class=&quot;price-section&quot;&gt;
+        &lt;div class=&quot;price-row&quot;&gt;&lt;span class=&quot;current-price&quot;&gt;298&lt;/span&gt;&lt;span class=&quot;original-price&quot;&gt;¥398&lt;/span&gt;&lt;span class=&quot;sales-tag&quot;&gt;已售4500+&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;title-section&quot;&gt;&lt;div class=&quot;title-row&quot;&gt;&lt;span class=&quot;self-tag&quot;&gt;自营&lt;/span&gt;&lt;span class=&quot;product-title&quot;&gt;绿韵草本精华礼盒套装&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;div class=&quot;info-section&quot;&gt;
+        &lt;div class=&quot;info-row&quot;&gt;&lt;div class=&quot;info-label&quot;&gt;&lt;span class=&quot;icon&quot;&gt;☰&lt;/span&gt;规格&lt;/div&gt;&lt;div class=&quot;info-value&quot;&gt;共3款 &lt;span class=&quot;arrow&quot;&gt;›&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;info-row&quot;&gt;&lt;div class=&quot;info-label&quot;&gt;&lt;span class=&quot;icon&quot;&gt;🚚&lt;/span&gt;运费&lt;/div&gt;&lt;div class=&quot;info-value&quot;&gt;广东省内1件免运费 &lt;span class=&quot;arrow&quot;&gt;›&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;info-row&quot;&gt;&lt;div class=&quot;info-label&quot;&gt;&lt;span class=&quot;icon&quot;&gt;⏱&lt;/span&gt;参数&lt;/div&gt;&lt;div class=&quot;info-value&quot;&gt;暂无参数 &lt;span class=&quot;arrow&quot;&gt;›&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;qty-section&quot;&gt;&lt;span class=&quot;qty-label&quot;&gt;购买数量&lt;/span&gt;&lt;div class=&quot;qty-control&quot;&gt;&lt;button class=&quot;qty-btn&quot;&gt;−&lt;/button&gt;&lt;input class=&quot;qty-input&quot; type=&quot;number&quot; value=&quot;10&quot; id=&quot;qtyInput&quot; readonly&gt;&lt;button class=&quot;qty-btn&quot;&gt;+&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;div style=&quot;background:#fff;margin-top:8px;padding:14px 16px;display:flex;align-items:center;gap:10px;&quot;&gt;
+        &lt;div style=&quot;width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#dcfce7,#bbf7d0);display:flex;align-items:center;justify-content:center;font-size:18px;&quot;&gt;♻️&lt;/div&gt;
+        &lt;div style=&quot;flex:1;&quot;&gt;&lt;div style=&quot;font-size:14px;font-weight:600;color:#222;&quot;&gt;绿韵家官方自营&lt;/div&gt;&lt;div style=&quot;font-size:12px;color:#999;&quot;&gt;湖南省长沙市雨花区方博汇云谷&lt;/div&gt;&lt;/div&gt;
+        &lt;div style=&quot;padding:4px 12px;background:#e8f5e9;color:#07c160;font-size:11px;border-radius:12px;font-weight:600;&quot;&gt;进店&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div style=&quot;background:#fff;margin-top:8px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;&quot;&gt;
+        &lt;div style=&quot;font-size:15px;font-weight:600;color:#222;&quot;&gt;用户评价&lt;span style=&quot;color:#666;font-weight:400;font-size:13px;&quot;&gt;(243)&lt;/span&gt;&lt;/div&gt;
+        &lt;span style=&quot;font-size:13px;color:#999;cursor:pointer;&quot;&gt;查看更多 ›&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;bottom-bar&quot; style=&quot;border-top:1px solid #eee;margin-top:16px;&quot;&gt;
+        &lt;div class=&quot;icon-btns&quot;&gt;&lt;div class=&quot;icon-btn&quot;&gt;&lt;span class=&quot;emoji&quot;&gt;🏠&lt;/span&gt;首页&lt;/div&gt;&lt;div class=&quot;icon-btn&quot;&gt;&lt;span class=&quot;emoji&quot;&gt;👩‍💻&lt;/span&gt;客服&lt;/div&gt;&lt;div class=&quot;icon-btn&quot;&gt;&lt;span class=&quot;emoji&quot;&gt;🛒&lt;/span&gt;购物车&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;action-btns&quot;&gt;&lt;button class=&quot;btn btn-cart&quot;&gt;加入购物车&lt;/button&gt;&lt;button class=&quot;btn btn-buy&quot;&gt;立即购买&lt;/button&gt;&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;flat-col&quot;&gt;
+        &lt;div class=&quot;page-label&quot;&gt;PAGE 02 确认订单（订单账号）&lt;/div&gt;
+        &lt;div class=&quot;phone-frame&quot;&gt;
+            &lt;div class=&quot;pages-container&quot;&gt;
+&lt;!-- ==================== PAGE 02 确认订单 ==================== --&gt;
+&lt;div class=&quot;page&quot; id=&quot;page-confirm-order&quot; data-step=&quot;2&quot;&gt;
+&lt;div class=&quot;header&quot;&gt;&lt;span class=&quot;back&quot;&gt;‹&lt;/span&gt;确认订单&lt;span class=&quot;right&quot;&gt;&lt;span class=&quot;dot-btn&quot;&gt;···&lt;/span&gt;&lt;span class=&quot;dot-btn&quot;&gt;⊙&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;
+&lt;div class=&quot;page-scroll&quot;&gt;
+    &lt;div class=&quot;addr-card-confirm&quot;&gt;
+        &lt;div class=&quot;addr-row&quot;&gt;&lt;span style=&quot;font-size:18px;color:#e64340;&quot;&gt;📍&lt;/span&gt;&lt;span class=&quot;addr-name&quot;&gt;湖南省长沙市岳麓区 中电科技园二期&lt;/span&gt;&lt;span style=&quot;margin-left:auto;color:#ccc;font-size:18px;&quot;&gt;›&lt;/span&gt;&lt;/div&gt;
+        &lt;div style=&quot;display:flex;gap:8px;margin-top:4px;&quot;&gt;&lt;span class=&quot;addr-name&quot; style=&quot;font-size:15px;&quot;&gt;宋健&lt;/span&gt;&lt;span class=&quot;addr-phone&quot;&gt;18307448442&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;addr-line&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;confirm-goods-row&quot;&gt;
+        &lt;div class=&quot;cg-thumb&quot;&gt;🧴&lt;div class=&quot;sold-tag&quot;&gt;上海发货·极速达&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;cg-info&quot;&gt;
+            &lt;div class=&quot;cg-name-row&quot;&gt;&lt;span class=&quot;cg-self-tag&quot;&gt;赛隆瑶乐饮品&lt;/span&gt;&lt;span class=&quot;cg-name&quot;&gt;赛隆瑶乐饮品&lt;/span&gt;&lt;/div&gt;
+            &lt;div class=&quot;cg-spec&quot;&gt;2盒&lt;/div&gt;
+            &lt;div class=&quot;cg-bottom&quot;&gt;
+                &lt;div class=&quot;cg-price-line&quot;&gt;&lt;span class=&quot;cg-fire&quot;&gt;🔥&lt;/span&gt;&lt;span&gt;1&lt;/span&gt;&lt;span class=&quot;cg-price&quot;&gt;1.00&lt;/span&gt;&lt;/div&gt;
+                &lt;span class=&quot;cg-qty&quot;&gt;x1&lt;/span&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;co-amt-box&quot;&gt;&lt;div class=&quot;co-amt-row&quot;&gt;&lt;span&gt;运费&lt;/span&gt;&lt;span style=&quot;color:#999;&quot;&gt;¥0&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;div class=&quot;co-amt-box&quot;&gt;
+        &lt;div class=&quot;co-amt-row&quot;&gt;&lt;span&gt;商品总价&lt;/span&gt;&lt;span style=&quot;display:flex;align-items:center;gap:4px;&quot;&gt;共计&lt;span id=&quot;coTi&quot;&gt;1&lt;/span&gt;件&lt;span style=&quot;margin-left:auto;&quot; id=&quot;coGv&quot;&gt;¥1&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;co-amt-row&quot;&gt;&lt;span&gt;运费&lt;/span&gt;&lt;span id=&quot;coSv&quot;&gt;¥0&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;co-amt-row&quot;&gt;&lt;span&gt;专享优惠&lt;/span&gt;&lt;span style=&quot;color:#07c600;&quot;&gt;- ¥0.25&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;coupon-row&quot;&gt;&lt;div class=&quot;coupon-left&quot;&gt;优惠券抵扣&lt;span class=&quot;coupon-count&quot;&gt;(可用优惠券0)&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;coupon-radio&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;deduct-row&quot;&gt;&lt;div class=&quot;deduct-left&quot;&gt;电子币抵扣&lt;span class=&quot;deduct-count&quot;&gt;(可用电子币0)&lt;/span&gt;&lt;/div&gt;&lt;span class=&quot;deduct-hint&quot;&gt;电子币不足，暂不可抵扣&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;co-amt-row&quot;&gt;&lt;span&gt;余额抵扣(可用9350)&lt;/span&gt;&lt;span style=&quot;color:#07c600;&quot;&gt;- ¥0.75&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;co-total-row&quot;&gt;&lt;span class=&quot;co-total-lbl&quot;&gt;实付金额&lt;/span&gt;&lt;span class=&quot;co-total-val&quot;&gt;0.00&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;confirm-buy-bar&quot; style=&quot;margin-top:16px;border-top:1px solid #eee;padding-top:12px;&quot;&gt;
+            &lt;div class=&quot;cbb-left&quot;&gt;&lt;span class=&quot;cbb-text&quot;&gt;合计：&lt;/span&gt;&lt;span class=&quot;cbb-amount&quot;&gt;0.00&lt;/span&gt;&lt;span class=&quot;cbb-fire&quot;&gt;🔥 1.0&lt;/span&gt;&lt;/div&gt;
+            &lt;button class=&quot;btn-confirm-buy&quot;&gt;确认购买&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;flat-col&quot;&gt;
+        &lt;div class=&quot;page-label&quot;&gt;PAGE 03 收银台（订单账号）&lt;/div&gt;
+        &lt;div class=&quot;phone-frame&quot;&gt;
+            &lt;div class=&quot;pages-container&quot;&gt;
+&lt;!-- ==================== PAGE 03 收银台（买家视角）==================== --&gt;
+&lt;div class=&quot;page&quot; id=&quot;page-checkout&quot; data-step=&quot;3&quot;&gt;
+&lt;div class=&quot;header&quot;&gt;&lt;span class=&quot;back&quot;&gt;‹&lt;/span&gt;收银台&lt;span class=&quot;right&quot;&gt;&lt;span class=&quot;dot-btn&quot;&gt;···&lt;/span&gt;&lt;span class=&quot;dot-btn&quot;&gt;⊙&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;
+&lt;div class=&quot;page-scroll&quot;&gt;
+    &lt;div class=&quot;pay-area&quot;&gt;
+        &lt;div class=&quot;cd-label&quot;&gt;支付剩余时间 &lt;span id=&quot;cdT&quot;&gt;29:57&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;cd-amount&quot; id=&quot;cdA&quot;&gt;0.72&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;pm-section&quot;&gt;
+    &lt;div class=&quot;pm-title&quot;&gt;选择支付方式&lt;/div&gt;
+    &lt;div class=&quot;pm-list&quot; id=&quot;pmListB&quot;&gt;
+        &lt;div class=&quot;pm-item&quot;&gt;
+            &lt;div class=&quot;pm-icon o&quot;&gt;💰&lt;/div&gt;&lt;div class=&quot;pm-text&quot;&gt;&lt;div class=&quot;pm-name&quot;&gt;储值支付&lt;/div&gt;&lt;div class=&quot;pm-bal&quot;&gt;¥ 97,992.82&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;pm-radio on&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;pm-item&quot;&gt;
+            &lt;div class=&quot;pm-icon g&quot;&gt;微&lt;/div&gt;&lt;div class=&quot;pm-text&quot;&gt;&lt;div class=&quot;pm-name&quot;&gt;微信支付&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;pm-radio&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;pm-item&quot; id=&quot;pmProxyItem&quot;&gt;
+            &lt;div class=&quot;pm-icon o&quot; style=&quot;background:linear-gradient(135deg,#ff9a56,#ff6b35);&quot;&gt;🤝&lt;/div&gt;&lt;div class=&quot;pm-text&quot;&gt;&lt;div class=&quot;pm-name&quot;&gt;找人代付&lt;/div&gt;&lt;div class=&quot;pm-bal&quot;&gt;邀请关系链内老会员为您代付&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;pm-radio&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;pm-item&quot;&gt;
+            &lt;div class=&quot;pm-icon b&quot;&gt;💳&lt;/div&gt;&lt;div class=&quot;pm-text&quot;&gt;&lt;div class=&quot;pm-name&quot;&gt;银行卡支付&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;pm-radio&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;pay-bar&quot;&gt;&lt;button class=&quot;btn-pay&quot; id=&quot;chkBtn&quot;&gt;确认支付&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;flat-col&quot;&gt;
+        &lt;div class=&quot;page-label&quot;&gt;PAGE 04 代付人信息（订单账号）&lt;/div&gt;
+        &lt;div class=&quot;phone-frame&quot;&gt;
+            &lt;div class=&quot;pages-container&quot;&gt;
+&lt;!-- ==================== PAGE 04 代付人信息（精简版）==================== --&gt;
+&lt;div class=&quot;page&quot; id=&quot;page-input-proxy&quot; data-step=&quot;4&quot;&gt;
+&lt;div class=&quot;header&quot;&gt;&lt;span class=&quot;back&quot;&gt;‹&lt;/span&gt;代付人信息&lt;span class=&quot;right&quot;&gt;&lt;span class=&quot;dot-btn&quot;&gt;···&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;
+&lt;div class=&quot;page-scroll&quot;&gt;
+    &lt;div style=&quot;text-align:center;padding:20px 16px 0;&quot;&gt;&lt;div style=&quot;font-size:40px;margin-bottom:12px;&quot;&gt;🤝&lt;/div&gt;&lt;div style=&quot;font-size:17px;font-weight:700;color:#222;margin-bottom:6px;&quot;&gt;请输入代付人信息&lt;/div&gt;&lt;div style=&quot;font-size:13px;color:#999;line-height:1.6;&quot;&gt;系统将校验对方是否与您在同一关系链内&lt;/div&gt;&lt;/div&gt;
+
+    &lt;!-- 手机号输入（置顶） --&gt;
+    &lt;div class=&quot;input-section&quot;&gt;
+        &lt;div class=&quot;input-label&quot;&gt;📱 输入同链路账号&lt;/div&gt;
+        &lt;div class=&quot;phone-input-wrap&quot;&gt;
+            &lt;input type=&quot;tel&quot; id=&quot;phIn&quot; placeholder=&quot;请输入老会员手机号&quot; maxlength=&quot;11&quot; autocomplete=&quot;off&quot;&gt;
+            &lt;!-- 搜索联想下拉 --&gt;
+            &lt;div class=&quot;search-suggest&quot; id=&quot;searchSuggest&quot; style=&quot;display:none;&quot;&gt;
+                &lt;div class=&quot;ss-item&quot;&gt;&lt;span class=&quot;ss-name&quot;&gt;王建国&lt;/span&gt;&lt;span class=&quot;ss-phone&quot;&gt;138****1234&lt;/span&gt;&lt;span class=&quot;ss-tag&quot;&gt;上级&lt;/span&gt;&lt;/div&gt;
+                &lt;div class=&quot;ss-item&quot;&gt;&lt;span class=&quot;ss-name&quot;&gt;张薇&lt;/span&gt;&lt;span class=&quot;ss-phone&quot;&gt;139****5678&lt;/span&gt;&lt;span class=&quot;ss-tag&quot;&gt;平级&lt;/span&gt;&lt;/div&gt;
+                &lt;div class=&quot;ss-item&quot;&gt;&lt;span class=&quot;ss-name&quot;&gt;李强&lt;/span&gt;&lt;span class=&quot;ss-phone&quot;&gt;137****9012&lt;/span&gt;&lt;span class=&quot;ss-tag&quot;&gt;下级&lt;/span&gt;&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;input-hint&quot;&gt;请确保对方与您在同一推荐关系链内&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- 历史请求过的代付人 --&gt;
+    &lt;div class=&quot;history-users&quot;&gt;
+        &lt;div class=&quot;hu-title&quot;&gt;🕐 最近请求过的代付人（可直接选择）&lt;/div&gt;
+        &lt;div class=&quot;hu-list&quot;&gt;
+            &lt;div class=&quot;hu-item sel&quot; id=&quot;hu0&quot;&gt;
+                &lt;div class=&quot;hu-avatar&quot;&gt;👨&lt;/div&gt;&lt;div class=&quot;hu-info&quot;&gt;&lt;div class=&quot;hu-name&quot;&gt;王建国&lt;/div&gt;&lt;div class=&quot;hu-time&quot;&gt;今天 14:32 请求过&lt;/div&gt;&lt;/div&gt;&lt;span class=&quot;hu-arrow&quot;&gt;›&lt;/span&gt;
+            &lt;/div&gt;
+            &lt;div class=&quot;hu-item&quot; id=&quot;hu1&quot;&gt;
+                &lt;div class=&quot;hu-avatar&quot;&gt;👩&lt;/div&gt;&lt;div class=&quot;hu-info&quot;&gt;&lt;div class=&quot;hu-name&quot;&gt;张薇&lt;/div&gt;&lt;div class=&quot;hu-time&quot;&gt;昨天 09:15 请求过&lt;/div&gt;&lt;/div&gt;&lt;span class=&quot;hu-arrow&quot;&gt;›&lt;/span&gt;
+            &lt;/div&gt;
+            &lt;div class=&quot;hu-item&quot; id=&quot;hu2&quot;&gt;
+                &lt;div class=&quot;hu-avatar&quot;&gt;👩&lt;/div&gt;&lt;div class=&quot;hu-info&quot;&gt;&lt;div class=&quot;hu-name&quot;&gt;刘芳&lt;/div&gt;&lt;div class=&quot;hu-time&quot;&gt;3天前 请求过&lt;/div&gt;&lt;/div&gt;&lt;span class=&quot;hu-arrow&quot;&gt;›&lt;/span&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- 默认显示校验通过 --&gt;
+    &lt;div class=&quot;verify-card ok&quot; id=&quot;vcOk&quot;&gt;
+        &lt;div style=&quot;display:flex;align-items:center;gap:6px;padding:12px 16px;&quot;&gt;
+            &lt;span style=&quot;font-size:18px;&quot;&gt;✅&lt;/span&gt;&lt;span style=&quot;font-size:15px;color:#07c160;font-weight:600;&quot;&gt;关系链校验通过&lt;/span&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;pay-bar&quot;&gt;
+    &lt;button class=&quot;btn-pay o&quot; id=&quot;sbBtn&quot;&gt;发起代付请求&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;flat-col&quot;&gt;
+        &lt;div class=&quot;page-label&quot;&gt;PAGE 05 等待确认（订单账号）&lt;/div&gt;
+        &lt;div class=&quot;phone-frame&quot;&gt;
+            &lt;div class=&quot;pages-container&quot;&gt;
+&lt;!-- ==================== PAGE 05 等待确认 ==================== --&gt;
+&lt;div class=&quot;page&quot; id=&quot;page-waiting&quot; data-step=&quot;5&quot;&gt;
+&lt;div class=&quot;header&quot;&gt;&lt;span class=&quot;back&quot;&gt;‹&lt;/span&gt;代付进度&lt;span class=&quot;right&quot;&gt;&lt;span class=&quot;dot-btn&quot;&gt;···&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;
+&lt;div class=&quot;page-scroll&quot;&gt;
+    &lt;div class=&quot;waiting-body&quot;&gt;
+        &lt;div class=&quot;wait-circle&quot;&gt;⏳&lt;/div&gt;
+        &lt;div class=&quot;wait-title&quot;&gt;代付请求已发送&lt;/div&gt;
+        &lt;div class=&quot;wait-desc&quot;&gt;正在等待&lt;strong id=&quot;wtNm&quot;&gt;王建国&lt;/strong&gt;确认代付&lt;br&gt;对方确认后将自动完成支付&lt;/div&gt;
+        &lt;div class=&quot;wait-detail-card&quot;&gt;
+            &lt;div class=&quot;wd-row&quot;&gt;&lt;span class=&quot;wd-lbl&quot;&gt;代付人&lt;/span&gt;&lt;span class=&quot;wd-val&quot; id=&quot;wtPn&quot;&gt;王建国（138****1234）&lt;/span&gt;&lt;/div&gt;
+            &lt;div class=&quot;wd-row&quot;&gt;&lt;span class=&quot;wd-lbl&quot;&gt;商品&lt;/span&gt;&lt;span class=&quot;wd-val&quot; id=&quot;wtGn&quot;&gt;绿韵草本精华礼盒套装 ×10&lt;/span&gt;&lt;/div&gt;
+            &lt;div class=&quot;wd-row&quot;&gt;&lt;span class=&quot;wd-lbl&quot;&gt;代付金额&lt;/span&gt;&lt;span class=&quot;wd-val red&quot; id=&quot;wtAm&quot;&gt;¥2,980.00&lt;/span&gt;&lt;/div&gt;
+            &lt;div class=&quot;wd-row&quot;&gt;&lt;span class=&quot;wd-lbl&quot;&gt;当前状态&lt;/span&gt;&lt;span class=&quot;wd-val yw&quot;&gt;⏳ 待对方确认&lt;/span&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;tip-bar&quot;&gt;&lt;span style=&quot;font-size:16px;flex-shrink:0;&quot;&gt;💡&lt;/span&gt;&lt;span&gt;系统已向代付人发送通知，请耐心等待对方确认。&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;switch-hint&quot;&gt;&lt;span style=&quot;font-size:16px;flex-shrink:0;&quot;&gt;🔀&lt;/span&gt;&lt;span&gt;点击切换到「&lt;strong&gt;支付账号&lt;/strong&gt;」去确认代付&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;pay-bar&quot;&gt;&lt;button class=&quot;btn-pay g&quot; style=&quot;width:auto;padding:0 44px;&quot;&gt;取消代付请求&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;flat-col&quot;&gt;
+        &lt;div class=&quot;page-label&quot;&gt;PAGE 06 支付账号首页&lt;/div&gt;
+        &lt;div class=&quot;phone-frame&quot;&gt;
+            &lt;div class=&quot;pages-container&quot;&gt;
+&lt;!-- ==================== PAGE 06 支付账号首页 ==================== --&gt;
+&lt;div class=&quot;page&quot; id=&quot;page-payer-home&quot; data-step=&quot;&quot;&gt;
+&lt;div class=&quot;header&quot;&gt;&lt;span class=&quot;back&quot;&gt;‹&lt;/span&gt;我的&lt;span class=&quot;right&quot;&gt;&lt;span class=&quot;dot-btn&quot;&gt;···&lt;/span&gt;&lt;span class=&quot;dot-btn&quot;&gt;⊙&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;
+&lt;div style=&quot;padding:20px;text-align:center;&quot;&gt;
+    &lt;div style=&quot;width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#e0e7ff,#c7d2fe);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:36px;&quot;&gt;👤&lt;/div&gt;
+    &lt;div style=&quot;font-size:18px;font-weight:700;color:#222;&quot;&gt;王建国&lt;/div&gt;
+    &lt;div style=&quot;font-size:13px;color:#999;margin-top:4px;&quot;&gt;老会员 · 138****1234&lt;/div&gt;
+    &lt;div style=&quot;margin-top:24px;background:#fff;border-radius:12px;padding:16px;text-align:left;&quot;&gt;
+        &lt;div style=&quot;display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f5f5f5;cursor:pointer;&quot;&gt;&lt;span style=&quot;font-size:14px;color:#333;&quot;&gt;📦 我的订单&lt;/span&gt;&lt;span style=&quot;color:#ccc;&quot;&gt;›&lt;/span&gt;&lt;/div&gt;
+        &lt;div style=&quot;display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f5f5f5;cursor:pointer;&quot;&gt;&lt;span style=&quot;font-size:14px;color:#333;&quot;&gt;💬 智连 · 交易消息&lt;/span&gt;&lt;span style=&quot;display:inline-block;background:#e64340;color:#fff;font-size:10px;padding:1px 7px;border-radius:8px;margin-right:6px;&quot;&gt;1新&lt;/span&gt;&lt;span style=&quot;color:#ccc;&quot;&gt;›&lt;/span&gt;&lt;/div&gt;
+        &lt;div style=&quot;display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f5f5f5;cursor:pointer;&quot;&gt;&lt;span style=&quot;font-size:14px;color:#333;&quot;&gt;💼 我的钱包&lt;/span&gt;&lt;span style=&quot;color:#ccc;&quot;&gt;›&lt;/span&gt;&lt;/div&gt;
+        &lt;div style=&quot;display:flex;justify-content:space-between;padding:12px 0;cursor:pointer;&quot;&gt;&lt;span style=&quot;font-size:14px;color:#333;&quot;&gt;🔗 我的关系链&lt;/span&gt;&lt;span style=&quot;color:#ccc;&quot;&gt;›&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;flat-col&quot;&gt;
+        &lt;div class=&quot;page-label&quot;&gt;PAGE 06b 智连·交易消息&lt;/div&gt;
+        &lt;div class=&quot;phone-frame&quot;&gt;
+            &lt;div class=&quot;pages-container&quot;&gt;
+&lt;!-- ==================== PAGE 06b 智连 · 交易消息 ==================== --&gt;
+&lt;div class=&quot;page&quot; id=&quot;page-connect-msg&quot; data-step=&quot;&quot;&gt;
+&lt;div class=&quot;header&quot;&gt;&lt;span class=&quot;back&quot;&gt;‹&lt;/span&gt;智连&lt;span class=&quot;right&quot;&gt;&lt;span class=&quot;dot-btn&quot;&gt;···&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;
+
+&lt;!-- Tab栏 --&gt;
+&lt;div class=&quot;conn-tabs&quot;&gt;
+    &lt;div class=&quot;conn-tab active&quot;&gt;交易&lt;span class=&quot;badge&quot;&gt;2&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;conn-tab&quot;&gt;消息&lt;/div&gt;
+    &lt;div class=&quot;conn-tab&quot;&gt;通知&lt;/div&gt;
+    &lt;div class=&quot;conn-tab&quot;&gt;服务&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;page-scroll&quot;&gt;
+    &lt;!-- 消息1：代付待处理 (未读) 点击跳转代付订单详情 --&gt;
+    &lt;div class=&quot;conn-msg-item&quot;&gt;
+        &lt;div class=&quot;conn-msg-avatar&quot;&gt;¥&lt;div class=&quot;dot&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;conn-msg-body&quot;&gt;
+            &lt;div class=&quot;conn-msg-top&quot;&gt;
+                &lt;span class=&quot;conn-msg-name&quot;&gt;平台消息&lt;/span&gt;
+                &lt;span class=&quot;conn-msg-time&quot;&gt;2026-01-23&lt;/span&gt;
+            &lt;/div&gt;
+            &lt;div class=&quot;conn-msg-content&quot;&gt;您有一条代付请求，请尽快处理&lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- 消息2：代付已完成 --&gt;
+    &lt;div class=&quot;conn-msg-item&quot;&gt;
+        &lt;div class=&quot;conn-msg-avatar&quot;&gt;¥&lt;/div&gt;
+        &lt;div class=&quot;conn-msg-body&quot;&gt;
+            &lt;div class=&quot;conn-msg-top&quot;&gt;
+                &lt;span class=&quot;conn-msg-name&quot;&gt;平台消息&lt;/span&gt;
+                &lt;span class=&quot;conn-msg-time&quot;&gt;2026-01-22&lt;/span&gt;
+            &lt;/div&gt;
+            &lt;div class=&quot;conn-msg-content&quot;&gt;您有一条代付请求已完成，点击查看详情&lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- 消息3：系统通知 --&gt;
+    &lt;div class=&quot;conn-msg-item&quot;&gt;
+        &lt;div class=&quot;conn-msg-avatar&quot;&gt;¥&lt;/div&gt;
+        &lt;div class=&quot;conn-msg-body&quot;&gt;
+            &lt;div class=&quot;conn-msg-top&quot;&gt;
+                &lt;span class=&quot;conn-msg-name&quot;&gt;平台消息&lt;/span&gt;
+                &lt;span class=&quot;conn-msg-time&quot;&gt;2026-01-21&lt;/span&gt;
+            &lt;/div&gt;
+            &lt;div class=&quot;conn-msg-content&quot;&gt;您的会员等级已提升至黄金会员，享有更多专属权益&lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;flat-col&quot;&gt;
+        &lt;div class=&quot;page-label&quot;&gt;PAGE 07 订单列表（支付账号）&lt;/div&gt;
+        &lt;div class=&quot;phone-frame&quot;&gt;
+            &lt;div class=&quot;pages-container&quot;&gt;
+&lt;!-- ==================== PAGE 07 支付账号-订单列表 ==================== --&gt;
+&lt;div class=&quot;page&quot; id=&quot;page-payer-orders&quot; data-step=&quot;&quot;&gt;
+&lt;!-- 顶部搜索栏 --&gt;
+&lt;div class=&quot;ol-header-bar&quot;&gt;
+    &lt;span class=&quot;ol-hb-back&quot;&gt;‹&lt;/span&gt;
+    &lt;div class=&quot;ol-hb-search&quot;&gt;&lt;span style=&quot;font-size:15px;&quot;&gt;🔍&lt;/span&gt; 搜索商品名称/订单号&lt;/div&gt;
+    &lt;div class=&quot;ol-hb-right&quot;&gt;
+        &lt;div class=&quot;ol-hb-score&quot;&gt;⭐ 4.8&lt;/div&gt;
+        &lt;div class=&quot;ol-hb-avatar&quot;&gt;👤&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Tab栏 --&gt;
+&lt;div class=&quot;ol-tabs&quot;&gt;
+    &lt;div class=&quot;ol-tab active&quot;&gt;全部&lt;/div&gt;
+    &lt;div class=&quot;ol-tab&quot;&gt;待付款&lt;/div&gt;
+    &lt;div class=&quot;ol-tab&quot;&gt;待发货/待核销&lt;/div&gt;
+    &lt;div class=&quot;ol-tab&quot;&gt;待收货&lt;/div&gt;
+    &lt;div class=&quot;ol-tab&quot;&gt;已完成&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div style=&quot;padding-bottom:16px;&quot;&gt;
+
+    &lt;!-- 订单卡片0：代付请求（待付款）--&gt;
+    &lt;div class=&quot;ol-card&quot; id=&quot;proxyCardPending&quot; style=&quot;border:1.5px solid #ff6b35;&quot;&gt;
+        &lt;div class=&quot;olc-top&quot;&gt;
+            &lt;div class=&quot;olc-no&quot; style=&quot;display:flex;align-items:center;gap:6px;&quot;&gt;订单号：605448 &lt;span style=&quot;display:inline-flex;align-items:center;background:linear-gradient(135deg,#fef3c7,#fde68a);color:#92400e;font-size:10px;padding:2px 7px;border-radius:8px;border:1px solid #fcd34d;font-weight:600;&quot;&gt;🤝 代付请求&lt;/span&gt;&lt;/div&gt;
+            &lt;div class=&quot;olc-status wait-pay&quot; id=&quot;proxyCardStatus&quot;&gt;待付款&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;olc-goods&quot;&gt;
+            &lt;div class=&quot;olc-thumb&quot; style=&quot;background:#fff7e6;border-color:#ffe7ba;&quot;&gt;🧴&lt;div class=&quot;olc-thumb-tag&quot;&gt;上海发货·极速达&lt;/div&gt;&lt;/div&gt;
+            &lt;div class=&quot;olc-info&quot;&gt;
+                &lt;div class=&quot;olc-name-row&quot;&gt;&lt;span class=&quot;olc-self&quot;&gt;自营&lt;/span&gt;&lt;span class=&quot;olc-name&quot;&gt;赛隆瑶乐饮品&lt;/span&gt;&lt;/div&gt;
+                &lt;div class=&quot;olc-spec&quot;&gt;2盒&lt;/div&gt;
+                &lt;div class=&quot;olc-price-row&quot;&gt;
+                    &lt;div&gt;&lt;span class=&quot;olc-price-fire&quot;&gt;🔥1&lt;/span&gt;&lt;span class=&quot;olc-price-val&quot;&gt;1.00&lt;/span&gt;&lt;/div&gt;
+                    &lt;div class=&quot;olc-qty&quot;&gt;×&lt;/div&gt;1
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;olc-summary&quot;&gt;
+            &lt;div class=&quot;olcs-time&quot;&gt;下单时间：2026-06-22 19:42:18&lt;/div&gt;
+            &lt;div class=&quot;olcs-total&quot;&gt;共1件，实付款：&lt;span&gt;0.72&lt;/span&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;olc-actions&quot;&gt;
+            &lt;button class=&quot;olc-btn olc-btn-outline&quot;&gt;联系客服&lt;/button&gt;
+            &lt;button class=&quot;olc-btn olc-btn-green&quot; style=&quot;background:#ff6b35;border-color:#ff6b35;color:#fff;&quot;&gt;立即代付&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- 订单卡片1：普通订单 --&gt;
+    &lt;div class=&quot;ol-card&quot;&gt;
+        &lt;div class=&quot;olc-top&quot;&gt;
+            &lt;div class=&quot;olc-no&quot;&gt;订单号：605447&lt;/div&gt;
+            &lt;div class=&quot;olc-status wait-pay&quot;&gt;待发货&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;olc-goods&quot;&gt;
+            &lt;div class=&quot;olc-thumb&quot;&gt;🧴&lt;div class=&quot;olc-thumb-tag&quot;&gt;上海发货·极速达&lt;/div&gt;&lt;/div&gt;
+            &lt;div class=&quot;olc-info&quot;&gt;
+                &lt;div class=&quot;olc-name-row&quot;&gt;&lt;span class=&quot;olc-self&quot;&gt;自营&lt;/span&gt;&lt;span class=&quot;olc-name&quot;&gt;赛隆瑶乐饮品&lt;/span&gt;&lt;/div&gt;
+                &lt;div class=&quot;olc-spec&quot;&gt;2盒&lt;/div&gt;
+                &lt;div class=&quot;olc-price-row&quot;&gt;
+                    &lt;div&gt;&lt;span class=&quot;olc-price-fire&quot;&gt;🔥1&lt;/span&gt;&lt;span class=&quot;olc-price-val&quot;&gt;1.00&lt;/span&gt;&lt;/div&gt;
+                    &lt;div class=&quot;olc-qty&quot;&gt;×&lt;/div&gt;1
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;olc-summary&quot;&gt;
+            &lt;div class=&quot;olcs-time&quot;&gt;支付时间：2026-06-22 18:16:32&lt;/div&gt;
+            &lt;div class=&quot;olcs-total&quot;&gt;共1件，实付款：&lt;span&gt;0.00&lt;/span&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;olc-actions&quot;&gt;
+            &lt;button class=&quot;olc-btn olc-btn-green&quot;&gt;联系客服&lt;/button&gt;
+            &lt;button class=&quot;olc-btn olc-btn-outline&quot;&gt;取消订单&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- 订单卡片2：已取消 --&gt;
+    &lt;div class=&quot;ol-card&quot;&gt;
+        &lt;div class=&quot;olc-top&quot;&gt;
+            &lt;div class=&quot;olc-no&quot;&gt;订单号：605446&lt;/div&gt;
+            &lt;div class=&quot;olc-status cancelled&quot;&gt;已取消&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;olc-goods&quot;&gt;
+            &lt;div class=&quot;olc-thumb&quot;&gt;🧴&lt;div class=&quot;olc-thumb-tag&quot;&gt;上海发货·极速达&lt;/div&gt;&lt;/div&gt;
+            &lt;div class=&quot;olc-info&quot;&gt;
+                &lt;div class=&quot;olc-name-row&quot;&gt;&lt;span class=&quot;olc-self&quot;&gt;自营&lt;/span&gt;&lt;span class=&quot;olc-name&quot;&gt;赛隆瑶乐饮品&lt;/span&gt;&lt;/div&gt;
+                &lt;div class=&quot;olc-spec&quot;&gt;2盒&lt;/div&gt;
+                &lt;div class=&quot;olc-price-row&quot;&gt;
+                    &lt;div&gt;&lt;span class=&quot;olc-price-fire&quot;&gt;🔥1&lt;/span&gt;&lt;span class=&quot;olc-price-val&quot;&gt;1.00&lt;/span&gt;&lt;/div&gt;
+                    &lt;div class=&quot;olc-qty&quot;&gt;×&lt;/div&gt;1
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;olc-summary&quot;&gt;
+            &lt;div class=&quot;olcs-time&quot;&gt;&lt;/div&gt;
+            &lt;div class=&quot;olcs-total&quot;&gt;共1件，实付款：&lt;span&gt;0.72&lt;/span&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;olc-actions&quot;&gt;
+            &lt;button class=&quot;olc-btn olc-btn-green&quot;&gt;联系客服&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- 订单卡片3：已取消 --&gt;
+    &lt;div class=&quot;ol-card&quot;&gt;
+        &lt;div class=&quot;olc-top&quot;&gt;
+            &lt;div class=&quot;olc-no&quot;&gt;订单号：605445&lt;/div&gt;
+            &lt;div class=&quot;olc-status cancelled&quot;&gt;已取消&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;olc-goods&quot;&gt;
+            &lt;div class=&quot;olc-thumb&quot;&gt;🧴&lt;div class=&quot;olc-thumb-tag&quot;&gt;上海发货·极速达&lt;/div&gt;&lt;/div&gt;
+            &lt;div class=&quot;olc-info&quot;&gt;
+                &lt;div class=&quot;olc-name-row&quot;&gt;&lt;span class=&quot;olc-self&quot;&gt;自营&lt;/span&gt;&lt;span class=&quot;olc-name&quot;&gt;赛隆瑶乐饮品&lt;/span&gt;&lt;/div&gt;
+                &lt;div class=&quot;olc-spec&quot;&gt;2盒&lt;/div&gt;
+                &lt;div class=&quot;olc-price-row&quot;&gt;
+                    &lt;div&gt;&lt;span class=&quot;olc-price-fire&quot;&gt;🔥1&lt;/span&gt;&lt;span class=&quot;olc-price-val&quot;&gt;1.00&lt;/span&gt;&lt;/div&gt;
+                    &lt;div class=&quot;olc-qty&quot;&gt;×&lt;/div&gt;1
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;olc-summary&quot;&gt;
+            &lt;div class=&quot;olcs-time&quot;&gt;&lt;/div&gt;
+            &lt;div class=&quot;olcs-total&quot;&gt;共1件，实付款：&lt;span&gt;0.26&lt;/span&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;olc-actions&quot;&gt;
+            &lt;button class=&quot;olc-btn olc-btn-green&quot;&gt;联系客服&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;flat-col&quot;&gt;
+        &lt;div class=&quot;page-label&quot;&gt;PAGE 08 订单详情（支付账号）&lt;/div&gt;
+        &lt;div class=&quot;phone-frame&quot;&gt;
+            &lt;div class=&quot;pages-container&quot;&gt;
+&lt;!-- ==================== PAGE 08 待付款订单详情 ==================== --&gt;
+&lt;div class=&quot;page&quot; id=&quot;page-payer-detail&quot; data-step=&quot;&quot;&gt;
+&lt;div class=&quot;header&quot;&gt;&lt;span class=&quot;back&quot;&gt;‹&lt;/span&gt;待付款&lt;span class=&quot;right&quot;&gt;&lt;span class=&quot;dot-btn&quot;&gt;···&lt;/span&gt;&lt;span class=&quot;dot-btn&quot;&gt;⊙&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;
+&lt;div style=&quot;padding-bottom:16px;&quot;&gt;
+    &lt;div class=&quot;ol-header&quot;&gt;&lt;div class=&quot;ol-buyer&quot;&gt;宋健 &lt;span style=&quot;font-size:14px;font-weight:400;&quot;&gt;183****8442&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;ol-addr&quot;&gt;湖南省长沙市岳麓区中电科技园二期&lt;/div&gt;&lt;div class=&quot;ol-divider&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;div class=&quot;confirm-goods-row&quot;&gt;
+        &lt;div class=&quot;cg-thumb&quot;&gt;🧴&lt;div class=&quot;sold-tag&quot;&gt;上海发货·极速达&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;cg-info&quot;&gt;
+            &lt;div class=&quot;cg-name-row&quot;&gt;&lt;span class=&quot;cg-self-tag&quot;&gt;自营&lt;/span&gt;&lt;span class=&quot;cg-name&quot;&gt;赛隆瑶乐饮品&lt;/span&gt;&lt;/div&gt;
+            &lt;div class=&quot;cg-spec&quot;&gt;2盒&lt;/div&gt;
+            &lt;div class=&quot;cg-bottom&quot;&gt;&lt;div class=&quot;cg-price-line&quot;&gt;&lt;span class=&quot;cg-fire&quot;&gt;🔥&lt;/span&gt;&lt;span&gt;1&lt;/span&gt;&lt;span class=&quot;cg-price&quot;&gt;1.00&lt;/span&gt;&lt;/div&gt;&lt;span class=&quot;cg-qty&quot;&gt;x1&lt;/span&gt;&lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;co-amt-box&quot;&gt;
+        &lt;div class=&quot;co-amt-row&quot;&gt;&lt;span&gt;商品总额(含运费)&lt;/span&gt;&lt;span style=&quot;display:flex;align-items:center;gap:4px;&quot;&gt;&lt;span class=&quot;cg-fire&quot;&gt;🔥&lt;/span&gt;&lt;span&gt;1&lt;/span&gt;&lt;span style=&quot;margin-left:auto;color:#e64340;font-weight:700;&quot;&gt;¥1&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;co-amt-row&quot;&gt;&lt;span&gt;订单编号&lt;/span&gt;&lt;span style=&quot;display:flex;align-items:center;gap:4px;&quot;&gt;&lt;span style=&quot;color:#333;&quot;&gt;605446&lt;/span&gt;&lt;span class=&quot;oc-copy&quot;&gt;| 复制&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;co-amt-row&quot;&gt;&lt;span&gt;下单时间&lt;/span&gt;&lt;span style=&quot;color:#333;&quot;&gt;2026-06-22 18:08:35&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;co-amt-box&quot; style=&quot;padding:14px 16px;&quot;&gt;
+        &lt;div style=&quot;font-size:14px;font-weight:600;color:#222;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;&quot;&gt;订单备注 &lt;span style=&quot;font-size:12px;color:#999;&quot;&gt;∨&lt;/span&gt;&lt;/div&gt;
+        &lt;div id=&quot;rdC&quot; style=&quot;display:none;font-size:13px;color:#666;padding-top:8px;border-top:1px dashed #eee;&quot;&gt;暂无&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;rec-section&quot;&gt;&lt;div class=&quot;rec-grid&quot;&gt;&lt;div class=&quot;rec-itm&quot;&gt;&lt;div class=&quot;rec-img&quot; style=&quot;background:linear-gradient(135deg,#d1fae5,#a7f3d0);&quot;&gt;💊&lt;div class=&quot;rec-sold&quot;&gt;已售罄&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;rec-nm&quot;&gt;黄精复合益生菌冻干粉&lt;/div&gt;&lt;div class=&quot;rec-pr&quot;&gt;218.00&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;rec-itm&quot;&gt;&lt;div class=&quot;rec-img&quot; style=&quot;background:linear-gradient(135deg,#e0f2fe,#bae6fd);&quot;&gt;🧴&lt;/div&gt;&lt;div class=&quot;rec-nm&quot;&gt;绿韵兰茵益齿健牙膏&lt;/div&gt;&lt;div class=&quot;rec-pr&quot;&gt;9.9&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;flat-col&quot;&gt;
+        &lt;div class=&quot;page-label&quot;&gt;PAGE 08b 代付请求详情（支付账号）&lt;/div&gt;
+        &lt;div class=&quot;phone-frame&quot;&gt;
+            &lt;div class=&quot;pages-container&quot;&gt;
+&lt;!-- ==================== PAGE 08b 代付请求订单详情 ==================== --&gt;
+&lt;div class=&quot;page&quot; id=&quot;page-payer-detail-proxy&quot; data-step=&quot;&quot;&gt;
+&lt;div class=&quot;header&quot;&gt;&lt;span class=&quot;back&quot;&gt;‹&lt;/span&gt;待付款&lt;span class=&quot;right&quot;&gt;&lt;span class=&quot;dot-btn&quot;&gt;···&lt;/span&gt;&lt;span class=&quot;dot-btn&quot;&gt;⊙&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;
+&lt;div style=&quot;padding-bottom:16px;&quot;&gt;
+    &lt;div style=&quot;background:#fff;margin-top:8px;padding:14px 16px;position:relative;&quot;&gt;
+        &lt;div style=&quot;display:flex;align-items:center;gap:8px;&quot;&gt;&lt;span style=&quot;font-size:18px;color:#e64340;&quot;&gt;📍&lt;/span&gt;&lt;div style=&quot;flex:1;&quot;&gt;&lt;div style=&quot;font-size:15px;font-weight:600;color:#222;&quot;&gt;宋健 &lt;span style=&quot;font-size:13px;font-weight:400;color:#888;&quot;&gt;183****8442&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;font-size:13px;color:#999;margin-top:2px;&quot;&gt;湖南省长沙市岳麓区中电科技园二期&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div style=&quot;height:4px;width:100%;margin-top:12px;background:repeating-linear-gradient(90deg,#07c160 0,#07c600 10px,transparent 10px,transparent 13px,#1890ff 13px,#1890ff 23px,transparent 23px,transparent 26px,#faad14 26px,#faad14 36px,transparent 36px,transparent 39px,#ff4d4f 39px,#ff4d4f 49px,transparent 49px,transparent 52px);opacity:.45;&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- 代付信息提示 --&gt;
+    &lt;div style=&quot;background:linear-gradient(135deg,#fff7ed,#fed7aa);border:1px solid #fdba74;margin:8px 16px 0;padding:12px 14px;border-radius:10px;display:flex;align-items:center;gap:8px;&quot;&gt;
+        &lt;span style=&quot;font-size:18px;&quot;&gt;🤝&lt;/span&gt;
+        &lt;div style=&quot;flex:1;font-size:12px;color:#92400e;line-height:1.7;&quot;&gt;
+            &lt;strong&gt;关系链成员「李小新」&lt;/strong&gt;请求您代付此订单&lt;br&gt;
+            商品：&lt;strong&gt;赛隆瑶乐饮品 ×1&lt;/strong&gt; · 代付金额：&lt;strong style=&quot;color:#e64340;&quot;&gt;¥0.72&lt;/strong&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;confirm-goods-row&quot; style=&quot;margin-top:8px;&quot;&gt;
+        &lt;div class=&quot;cg-thumb&quot;&gt;🧴&lt;div class=&quot;sold-tag&quot;&gt;上海发货·极速达&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;cg-info&quot;&gt;
+            &lt;div class=&quot;cg-name-row&quot;&gt;&lt;span class=&quot;cg-self-tag&quot;&gt;自营&lt;/span&gt;&lt;span class=&quot;cg-name&quot;&gt;赛隆瑶乐饮品&lt;/span&gt;&lt;/div&gt;
+            &lt;div class=&quot;cg-spec&quot;&gt;2盒&lt;/div&gt;
+            &lt;div class=&quot;cg-bottom&quot;&gt;&lt;div class=&quot;cg-price-line&quot;&gt;&lt;span class=&quot;cg-fire&quot;&gt;🔥&lt;/span&gt;&lt;span&gt;1&lt;/span&gt;&lt;span class=&quot;cg-price&quot;&gt;1.00&lt;/span&gt;&lt;/div&gt;&lt;span class=&quot;cg-qty&quot;&gt;x1&lt;/span&gt;&lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;co-amt-box&quot;&gt;
+        &lt;div class=&quot;co-amt-row&quot;&gt;&lt;span&gt;商品总额(含运费)&lt;/span&gt;&lt;span style=&quot;display:flex;align-items:center;gap:4px;&quot;&gt;&lt;span class=&quot;cg-fire&quot;&gt;🔥&lt;/span&gt;&lt;span&gt;1&lt;/span&gt;&lt;span style=&quot;margin-left:auto;color:#e64340;font-weight:700;&quot;&gt;¥1&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;co-amt-row&quot;&gt;&lt;span&gt;专享优惠&lt;/span&gt;&lt;span style=&quot;color:#07c160;&quot;&gt;- ¥0.25&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;co-amt-row&quot;&gt;&lt;span&gt;余额抵扣&lt;/span&gt;&lt;span style=&quot;color:#07c160;&quot;&gt;- ¥0.03&lt;/span&gt;&lt;/div&gt;
+        &lt;div style=&quot;border-top:1px dashed #eee;margin-top:8px;padding-top:10px;display:flex;justify-content:space-between;align-items:baseline;&quot;&gt;&lt;span style=&quot;font-size:13px;color:#666;&quot;&gt;实付款&lt;/span&gt;&lt;span style=&quot;font-size:20px;color:#e64340;font-weight:700;&quot;&gt;¥0.72&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;co-amt-row&quot; style=&quot;padding-top:8px;border-top:1px solid #f5f5f5;margin-top:4px;&quot;&gt;&lt;span&gt;订单编号&lt;/span&gt;&lt;span style=&quot;display:flex;align-items:center;gap:4px;&quot;&gt;&lt;span style=&quot;color:#333;&quot;&gt;605448&lt;/span&gt;&lt;span style=&quot;color:#1890ff;cursor:pointer;&quot;&gt;| 复制&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;co-amt-row&quot;&gt;&lt;span&gt;下单时间&lt;/span&gt;&lt;span style=&quot;color:#333;&quot;&gt;2026-06-22 19:42:18&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;co-amt-row&quot;&gt;&lt;span&gt;代付人（请求方）&lt;/span&gt;&lt;span style=&quot;color:#333;&quot;&gt;李小新（新人）&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;rec-section&quot;&gt;&lt;div class=&quot;rec-grid&quot;&gt;&lt;div class=&quot;rec-itm&quot;&gt;&lt;div class=&quot;rec-img&quot; style=&quot;background:linear-gradient(135deg,#d1fae5,#a7f3d0);&quot;&gt;💊&lt;div class=&quot;rec-sold&quot;&gt;已售罄&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;rec-nm&quot;&gt;黄精复合益生菌冻干粉&lt;/div&gt;&lt;div class=&quot;rec-pr&quot;&gt;218.00&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;rec-itm&quot;&gt;&lt;div class=&quot;rec-img&quot; style=&quot;background:linear-gradient(135deg,#e0f2fe,#bae6fd);&quot;&gt;🧴&lt;/div&gt;&lt;div class=&quot;rec-nm&quot;&gt;绿韵兰茵益齿健牙膏&lt;/div&gt;&lt;div class=&quot;rec-pr&quot;&gt;9.9&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+
+    &lt;!-- 底部操作栏 --&gt;
+    &lt;div style=&quot;position:sticky;bottom:0;background:#fff;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:center;padding:10px 16px;margin-top:16px;&quot;&gt;
+        &lt;div&gt;&lt;span style=&quot;font-size:14px;color:#333;&quot;&gt;合计：&lt;/span&gt;&lt;span style=&quot;font-size:22px;color:#e64340;font-weight:700;&quot;&gt;0.72&lt;/span&gt;&lt;/div&gt;
+        &lt;button style=&quot;padding:0 32px;height:42px;border-radius:21px;border:none;background:#ff6b35;color:#fff;font-size:16px;font-weight:600;cursor:pointer;&quot;&gt;确认代付&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;flat-col&quot;&gt;
+        &lt;div class=&quot;page-label&quot;&gt;PAGE 09 收银台（支付账号）&lt;/div&gt;
+        &lt;div class=&quot;phone-frame&quot;&gt;
+            &lt;div class=&quot;pages-container&quot;&gt;
+&lt;!-- ==================== PAGE 09 支付账号-收银台 ==================== --&gt;
+&lt;div class=&quot;page&quot; id=&quot;page-payer-checkout&quot; data-step=&quot;&quot;&gt;
+&lt;div class=&quot;header&quot;&gt;&lt;span class=&quot;back&quot;&gt;‹&lt;/span&gt;收银台&lt;span class=&quot;right&quot;&gt;&lt;span class=&quot;dot-btn&quot;&gt;···&lt;/span&gt;&lt;span class=&quot;dot-btn&quot;&gt;⊙&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;
+&lt;div class=&quot;page-scroll&quot;&gt;
+    &lt;div class=&quot;pay-area&quot;&gt;
+        &lt;div class=&quot;cd-label&quot;&gt;支付剩余时间 &lt;span id=&quot;pcdT&quot;&gt;29:57&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;cd-amount&quot;&gt;0.72&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;pm-section&quot;&gt;
+    &lt;div class=&quot;pm-title&quot;&gt;选择支付方式&lt;/div&gt;
+    &lt;div class=&quot;pm-list&quot;&gt;
+        &lt;div class=&quot;pm-item&quot;&gt;&lt;div class=&quot;pm-icon o&quot;&gt;💰&lt;/div&gt;&lt;div class=&quot;pm-text&quot;&gt;&lt;div class=&quot;pm-name&quot;&gt;储值支付&lt;/div&gt;&lt;div class=&quot;pm-bal&quot;&gt;¥ 97,992.82&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;pm-radio on&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;pm-item&quot;&gt;&lt;div class=&quot;pm-icon g&quot;&gt;微&lt;/div&gt;&lt;div class=&quot;pm-text&quot;&gt;&lt;div class=&quot;pm-name&quot;&gt;微信支付&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;pm-radio&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;pm-item&quot;&gt;&lt;div class=&quot;pm-icon b&quot;&gt;💳&lt;/div&gt;&lt;div class=&quot;pm-text&quot;&gt;&lt;div class=&quot;pm-name&quot;&gt;银行卡支付&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;pm-radio&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;pay-bar&quot;&gt;&lt;button class=&quot;btn-pay&quot;&gt;确认支付&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;flat-col&quot;&gt;
+        &lt;div class=&quot;page-label&quot;&gt;PAGE 10 支付成功&lt;/div&gt;
+        &lt;div class=&quot;phone-frame&quot;&gt;
+            &lt;div class=&quot;pages-container&quot;&gt;
+&lt;!-- ==================== PAGE 10 成功 ==================== --&gt;
+&lt;div class=&quot;page&quot; id=&quot;page-success&quot; data-step=&quot;6&quot;&gt;
+&lt;div class=&quot;header&quot;&gt;&lt;span class=&quot;back&quot;&gt;‹&lt;/span&gt;支付结果&lt;span class=&quot;right&quot;&gt;&lt;span class=&quot;dot-btn&quot;&gt;···&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;
+&lt;div class=&quot;success-body&quot; id=&quot;scBody&quot;&gt;
+    &lt;div class=&quot;sc-icon&quot;&gt;✅&lt;/div&gt;&lt;div class=&quot;sc-title&quot; id=&quot;scTitle&quot;&gt;代付成功！&lt;/div&gt;&lt;div class=&quot;sc-desc&quot; id=&quot;scDesc&quot;&gt;&lt;/div&gt;&lt;div class=&quot;sc-card&quot; id=&quot;scCard&quot;&gt;&lt;/div&gt;&lt;div class=&quot;sc-btns&quot; id=&quot;scBtns&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;&lt;!-- end pages-container --&gt;
+&lt;/div&gt;&lt;!-- end phone-frame --&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+
+<script>
+function doCopy() {
+    var code = document.getElementById('sourceCode').textContent;
+    var btn = document.getElementById('copyBtn');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(function() {
+            btn.innerHTML = '<span>✅</span> 复制成功！';
+            btn.classList.add('copied');
+            setTimeout(function() {
+                btn.innerHTML = '<span>📋</span> 一键复制源码';
+                btn.classList.remove('copied');
+            }, 2000);
+        }).catch(function() { fallbackCopy(code); });
+    } else { fallbackCopy(code); }
+}
+function fallbackCopy(code) {
+    var ta = document.createElement('textarea');
+    ta.value = code; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); var btn = document.getElementById('copyBtn');
+        btn.innerHTML = '<span>✅</span> 复制成功！'; btn.classList.add('copied');
+        setTimeout(function() { btn.innerHTML = '<span>📋</span> 一键复制源码'; btn.classList.remove('copied'); }, 2000);
+    } catch(e) { alert('复制失败，请手动全选复制'); }
+    document.body.removeChild(ta);
+}
+</script>
+</body>
+</html>
