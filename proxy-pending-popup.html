@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>待付款信息弹窗 · 支付账号视角</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f2f2f2; min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+}
+
+/* ========== 手机框架 ========== */
+.phone-frame {
+    width: 375px; height: 812px;
+    background: #f2f2f2;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+}
+
+/* ========== 状态栏 ========== */
+.status-bar {
+    height: 30px; background: #fff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 12px; font-size: 12px; font-weight: 600; color: #333;
+}
+
+/* ========== 导航栏 ========== */
+.header {
+    background: #fff; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    border-bottom: 1px solid #eee; font-size: 17px; font-weight: 500; color: #333;
+    position: relative;
+}
+.header .back {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    display: flex; align-items: center; padding-left: 14px; font-size: 26px; color: #333;
+    cursor: pointer; line-height: 1;
+}
+.header .right {
+    position: absolute; right: 12px; display: flex; gap: 12px; align-items: center;
+}
+.header .right .dot-btn { font-size: 20px; color: #666; letter-spacing: -2px; }
+
+/* ========== 首页内容 ========== */
+.home-content {
+    padding: 20px; text-align: center;
+    opacity: 0.6; /* 弹窗覆盖时首页半透明 */
+}
+.avatar {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: linear-gradient(135deg,#e0e7ff,#c7d2fe);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px; font-size: 36px;
+}
+.user-name { font-size: 18px; font-weight: 700; color: #222; }
+.user-phone { font-size: 13px; color: #999; margin-top: 4px; }
+.menu-card {
+    background: #fff; border-radius: 12px; padding: 16px;
+    margin-top: 24px; text-align: left;
+}
+.menu-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0; border-bottom: 1px solid #f5f5f5;
+    font-size: 14px; color: #333; cursor: pointer;
+}
+.menu-row:last-child { border-bottom: none; }
+.menu-row .arrow { color: #ccc; }
+.menu-row .badge {
+    display: inline-block; background: #e64340; color: #fff;
+    font-size: 10px; padding: 1px 7px; border-radius: 8px; margin-right: 6px;
+}
+
+/* ========== 遮罩层 ========== */
+.modal-overlay {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,.45);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+}
+
+/* ========== 弹窗本体 ========== */
+.modal-box {
+    background: #fff; border-radius: 16px;
+    width: 300px; padding: 28px 24px 24px;
+    text-align: center;
+    animation: modalIn .3s ease;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+}
+@keyframes modalIn {
+    from { opacity: 0; transform: scale(.92); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* 弹窗图标 */
+.modal-icon {
+    font-size: 48px; margin-bottom: 12px;
+    display: flex; align-items: center; justify-content: center;
+}
+.modal-icon .icon-circle {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: linear-gradient(135deg, #fff7ed, #fed7aa);
+    display: flex; align-items: center; justify-content: center;
+}
+
+/* 弹窗标题 */
+.modal-title {
+    font-size: 17px; font-weight: 700; color: #222;
+    margin-bottom: 8px;
+}
+
+/* 弹窗描述 */
+.modal-desc {
+    font-size: 13px; color: #666; line-height: 1.7;
+    margin-bottom: 8px;
+}
+
+/* 代付详情卡片 */
+.modal-detail {
+    background: #fef3c7; border-radius: 10px;
+    padding: 12px 14px; margin: 0 0 18px;
+    text-align: left; font-size: 12px; color: #92400e;
+    line-height: 1.8;
+    border: 1px solid #fcd34d;
+}
+.modal-detail .detail-row {
+    display: flex; justify-content: space-between;
+}
+.modal-detail .detail-val {
+    color: #b45309; font-weight: 600;
+}
+.modal-detail .detail-val.red {
+    color: #e64340; font-weight: 700;
+}
+
+/* 按钮区 */
+.modal-btns {
+    display: flex; gap: 10px;
+}
+.modal-btn {
+    flex: 1; height: 42px; border-radius: 21px;
+    border: none; font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: all .15s;
+}
+.modal-btn:active { transform: scale(0.96); }
+.modal-btn.primary {
+    background: #ff6b35; color: #fff;
+}
+.modal-btn.primary:hover { background: #e55a2b; }
+.modal-btn.default {
+    background: #f5f5f5; color: #666;
+}
+.modal-btn.default:hover { background: #e8e8e8; }
+
+/* ========== 提示文案 ========== */
+.page-hint {
+    position: absolute; bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px; color: #aaa; white-space: nowrap;
+    background: rgba(0,0,0,0.04); padding: 6px 14px;
+    border-radius: 12px;
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== 手机外壳 ==================== -->
+<div class="phone-frame">
+
+    <!-- 状态栏 -->
+    <div class="status-bar">
+        <span>9:41</span>
+        <span>📶 🔋</span>
+    </div>
+
+    <!-- 导航栏 -->
+    <div class="header">
+        <span class="back">‹</span>
+        我的
+        <span class="right">
+            <span class="dot-btn">···</span>
+            <span class="dot-btn">⊙</span>
+        </span>
+    </div>
+
+    <!-- 首页内容（弹窗覆盖下隐约可见） -->
+    <div class="home-content">
+        <div class="avatar">👤</div>
+        <div class="user-name">王建国</div>
+        <div class="user-phone">老会员 · 138****1234</div>
+        <div class="menu-card">
+            <div class="menu-row">📦 我的订单<span class="arrow">›</span></div>
+            <div class="menu-row">💬 智连 · 交易消息<span class="badge">1新</span><span class="arrow">›</span></div>
+            <div class="menu-row">💼 我的钱包<span class="arrow">›</span></div>
+            <div class="menu-row">🔗 我的关系链<span class="arrow">›</span></div>
+        </div>
+    </div>
+
+    <!-- ==================== 代付提醒弹窗（核心） ==================== -->
+    <div class="modal-overlay">
+        <div class="modal-box">
+            <!-- 图标 -->
+            <div class="modal-icon">
+                <div class="icon-circle">🔔</div>
+            </div>
+            
+            <!-- 标题 -->
+            <div class="modal-title">代付提醒</div>
+            
+            <!-- 描述 -->
+            <div class="modal-desc">
+                您有 <strong style="color:#e64340;">1 条待处理的代付请求</strong><br>
+                来自关系链成员 <strong>李小新</strong>
+            </div>
+
+            <!-- 代付详情 -->
+            <div class="modal-detail">
+                <div class="detail-row">
+                    <span>请求人</span>
+                    <span class="detail-val">李小新（新人）</span>
+                </div>
+                <div class="detail-row">
+                    <span>商品</span>
+                    <span class="detail-val">赛隆瑶乐饮品 ×1</span>
+                </div>
+                <div class="detail-row">
+                    <span>代付金额</span>
+                    <span class="detail-val red">¥0.72</span>
+                </div>
+            </div>
+
+            <!-- 按钮 -->
+            <div class="modal-btns">
+                <button class="modal-btn default" onclick="dismiss()">稍后处理</button>
+                <button class="modal-btn primary" onclick="goHandle()">立即前往</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部提示 -->
+    <div class="page-hint">← 此为弹窗独立预览</div>
+
+</div>
+
+<script>
+function dismiss() {
+    alert('点击「稍后处理」→ 关闭弹窗，回到首页');
+}
+function goHandle() {
+    alert('点击「立即前往」→ 跳转至订单列表，查看代付请求详情');
+}
+</script>
+</body>
+</html>
