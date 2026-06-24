@@ -46,7 +46,7 @@ body {
 <div class="copy-bar">
     <div>
         <div class="title"><span class="icon">&#x1F4C4;</span>储值管理后台 · 完整源码</div>
-        <div class="info">共 24106 字符 / 510 行 · 含奖励金额计算逻辑 · 点击按钮一键复制全部源码</div>
+        <div class="info">共 24406 字符 / 518 行 · 含是否店主列+奖励金额计算 · 点击按钮一键复制全部源码</div>
     </div>
     <button class="copy-btn" id="copyBtn" onclick="doCopy()">
         <span>&#x1F4CB;</span> 一键复制源码
@@ -242,6 +242,7 @@ tr:hover { background: #fafafa; }
                             &lt;th&gt;用户昵称&lt;/th&gt;
                             &lt;th&gt;用户账号&lt;/th&gt;
                             &lt;th&gt;会员等级&lt;/th&gt;
+                            &lt;th&gt;是否店主&lt;/th&gt;
                             &lt;th&gt;申请凭证&lt;/th&gt;
                             &lt;th&gt;交易单号&lt;/th&gt;
                             &lt;th&gt;储值金额&lt;/th&gt;
@@ -257,6 +258,7 @@ tr:hover { background: #fafafa; }
                             &lt;td&gt;&lt;div style=&quot;display:flex;align-items:center;gap:8px;&quot;&gt;&lt;span class=&quot;td-avatar&quot;&gt;团&lt;/span&gt; 团购大管旅游&lt;/div&gt;&lt;/td&gt;
                             &lt;td&gt;18373220001&lt;/td&gt;
                             &lt;td&gt;经验达人&lt;/td&gt;
+                            &lt;td&gt;否&lt;/td&gt;
                             &lt;td&gt;&lt;span class=&quot;td-img&quot;&gt;&amp;#128196;&lt;/span&gt;&lt;/td&gt;
                             &lt;td&gt;155155151&lt;/td&gt;
                             &lt;td&gt;983.23&lt;/td&gt;
@@ -270,6 +272,7 @@ tr:hover { background: #fafafa; }
                             &lt;td&gt;&lt;div style=&quot;display:flex;align-items:center;gap:8px;&quot;&gt;&lt;span class=&quot;td-avatar&quot;&gt;团&lt;/span&gt; 团购大管旅游&lt;/div&gt;&lt;/td&gt;
                             &lt;td&gt;18373220001&lt;/td&gt;
                             &lt;td&gt;经验达人&lt;/td&gt;
+                            &lt;td&gt;否&lt;/td&gt;
                             &lt;td&gt;&lt;span class=&quot;td-img&quot;&gt;&amp;#128172;&lt;/span&gt;&lt;/td&gt;
                             &lt;td&gt;145015150151&lt;/td&gt;
                             &lt;td&gt;1000&lt;/td&gt;
@@ -283,6 +286,7 @@ tr:hover { background: #fafafa; }
                             &lt;td&gt;&lt;div style=&quot;display:flex;align-items:center;gap:8px;&quot;&gt;&lt;span class=&quot;td-avatar&quot;&gt;C&lt;/span&gt; C小娟&lt;/div&gt;&lt;/td&gt;
                             &lt;td&gt;12074201850&lt;/td&gt;
                             &lt;td&gt;分享达人&lt;/td&gt;
+                            &lt;td&gt;否&lt;/td&gt;
                             &lt;td&gt;&lt;span class=&quot;td-img&quot; style=&quot;background:#e6f7ff;color:#1890ff;&quot;&gt;&amp;#127968;&lt;/span&gt;&lt;/td&gt;
                             &lt;td&gt;12581581&lt;/td&gt;
                             &lt;td&gt;100&lt;/td&gt;
@@ -295,9 +299,11 @@ tr:hover { background: #fafafa; }
                         &lt;tr style=&quot;background:#fffbe6;&quot;&gt;
                             &lt;td&gt;&lt;div style=&quot;display:flex;align-items:center;gap:8px;&quot;&gt;&lt;span class=&quot;td-avatar&quot;&gt;G&lt;/span&gt; George Tan&lt;/div&gt;&lt;/td&gt;
                             &lt;td&gt;18569596673&lt;/td&gt;
-                            &lt;td&gt;店主&lt;/td&gt;
+                            &lt;td&gt;分享达人&lt;/td&gt;
+                            &lt;td&gt;是&lt;/td&gt;
                             &lt;td&gt;&lt;span class=&quot;td-img&quot;&gt;&amp;#128247;&lt;/span&gt;&lt;/td&gt;
                             &lt;td&gt;-&lt;/td&gt;
+                            &lt;td&gt;5000.00&lt;/td&gt;
                             &lt;td class=&quot;status-pending&quot;&gt;待审核&lt;/td&gt;
                             &lt;td&gt;-&lt;/td&gt;
                             &lt;td&gt;2025-04-21 13:47&lt;/td&gt;
@@ -308,6 +314,7 @@ tr:hover { background: #fafafa; }
                             &lt;td&gt;&lt;div style=&quot;display:flex;align-items:center;gap:8px;&quot;&gt;&lt;span class=&quot;td-avatar&quot;&gt;平&lt;/span&gt; 平平安安&lt;/div&gt;&lt;/td&gt;
                             &lt;td&gt;15115411357&lt;/td&gt;
                             &lt;td&gt;普通用户&lt;/td&gt;
+                            &lt;td&gt;否&lt;/td&gt;
                             &lt;td&gt;&lt;span class=&quot;td-img&quot; style=&quot;font-size:10px;&quot;&gt;YUU.UU&lt;/span&gt;&lt;/td&gt;
                             &lt;td&gt;-&lt;/td&gt;
                             &lt;td&gt;9.9&lt;/td&gt;
@@ -321,6 +328,7 @@ tr:hover { background: #fafafa; }
                             &lt;td&gt;&lt;div style=&quot;display:flex;align-items:center;gap:8px;&quot;&gt;&lt;span class=&quot;td-avatar&quot;&gt;亮&lt;/span&gt; 亮红&lt;/div&gt;&lt;/td&gt;
                             &lt;td&gt;15811977020&lt;/td&gt;
                             &lt;td&gt;普通用户&lt;/td&gt;
+                            &lt;td&gt;否&lt;/td&gt;
                             &lt;td&gt;&lt;span class=&quot;td-img&quot; style=&quot;font-size:12px;&quot;&gt;-15.00&lt;/span&gt;&lt;/td&gt;
                             &lt;td&gt;-&lt;/td&gt;
                             &lt;td&gt;600&lt;/td&gt;
@@ -383,7 +391,7 @@ tr:hover { background: #fafafa; }
             &lt;div class=&quot;form-row&quot;&gt;
                 &lt;div class=&quot;form-label&quot;&gt;会员等级&lt;/div&gt;
                 &lt;div class=&quot;form-content&quot;&gt;
-                    &lt;div class=&quot;form-text&quot; id=&quot;memberLevel&quot;&gt;店主&lt;/div&gt;
+                    &lt;div class=&quot;form-text&quot; id=&quot;memberLevel&quot;&gt;分享达人&lt;/div&gt;
                 &lt;/div&gt;
             &lt;/div&gt;
             &lt;div class=&quot;form-row&quot;&gt;
@@ -481,16 +489,16 @@ tr:hover { background: #fafafa; }
 &lt;/div&gt;
 
 &lt;script&gt;
-// 会员等级配置（演示用）
-const memberLevel = &#x27;店主&#x27;;
+// 店主标识（演示用）
+const isStoreOwner = true;
 const REWARD_THRESHOLD = 5000;
 const REWARD_RATE = 0.02;
 
 // 打开审批弹窗
 function openModal() {
     document.getElementById(&#x27;auditModal&#x27;).classList.add(&#x27;show&#x27;);
-    // 根据会员等级判断是否显示奖励
-    if (memberLevel === &#x27;店主&#x27;) {
+    // 根据是否店主判断是否显示奖励
+    if (isStoreOwner) {
         document.getElementById(&#x27;rewardInfo&#x27;).classList.remove(&#x27;hidden&#x27;);
     }
 }
@@ -505,7 +513,7 @@ function calculateReward() {
     const amount = parseFloat(document.getElementById(&#x27;depositAmount&#x27;).value) || 0;
     let reward = 0;
     
-    if (memberLevel === &#x27;店主&#x27; &amp;&amp; amount &gt;= REWARD_THRESHOLD) {
+    if (isStoreOwner &amp;&amp; amount &gt;= REWARD_THRESHOLD) {
         reward = amount * REWARD_RATE;
     }
     
@@ -534,7 +542,7 @@ function updateConfirmDetail() {
     const amount = parseFloat(document.getElementById(&#x27;confirmInput&#x27;).value) || 0;
     let reward = 0;
     
-    if (memberLevel === &#x27;店主&#x27; &amp;&amp; amount &gt;= REWARD_THRESHOLD) {
+    if (isStoreOwner &amp;&amp; amount &gt;= REWARD_THRESHOLD) {
         reward = amount * REWARD_RATE;
     }
     

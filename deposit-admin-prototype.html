@@ -187,6 +187,7 @@ tr:hover { background: #fafafa; }
                             <th>用户昵称</th>
                             <th>用户账号</th>
                             <th>会员等级</th>
+                            <th>是否店主</th>
                             <th>申请凭证</th>
                             <th>交易单号</th>
                             <th>储值金额</th>
@@ -202,6 +203,7 @@ tr:hover { background: #fafafa; }
                             <td><div style="display:flex;align-items:center;gap:8px;"><span class="td-avatar">团</span> 团购大管旅游</div></td>
                             <td>18373220001</td>
                             <td>经验达人</td>
+                            <td>否</td>
                             <td><span class="td-img">&#128196;</span></td>
                             <td>155155151</td>
                             <td>983.23</td>
@@ -215,6 +217,7 @@ tr:hover { background: #fafafa; }
                             <td><div style="display:flex;align-items:center;gap:8px;"><span class="td-avatar">团</span> 团购大管旅游</div></td>
                             <td>18373220001</td>
                             <td>经验达人</td>
+                            <td>否</td>
                             <td><span class="td-img">&#128172;</span></td>
                             <td>145015150151</td>
                             <td>1000</td>
@@ -228,6 +231,7 @@ tr:hover { background: #fafafa; }
                             <td><div style="display:flex;align-items:center;gap:8px;"><span class="td-avatar">C</span> C小娟</div></td>
                             <td>12074201850</td>
                             <td>分享达人</td>
+                            <td>否</td>
                             <td><span class="td-img" style="background:#e6f7ff;color:#1890ff;">&#127968;</span></td>
                             <td>12581581</td>
                             <td>100</td>
@@ -240,7 +244,8 @@ tr:hover { background: #fafafa; }
                         <tr style="background:#fffbe6;">
                             <td><div style="display:flex;align-items:center;gap:8px;"><span class="td-avatar">G</span> George Tan</div></td>
                             <td>18569596673</td>
-                            <td>店主</td>
+                            <td>分享达人</td>
+                            <td>是</td>
                             <td><span class="td-img">&#128247;</span></td>
                             <td>-</td>
                             <td>5000.00</td>
@@ -254,6 +259,7 @@ tr:hover { background: #fafafa; }
                             <td><div style="display:flex;align-items:center;gap:8px;"><span class="td-avatar">平</span> 平平安安</div></td>
                             <td>15115411357</td>
                             <td>普通用户</td>
+                            <td>否</td>
                             <td><span class="td-img" style="font-size:10px;">YUU.UU</span></td>
                             <td>-</td>
                             <td>9.9</td>
@@ -267,6 +273,7 @@ tr:hover { background: #fafafa; }
                             <td><div style="display:flex;align-items:center;gap:8px;"><span class="td-avatar">亮</span> 亮红</div></td>
                             <td>15811977020</td>
                             <td>普通用户</td>
+                            <td>否</td>
                             <td><span class="td-img" style="font-size:12px;">-15.00</span></td>
                             <td>-</td>
                             <td>600</td>
@@ -329,7 +336,7 @@ tr:hover { background: #fafafa; }
             <div class="form-row">
                 <div class="form-label">会员等级</div>
                 <div class="form-content">
-                    <div class="form-text" id="memberLevel">店主</div>
+                    <div class="form-text" id="memberLevel">分享达人</div>
                 </div>
             </div>
             <div class="form-row">
@@ -427,16 +434,16 @@ tr:hover { background: #fafafa; }
 </div>
 
 <script>
-// 会员等级配置（演示用）
-const memberLevel = '店主';
+// 店主标识（演示用）
+const isStoreOwner = true;
 const REWARD_THRESHOLD = 5000;
 const REWARD_RATE = 0.02;
 
 // 打开审批弹窗
 function openModal() {
     document.getElementById('auditModal').classList.add('show');
-    // 根据会员等级判断是否显示奖励
-    if (memberLevel === '店主') {
+    // 根据是否店主判断是否显示奖励
+    if (isStoreOwner) {
         document.getElementById('rewardInfo').classList.remove('hidden');
     }
 }
@@ -451,7 +458,7 @@ function calculateReward() {
     const amount = parseFloat(document.getElementById('depositAmount').value) || 0;
     let reward = 0;
     
-    if (memberLevel === '店主' && amount >= REWARD_THRESHOLD) {
+    if (isStoreOwner && amount >= REWARD_THRESHOLD) {
         reward = amount * REWARD_RATE;
     }
     
@@ -480,7 +487,7 @@ function updateConfirmDetail() {
     const amount = parseFloat(document.getElementById('confirmInput').value) || 0;
     let reward = 0;
     
-    if (memberLevel === '店主' && amount >= REWARD_THRESHOLD) {
+    if (isStoreOwner && amount >= REWARD_THRESHOLD) {
         reward = amount * REWARD_RATE;
     }
     
