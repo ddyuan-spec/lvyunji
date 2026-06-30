@@ -9,15 +9,12 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: #e0e0e0; color: #333; font-size: 14px; line-height: 1.5;
-    margin: 0; padding: 12px;
-    overflow-x: auto;
+    background: #d6d6d6; color: #333; font-size: 14px; line-height: 1.5;
+    margin: 0; padding: 12px; overflow-x: auto;
 }
 .flat-scroll {
     display: flex; flex-direction: row; flex-wrap: nowrap;
-    gap: 18px;
-    min-height: 100vh;
-    align-items: flex-start;
+    gap: 18px; min-height: 100vh; align-items: flex-start;
 }
 .flat-col {
     display: flex; flex-direction: column;
@@ -28,167 +25,275 @@ body {
     color: #fff; padding: 10px 16px;
     font-size: 13px; font-weight: 700; text-align: center;
     border-radius: 12px 12px 0 0;
-    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
     letter-spacing: 0.5px;
 }
 
 .phone-frame {
-    width: 375px; min-height: 820px;
+    width: 375px; min-height: 780px;
     background: #f2f2f2;
     overflow: hidden; position: relative;
     display: flex; flex-direction: column;
     margin: 0; border-radius: 0 0 12px 12px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
-    flex-shrink: 0;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12); flex-shrink: 0;
 }
 
-/* Header */
-.header {
+/* ======== 浏览器顶栏 ======== */
+.browser-bar {
+    background: #fff; height: 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 10px; border-bottom: 1px solid #e5e5e5; flex-shrink: 0;
+}
+.browser-bar .time { font-size: 13px; color: #333; font-weight: 500; }
+.browser-bar .url {
+    flex: 1; text-align: center; font-size: 11px; color: #666;
+    margin: 0 8px; overflow: hidden; white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.browser-bar .icons { font-size: 15px; color: #333; display: flex; gap: 6px; }
+
+/* ======== 页面头部 ======== */
+.page-header {
     background: #fff; height: 44px;
-    display: flex; align-items: center; justify-content: center;
-    border-bottom: 1px solid #eee; font-size: 17px; font-weight: 500; color: #333;
-    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; border-bottom: 1px solid #eee; flex-shrink: 0;
 }
-.header .back {
-    position: absolute; left: 0; top: 0; bottom: 0;
-    display: flex; align-items: center; padding-left: 14px;
-    font-size: 26px; color: #333; line-height: 1;
+.page-header .title { font-size: 17px; font-weight: 600; color: #333; }
+.logout-btn {
+    border: 1px solid #07c160; color: #07c160;
+    font-size: 11px; padding: 3px 9px; border-radius: 10px;
+    background: transparent;
 }
-.header .right {
-    position: absolute; right: 12px;
-    display: flex; gap: 16px; align-items: center;
-}
-.header .right .dot-btn { font-size: 20px; color: #666; letter-spacing: -2px; }
 
-.page-body { flex: 1; overflow-y: auto; padding-bottom: 20px; }
-
-/* ======== 用户账号信息卡片 ======== */
-.user-info-card {
-    background: #fff;
-    margin: 10px 12px 0;
-    border-radius: 12px;
-    padding: 14px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
+/* ======== 用户账号信息卡片（新增需求1） ======== */
+.user-account-card {
+    background: #fff; margin: 8px 12px 0;
+    border-radius: 10px; padding: 12px 16px;
+    display: flex; align-items: center; gap: 10px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
-.user-avatar {
-    width: 44px; height: 44px; border-radius: 50%;
+.user-avatar-sm {
+    width: 38px; height: 38px; border-radius: 50%;
     background: linear-gradient(135deg, #07c160, #05a84a);
     color: #fff; display: flex; align-items: center; justify-content: center;
-    font-size: 18px; font-weight: 700; flex-shrink: 0;
+    font-size: 16px; font-weight: 700; flex-shrink: 0;
 }
-.user-info-text { flex: 1; }
-.user-nickname { font-size: 15px; font-weight: 600; color: #222; }
-.user-account { font-size: 12px; color: #999; margin-top: 2px; }
-.user-badge {
-    display: inline-flex; align-items: center; gap: 3px;
+.user-detail { flex: 1; }
+.user-nm { font-size: 14px; font-weight: 600; color: #222; }
+.user-acct { font-size: 11px; color: #999; margin-top: 1px; }
+.user-tag {
+    display: inline-flex; align-items: center;
     background: #e8f5e9; color: #07c160;
-    font-size: 10px; padding: 2px 8px; border-radius: 10px;
-    margin-top: 3px;
+    font-size: 10px; padding: 1px 7px; border-radius: 8px; margin-top: 2px;
 }
-.user-arrow { color: #ccc; font-size: 18px; }
 
-/* ======== 储值说明区域 ======== */
-.deposit-notice {
-    background: linear-gradient(135deg, #fff7ed, #ffedd5);
-    border: 1px solid #fed7aa;
-    margin: 10px 12px 0; padding: 12px 14px;
-    border-radius: 10px; font-size: 12px; color: #92400e;
-    line-height: 1.7; display: flex; align-items: flex-start; gap: 8px;
+/* ======== 绿色储值余额卡片 ======== */
+.balance-card {
+    margin: 10px 12px 0;
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 45%, #86efac 70%, #22c55e 100%);
+    border-radius: 12px; padding: 18px 20px 24px;
+    position: relative; overflow: hidden;
 }
-.deposit-notice .icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.balance-card::after {
+    content: ""; position: absolute;
+    width: 90px; height: 90px; border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    right: -10px; top: 50%; transform: translateY(-50%);
+}
+.balance-card .card-icon {
+    position: absolute; right: 16px; top: 50%; transform: translateY(-55%);
+    font-size: 52px; opacity: 0.12; z-index: 1;
+}
+.balance-label { font-size: 12px; color: #166534; font-weight: 500; }
+.balance-amt { font-size: 36px; color: #15803d; font-weight: 700; margin-top: 4px; line-height: 1.2; }
 
-/* ======== 储值金额输入区 ======== */
-.amount-section {
-    background: #fff; margin: 10px 12px 0;
-    border-radius: 12px; padding: 20px 16px;
-    text-align: center;
+/* ======== Tab 栏（去储值 / 消费记录） ======== */
+.balance-tabs {
+    display: flex; margin: 0 12px; background: #fff;
+    border-radius: 10px; overflow: hidden;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
-.amount-label { font-size: 13px; color: #999; margin-bottom: 10px; }
-.amount-input-wrap {
-    display: flex; align-items: baseline; justify-content: center; gap: 4px;
+.tab-item {
+    flex: 1; height: 42px; display: flex; align-items: center; justify-content: center;
+    gap: 5px; font-size: 14px; color: #666; cursor: pointer; border-bottom: none;
+    border-right: 1px solid #f0f0f0; transition: all .2s;
 }
-.amount-symbol { font-size: 24px; color: #333; font-weight: 600; }
-.amount-input {
-    border: none; outline: none; background: transparent;
-    font-size: 42px; font-weight: 700; color: #222;
-    width: 180px; text-align: center;
-    border-bottom: 2px solid #e5e5e5; padding: 6px 0;
-    transition: border-color .2s;
+.tab-item:last-child { border-right: none; }
+.tab-item.active { color: #07c160; font-weight: 600; }
+.tab-item.active .tab-circle {
+    width: 17px; height: 17px; border-radius: 50%; border: 1.5px solid #07c160;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
 }
-.amount-input:focus { border-bottom-color: #07c160; }
-.amount-hint {
-    margin-top: 12px; font-size: 12px; color: #bbb;
+.tab-circle-inner {
+    width: 8px; height: 8px; border-radius: 50%; background: #07c160;
 }
 
-/* ======== 储值方式 ======== */
-.payment-section { margin: 16px 12px 0; }
-.payment-section .section-title {
-    font-size: 14px; color: #666; font-weight: 500;
-    padding: 0 4px 10px;
-}
-.payment-list {
-    background: #fff; border-radius: 12px;
-    overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-}
-.payment-item {
-    display: flex; align-items: center; padding: 14px 14px;
-    border-bottom: 1px solid #f5f5f5;
-}
-.payment-item:last-child { border-bottom: none; }
-.pay-icon {
-    width: 32px; height: 32px; border-radius: 7px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; flex-shrink: 0; margin-right: 12px;
-}
-.pay-icon.transfer { background: #e8f5e9; color: #07c160; }
-.pay-icon.bank { background: #e8f0fe; color: #4285f4; }
-.pay-icon.wallet { background: linear-gradient(135deg, #fff7ed, #fed7aa); color: #ff6b35; }
-.pay-text { flex: 1; }
-.pay-name { font-size: 15px; color: #333; font-weight: 500; }
-.pay-desc { font-size: 12px; color: #999; margin-top: 1px; }
-.pay-radio {
-    width: 22px; height: 22px; border-radius: 50%;
-    border: 1.5px solid #ccc; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-}
-.pay-radio.on { border-color: #07c160; background: #07c160; }
-.pay-radio.on::after {
-    content: ""; width: 6px; height: 10px;
-    border: solid #fff; border-width: 0 2px 2px 0;
-    transform: rotate(45deg) translateY(-1px);
-}
-
-/* ======== 操作按钮（去储值 + 转账到绿韵家） ======== */
-.action-buttons {
-    display: flex; flex-direction: column; gap: 10px;
-    margin: 20px 12px 0;
-    padding-bottom: 20px;
-}
-.btn-deposit {
-    width: 100%; height: 48px; border-radius: 24px; border: none;
+/* ======== 转账按钮 ======== */
+.transfer-btn-wrap { padding: 12px 12px 0; }
+.btn-transfer-main {
+    width: 100%; height: 46px; border-radius: 23px; border: none;
     background: linear-gradient(135deg, #07c160, #06ad56);
-    color: #fff; font-size: 17px; font-weight: 700;
-    cursor: pointer; box-shadow: 0 4px 14px rgba(7,193,96,0.3);
+    color: #fff; font-size: 16px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    gap: 5px; box-shadow: 0 3px 10px rgba(7,193,96,0.25);
 }
-.btn-transfer {
-    width: 100%; height: 48px; border-radius: 24px; border: 1.5px solid #07c160;
-    background: #fff; color: #07c160; font-size: 17px; font-weight: 600;
-    cursor: pointer;
+.btn-transfer-arrow { font-size: 14px; }
+
+/* ======== 去储值按钮（需求2：互换位置后，去储值变成独立按钮） ======== */
+.deposit-btn-wrap { padding: 8px 12px 0; }
+.btn-deposit-main {
+    width: 100%; height: 46px; border-radius: 23px; border: 1.5px solid #07c160;
+    background: #fff; color: #07c160; font-size: 16px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    gap: 5px;
 }
 
-/* ======== 审核通过弹窗 ======== */
+/* ======== 储值申请记录列表 ======== */
+.record-section { padding: 14px 12px 0; }
+.record-title { font-size: 14px; color: #333; font-weight: 600; margin-bottom: 10px; }
+.record-list { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.record-item {
+    padding: 14px 16px; border-bottom: 1px solid #f5f5f5;
+}
+.record-item:last-child { border-bottom: none; }
+.record-row-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.record-label { font-size: 12px; color: #999; }
+.record-status-fail {
+    font-size: 11px; color: #ff4d4f; background: #fff2f0;
+    border: 1px solid #ffccc7; padding: 1px 7px; border-radius: 8px;
+}
+.record-status-success {
+    font-size: 11px; color: #07c160; background: #f6ffed;
+    border: 1px solid #b7eb8f; padding: 1px 7px; border-radius: 8px;
+}
+.record-signal { font-size: 13px; color: #333; font-weight: 500; margin-bottom: 2px; }
+.record-link { font-size: 11px; color: #1890ff; float: right; margin-top: 2px; }
+.record-meta { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.record-tag {
+    font-size: 10px; color: #ff6b35; background: #fff7ed;
+    border: 1px solid #fed7aa; padding: 1px 6px; border-radius: 6px;
+}
+.record-date { font-size: 11px; color: #bbb; }
+.empty-tip { text-align: center; padding: 30px 0; color: #ccc; font-size: 13px; }
+
+/* ======== 底部导航栏 ======== */
+.bottom-nav {
+    background: #fff; border-top: 1px solid #eee;
+    display: flex; justify-content: space-around; padding: 6px 0;
+    margin-top: auto; flex-shrink: 0;
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
+}
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; color: #999; }
+.nav-icon { font-size: 20px; }
+
+/* ======== 转账弹窗（需求2：带绿韵家字样） ======== */
 .popup-overlay {
     position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.5); z-index: 200;
+    background: rgba(0,0,0,0.45); z-index: 200;
     display: flex; align-items: center; justify-content: center;
 }
-.popup-card {
-    background: #fff; border-radius: 16px;
-    width: 300px; overflow: hidden;
+.popup-panel {
+    background: #fff; border-radius: 14px;
+    width: 320px; max-height: 85vh; overflow-y: auto;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+    animation: popUp .28s ease;
+}
+@keyframes popUp {
+    from{transform:translateY(30px);opacity:0;}
+    to{transform:translateY(0);opacity:1;}
+}
+.popup-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 18px 0; border-bottom: 1px solid #f5f5f5;
+}
+.popup-head .popup-title { font-size: 16px; font-weight: 600; color: #333; }
+.popup-close { font-size: 20px; color: #999; cursor: pointer; line-height: 1; }
+.popup-body { padding: 18px 18px 20px; }
+.form-group { margin-bottom: 16px; }
+.form-label-row {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 6px;
+}
+.form-label { font-size: 13px; color: #333; font-weight: 500; }
+.form-extra { font-size: 11px; color: #999; }
+.form-input {
+    width: 100%; height: 42px; border: 1px solid #ddd; border-radius: 8px;
+    padding: 0 12px; font-size: 14px; color: #333; outline: none;
+    transition: border-color .2s;
+}
+.form-input:focus { border-color: #07c160; }
+.form-input::placeholder { color: #bbb; }
+.form-hint {
+    font-size: 11px; color: #e64340; margin-top: 4px; line-height: 1.5;
+}
+.amount-row { display: flex; align-items: baseline; gap: 4px; }
+.amount-symbol { font-size: 16px; color: #333; font-weight: 600; }
+.verify-row { display: flex; gap: 8px; }
+.verify-row .form-input { flex: 1; }
+.code-btn {
+    white-space: nowrap; height: 42px; padding: 0 14px;
+    border: 1px solid #ddd; border-radius: 8px; background: #fafafa;
+    color: #666; font-size: 13px; cursor: pointer; flex-shrink: 0;
+}
+.btn-confirm-transfer {
+    width: 100%; height: 46px; border-radius: 23px; border: none;
+    background: linear-gradient(135deg, #07c160, #06ad56);
+    color: #fff; font-size: 16px; font-weight: 600;
+    cursor: pointer; box-shadow: 0 3px 10px rgba(7,193,96,0.25);
+    margin-top: 8px;
+}
+.popup-back { text-align: left; padding: 8px 18px 16px; color: #999; font-size: 18px; }
+
+/* ======== 小程序首页背景（用于弹窗展示） ======== */
+.miniapp-page { flex: 1; position: relative; background: #f5f5f5; overflow: hidden; }
+.miniapp-header {
+    background: linear-gradient(180deg, #07c160 0%, #05a84a 60%, #f5f5f5 100%);
+    height: 200px; display: flex; flex-direction: column; align-items: center;
+    padding-top: 65px;
+}
+.miniapp-avatar {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: rgba(255,255,255,0.3); border: 2px solid rgba(255,255,255,0.5);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #fff;
+}
+.miniapp-name { color: #fff; font-size: 15px; margin-top: 8px; font-weight: 500; }
+.mini-cards {
+    display: flex; gap: 10px; padding: 14px 16px; margin-top: -20px;
+}
+.mini-card {
+    flex: 1; background: #fff; border-radius: 12px;
+    padding: 14px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.mini-card .v { font-size: 19px; font-weight: 700; color: #333; }
+.mini-card .l { font-size: 11px; color: #999; margin-top: 4px; }
+.mini-menu-list {
+    background: #fff; margin: 6px 12px; border-radius: 12px; overflow: hidden;
+}
+.mini-menu-itm {
+    display: flex; align-items: center; padding: 14px 16px;
+    border-bottom: 1px solid #f5f5f5;
+}
+.mini-menu-itm:last-child { border-bottom: none; }
+.mi-icon {
+    width: 30px; height: 30px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; margin-right: 12px;
+}
+.mi-grn { background: #e8f5e9; color: #07c160; }
+.mi-blu { background: #e8f0fe; color: #4285f4; }
+.mi-org { background: #fff7ed; color: #ff6b35; }
+.mi-text { flex: 1; font-size: 14px; color: #333; font-weight: 500; }
+.mi-arrow { color: #ccc; font-size: 14px; }
+
+/* ======== 审核通过弹窗（需求3） ======== */
+.approval-popup {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5); z-index: 300;
+    display: flex; align-items: center; justify-content: center;
+}
+.approval-card {
+    background: #fff; border-radius: 16px; width: 296px; overflow: hidden;
     box-shadow: 0 8px 40px rgba(0,0,0,0.2);
     animation: popIn .3s ease;
 }
@@ -196,228 +301,289 @@ body {
     from{transform:scale(0.85);opacity:0;}
     to{transform:scale(1);opacity:1;}
 }
-.popup-icon-area {
+.ap-header {
     background: linear-gradient(135deg, #dcfce7, #bbf7d0);
-    padding: 28px 0 20px; text-align: center;
+    padding: 26px 0 18px; text-align: center;
 }
-.popup-icon {
-    width: 64px; height: 64px; border-radius: 50%;
-    background: #fff; display: flex; align-items: center; justify-content: center;
-    margin: 0 auto; font-size: 32px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+.ap-icon {
+    width: 56px; height: 56px; border-radius: 50%; background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 10px; font-size: 28px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
-.popup-title {
-    font-size: 18px; font-weight: 700; color: #07c160;
-    margin-top: 12px;
-}
-.popup-body { padding: 20px 24px 24px; text-align: center; }
-.popup-desc {
-    font-size: 14px; color: #666; line-height: 1.7;
-    margin-bottom: 6px;
-}
-.popup-extra {
-    font-size: 12px; color: #999;
-    margin-top: 6px;
-}
-.popup-amount {
-    font-size: 28px; color: #e64340; font-weight: 700;
-    margin: 8px 0;
-}
-.popup-amount::before { content: "¥"; font-size: 18px; }
-.popup-btn {
-    width: 100%; height: 46px; border-radius: 23px; border: none;
+.ap-title { font-size: 17px; font-weight: 700; color: #07c160; }
+.ap-body { padding: 20px 22px 24px; text-align: center; }
+.ap-desc { font-size: 14px; color: #555; line-height: 1.75; }
+.ap-highlight { color: #e64340; font-weight: 600; }
+.ap-sub { font-size: 12px; color: #999; margin-top: 8px; line-height: 1.6; }
+.ap-btn {
+    width: 100%; height: 44px; border-radius: 22px; border: none;
     background: linear-gradient(135deg, #07c160, #06ad56);
-    color: #fff; font-size: 16px; font-weight: 600;
-    cursor: pointer; margin-top: 20px;
-    box-shadow: 0 4px 14px rgba(7,193,96,0.3);
+    color: #fff; font-size: 15px; font-weight: 600;
+    cursor: pointer; margin-top: 18px;
+    box-shadow: 0 4px 12px rgba(7,193,96,0.28);
 }
-
-/* ======== 小程序首页（弹窗背景） ======== */
-.miniapp-home {
-    flex: 1; position: relative;
-    background: #f5f5f5; overflow: hidden;
-}
-.home-top-bg {
-    background: linear-gradient(180deg, #07c160 0%, #05a84a 60%, #f5f5f5 100%);
-    height: 200px; display: flex; flex-direction: column;
-    align-items: center; padding-top: 70px;
-}
-.home-avatar {
-    width: 52px; height: 52px; border-radius: 50%;
-    background: rgba(255,255,255,0.3); border: 2px solid rgba(255,255,255,0.5);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px; color: #fff;
-}
-.home-greeting { color: #fff; font-size: 15px; margin-top: 8px; font-weight: 500; }
-.home-cards {
-    display: flex; gap: 10px; padding: 14px 16px;
-    margin-top: -20px;
-}
-.home-card {
-    flex: 1; background: #fff; border-radius: 12px;
-    padding: 14px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
-.home-card .val { font-size: 20px; font-weight: 700; color: #333; }
-.home-card .val.maxed { color: #e64340; }
-.home-card .lbl { font-size: 11px; color: #999; margin-top: 4px; }
-.home-menu {
-    background: #fff; margin: 6px 12px; border-radius: 12px;
-    overflow: hidden;
-}
-.home-menu-item {
-    display: flex; align-items: center; padding: 14px 16px;
-    border-bottom: 1px solid #f5f5f5;
-}
-.home-menu-item:last-child { border-bottom: none; }
-.home-menu-icon {
-    width: 32px; height: 32px; border-radius: 7px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 15px; margin-right: 12px;
-}
-.home-menu-icon.green { background: #e8f5e9; color: #07c160; }
-.home-menu-icon.blue { background: #e8f0fe; color: #4285f4; }
-.home-menu-icon.orange { background: #fff7ed; color: #ff6b35; }
-.home-menu-text { flex: 1; font-size: 14px; color: #333; font-weight: 500; }
-.home-menu-arrow { color: #ccc; font-size: 14px; }
 </style>
 </head>
 <body>
 
 <div class="flat-scroll">
 
-    <!-- ===== PAGE 1: 储值页面（含用户账号信息 + 按钮互换 + 绿韵家） ===== -->
+    <!-- ========================================================= -->
+    <!-- PAGE 1: 需求1+2 — H5储值页面（含用户账号信息 + 按钮互换·绿韵家） -->
+    <!-- ========================================================= -->
     <div class="flat-col">
-        <div class="page-label">需求1+2：储值页面 · 用户账号信息 · 按钮互换·绿韵家</div>
+        <div class="page-label">需求1+2：H5储值页 · 用户账号信息 · 按钮互换 · 转账到绿韵家</div>
         <div class="phone-frame">
-            <div class="header">
-                <span class="back">‹</span>储值
-                <span class="right">
-                    <span class="dot-btn">···</span>
-                </span>
+            <!-- 浏览器顶栏 -->
+            <div class="browser-bar">
+                <span class="time">17:38</span>
+                <span class="url">h5.yoocat.cn</span>
+                <span class="icons">⟳</span>
             </div>
-            <div class="page-body">
+            <!-- 页面标题栏 -->
+            <div class="page-header">
+                <span class="title">我的储值</span>
+                <button class="logout-btn">退出登录</button>
+            </div>
 
-                <!-- ★ 新增：用户账号信息卡片 -->
-                <div class="user-info-card">
-                    <div class="user-avatar">王</div>
-                    <div class="user-info-text">
-                        <div class="user-nickname">王建国</div>
-                        <div class="user-account">账号：183****8442</div>
-                        <div class="user-badge">✓ 当前账号</div>
+            <div style="flex:1;overflow-y:auto;background:#f2f2f2;">
+                <!-- ★ 新增需求1：用户账号信息卡片 -->
+                <div class="user-account-card">
+                    <div class="user-avatar-sm">王</div>
+                    <div class="user-detail">
+                        <div class="user-nm">王建国</div>
+                        <div class="user-acct">账号：183****8442</div>
+                        <div class="user-tag">✓ 当前登录账号</div>
                     </div>
-                    <div class="user-arrow">›</div>
                 </div>
 
-                <!-- 储值说明 -->
-                <div class="deposit-notice">
-                    <span class="icon">📌</span>
-                    <span>储值金额将存入您的账户余额，可用于购买平台商品。充值后不可提现，请确认金额无误后再提交。</span>
+                <!-- 绿色余额卡 -->
+                <div class="balance-card">
+                    <span class="balance-label">当前储值</span>
+                    <div class="balance-amt">¥1.50</div>
+                    <span class="card-icon">💰</span>
                 </div>
 
-                <!-- 储值金额输入 -->
-                <div class="amount-section">
-                    <div class="amount-label">储值金额</div>
-                    <div class="amount-input-wrap">
-                        <span class="amount-symbol">¥</span>
-                        <input type="number" class="amount-input" value="5000" placeholder="请输入金额">
+                <!-- ★ 需求2：Tab栏（去储值 / 消费记录）—— 按钮互换后"去储值"在这里 -->
+                <div class="balance-tabs">
+                    <div class="tab-item active">
+                        <div class="tab-circle"><div class="tab-circle-inner"></div></div> 去储值
                     </div>
-                    <div class="amount-hint">最低储值 100 元</div>
+                    <div class="tab-item">📋 消费记录</div>
                 </div>
 
-                <!-- 储值方式选择 -->
-                <div class="payment-section">
-                    <div class="section-title">选择储值方式</div>
-                    <div class="payment-list">
-                        <div class="payment-item">
-                            <div class="pay-icon wallet">💰</div>
-                            <div class="pay-text">
-                                <div class="pay-name">钱包余额支付</div>
-                                <div class="pay-desc">使用账户余额直接储值</div>
+                <!-- ★ 需求2：转账按钮在下面，加"绿韵家"文字 -->
+                <div class="transfer-btn-wrap">
+                    <button class="btn-transfer-main">
+                        ↗ 转账<span class="btn-transfer-arrow"></span>
+                    </button>
+                </div>
+
+                <!-- 储值申请记录列表 -->
+                <div class="record-section">
+                    <div class="record-title">储值申请记录</div>
+                    <div class="record-list">
+                        <div class="record-item">
+                            <div class="record-row-top">
+                                <span class="record-label">申请储值信号</span>
+                                <span class="record-status-fail">储值失败</span>
                             </div>
-                            <div class="pay-radio on"></div>
-                        </div>
-                        <div class="payment-item">
-                            <div class="pay-icon bank">🏦</div>
-                            <div class="pay-text">
-                                <div class="pay-name">银行卡支付</div>
-                                <div class="pay-desc">支持储蓄卡 / 信用卡</div>
+                            <div class="record-signal">CZ11260623580398263636 <span class="record-link">查看储值凭证 ›</span></div>
+                            <div class="record-meta">
+                                <span class="record-tag">驳回</span>
+                                <span class="record-date">申请时间 2026-06-23 16:09:02</span>
                             </div>
-                            <div class="pay-radio"></div>
+                        </div>
+                        <div class="record-item">
+                            <div class="record-row-top">
+                                <span class="record-label">申请储值信号</span>
+                                <span class="record-status-fail">储值失败</span>
+                            </div>
+                            <div class="record-signal">CZ11260623580350411869 <span class="record-link">查看储值凭证 ›</span></div>
+                            <div class="record-meta">
+                                <span class="record-tag">驳回 · 整回</span>
+                                <span class="record-date">申请时间 2026-06-23 16:08:19</span>
+                            </div>
+                        </div>
+                        <div class="record-item">
+                            <div class="record-row-top">
+                                <span class="record-label">申请储值信号</span>
+                                <span class="record-status-success">储值失败</span>
+                            </div>
+                            <div class="record-signal" style="display:flex;align-items:center;gap:6px;"><span style="background:#07c160;color:#fff;font-size:10px;padding:2px 6px;border-radius:6px;">绿家<br>储值</span>CZ11260518580352883133 <span class="record-link">查看储值凭证 ›</span></div>
+                            <div class="record-meta">
+                                <span class="record-tag" style="color:#07c160;background:#f6ffed;border-color:#b7eb8f;">待付款提交充值订单</span>
+                                <span class="record-date">申请时间 2026-05-18 14:35:30</span>
+                            </div>
                         </div>
                     </div>
+                    <div class="empty-tip">—我也是有钱的呢～</div>
                 </div>
+            </div>
 
-                <!-- ★ 按钮位置互换：先去储值 → 再转账（绿韵家） -->
-                <div class="action-buttons">
-                    <button class="btn-deposit">去储值</button>
-                    <button class="btn-transfer">转账到绿韵家账户</button>
-                </div>
-
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+                <div class="nav-item"><span class="nav-icon">◀</span><span>返回</span></div>
+                <div class="nav-item"><span class="nav-icon">📥</span><span>下载</span></div>
+                <div class="nav-item"><span class="nav-icon">📖</span><span>目录</span></div>
+                <div class="nav-item"><span class="nav-icon">🔗</span><span>链接</span></div>
             </div>
         </div>
     </div>
 
-    <!-- ===== PAGE 2: 审核通过弹窗提醒（在小程序首页弹出） ===== -->
+    <!-- ========================================================= -->
+    <!-- PAGE 2: 需求2 — 转账弹窗（带"绿韵家"字样）叠加在H5页面上 -->
+    <!-- ========================================================= -->
+    <div class="flat-col">
+        <div class="page-label">需求2：转账弹窗 · 含"请输入对方绑定的绿韵家账号"</div>
+        <div class="phone-frame" style="position:relative;">
+            <div class="browser-bar">
+                <span class="time">14:23</span>
+                <span class="url">h5.yoocat.cn</span>
+                <span class="icons">⟳</span>
+            </div>
+            <div class="page-header">
+                <span class="title">我的储值</span>
+                <button class="logout-btn">退出登录</button>
+            </div>
+
+            <div style="flex:1;overflow:hidden;background:#f2f2f2;display:flex;flex-direction:column;">
+                <div class="balance-card" style="margin:8px 12px 0;">
+                    <span class="balance-label">当前储值</span>
+                    <div class="balance-amt">¥0.10</div>
+                    <span class="card-icon">💰</span>
+                </div>
+                <div class="balance-tabs" style="margin:0 12px;">
+                    <div class="tab-item active"><div class="tab-circle"><div class="tab-circle-inner"></div></div> 去储值</div>
+                    <div class="tab-item">📋 消费记录</div>
+                </div>
+                <div class="transfer-btn-wrap">
+                    <button class="btn-transfer-main">↗ 转账</button>
+                </div>
+                <div class="record-section" style="padding-top:10px;">
+                    <div class="record-title">储值申请记录</div>
+                    <div class="record-list">
+                        <div class="record-item">
+                            <div class="record-row-top">
+                                <span class="record-label">申请储值信号</span>
+                                <span class="record-status-success">储值成功</span>
+                            </div>
+                            <div class="record-signal">CZ11260324611841491392 <span class="record-link">查看储值凭证 ›</span></div>
+                            <div class="record-meta">
+                                <span class="record-date">申请时间 2026-03-24 10:51:50</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="empty-tip">—我也是有钱的呢～</div>
+                </div>
+            </div>
+
+            <!-- ★ 转账弹窗（含绿韵家提示） -->
+            <div class="popup-overlay">
+                <div class="popup-panel">
+                    <div class="popup-head">
+                        <span class="popup-title">转账</span>
+                        <span class="popup-close">✕</span>
+                    </div>
+                    <div class="popup-body">
+                        <div class="form-group">
+                            <div class="form-label-row">
+                                <span class="form-label">对方账号</span>
+                            </div>
+                            <div class="form-hint">请输入对方绑定的<span style="font-weight:700;color:#e64340;">绿韵家</span>账号</div>
+                            <input type="text" class="form-input" placeholder="请输入对方账号或手机号" />
+                        </div>
+                        <div class="form-group">
+                            <div class="form-label-row">
+                                <span class="form-label">转账金额</span>
+                                <span class="form-extra">可用余额 ¥0.10</span>
+                            </div>
+                            <div class="amount-row">
+                                <span class="amount-symbol">¥</span>
+                                <input type="number" class="form-input" value="0.00" step="0.01" style="padding-left:4px;" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-label-row"><span class="form-label">绑定手机号验证</span></div>
+                            <input type="text" class="form-input" placeholder="请输入与账号绑定的11位手机号" />
+                        </div>
+                        <div class="form-group">
+                            <div class="form-label-row">
+                                <span class="form-label">验证码</span>
+                                <span class="form-extra" style="color:#1890ff;cursor:pointer;">获取验证码</span>
+                            </div>
+                            <input type="text" class="form-input" placeholder="请输入验证码" />
+                        </div>
+                        <button class="btn-confirm-transfer">确认转账</button>
+                    </div>
+                    <div class="popup-back">‹</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- PAGE 3: 需求3 — 小程序打开时弹出"储值到账通知"弹窗 -->
+    <!-- ========================================================= -->
     <div class="flat-col">
         <div class="page-label">需求3：小程序首页 · 储值到账通知弹窗</div>
         <div class="phone-frame" style="position:relative;">
-            <!-- 小程序 首页 背景 -->
-            <div class="header">
-                绿韵家
-                <span class="right">
-                    <span class="dot-btn">○</span>
-                </span>
+            <div class="page-header" style="border:none;background:transparent;">
+                <span class="title" style="color:#fff;">绿韵家</span>
             </div>
-            <div class="miniapp-home">
-                <div class="home-top-bg">
-                    <div class="home-avatar">王</div>
-                    <div class="home-greeting">王建国</div>
+
+            <!-- 小程序首页内容（被半透明遮罩覆盖） -->
+            <div class="miniapp-page">
+                <div class="miniapp-header">
+                    <div class="miniapp-avatar">王</div>
+                    <div class="miniapp-name">王建国</div>
                 </div>
-                <div class="home-cards">
-                    <div class="home-card">
-                        <div class="val">¥3,280.50</div>
-                        <div class="lbl">账户余额</div>
+                <div class="mini-cards">
+                    <div class="mini-card">
+                        <div class="v">¥3,280.50</div>
+                        <div class="l">账户余额</div>
                     </div>
-                    <div class="home-card">
-                        <div class="val maxed">¥5,100.00</div>
-                        <div class="lbl">储值金额</div>
+                    <div class="mini-card">
+                        <div class="v" style="color:#e64340;">¥5,000.00</div>
+                        <div class="l">储值金额</div>
                     </div>
                 </div>
-                <div class="home-menu">
-                    <div class="home-menu-item">
-                        <div class="home-menu-icon green">💳</div>
-                        <div class="home-menu-text">储值中心</div>
-                        <div class="home-menu-arrow">›</div>
+                <div class="mini-menu-list">
+                    <div class="mini-menu-itm">
+                        <div class="mi-icon mi-grn">💳</div>
+                        <div class="mi-text">储值中心</div>
+                        <div class="mi-arrow">›</div>
                     </div>
-                    <div class="home-menu-item">
-                        <div class="home-menu-icon blue">📦</div>
-                        <div class="home-menu-text">我的订单</div>
-                        <div class="home-menu-arrow">›</div>
+                    <div class="mini-menu-itm">
+                        <div class="mi-icon mi-blu">📦</div>
+                        <div class="mi-text">我的订单</div>
+                        <div class="mi-arrow">›</div>
                     </div>
-                    <div class="home-menu-item">
-                        <div class="home-menu-icon orange">💰</div>
-                        <div class="home-menu-text">我的钱包</div>
-                        <div class="home-menu-arrow">›</div>
+                    <div class="mini-menu-itm">
+                        <div class="mi-icon mi-org">💰</div>
+                        <div class="mi-text">我的钱包</div>
+                        <div class="mi-arrow">›</div>
                     </div>
                 </div>
             </div>
 
-            <!-- ★ 储值到账通知弹窗 -->
-            <div class="popup-overlay">
-                <div class="popup-card">
-                    <div class="popup-icon-area">
-                        <div class="popup-icon">✅</div>
-                        <div class="popup-title">储值到账通知</div>
+            <!-- ★ 审核通过弹窗 -->
+            <div class="approval-popup">
+                <div class="approval-card">
+                    <div class="ap-header">
+                        <div class="ap-icon">✅</div>
+                        <div class="ap-title">储值到账通知</div>
                     </div>
-                    <div class="popup-body">
-                        <div class="popup-desc">
+                    <div class="ap-body">
+                        <div class="ap-desc">
                             您提交的储值申请已审核通过，<br>金额已到账。
                         </div>
-                        <div class="popup-amount">5,000.00</div>
-                        <div class="popup-extra">
-                            具体请前往 <span style="color:#07c160;font-weight:600;">H5 储值页面</span> 查看。
+                        <div class="ap-sub">
+                            具体请前往 <span class="ap-highlight">H5 储值页面</span> 查看。
                         </div>
-                        <button class="popup-btn">我知道了</button>
+                        <button class="ap-btn">我知道了</button>
                     </div>
                 </div>
             </div>
