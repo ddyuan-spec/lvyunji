@@ -5,22 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>储值细节需求原型 · 一键复制源码</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background: #1a1a2e; min-height: 100vh; padding: 20px; }
-.header { text-align: center; margin-bottom: 20px; }
-.header h1 { color: #fff; font-size: 20px; margin-bottom: 8px; }
-.header p { color: #999; font-size: 13px; }
-.btn-row { display: flex; justify-content: center; gap: 12px; margin-bottom: 16px; }
-.btn { padding: 10px 28px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all .2s; }
-.btn-primary { background: linear-gradient(135deg, #07c160, #06ad56); color: #fff; }
-.btn-primary:hover { opacity: 0.9; }
-.code-container { background: #0d1117; border-radius: 12px; overflow: hidden; max-width: 1200px; margin: 0 auto; box-shadow: 0 4px 24px rgba(0,0,0,0.4); }
-.code-header { background: #161b22; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #30363d; }
-.code-header span { color: #8b949e; font-size: 13px; }
-.code-content { padding: 20px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; color: #c9d1d9; font-family: "SF Mono", "Fira Code", "Consolas", monospace; font-size: 13px; line-height: 1.6; max-height: 80vh; overflow-y: auto; }
-.btn-copy { background: #30363d; color: #c9d1d9; border: 1px solid #484f58; padding: 5px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; }
-.btn-copy:hover { background: #484f58; }
-.copied { color: #07c160 !important; border-color: #07c160 !important; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#1a1a2e;min-height:100vh;padding:20px}
+.header{text-align:center;margin-bottom:20px}
+.header h1{color:#fff;font-size:20px;margin-bottom:8px}
+.header p{color:#999;font-size:13px}
+.btn-row{display:flex;justify-content:center;gap:12px;margin-bottom:16px}
+.btn{padding:10px 28px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary{background:linear-gradient(135deg,#07c160,#06ad56);color:#fff}
+.btn-primary:hover{opacity:0.9}
+.code-container{background:#0d1117;border-radius:12px;overflow:hidden;max-width:1200px;margin:0 auto;box-shadow:0 4px 24px rgba(0,0,0,0.4)}
+.code-header{background:#161b22;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #30363d}
+.code-header span{color:#8b949e;font-size:13px}
+.code-content{padding:20px;overflow-x:auto;white-space:pre-wrap;word-break:break-all;color:#c9d1d9;font-family:"SF Mono","Fira Code","Consolas",monospace;font-size:13px;line-height:1.6;max-height:80vh;overflow-y:auto}
+.btn-copy{background:#30363d;color:#c9d1d9;border:1px solid #484f58;padding:5px 14px;border-radius:6px;font-size:12px;cursor:pointer}
+.btn-copy:hover{background:#484f58}
+.copied{color:#07c160!important;border-color:#07c160!important}
 </style>
 </head>
 <body>
@@ -635,17 +635,17 @@ body {
 </div>
 </div>
 <script>
-function copyAll() {
-    const code = document.getElementById('sourceCode').innerText;
-    navigator.clipboard.writeText(code).then(() => {
-        const btns = document.querySelectorAll('.btn-copy, .btn-primary');
-        btns.forEach(b => { b.classList.add('copied'); b.textContent = '已复制!'; });
-        setTimeout(() => {
-            btns.forEach(b => { b.classList.remove('copied'); });
-            document.querySelector('.btn-primary').textContent = '📋 一键复制全部源码';
-            document.querySelector('.btn-copy').textContent = '复制';
-        }, 2000);
-    }).catch(() => alert('复制失败，请手动选择全部代码后 Ctrl+C'));
+function copyAll(){
+const code=document.getElementById('sourceCode').innerText;
+navigator.clipboard.writeText(code).then(function(){
+var btns=document.querySelectorAll('.btn-copy,.btn-primary');
+btns.forEach(function(b){b.classList.add('copied');b.textContent='已复制!'});
+setTimeout(function(){
+btns.forEach(function(b){b.classList.remove('copied')});
+document.querySelector('.btn-primary').textContent='📋 一键复制全部源码';
+document.querySelector('.btn-copy').textContent='复制';
+},2000);
+}).catch(function(){alert('复制失败，请手动选择全部代码后 Ctrl+C')});
 }
 </script>
 </body>
