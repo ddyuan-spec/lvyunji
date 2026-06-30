@@ -3,9 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>储值细节需求 · 一键复制源码</title>
-<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",monospace;background:#1e1e2e;color:#cdd6f4;padding:0;min-height:100vh}.copy-bar{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,#1a1a2e,#16213e);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #313244;box-shadow:0 2px 16px rgba(0,0,0,.3)}.copy-bar .title{font-size:16px;font-weight:700;color:#f5f5f5;display:flex;align-items:center;gap:8px}.copy-bar .title .icon{font-size:22px}.copy-bar .info{font-size:13px;color:#a6adc8}.copy-btn{padding:10px 28px;border-radius:24px;border:none;background:linear-gradient(135deg,#07c160,#06ad56);color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(7,193,96,.3)}.copy-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(7,193,96,.4)}.copy-btn:active{transform:scale(.96)}.copy-btn.copied{background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 4px 14px rgba(245,158,11,.3)}.code-wrap{padding:20px;max-width:960px;margin:0 auto}.code-wrap pre{background:#181825;border:1px solid #313244;border-radius:12px;padding:20px;overflow-x:auto;font-size:13px;line-height:1.65;white-space:pre-wrap;word-break:break-all;font-family:"SF Mono","Fira Code","Cascadia Code",Menlo,monospace;color:#cdd6f4}</style></head>
-<body><div class="copy-bar"><div><div class="title"><span class="icon">&#x1F4C4;</span>储值细节需求原型（一比一复刻）· 完整源码</div><div class="info">共 25722 字符 / 597 行 · H5储值页+转账弹窗·绿韵家+审核通知弹窗 · 点击一键复制</div></div><button class="copy-btn" id="copyBtn" onclick="doCopy()"><span>&#x1F4CB;</span> 一键复制源码</button></div><div class="code-wrap"><pre><code id="sourceCode">&lt;!DOCTYPE html&gt;
+<title>储值细节需求原型 · 一键复制源码</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background: #1a1a2e; min-height: 100vh; padding: 20px; }
+.header { text-align: center; margin-bottom: 20px; }
+.header h1 { color: #fff; font-size: 20px; margin-bottom: 8px; }
+.header p { color: #999; font-size: 13px; }
+.btn-row { display: flex; justify-content: center; gap: 12px; margin-bottom: 16px; }
+.btn { padding: 10px 28px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all .2s; }
+.btn-primary { background: linear-gradient(135deg, #07c160, #06ad56); color: #fff; }
+.btn-primary:hover { opacity: 0.9; }
+.code-container { background: #0d1117; border-radius: 12px; overflow: hidden; max-width: 1200px; margin: 0 auto; box-shadow: 0 4px 24px rgba(0,0,0,0.4); }
+.code-header { background: #161b22; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #30363d; }
+.code-header span { color: #8b949e; font-size: 13px; }
+.code-content { padding: 20px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; color: #c9d1d9; font-family: "SF Mono", "Fira Code", "Consolas", monospace; font-size: 13px; line-height: 1.6; max-height: 80vh; overflow-y: auto; }
+.btn-copy { background: #30363d; color: #c9d1d9; border: 1px solid #484f58; padding: 5px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+.btn-copy:hover { background: #484f58; }
+.copied { color: #07c160 !important; border-color: #07c160 !important; }
+</style>
+</head>
+<body>
+<div class="header">
+<h1>储值细节需求原型 · 一键复制源码</h1>
+<p>点击下方按钮一键复制完整 HTML 源码</p>
+</div>
+<div class="btn-row">
+<button class="btn btn-primary" onclick="copyAll()">📋 一键复制全部源码</button>
+</div>
+<div class="code-container">
+<div class="code-header">
+<span>deposit-detail-requirements-flat.html — 29833 字符</span>
+<button class="btn-copy" onclick="copyAll()">复制</button>
+</div>
+<pre class="code-content" id="sourceCode">&lt;!DOCTYPE html&gt;
 &lt;html lang=&quot;zh-CN&quot;&gt;
 &lt;head&gt;
 &lt;meta charset=&quot;UTF-8&quot;&gt;
@@ -244,9 +275,9 @@ body {
 }
 .btn-confirm-transfer {
     width: 100%; height: 46px; border-radius: 23px; border: none;
-    background: linear-gradient(135deg, #07c160, #06ad56);
-    color: #fff; font-size: 16px; font-weight: 600;
-    cursor: pointer; box-shadow: 0 3px 10px rgba(7,193,96,0.25);
+    background: #e8e8e8;
+    color: #999; font-size: 16px; font-weight: 600;
+    cursor: pointer;
     margin-top: 8px;
 }
 .popup-back { text-align: left; padding: 8px 18px 16px; color: #999; font-size: 18px; }
@@ -340,7 +371,7 @@ body {
     &lt;!-- PAGE 1: 需求1+2 — H5储值页面（含用户账号信息 + 按钮互换·绿韵家） --&gt;
     &lt;!-- ========================================================= --&gt;
     &lt;div class=&quot;flat-col&quot;&gt;
-        &lt;div class=&quot;page-label&quot;&gt;需求1+2：H5储值页 · 用户账号信息 · 按钮互换 · 转账到绿韵家&lt;/div&gt;
+        &lt;div class=&quot;page-label&quot;&gt;需求1+2：H5储值页 · 用户账号信息 · 按钮互换（转账Tab+去储值按钮）&lt;/div&gt;
         &lt;div class=&quot;phone-frame&quot;&gt;
             &lt;!-- 浏览器顶栏 --&gt;
             &lt;div class=&quot;browser-bar&quot;&gt;
@@ -372,18 +403,18 @@ body {
                     &lt;span class=&quot;card-icon&quot;&gt;💰&lt;/span&gt;
                 &lt;/div&gt;
 
-                &lt;!-- ★ 需求2：Tab栏（去储值 / 消费记录）—— 按钮互换后&quot;去储值&quot;在这里 --&gt;
+                &lt;!-- ★ 需求2：Tab栏（转账 / 消费记录）—— 按钮互换后&quot;转账&quot;在这里 --&gt;
                 &lt;div class=&quot;balance-tabs&quot;&gt;
                     &lt;div class=&quot;tab-item active&quot;&gt;
-                        &lt;div class=&quot;tab-circle&quot;&gt;&lt;div class=&quot;tab-circle-inner&quot;&gt;&lt;/div&gt;&lt;/div&gt; 去储值
+                        &lt;div class=&quot;tab-circle&quot;&gt;&lt;div class=&quot;tab-circle-inner&quot;&gt;&lt;/div&gt;&lt;/div&gt; 转账
                     &lt;/div&gt;
                     &lt;div class=&quot;tab-item&quot;&gt;📋 消费记录&lt;/div&gt;
                 &lt;/div&gt;
 
-                &lt;!-- ★ 需求2：转账按钮在下面，加&quot;绿韵家&quot;文字 --&gt;
-                &lt;div class=&quot;transfer-btn-wrap&quot;&gt;
-                    &lt;button class=&quot;btn-transfer-main&quot;&gt;
-                        ↗ 转账&lt;span class=&quot;btn-transfer-arrow&quot;&gt;&lt;/span&gt;
+                &lt;!-- ★ 需求2：去储值按钮在下面 --&gt;
+                &lt;div class=&quot;deposit-btn-wrap&quot;&gt;
+                    &lt;button class=&quot;btn-deposit-main&quot;&gt;
+                        💰 去储值
                     &lt;/button&gt;
                 &lt;/div&gt;
 
@@ -462,11 +493,11 @@ body {
                     &lt;span class=&quot;card-icon&quot;&gt;💰&lt;/span&gt;
                 &lt;/div&gt;
                 &lt;div class=&quot;balance-tabs&quot; style=&quot;margin:0 12px;&quot;&gt;
-                    &lt;div class=&quot;tab-item active&quot;&gt;&lt;div class=&quot;tab-circle&quot;&gt;&lt;div class=&quot;tab-circle-inner&quot;&gt;&lt;/div&gt;&lt;/div&gt; 去储值&lt;/div&gt;
+                    &lt;div class=&quot;tab-item active&quot;&gt;&lt;div class=&quot;tab-circle&quot;&gt;&lt;div class=&quot;tab-circle-inner&quot;&gt;&lt;/div&gt;&lt;/div&gt; 转账&lt;/div&gt;
                     &lt;div class=&quot;tab-item&quot;&gt;📋 消费记录&lt;/div&gt;
                 &lt;/div&gt;
-                &lt;div class=&quot;transfer-btn-wrap&quot;&gt;
-                    &lt;button class=&quot;btn-transfer-main&quot;&gt;↗ 转账&lt;/button&gt;
+                &lt;div class=&quot;deposit-btn-wrap&quot; style=&quot;padding:8px 12px 0;&quot;&gt;
+                    &lt;button class=&quot;btn-deposit-main&quot;&gt;💰 去储值&lt;/button&gt;
                 &lt;/div&gt;
                 &lt;div class=&quot;record-section&quot; style=&quot;padding-top:10px;&quot;&gt;
                     &lt;div class=&quot;record-title&quot;&gt;储值申请记录&lt;/div&gt;
@@ -498,8 +529,7 @@ body {
                             &lt;div class=&quot;form-label-row&quot;&gt;
                                 &lt;span class=&quot;form-label&quot;&gt;对方账号&lt;/span&gt;
                             &lt;/div&gt;
-                            &lt;div class=&quot;form-hint&quot;&gt;请输入对方绑定的&lt;span style=&quot;font-weight:700;color:#e64340;&quot;&gt;绿韵家&lt;/span&gt;账号&lt;/div&gt;
-                            &lt;input type=&quot;text&quot; class=&quot;form-input&quot; placeholder=&quot;请输入对方账号或手机号&quot; /&gt;
+                            &lt;input type=&quot;text&quot; class=&quot;form-input&quot; placeholder=&quot;请输入对方绑定的绿韵家账号&quot; /&gt;
                         &lt;/div&gt;
                         &lt;div class=&quot;form-group&quot;&gt;
                             &lt;div class=&quot;form-label-row&quot;&gt;
@@ -601,5 +631,22 @@ body {
 &lt;/div&gt;&lt;!-- end flat-scroll --&gt;
 
 &lt;/body&gt;
-&lt;/html&gt;</code></pre></div>
-<script>function doCopy(){var c=document.getElementById("sourceCode").textContent,b=document.getElementById("copyBtn");navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(c).then(function(){b.innerHTML="<span>&#x2705;</span> 复制成功！";b.classList.add("copied");setTimeout(function(){b.innerHTML="<span>&#x1F4CB;</span> 一键复制源码";b.classList.remove("copied")},2000)}).catch(function(){fallbackCopy(c)}):fallbackCopy(c)}function fallbackCopy(c){var t=document.createElement("textarea");t.value=c;t.style.position="fixed";t.style.left="-9999px";document.body.appendChild(t);t.select();try{document.execCommand("copy");var b=document.getElementById("copyBtn");b.innerHTML="<span>&#x2705;</span> 复制成功！";b.classList.add("copied");setTimeout(function(){b.innerHTML="<span>&#x1F4CB;</span> 一键复制源码";b.classList.remove("copied")},2000)}catch(e){alert("复制失败，请手动全选复制")}document.body.removeChild(t)}</script></body></html>
+&lt;/html&gt;</pre>
+</div>
+</div>
+<script>
+function copyAll() {
+    const code = document.getElementById('sourceCode').innerText;
+    navigator.clipboard.writeText(code).then(() => {
+        const btns = document.querySelectorAll('.btn-copy, .btn-primary');
+        btns.forEach(b => { b.classList.add('copied'); b.textContent = '已复制!'; });
+        setTimeout(() => {
+            btns.forEach(b => { b.classList.remove('copied'); });
+            document.querySelector('.btn-primary').textContent = '📋 一键复制全部源码';
+            document.querySelector('.btn-copy').textContent = '复制';
+        }, 2000);
+    }).catch(() => alert('复制失败，请手动选择全部代码后 Ctrl+C'));
+}
+</script>
+</body>
+</html>
