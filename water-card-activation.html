@@ -164,24 +164,31 @@ body {
   </div>
   <div class="page-content">
 
-    <!-- 卡片1：未激活 → 可激活 -->
-    <div class="water-card" id="card1">
-      <div class="card-header">
-        <div class="card-header-left">
-          <h3>权益水卡</h3>
-          <div class="tagline">智慧饮水，权益随行</div>
+    <!-- 卡片1：已激活仪表盘样式 -->
+    <div class="water-card card-active">
+      <div class="card-active-header">
+        <span class="rights-id">权益编号：42224</span>
+      </div>
+      <div class="dashboard">
+        <div class="dash-item">
+          <div class="num">450</div>
+          <div class="label">总水量（袋）</div>
         </div>
-        <div class="card-header-icon">
-          <span class="bolt">⚡</span>
+        <div class="dash-item">
+          <div class="num green">11</div>
+          <div class="label">本月可取（袋）</div>
+        </div>
+        <div class="dash-item">
+          <div class="num">9</div>
+          <div class="label">已领取（袋）</div>
         </div>
       </div>
-      <div class="card-body">
-        <div class="source-label">来源说明：</div>
-        <div class="source-text">20260330日结算消费达900.00PV（退款后未达标作废）</div>
-        <div class="rights-id">权益编号：42224</div>
-        <div class="card-actions">
-          <button class="btn-primary" style="flex:none;width:100%;" onclick="openActivateModal('card1')">激活水卡</button>
-        </div>
+      <div class="card-active-source">
+        <span class="src-label">来源说明：</span>20260330日结算消费达900.00PV（退款后未达标作废）
+      </div>
+      <div class="card-active-actions">
+        <button class="btn-outline" onclick="alert('跳转预约记录页面')">预约记录</button>
+        <button class="btn-primary" onclick="alert('跳转预约取水页面')">预约取水</button>
       </div>
     </div>
 
@@ -206,7 +213,7 @@ body {
       </div>
     </div>
 
-    <!-- 卡片3：已激活仪表盘样式(图3) -->
+    <!-- 卡片3：已激活仪表盘样式 -->
     <div class="water-card card-active">
       <div class="card-active-header">
         <span class="rights-id">权益编号：42203</span>
@@ -282,7 +289,7 @@ function confirmActivate() {
   }
 
   // 替换为已激活仪表盘样式
-  var rightsId = currentCardId === 'card1' ? '42224' : '42203';
+  var rightsId = '42203';
   card.className = 'water-card card-active';
   card.innerHTML = `
     <div class="card-active-header">
