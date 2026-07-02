@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>权益订单 - 绿韵家</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: #f5f5f5;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0;
+}
+.phone {
+  width: 375px;
+  min-height: 100vh;
+  background: #fff;
+  position: relative;
+  overflow-x: hidden;
+}
+/* 导航栏 */
+.navbar {
+  position: sticky; top: 0; z-index: 50;
+  height: 44px; background: #fff;
+  display: flex; align-items: center;
+  padding: 0 16px; border-bottom: 1px solid #f0f0f0;
+}
+.navbar .back { font-size: 18px; color: #333; cursor: pointer; text-decoration: none; margin-right: 12px; }
+.navbar .title { font-size: 17px; font-weight: 600; color: #333; flex: 1; text-align: center; margin-right: 30px; }
+.page-content { padding: 16px; }
+/* === 权益水卡 - 未激活样式(图2) === */
+.water-card {
+  background: #fff; border-radius: 12px;
+  overflow: hidden; margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.card-header {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  padding: 16px 20px; display: flex;
+  align-items: center; justify-content: space-between;
+}
+.card-header-left h3 {
+  font-size: 18px; font-weight: 700; color: #2e7d32;
+  margin-bottom: 4px;
+}
+.card-header-left .tagline {
+  font-size: 12px; color: #66bb6a;
+}
+.card-header-icon {
+  width: 48px; height: 48px;
+  background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+  border-radius: 50%; display: flex;
+  align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.card-header-icon::before {
+  content: ''; position: absolute;
+  width: 24px; height: 24px;
+  background: #fff; border-radius: 50%;
+  top: 6px; left: 6px;
+}
+.card-header-icon .bolt {
+  font-size: 20px; color: #fff; position: relative; z-index: 1;
+}
+.card-body { padding: 14px 20px; }
+.card-body .source-label { font-size: 12px; color: #999; margin-bottom: 4px; }
+.card-body .source-text { font-size: 13px; color: #333; line-height: 1.6; margin-bottom: 14px; }
+.card-body .rights-id { font-size: 12px; color: #999; margin-bottom: 14px; }
+.card-actions { display: flex; gap: 10px; }
+.btn-outline {
+  flex: 1; padding: 10px 0; text-align: center;
+  border: 1px solid #e0e0e0; border-radius: 20px;
+  background: #fff; color: #666; font-size: 14px;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-outline:hover { border-color: #4caf50; color: #4caf50; }
+.btn-primary {
+  flex: 1; padding: 10px 0; text-align: center;
+  border: none; border-radius: 20px;
+  background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
+  color: #fff; font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(76,175,80,0.3);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(76,175,80,0.4); }
+/* === 权益水卡 - 已激活仪表盘样式(图3) === */
+.card-active { padding: 0; }
+.card-active-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; border-bottom: 1px solid #f5f5f5;
+}
+.card-active-header .rights-id { font-size: 13px; color: #333; }
+.dashboard {
+  display: flex; padding: 20px 16px;
+  text-align: center; border-bottom: 1px solid #f5f5f5;
+}
+.dash-item { flex: 1; }
+.dash-item .num { font-size: 28px; font-weight: 700; color: #333; }
+.dash-item .num.green { color: #4caf50; }
+.dash-item .label { font-size: 12px; color: #999; margin-top: 4px; }
+.card-active-source { padding: 12px 20px; font-size: 13px; color: #666; }
+.card-active-source .src-label { color: #999; }
+.card-active-actions { display: flex; gap: 10px; padding: 14px 20px; }
+/* === 弹窗 === */
+.modal-overlay {
+  display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5); z-index: 100;
+  justify-content: center; align-items: center;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  width: 310px; background: #fff; border-radius: 16px;
+  padding: 28px 24px 20px; text-align: center;
+  animation: modalIn 0.3s ease;
+}
+@keyframes modalIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.modal .icon-warn {
+  width: 56px; height: 56px; background: #fff3e0;
+  border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; margin: 0 auto 16px;
+  font-size: 28px;
+}
+.modal h3 { font-size: 17px; color: #333; margin-bottom: 10px; }
+.modal .desc { font-size: 13px; color: #999; line-height: 1.7; margin-bottom: 8px; }
+.modal .highlight-text { color: #ef6c00; font-weight: 500; }
+.modal-actions { display: flex; gap: 12px; margin-top: 20px; }
+.modal-actions .btn-cancel {
+  flex: 1; padding: 12px 0; background: #f5f5f5;
+  border: none; border-radius: 22px; color: #666;
+  font-size: 15px; cursor: pointer;
+}
+.modal-actions .btn-confirm {
+  flex: 1; padding: 12px 0;
+  background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
+  border: none; border-radius: 22px; color: #fff;
+  font-size: 15px; font-weight: 500; cursor: pointer;
+  box-shadow: 0 2px 8px rgba(76,175,80,0.3);
+}
+.modal-actions .btn-confirm:hover { transform: translateY(-1px); }
+/* Toast */
+.toast {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  background: rgba(0,0,0,0.78); color: #fff; padding: 12px 24px;
+  border-radius: 8px; font-size: 14px; z-index: 200;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.toast.show { opacity: 1; }
+/* 底部 */
+.footer { text-align: center; padding: 24px; font-size: 12px; color: #ccc; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="navbar">
+    <a class="back" href="javascript:;">←</a>
+    <div class="title">权益订单</div>
+  </div>
+  <div class="page-content">
+
+    <!-- 卡片1：未激活 → 可激活 -->
+    <div class="water-card" id="card1">
+      <div class="card-header">
+        <div class="card-header-left">
+          <h3>权益水卡</h3>
+          <div class="tagline">智慧饮水，权益随行</div>
+        </div>
+        <div class="card-header-icon">
+          <span class="bolt">⚡</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="source-label">来源说明：</div>
+        <div class="source-text">20260330日结算消费达900.00PV（退款后未达标作废）</div>
+        <div class="rights-id">权益编号：42224</div>
+        <div class="card-actions">
+          <button class="btn-outline" onclick="alert('跳转预约记录页面')">预约记录</button>
+          <button class="btn-primary" onclick="openActivateModal('card1')">新增水卡</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 卡片2：未激活 → 可激活 -->
+    <div class="water-card" id="card2">
+      <div class="card-header">
+        <div class="card-header-left">
+          <h3>权益水卡</h3>
+          <div class="tagline">智慧饮水，权益随行</div>
+        </div>
+        <div class="card-header-icon">
+          <span class="bolt">⚡</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="source-label">来源说明：</div>
+        <div class="source-text">20260427日结算旅游产品 ID：LYCODE2048582907895775232</div>
+        <div class="rights-id">权益编号：42203</div>
+        <div class="card-actions">
+          <button class="btn-outline" onclick="alert('跳转预约记录页面')">预约记录</button>
+          <button class="btn-primary" onclick="openActivateModal('card2')">新增水卡</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 卡片3：已激活仪表盘样式(图3) -->
+    <div class="water-card card-active">
+      <div class="card-active-header">
+        <span class="rights-id">权益编号：42203</span>
+      </div>
+      <div class="dashboard">
+        <div class="dash-item">
+          <div class="num">450</div>
+          <div class="label">总水量（袋）</div>
+        </div>
+        <div class="dash-item">
+          <div class="num green">11</div>
+          <div class="label">本月可取（袋）</div>
+        </div>
+        <div class="dash-item">
+          <div class="num">9</div>
+          <div class="label">已领取（袋）</div>
+        </div>
+      </div>
+      <div class="card-active-source">
+        <span class="src-label">来源说明：</span>1
+      </div>
+      <div class="card-active-actions">
+        <button class="btn-outline" onclick="alert('跳转预约记录页面')">预约记录</button>
+        <button class="btn-primary" onclick="alert('跳转预约取水页面')">预约取水</button>
+      </div>
+    </div>
+  </div>
+  <div class="footer">— 我也是有底线的 —</div>
+</div>
+
+<!-- 激活确认弹窗 -->
+<div class="modal-overlay" id="activateModal">
+  <div class="modal">
+    <div class="icon-warn">⚠️</div>
+    <h3>确认激活权益水卡</h3>
+    <p class="desc">
+      激活后<span class="highlight-text">不可撤回</span>，权益将在<br>
+      <span class="highlight-text">一年后到期</span>，是否确认激活？
+    </p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeActivateModal()">取消</button>
+      <button class="btn-confirm" onclick="confirmActivate()">确认激活</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+var currentCardId = '';
+
+function openActivateModal(cardId) {
+  currentCardId = cardId;
+  document.getElementById('activateModal').classList.add('show');
+}
+
+function closeActivateModal() {
+  document.getElementById('activateModal').classList.remove('show');
+  currentCardId = '';
+}
+
+function confirmActivate() {
+  closeActivateModal();
+  var card = document.getElementById(currentCardId);
+  if (!card) return;
+
+  // 替换为已激活仪表盘样式
+  var rightsId = currentCardId === 'card1' ? '42224' : '42203';
+  card.className = 'water-card card-active';
+  card.innerHTML = `
+    <div class="card-active-header">
+      <span class="rights-id">权益编号：${rightsId}</span>
+    </div>
+    <div class="dashboard">
+      <div class="dash-item">
+        <div class="num">450</div>
+        <div class="label">总水量（袋）</div>
+      </div>
+      <div class="dash-item">
+        <div class="num green">11</div>
+        <div class="label">本月可取（袋）</div>
+      </div>
+      <div class="dash-item">
+        <div class="num">0</div>
+        <div class="label">已领取（袋）</div>
+      </div>
+    </div>
+    <div class="card-active-source">
+      <span class="src-label">来源说明：</span>1
+    </div>
+    <div class="card-active-actions">
+      <button class="btn-outline" onclick="alert('跳转预约记录页面')">预约记录</button>
+      <button class="btn-primary" onclick="alert('跳转预约取水页面')">预约取水</button>
+    </div>
+  `;
+
+  showToast('激活成功！权益水卡已生效');
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2000);
+}
+
+// 点击遮罩关闭弹窗
+document.getElementById('activateModal').addEventListener('click', function(e) {
+  if (e.target === this) closeActivateModal();
+});
+</script>
+</body>
+</html>
