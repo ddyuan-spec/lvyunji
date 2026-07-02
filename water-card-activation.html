@@ -274,6 +274,13 @@ function confirmActivate() {
   var card = document.getElementById(currentCardId);
   if (!card) return;
 
+  // 获取原始来源说明
+  var sourceText = '';
+  var sourceEl = card.querySelector('.source-text');
+  if (sourceEl) {
+    sourceText = sourceEl.textContent || '';
+  }
+
   // 替换为已激活仪表盘样式
   var rightsId = currentCardId === 'card1' ? '42224' : '42203';
   card.className = 'water-card card-active';
@@ -296,7 +303,7 @@ function confirmActivate() {
       </div>
     </div>
     <div class="card-active-source">
-      <span class="src-label">来源说明：</span>1
+      <span class="src-label">来源说明：</span>${sourceText}
     </div>
     <div class="card-active-actions">
       <button class="btn-outline" onclick="alert('跳转预约记录页面')">预约记录</button>
