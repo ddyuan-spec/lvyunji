@@ -270,8 +270,9 @@ function closeActivateModal() {
 }
 
 function confirmActivate() {
+  var cardId = currentCardId;
   closeActivateModal();
-  var card = document.getElementById(currentCardId);
+  var card = document.getElementById(cardId);
   if (!card) return;
 
   // 获取原始来源说明和权益编号
