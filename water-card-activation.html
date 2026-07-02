@@ -286,18 +286,9 @@ function confirmActivate() {
     rightsIdText = rightsIdEl.textContent || '';
   }
 
-  // 替换为已激活仪表盘样式，保留顶部标题栏
+  // 替换为已激活仪表盘样式
   card.className = 'water-card card-active';
   card.innerHTML = `
-      <div class="card-header">
-        <div class="card-header-left">
-          <h3>权益水卡</h3>
-          <div class="tagline">智慧饮水，权益随行</div>
-        </div>
-        <div class="card-header-icon">
-          <span class="bolt">⚡</span>
-        </div>
-      </div>
       <div class="card-active-header">
         <span class="rights-id">${rightsIdText}</span>
       </div>
