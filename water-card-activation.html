@@ -286,33 +286,42 @@ function confirmActivate() {
     rightsIdText = rightsIdEl.textContent || '';
   }
 
-  // 替换为已激活仪表盘样式
+  // 替换为已激活仪表盘样式，保留顶部标题栏
   card.className = 'water-card card-active';
   card.innerHTML = `
-    <div class="card-active-header">
-      <span class="rights-id">${rightsIdText}</span>
-    </div>
-    <div class="dashboard">
-      <div class="dash-item">
-        <div class="num">450</div>
-        <div class="label">总水量（袋）</div>
+      <div class="card-header">
+        <div class="card-header-left">
+          <h3>权益水卡</h3>
+          <div class="tagline">智慧饮水，权益随行</div>
+        </div>
+        <div class="card-header-icon">
+          <span class="bolt">⚡</span>
+        </div>
       </div>
-      <div class="dash-item">
-        <div class="num green">11</div>
-        <div class="label">本月可取（袋）</div>
+      <div class="card-active-header">
+        <span class="rights-id">${rightsIdText}</span>
       </div>
-      <div class="dash-item">
-        <div class="num">0</div>
-        <div class="label">已领取（袋）</div>
+      <div class="dashboard">
+        <div class="dash-item">
+          <div class="num">450</div>
+          <div class="label">总水量（袋）</div>
+        </div>
+        <div class="dash-item">
+          <div class="num green">11</div>
+          <div class="label">本月可取（袋）</div>
+        </div>
+        <div class="dash-item">
+          <div class="num">0</div>
+          <div class="label">已领取（袋）</div>
+        </div>
       </div>
-    </div>
-    <div class="card-active-source">
-      <span class="src-label">来源说明：</span>${sourceText}
-    </div>
-    <div class="card-active-actions">
-      <button class="btn-outline" onclick="alert('跳转预约记录页面')">预约记录</button>
-      <button class="btn-primary" onclick="alert('跳转预约取水页面')">预约取水</button>
-    </div>
+      <div class="card-active-source">
+        <span class="src-label">来源说明：</span>${sourceText}
+      </div>
+      <div class="card-active-actions">
+        <button class="btn-outline" onclick="alert('跳转预约记录页面')">预约记录</button>
+        <button class="btn-primary" onclick="alert('跳转预约取水页面')">预约取水</button>
+      </div>
   `;
 
   showToast('激活成功！权益水卡已生效');
