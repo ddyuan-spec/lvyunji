@@ -152,7 +152,27 @@ body {
   opacity: 0; pointer-events: none; transition: opacity 0.3s;
 }
 .toast.show { opacity: 1; }
-/* 底部 */
+/* 规则链接 */
+.rules-link {
+  color: #2563eb; font-size: 13px; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.rules-link:hover { color: #1d4ed8; }
+/* 规则弹窗 */
+.rules-modal {
+  width: 340px; max-height: 80vh; text-align: left;
+  padding: 20px 20px 16px;
+}
+.rules-content {
+  max-height: 52vh; overflow-y: auto; margin: 14px 0;
+  font-size: 13px; color: #555; line-height: 1.8;
+}
+.rules-section { margin-bottom: 14px; }
+.rules-section p { font-size: 13px; color: #555; margin-bottom: 4px; }
+.rules-title {
+  font-size: 14px; font-weight: 700; color: #2e7d32;
+  margin-bottom: 6px;
+}
 .footer { text-align: center; padding: 24px; font-size: 12px; color: #ccc; }
 </style>
 </head>
@@ -246,9 +266,46 @@ body {
       激活后<span class="highlight-text">不可撤回</span>，权益将在<br>
       <span class="highlight-text">一年后到期</span>，是否确认激活？
     </p>
+    <p class="desc" style="margin-top:10px;">
+      <a class="rules-link" onclick="openRulesModal()">查看水卡转水袋规则说明</a>
+    </p>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeActivateModal()">取消</button>
       <button class="btn-confirm" onclick="confirmActivate()">确认激活</button>
+    </div>
+  </div>
+</div>
+
+<!-- 规则说明弹窗 -->
+<div class="modal-overlay" id="rulesModal">
+  <div class="modal rules-modal">
+    <h3 style="color:#2e7d32;margin-bottom:0;">水卡转水袋规则说明</h3>
+    <div class="rules-content">
+      <div class="rules-section">
+        <div class="rules-title">一、基本规则</div>
+        <p>自2026年7月*日起，用户可将水卡权益转换为水袋权益（共计415袋水）。</p>
+      </div>
+      <div class="rules-section">
+        <div class="rules-title">二、激活赠送</div>
+        <p>水卡激活时，系统立送50袋水，剩余365袋水按月度补送规则发放。</p>
+      </div>
+      <div class="rules-section">
+        <div class="rules-title">三、月度补送规则</div>
+        <p>· 当月底水袋余额 <b>低于30袋</b> 时，次月系统自动赠送30袋水。</p>
+        <p>· 最后一次统一补送35袋水，直至415袋水全部送完为止。</p>
+        <p>· 当月底水袋余额 <b>等于或大于30袋</b> 时，次月系统不予补送。</p>
+      </div>
+      <div class="rules-section">
+        <div class="rules-title">四、有效期限</div>
+        <p>水卡转水袋的有效期为1年，自转换之日起计算。1年内未领取的水袋，系统自动清零。</p>
+      </div>
+      <div class="rules-section">
+        <div class="rules-title">五、预约规则</div>
+        <p>用户可根据自身需求预约取水，无次数或数量限制。</p>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeRulesModal()">关闭</button>
     </div>
   </div>
 </div>
@@ -329,6 +386,17 @@ function showToast(msg) {
 // 点击遮罩关闭弹窗
 document.getElementById('activateModal').addEventListener('click', function(e) {
   if (e.target === this) closeActivateModal();
+});
+
+// 规则弹窗
+function openRulesModal() {
+  document.getElementById('rulesModal').classList.add('show');
+}
+function closeRulesModal() {
+  document.getElementById('rulesModal').classList.remove('show');
+}
+document.getElementById('rulesModal').addEventListener('click', function(e) {
+  if (e.target === this) closeRulesModal();
 });
 </script>
 </body>
