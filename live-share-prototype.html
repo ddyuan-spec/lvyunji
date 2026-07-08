@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>直播 - 绿韵家</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #f5f5f5; min-height: 100vh;
+    display: flex; justify-content: center;
+}
+.phone {
+    width: 375px; min-height: 100vh;
+    background: #f5f5f5; position: relative;
+    overflow-x: hidden;
+}
+
+/* === 顶部导航 === */
+.navbar {
+    position: sticky; top: 0; z-index: 50;
+    height: 44px; background: #fff;
+    display: flex; align-items: center;
+    padding: 0 16px; border-bottom: 1px solid #f0f0f0;
+}
+.navbar .title { font-size: 17px; font-weight: 600; color: #333; flex: 1; }
+
+/* === Banner === */
+.banner {
+    width: 100%; height: 160px;
+    background: linear-gradient(135deg, #43a047 0%, #66bb6a 50%, #81c784 100%);
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.banner::before {
+    content: ''; position: absolute; top: -40px; right: -40px;
+    width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%;
+}
+.banner-tag {
+    background: rgba(255,255,255,0.2); color: #fff;
+    font-size: 11px; padding: 2px 10px; border-radius: 10px; margin-bottom: 6px;
+}
+.banner-title { font-size: 20px; font-weight: 700; color: #fff; text-align: center; }
+.banner-sub { font-size: 12px; color: rgba(255,255,255,0.9); margin-top: 4px; }
+.banner-btn {
+    background: #fff; color: #43a047; font-size: 12px; font-weight: 600;
+    padding: 4px 14px; border-radius: 14px; margin-top: 8px; border: none; cursor: pointer;
+}
+
+/* === Tab 栏 === */
+.tab-bar {
+    display: flex; background: #fff;
+    border-bottom: 1px solid #f0f0f0; padding: 0 16px;
+}
+.tab-item {
+    padding: 12px 0; margin-right: 20px;
+    font-size: 14px; color: #999; cursor: pointer; position: relative;
+}
+.tab-item.active {
+    color: #333; font-weight: 600;
+}
+.tab-item.active::after {
+    content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 20px; height: 3px; background: #43a047; border-radius: 2px;
+}
+
+/* === 直播列表 === */
+.live-list { padding: 12px 16px; }
+.live-card {
+    background: #fff; border-radius: 12px;
+    overflow: hidden; margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.live-card-cover {
+    position: relative; width: 100%; height: 180px;
+    background: #e8e8e8; overflow: hidden;
+}
+.cover-tag {
+    position: absolute; top: 8px; left: 8px;
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 10px;
+    display: flex; align-items: center; gap: 3px;
+}
+.cover-tag.live {
+    background: linear-gradient(135deg, #43a047, #66bb6a);
+}
+.cover-time {
+    position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+    background: rgba(255,152,0,0.9); color: #fff;
+    font-size: 11px; padding: 2px 10px; border-radius: 10px;
+}
+/* 分享按钮 */
+.share-btn {
+    position: absolute; top: 8px; right: 8px;
+    width: 32px; height: 32px;
+    background: rgba(255,255,255,0.85); backdrop-filter: blur(4px);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; border: none; z-index: 10;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+.share-btn svg { width: 16px; height: 16px; fill: #666; }
+.share-btn:active { background: rgba(255,255,255,0.95); transform: scale(0.95); }
+
+.live-card-info { padding: 12px 14px; }
+.live-title { font-size: 15px; font-weight: 600; color: #333; line-height: 1.5; margin-bottom: 6px; }
+.live-time {
+    font-size: 12px; color: #999; display: flex; align-items: center; gap: 4px;
+}
+.live-time svg { width: 14px; height: 14px; fill: #999; }
+
+/* === 底部弹窗1：分享选项（海报 / 链接） === */
+.modal-overlay {
+    display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5); z-index: 100;
+    justify-content: center; align-items: flex-end;
+}
+.modal-overlay.show { display: flex; }
+.modal-panel {
+    width: 100%; max-width: 375px;
+    background: #fff; border-radius: 16px 16px 0 0;
+    padding: 20px 20px 24px;
+    animation: slideUp 0.3s ease;
+}
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+/* 分享选项按钮行 */
+.share-options {
+    display: flex; gap: 16px; justify-content: center;
+    margin-bottom: 20px;
+}
+.share-option {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    cursor: pointer; padding: 8px 16px; border-radius: 12px;
+    transition: background 0.2s;
+}
+.share-option:active { background: #f5f5f5; }
+.share-option-icon {
+    width: 56px; height: 56px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    box-shadow: 0 2px 8px rgba(102,126,234,0.3);
+}
+.share-option-icon.poster { background: linear-gradient(135deg, #f093fb, #f5576c); }
+.share-option-icon.link { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+.share-option-icon svg { width: 24px; height: 24px; fill: #fff; }
+.share-option-label { font-size: 13px; color: #666; }
+
+.btn-cancel-full {
+    width: 100%; height: 46px; border-radius: 23px; border: none;
+    background: #f5f5f5; color: #666; font-size: 15px;
+    cursor: pointer; margin-top: 8px;
+}
+
+/* === 底部弹窗2：复制链接 === */
+.link-modal .modal-panel {
+    padding: 20px 20px 24px;
+}
+.link-modal-title {
+    font-size: 16px; font-weight: 600; color: #333;
+    text-align: center; margin-bottom: 6px;
+}
+.link-modal-tip {
+    font-size: 13px; color: #999; margin-bottom: 16px; text-align: center;
+}
+.link-box {
+    background: #f8f9fa; border-radius: 10px;
+    padding: 14px 16px; display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px; border: 1px solid #e8e8e8;
+}
+.link-box .link-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: #e8f5e9; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.link-box .link-icon svg { width: 20px; height: 20px; fill: #43a047; }
+.link-text-wrap { flex: 1; min-width: 0; }
+.link-text {
+    font-size: 13px; color: #333; word-break: break-all;
+    line-height: 1.5;
+}
+.link-desc {
+    font-size: 11px; color: #999; margin-top: 2px;
+}
+.btn-copy {
+    width: 100%; height: 46px; border-radius: 23px; border: none;
+    background: linear-gradient(135deg, #43a047, #66bb6a);
+    color: #fff; font-size: 15px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+    box-shadow: 0 2px 8px rgba(76,175,80,0.3);
+}
+.btn-copy:active { transform: scale(0.98); }
+.btn-copy.copied {
+    background: #e8e8e8; color: #999; box-shadow: none;
+}
+
+/* === Toast === */
+.toast {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    background: rgba(0,0,0,0.78); color: #fff; padding: 12px 24px;
+    border-radius: 8px; font-size: 14px; z-index: 200;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="phone">
+
+    <!-- 导航栏 -->
+    <div class="navbar">
+        <div class="title">直播</div>
+    </div>
+
+    <!-- Banner -->
+    <div class="banner">
+        <div class="banner-tag">健康大讲堂</div>
+        <div class="banner-title">观播赚积分 好礼兑不停</div>
+        <div class="banner-sub">积分怎么赚？健康大讲堂指南！</div>
+        <button class="banner-btn">立即领积分兑豪礼 GO</button>
+    </div>
+
+    <!-- Tab -->
+    <div class="tab-bar">
+        <div class="tab-item active">健康大讲堂</div>
+        <div class="tab-item">有享安选</div>
+        <div class="tab-item">智慧课堂</div>
+    </div>
+
+    <!-- 直播列表 -->
+    <div class="live-list">
+
+        <!-- 卡片1：预约中 -->
+        <div class="live-card" data-live-id="live-001">
+            <div class="live-card-cover">
+                <div style="width:100%;height:100%;background:linear-gradient(135deg,#fff3e0,#ffe0b2);display:flex;align-items:center;justify-content:center;">
+                    <span style="font-size:14px;color:#e65100;">[直播封面图片]</span>
+                </div>
+                <div class="cover-tag">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    预约中
+                </div>
+                <div class="cover-time">开播时间:03月23日19:00—20:00</div>
+                <button class="share-btn" onclick="openShareModal('live-001', 'https://lvyunji.com/live/detail?id=live001')">
+                    <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
+                </button>
+            </div>
+            <div class="live-card-info">
+                <div class="live-title">3.23吃了一堆没效果？不是你买的假，是你的脾"拒绝收货"</div>
+                <div class="live-time">
+                    <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                    2026-03-23 19:00 ~ 2026-03-23 20:00
+                </div>
+            </div>
+        </div>
+
+        <!-- 卡片2：直播中 -->
+        <div class="live-card" data-live-id="live-002">
+            <div class="live-card-cover">
+                <div style="width:100%;height:100%;background:linear-gradient(135deg,#e3f2fd,#bbdefb);display:flex;align-items:center;justify-content:center;">
+                    <span style="font-size:14px;color:#1565c0;">[直播封面图片]</span>
+                </div>
+                <div class="cover-tag live">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg>
+                    直播中
+                </div>
+                <button class="share-btn" onclick="openShareModal('live-002', 'https://lvyunji.com/live/detail?id=live002')">
+                    <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
+                </button>
+            </div>
+            <div class="live-card-info">
+                <div class="live-title">测试一下</div>
+                <div class="live-time">
+                    <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                    2026-07-06 17:45 ~ 2026-07-06 19:45
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- === 弹窗1：分享选项（海报 / 链接） === -->
+<div class="modal-overlay" id="shareModal">
+    <div class="modal-panel">
+        <div class="share-options">
+            <div class="share-option" onclick="sharePoster()">
+                <div class="share-option-icon poster">
+                    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5-7l-3 3.72L9 13l-3 4h12l-4-5z"/></svg>
+                </div>
+                <span class="share-option-label">分享海报</span>
+            </div>
+            <div class="share-option" onclick="openLinkModal()">
+                <div class="share-option-icon link">
+                    <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+                </div>
+                <span class="share-option-label">分享链接</span>
+            </div>
+        </div>
+        <button class="btn-cancel-full" onclick="closeShareModal()">取消</button>
+    </div>
+</div>
+
+<!-- === 弹窗2：复制链接 === -->
+<div class="modal-overlay link-modal" id="linkModal">
+    <div class="modal-panel">
+        <div class="link-modal-title">分享链接</div>
+        <div class="link-modal-tip">复制下方链接，分享给好友观看直播</div>
+        <div class="link-box">
+            <div class="link-icon">
+                <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+            </div>
+            <div class="link-text-wrap">
+                <div class="link-text" id="shareLinkText">https://lvyunji.com/live/detail?id=live001</div>
+                <div class="link-desc">点击复制即可分享给好友</div>
+            </div>
+        </div>
+        <button class="btn-copy" id="copyBtn" onclick="copyLink()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+            复制链接
+        </button>
+        <button class="btn-cancel-full" onclick="closeLinkModal()">取消</button>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">链接已复制</div>
+
+<script>
+var currentLink = '';
+
+function openShareModal(liveId, link) {
+    currentLink = link;
+    document.getElementById('shareModal').classList.add('show');
+}
+function closeShareModal() {
+    document.getElementById('shareModal').classList.remove('show');
+}
+
+function sharePoster() {
+    closeShareModal();
+    showToast('生成海报中...');
+    // 实际业务中这里跳转到海报生成页
+}
+
+function openLinkModal() {
+    closeShareModal();
+    document.getElementById('shareLinkText').textContent = currentLink;
+    document.getElementById('linkModal').classList.add('show');
+    // 重置复制按钮状态
+    var btn = document.getElementById('copyBtn');
+    btn.classList.remove('copied');
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>复制链接';
+}
+function closeLinkModal() {
+    document.getElementById('linkModal').classList.remove('show');
+}
+
+function copyLink() {
+    var link = document.getElementById('shareLinkText').textContent;
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(link).then(function() {
+            onCopySuccess();
+        }).catch(function() {
+            fallbackCopy(link);
+        });
+    } else {
+        fallbackCopy(link);
+    }
+}
+
+function fallbackCopy(text) {
+    var textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        onCopySuccess();
+    } catch (e) {
+        showToast('复制失败，请长按链接手动复制');
+    }
+    document.body.removeChild(textarea);
+}
+
+function onCopySuccess() {
+    var btn = document.getElementById('copyBtn');
+    btn.classList.add('copied');
+    btn.textContent = '已复制';
+    showToast('链接已复制，快去分享给好友吧');
+}
+
+function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function() { t.classList.remove('show'); }, 2000);
+}
+
+// 点击遮罩关闭弹窗
+document.getElementById('shareModal').addEventListener('click', function(e) {
+    if (e.target === this) closeShareModal();
+});
+document.getElementById('linkModal').addEventListener('click', function(e) {
+    if (e.target === this) closeLinkModal();
+});
+</script>
+
+</body>
+</html>
