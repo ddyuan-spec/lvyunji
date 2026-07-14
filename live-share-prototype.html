@@ -26,26 +26,45 @@ body {
 }
 .navbar .title { font-size: 17px; font-weight: 600; color: #333; flex: 1; }
 
-/* === Banner === */
+/* === Banner — 一比一复刻截图 === */
 .banner {
-    width: 100%; height: 160px;
-    background: linear-gradient(135deg, #43a047 0%, #66bb6a 50%, #81c784 100%);
+    width: 100%; height: auto;
+    background: linear-gradient(135deg, #43a047 0%, #4caf50 40%, #66bb6a 100%);
     position: relative; overflow: hidden;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 16px 16px 14px;
+    display: flex; align-items: stretch; gap: 12px;
 }
-.banner::before {
-    content: ''; position: absolute; top: -40px; right: -40px;
-    width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%;
+.banner-left {
+    flex: 1; display: flex; flex-direction: column; justify-content: center;
 }
-.banner-tag {
-    background: rgba(255,255,255,0.2); color: #fff;
-    font-size: 11px; padding: 2px 10px; border-radius: 10px; margin-bottom: 6px;
+.banner-badge {
+    display: inline-flex; align-items: center; gap: 3px;
+    background: rgba(255,255,255,0.22); color: #fff;
+    font-size: 11px; padding: 2px 8px; border-radius: 8px;
+    width: fit-content; margin-bottom: 6px;
 }
-.banner-title { font-size: 20px; font-weight: 700; color: #fff; text-align: center; }
-.banner-sub { font-size: 12px; color: rgba(255,255,255,0.9); margin-top: 4px; }
-.banner-btn {
-    background: #fff; color: #43a047; font-size: 12px; font-weight: 600;
-    padding: 4px 14px; border-radius: 14px; margin-top: 8px; border: none; cursor: pointer;
+.banner-big-title {
+    font-size: 26px; font-weight: 800; color: #ffeb3b;
+    line-height: 1.2; letter-spacing: 1px;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.banner-sub {
+    font-size: 13px; color: rgba(255,255,255,0.92); margin-top: 4px;
+    line-height: 1.4;
+}
+.banner-date-box {
+    background: rgba(255,255,255,0.18); border-radius: 10px;
+    padding: 10px 10px; min-width: 150px;
+}
+.banner-date-item {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 11px; color: rgba(255,255,255,0.9);
+    padding: 2px 0;
+    white-space: nowrap;
+}
+.banner-date-num {
+    color: #fff; font-weight: 700; font-size: 12px;
+    min-width: 32px;
 }
 
 /* === Tab 栏 === */
@@ -54,53 +73,64 @@ body {
     border-bottom: 1px solid #f0f0f0; padding: 0 16px;
 }
 .tab-item {
-    padding: 12px 0; margin-right: 20px;
+    padding: 13px 0; margin-right: 24px;
     font-size: 14px; color: #999; cursor: pointer; position: relative;
 }
 .tab-item.active {
-    color: #333; font-weight: 600;
+    color: #333; font-weight: 600; font-size: 15px;
 }
 .tab-item.active::after {
     content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 20px; height: 3px; background: #43a047; border-radius: 2px;
+    width: 24px; height: 3px; background: #43a047; border-radius: 2px;
 }
 
 /* === 直播列表 === */
-.live-list { padding: 12px 16px; }
+.live-list { padding: 12px 14px; }
 .live-card {
     background: #fff; border-radius: 12px;
     overflow: hidden; margin-bottom: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
 }
 .live-card-cover {
     position: relative; width: 100%; height: 180px;
-    background: #e8e8e8; overflow: hidden;
+    overflow: hidden;
 }
+.cover-bg {
+    width: 100%; height: 100%;
+    object-fit: cover;
+}
+/* 封面状态标签 */
 .cover-tag {
-    position: absolute; top: 8px; left: 8px;
+    position: absolute; top: 10px; left: 10px;
     background: linear-gradient(135deg, #ff9800, #f57c00);
-    color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 10px;
-    display: flex; align-items: center; gap: 3px;
+    color: #fff; font-size: 11px; padding: 3px 10px; border-radius: 12px;
+    display: flex; align-items: center; gap: 4px;
+    font-weight: 500;
 }
 .cover-tag.live {
-    background: linear-gradient(135deg, #43a047, #66bb6a);
+    background: linear-gradient(135deg, #e53935, #d32f2f);
 }
-.cover-time {
-    position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
-    background: rgba(255,152,0,0.9); color: #fff;
-    font-size: 11px; padding: 2px 10px; border-radius: 10px;
+.cover-time-bar {
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    background: rgba(230,57,64,0.92); color: #fff;
+    font-size: 11px; padding: 3px 12px; border-radius: 12px;
+    white-space: nowrap; font-weight: 500;
+}
+.cover-time-bar.orange {
+    background: rgba(255,152,0,0.92);
 }
 /* 分享按钮 */
 .share-btn {
-    position: absolute; top: 8px; right: 8px;
-    width: 32px; height: 32px;
-    background: rgba(255,255,255,0.85); backdrop-filter: blur(4px);
+    position: absolute; top: 10px; right: 10px;
+    width: 34px; height: 34px;
+    background: rgba(255,255,255,0.88); backdrop-filter: blur(6px);
     border-radius: 50%; display: flex; align-items: center; justify-content: center;
     cursor: pointer; border: none; z-index: 10;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: transform 0.15s;
 }
-.share-btn svg { width: 16px; height: 16px; fill: #666; }
-.share-btn:active { background: rgba(255,255,255,0.95); transform: scale(0.95); }
+.share-btn svg { width: 17px; height: 17px; fill: #555; }
+.share-btn:active { transform: scale(0.92); }
 
 .live-card-info { padding: 12px 14px; }
 .live-title { font-size: 15px; font-weight: 600; color: #333; line-height: 1.5; margin-bottom: 6px; }
@@ -109,17 +139,17 @@ body {
 }
 .live-time svg { width: 14px; height: 14px; fill: #999; }
 
-/* === 底部弹窗1：分享选项（海报 / 链接） === */
+/* === 底部弹窗1：分享选项（复制链接 / 分享海报）— 一比一复刻截图 === */
 .modal-overlay {
     display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.5); z-index: 100;
+    background: rgba(0,0,0,0.55); z-index: 100;
     justify-content: center; align-items: flex-end;
 }
 .modal-overlay.show { display: flex; }
 .modal-panel {
     width: 100%; max-width: 375px;
-    background: #fff; border-radius: 16px 16px 0 0;
-    padding: 20px 20px 24px;
+    background: #fff; border-radius: 18px 18px 0 0;
+    padding: 28px 24px 20px;
     animation: slideUp 0.3s ease;
 }
 @keyframes slideUp {
@@ -127,80 +157,83 @@ body {
     to { transform: translateY(0); }
 }
 
-/* 分享选项按钮行 */
+/* 两个圆形大按钮 */
 .share-options {
-    display: flex; gap: 16px; justify-content: center;
-    margin-bottom: 20px;
+    display: flex; gap: 36px; justify-content: center;
+    margin-bottom: 28px;
 }
 .share-option {
-    display: flex; flex-direction: column; align-items: center; gap: 8px;
-    cursor: pointer; padding: 8px 16px; border-radius: 12px;
-    transition: background 0.2s;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    cursor: pointer;
 }
-.share-option:active { background: #f5f5f5; }
+.share-option:active { opacity: 0.75; }
 .share-option-icon {
-    width: 56px; height: 56px; border-radius: 50%;
+    width: 58px; height: 58px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    box-shadow: 0 2px 8px rgba(102,126,234,0.3);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.12);
 }
-.share-option-icon.poster { background: linear-gradient(135deg, #f093fb, #f5576c); }
-.share-option-icon.link { background: linear-gradient(135deg, #4facfe, #00f2fe); }
-.share-option-icon svg { width: 24px; height: 24px; fill: #fff; }
-.share-option-label { font-size: 13px; color: #666; }
+/* 左：蓝色 — 复制链接 */
+.share-option-icon.link {
+    background: linear-gradient(135deg, #1976D2, #42A5F5);
+}
+/* 右：紫色 — 分享海报 */
+.share-option-icon.poster {
+    background: linear-gradient(135deg, #7B1FA2, #AB47BC);
+}
+.share-option-icon svg { width: 26px; height: 26px; fill: #fff; }
+.share-option-label {
+    font-size: 13px; color: #333; font-weight: 500;
+}
 
 .btn-cancel-full {
-    width: 100%; height: 46px; border-radius: 23px; border: none;
-    background: #f5f5f5; color: #666; font-size: 15px;
-    cursor: pointer; margin-top: 8px;
+    width: 100%; height: 48px; border-radius: 24px; border: none;
+    background: transparent; color: #999; font-size: 15px;
+    cursor: pointer;
 }
 
-/* === 底部弹窗2：复制链接 === */
+/* === 底部弹窗2：复制链接面板 === */
 .link-modal .modal-panel {
-    padding: 20px 20px 24px;
+    padding: 24px 20px 20px;
 }
 .link-modal-title {
-    font-size: 16px; font-weight: 600; color: #333;
-    text-align: center; margin-bottom: 6px;
+    font-size: 17px; font-weight: 600; color: #333;
+    text-align: center; margin-bottom: 8px;
 }
 .link-modal-tip {
-    font-size: 13px; color: #999; margin-bottom: 16px; text-align: center;
+    font-size: 13px; color: #999; margin-bottom: 18px; text-align: center;
 }
 .link-box {
-    background: #f8f9fa; border-radius: 10px;
-    padding: 14px 16px; display: flex; align-items: center; gap: 10px;
-    margin-bottom: 16px; border: 1px solid #e8e8e8;
+    background: #f7f8fa; border-radius: 10px;
+    padding: 14px 14px; display: flex; align-items: center; gap: 12px;
+    margin-bottom: 18px; border: 1px solid #eee;
 }
 .link-box .link-icon {
-    width: 40px; height: 40px; border-radius: 10px;
-    background: #e8f5e9; display: flex; align-items: center; justify-content: center;
+    width: 38px; height: 38px; border-radius: 10px;
+    background: #e3f2fd; display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
 }
-.link-box .link-icon svg { width: 20px; height: 20px; fill: #43a047; }
+.link-box .link-icon svg { width: 18px; height: 18px; fill: #1976D2; }
 .link-text-wrap { flex: 1; min-width: 0; }
 .link-text {
     font-size: 13px; color: #333; word-break: break-all;
     line-height: 1.5;
 }
-.link-desc {
-    font-size: 11px; color: #999; margin-top: 2px;
-}
 .btn-copy {
     width: 100%; height: 46px; border-radius: 23px; border: none;
-    background: linear-gradient(135deg, #43a047, #66bb6a);
+    background: linear-gradient(135deg, #1976D2, #42A5F5);
     color: #fff; font-size: 15px; font-weight: 600;
     cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
-    box-shadow: 0 2px 8px rgba(76,175,80,0.3);
+    box-shadow: 0 2px 8px rgba(25,118,210,0.3);
 }
 .btn-copy:active { transform: scale(0.98); }
 .btn-copy.copied {
-    background: #e8e8e8; color: #999; box-shadow: none;
+    background: #e8eaed; color: #bbb; box-shadow: none;
 }
 
 /* === Toast === */
 .toast {
     position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
-    background: rgba(0,0,0,0.78); color: #fff; padding: 12px 24px;
+    background: rgba(0,0,0,0.76); color: #fff; padding: 12px 24px;
     border-radius: 8px; font-size: 14px; z-index: 200;
     opacity: 0; pointer-events: none; transition: opacity 0.3s;
 }
@@ -217,10 +250,18 @@ body {
 
     <!-- Banner -->
     <div class="banner">
-        <div class="banner-tag">健康大讲堂</div>
-        <div class="banner-title">观播赚积分 好礼兑不停</div>
-        <div class="banner-sub">积分怎么赚？健康大讲堂指南！</div>
-        <button class="banner-btn">立即领积分兑豪礼 GO</button>
+        <div class="banner-left">
+            <div class="banner-badge">📢 直播预告</div>
+            <div class="banner-big-title">别错过！</div>
+            <div class="banner-sub">本周直播课程抢先知</div>
+        </div>
+        <div class="banner-date-box">
+            <div class="banner-date-item"><span class="banner-date-num">03/23</span>【这是你的脾"拒绝收货"】</div>
+            <div class="banner-date-item"><span class="banner-date-num">03/25</span>【春分补不补"心"...】</div>
+            <div class="banner-date-item"><span class="banner-date-num">03/27</span>【春分不养肝，睡一年都白费】</div>
+            <div class="banner-date-item"><span class="banner-date-num">03/28</span>【让你同龄人年轻5-10岁的秘诀】</div>
+            <div class="banner-date-item"><span class="banner-date-num">03/29</span>【身心同调，家庭兴旺，事业长青】</div>
+        </div>
     </div>
 
     <!-- Tab -->
@@ -236,20 +277,14 @@ body {
         <!-- 卡片1：预约中 -->
         <div class="live-card" data-live-id="live-001">
             <div class="live-card-cover">
-                <div style="width:100%;height:100%;background:linear-gradient(135deg,#fff3e0,#ffe0b2);display:flex;align-items:center;justify-content:center;">
-                    <span style="font-size:14px;color:#e65100;">[直播封面图片]</span>
-                </div>
-                <div class="cover-tag">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                    预约中
-                </div>
-                <div class="cover-time">开播时间:03月23日19:00—20:00</div>
-                <button class="share-btn" onclick="openShareModal('live-001', 'https://lvyunji.com/live/detail?id=live001')">
+                <img class="cover-bg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='375' height='180'%3E%3Cdefs%3E%3ClinearGradient id='g1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23fff8e1'/%3E%3Cstop offset='100%25' stop-color='%23ffe0b2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g1)' width='375' height='180'/%3E%3Ctext x='187' y='80' text-anchor='middle' fill='%23e65100' font-size='16' font-family='system-ui'%3E一瓶和中承春意，清明时节养身心%3C/text%3E%3Ctext x='187' y='105' text-anchor='middle' fill='%23ef6c00' font-size='13' font-family='system-ui'%3E你成长我奖励 "兑千元好礼"%3C/text%3E%3C/svg%3E" alt="直播封面" />
+                <div class="cover-time-bar orange">开播时间:04月01日19:00——20:00</div>
+                <button class="share-btn" onclick="openShareModal('live-001','https://lvyunji.com/live/detail?id=live001')">
                     <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
                 </button>
             </div>
             <div class="live-card-info">
-                <div class="live-title">3.23吃了一堆没效果？不是你买的假，是你的脾"拒绝收货"</div>
+                <div class="live-title">一瓶和中承春意，清阴时节养身心<br/>你成长我奖励 "兑千元好礼"</div>
                 <div class="live-time">
                     <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
                     2026-03-23 19:00 ~ 2026-03-23 20:00
@@ -257,17 +292,11 @@ body {
             </div>
         </div>
 
-        <!-- 卡片2：直播中 -->
+        <!-- 卡片2：测试 -->
         <div class="live-card" data-live-id="live-002">
             <div class="live-card-cover">
-                <div style="width:100%;height:100%;background:linear-gradient(135deg,#e3f2fd,#bbdefb);display:flex;align-items:center;justify-content:center;">
-                    <span style="font-size:14px;color:#1565c0;">[直播封面图片]</span>
-                </div>
-                <div class="cover-tag live">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg>
-                    直播中
-                </div>
-                <button class="share-btn" onclick="openShareModal('live-002', 'https://lvyunji.com/live/detail?id=live002')">
+                <img class="cover-bg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='375' height='180'%3E%3Crect fill='%23f0f0f0' width='375' height='180'/%3E%3Ctext x='187' y='95' text-anchor='middle' fill='%23999' font-size='16' font-family='system-ui'%3E[直播封面]%3C/text%3E%3C/svg%3E" alt="封面" />
+                <button class="share-btn" onclick="openShareModal('live-002','https://lvyunji.com/live/detail?id=live002')">
                     <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
                 </button>
             </div>
@@ -275,7 +304,28 @@ body {
                 <div class="live-title">测试一下</div>
                 <div class="live-time">
                     <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                    2026-07-06 17:45 ~ 2026-07-06 19:45
+                    2026-07-06 12:32 ~ 2026-07-06 14:32
+                </div>
+            </div>
+        </div>
+
+        <!-- 卡片3：预约中 -->
+        <div class="live-card" data-live-id="live-003">
+            <div class="live-card-cover">
+                <img class="cover-bg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='375' height='180'%3E%3Cdefs%3E%3ClinearGradient id='g2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23fce4ec'/%3E%3Cstop offset='100%25' stop-color='%23f8bbd0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g2)' width='375' height='180'/%3E%3Ctext x='187' y='90' text-anchor='middle' fill='%23c2185b' font-size='20' font-weight='bold' font-family='system-ui'%3E这是你的脾 "拒绝收货"%3C/text%3E%3C/svg%3E" alt="封面" />
+                <div class="cover-tag">
+                    <span style="font-size:10px;">⏰</span> 预约中
+                </div>
+                <div class="cover-time-bar orange">开播时间:03月23日19:00——20:00</div>
+                <button class="share-btn" onclick="openShareModal('live-003','https://lvyunji.com/live/detail?id=live003')">
+                    <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
+                </button>
+            </div>
+            <div class="live-card-info">
+                <div class="live-title">这是你的脾 "拒绝收货"</div>
+                <div class="live-time">
+                    <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                    2026-07-06 12:32 ~ 2026-07-06 14:32
                 </div>
             </div>
         </div>
@@ -283,21 +333,23 @@ body {
     </div>
 </div>
 
-<!-- === 弹窗1：分享选项（海报 / 链接） === -->
+<!-- === 弹窗1：分享选项（复制链接 / 分享海报） === -->
 <div class="modal-overlay" id="shareModal">
     <div class="modal-panel">
         <div class="share-options">
+            <!-- 左：复制链接 — 蓝色圆形图标 -->
+            <div class="share-option" onclick="openLinkModal()">
+                <div class="share-option-icon link">
+                    <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+                </div>
+                <span class="share-option-label">复制链接</span>
+            </div>
+            <!-- 右：分享海报 — 紫色圆形图标 -->
             <div class="share-option" onclick="sharePoster()">
                 <div class="share-option-icon poster">
                     <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5-7l-3 3.72L9 13l-3 4h12l-4-5z"/></svg>
                 </div>
                 <span class="share-option-label">分享海报</span>
-            </div>
-            <div class="share-option" onclick="openLinkModal()">
-                <div class="share-option-icon link">
-                    <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
-                </div>
-                <span class="share-option-label">分享链接</span>
             </div>
         </div>
         <button class="btn-cancel-full" onclick="closeShareModal()">取消</button>
@@ -307,22 +359,21 @@ body {
 <!-- === 弹窗2：复制链接 === -->
 <div class="modal-overlay link-modal" id="linkModal">
     <div class="modal-panel">
-        <div class="link-modal-title">分享链接</div>
-        <div class="link-modal-tip">复制下方链接，分享给好友观看直播</div>
+        <div class="link-modal-title">复制链接分享直播</div>
+        <div class="link-modal-tip">点击复制按钮，将链接发送给好友</div>
         <div class="link-box">
             <div class="link-icon">
                 <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
             </div>
             <div class="link-text-wrap">
-                <div class="link-text" id="shareLinkText">https://lvyunji.com/live/detail?id=live001</div>
-                <div class="link-desc">点击复制即可分享给好友</div>
+                <div class="link-text" id="shareLinkText"></div>
             </div>
         </div>
         <button class="btn-copy" id="copyBtn" onclick="copyLink()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
             复制链接
         </button>
-        <button class="btn-cancel-full" onclick="closeLinkModal()">取消</button>
+        <button class="btn-cancel-full" onclick="closeLinkModal()" style="margin-top:10px;">取消</button>
     </div>
 </div>
 
@@ -340,20 +391,13 @@ function closeShareModal() {
     document.getElementById('shareModal').classList.remove('show');
 }
 
-function sharePoster() {
-    closeShareModal();
-    showToast('生成海报中...');
-    // 实际业务中这里跳转到海报生成页
-}
-
 function openLinkModal() {
     closeShareModal();
     document.getElementById('shareLinkText').textContent = currentLink;
     document.getElementById('linkModal').classList.add('show');
-    // 重置复制按钮状态
     var btn = document.getElementById('copyBtn');
     btn.classList.remove('copied');
-    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>复制链接';
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg> 复制链接';
 }
 function closeLinkModal() {
     document.getElementById('linkModal').classList.remove('show');
@@ -364,35 +408,32 @@ function copyLink() {
     if (navigator.clipboard) {
         navigator.clipboard.writeText(link).then(function() {
             onCopySuccess();
-        }).catch(function() {
-            fallbackCopy(link);
-        });
-    } else {
-        fallbackCopy(link);
-    }
+        }).catch(function() { fallbackCopy(link); });
+    } else { fallbackCopy(link); }
 }
 
 function fallbackCopy(text) {
-    var textarea = document.createElement('textarea');
-    textarea.value = text;
-    textarea.style.position = 'fixed';
-    textarea.style.opacity = '0';
-    document.body.appendChild(textarea);
-    textarea.select();
-    try {
-        document.execCommand('copy');
-        onCopySuccess();
-    } catch (e) {
-        showToast('复制失败，请长按链接手动复制');
-    }
-    document.body.removeChild(textarea);
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); onCopySuccess(); }
+    catch(e) { showToast('请长按链接手动复制'); }
+    document.body.removeChild(ta);
 }
 
 function onCopySuccess() {
     var btn = document.getElementById('copyBtn');
     btn.classList.add('copied');
-    btn.textContent = '已复制';
+    btn.textContent = '已复制 ✓';
     showToast('链接已复制，快去分享给好友吧');
+}
+
+function sharePoster() {
+    closeShareModal();
+    showToast('正在生成海报...');
 }
 
 function showToast(msg) {
@@ -402,7 +443,6 @@ function showToast(msg) {
     setTimeout(function() { t.classList.remove('show'); }, 2000);
 }
 
-// 点击遮罩关闭弹窗
 document.getElementById('shareModal').addEventListener('click', function(e) {
     if (e.target === this) closeShareModal();
 });
