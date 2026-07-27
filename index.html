@@ -577,7 +577,6 @@ tbody tr:hover td { background:#fafafa; }
           <div class="sec-block">
             <div class="sec-head">商品规格 <span class="hl-new">NEW 购买级别</span></div>
             <div class="sec-body">
-              <div style="font-size:12px;color:#999;margin-bottom:10px;line-height:1.6">每个规格值可单独设置「购买级别(≥)」下拉，低于该级别的会员在前端购买时会被拦截提示；默认「不限制」。<b style="color:#e4393c">此处仅后台配置，不弹提示</b>。</div>
               <div class="spec-area">
                 <!-- 规格组：装量 -->
                 <div class="spec-row">
@@ -598,7 +597,7 @@ tbody tr:hover td { background:#fafafa; }
                   <span style="color:#e4393c;font-size:12px;cursor:pointer">上传规格图片</span>
                   <span class="spec-del" title="删除此规格值">✕</span>
                 </div>
-                <!-- 规格值2：豪华装（限高级会员） -->
+                <!-- 规格值2：豪华装 -->
                 <div class="spec-row" style="padding-left:78px;background:#fef0f0;border-radius:6px;border-bottom:none">
                   <input class="spec-val-in" value="豪华装" style="width:140px">
                   <span class="buy-level-label">购买级别(≥)</span>
@@ -623,7 +622,7 @@ tbody tr:hover td { background:#fafafa; }
                   <thead><tr><th>规格</th><th>市场价</th><th>销售价</th><th>积分</th><th>PV值</th><th>初始价</th><th>库存</th><th>商品编码</th></tr></thead>
                   <tbody>
                     <tr><td>标准装-S</td><td><input value="1"></td><td><input value="99"></td><td><input value="0"></td><td><input value="0"></td><td><input value="0"></td><td><input value="100"></td><td><input placeholder=""></td></tr>
-                    <tr style="background:#fef0f0"><td>豪华装-L<span class="hl-new" style="font-size:9px;margin-left:4px">限高级+</span></td><td><input value="1"></td><td><input value="199"></td><td><input value="0"></td><td><input value="0"></td><td><input value="0"></td><td><input value="50"></td><td><input placeholder=""></td></tr>
+                    <tr style="background:#fef0f0"><td>豪华装-L</td><td><input value="1"></td><td><input value="199"></td><td><input value="0"></td><td><input value="0"></td><td><input value="0"></td><td><input value="50"></td><td><input placeholder=""></td></tr>
                   </tbody>
                 </table>
                 <div class="batch-row">
@@ -727,7 +726,7 @@ tbody tr:hover td { background:#fafafa; }
                   <div class="fe-block-tit">选择规格</div>
                   <div class="fe-specs">
                     <div class="fe-spec on" onclick="pickSpec(this,0,'标准装')">标准装</div>
-                    <div class="fe-spec" onclick="pickSpec(this,2,'豪华装')">豪华装 <span class="lock">🔒限高级</span></div>
+                    <div class="fe-spec" onclick="pickSpec(this,2,'豪华装')">豪华装</div>
                   </div>
                 </div>
               </div>
