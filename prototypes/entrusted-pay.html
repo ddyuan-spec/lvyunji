@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>代付人信息 · 本地预览</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+  }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(160deg, #eef1f5 0%, #dfe4ea 100%);
+    padding: 24px;
+  }
+
+  /* 手机外壳 */
+  .phone {
+    position: relative;
+    width: 375px;
+    height: 812px;
+    background: #f5f5f5;
+    border-radius: 44px;
+    box-shadow: 0 24px 60px rgba(0,0,0,.28), 0 0 0 11px #1c1c1e, 0 0 0 13px #2c2c2e;
+    overflow: hidden;
+  }
+  /* 刘海 */
+  .notch {
+    position: absolute;
+    top: 0; left: 50%; transform: translateX(-50%);
+    width: 150px; height: 26px;
+    background: #1c1c1e;
+    border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;
+    z-index: 50;
+  }
+
+  /* 状态栏 */
+  .statusbar {
+    height: 44px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px;
+    font-size: 14px; font-weight: 600; color: #1a1a1a;
+    background: #fff;
+    position: relative; z-index: 20;
+  }
+  .statusbar .icons { display: flex; align-items: center; gap: 5px; }
+  .statusbar .icons svg { display: block; }
+
+  /* 导航栏 yxm-nav-bar */
+  .navbar {
+    height: 44px;
+    display: flex; align-items: center;
+    background: #fff;
+    border-bottom: 1rpx solid #ededed;
+    position: relative; z-index: 20;
+  }
+  .navbar .back {
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .navbar .title {
+    position: absolute; left: 0; right: 0;
+    text-align: center;
+    font-size: 17px; font-weight: 600; color: #1a1a1a;
+    pointer-events: none;
+  }
+
+  /* 滚动区域 */
+  .scroll-area {
+    position: absolute;
+    top: 88px; left: 0; right: 0; bottom: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .scroll-area::-webkit-scrollbar { width: 0; }
+
+  .content { min-height: 100%; background: #f5f5f5; }
+
+  .page-body {
+    padding: 20px 16px 90px;
+  }
+
+  /* Hero */
+  .hero-box {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 8px 0 4px;
+  }
+  .hero-icon {
+    width: 48px; height: 48px;
+  }
+  .hero-title {
+    margin-top: 12px;
+    color: #333; font-size: 16px; font-weight: 500; line-height: 22px;
+  }
+  .hero-desc {
+    margin-top: 4px;
+    color: #999; font-size: 12px; line-height: 17px;
+    text-align: center;
+  }
+
+  /* 卡片 */
+  .form-card, .recent-card {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    background: #fff;
+  }
+  .form-title-row { display: flex; align-items: center; flex-wrap: wrap; }
+  .form-title { color: #333; font-size: 16px; font-weight: 500; line-height: 22px; }
+  .form-sub-title { margin-left: 4px; color: #999; font-size: 12px; line-height: 17px; }
+
+  .form-input {
+    margin-top: 4px;
+    height: 54px;
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #e8e8e8;
+    color: #333; font-size: 16px;
+    background: transparent;
+    outline: none;
+  }
+  .form-input::placeholder { color: #999; font-size: 16px; }
+
+  .form-message {
+    margin-top: 6px;
+    font-size: 12px; line-height: 17px;
+    min-height: 17px;
+    display: flex; align-items: center;
+  }
+  .form-message.loading { color: #999; }
+  .form-message.success { color: #438500; }
+  .form-message.error   { color: #ff5656; }
+  .spinner {
+    width: 12px; height: 12px; margin-right: 6px;
+    border: 2px solid #ccc; border-top-color: #999;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* 最近代付人 */
+  .recent-title { color: #333; font-size: 16px; font-weight: 500; line-height: 22px; }
+  .recent-item {
+    margin-top: 8px;
+    padding: 12px;
+    height: 65px;
+    border-radius: 8px;
+    background: #f8f8f8;
+    display: flex; align-items: center;
+    box-sizing: border-box;
+    cursor: pointer;
+    user-select: none;
+  }
+  .recent-item.disabled { opacity: .68; pointer-events: none; }
+  .recent-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 16px; font-weight: 600;
+  }
+  .recent-info { flex: 1; margin-left: 8px; min-width: 0; }
+  .recent-name-row { display: flex; align-items: center; }
+  .recent-name { color: #333; font-size: 14px; font-weight: 600; line-height: 20px; }
+  .quick-tag {
+    margin-left: 6px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: rgba(255,159,38,0.12);
+    color: #ff9f26;
+    font-size: 10px; line-height: 14px;
+  }
+  .recent-time { margin-top: 3px; color: #999; font-size: 12px; line-height: 16px; }
+  .recent-arrow {
+    margin-left: 8px; width: 16px; height: 16px; position: relative; flex-shrink: 0;
+  }
+  .recent-arrow::after {
+    content: ""; position: absolute;
+    left: 4px; top: 3px;
+    width: 7px; height: 7px;
+    border-top: 2px solid #c9c9c9;
+    border-right: 2px solid #c9c9c9;
+    transform: rotate(45deg);
+  }
+
+  /* 底部提交栏 */
+  .bottom-bar {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 8px 16px;
+    background: #fff;
+    border-top: 1px solid #f0f0f0;
+  }
+  .submit-btn {
+    height: 44px;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #ffb248 0%, #ff9f26 100%);
+    color: #fff;
+    font-size: 16px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; user-select: none;
+    transition: opacity .15s;
+  }
+  .submit-btn.disabled { opacity: .45; pointer-events: none; }
+
+  /* 演示提示（非产品内容） */
+  .demo-hint {
+    margin-top: 14px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #fff7ec;
+    border: 1px dashed #ffd591;
+    color: #ad6800;
+    font-size: 11px; line-height: 16px;
+  }
+  .demo-hint b { color: #d46b08; }
+
+  /* 浮层：loading / toast / success */
+  .overlay {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 60; pointer-events: none;
+  }
+  .overlay.show { pointer-events: auto; }
+  .overlay .mask { position: absolute; inset: 0; background: rgba(0,0,0,.4); }
+  .toast {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    max-width: 240px;
+    padding: 12px 16px;
+    background: rgba(0,0,0,.78);
+    color: #fff; font-size: 14px; line-height: 20px;
+    border-radius: 8px; text-align: center;
+    z-index: 61;
+  }
+  .loading-box {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    padding: 18px 22px;
+    background: rgba(0,0,0,.78);
+    border-radius: 12px;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    z-index: 61;
+  }
+  .loading-box .big-spin {
+    width: 28px; height: 28px;
+    border: 3px solid rgba(255,255,255,.35); border-top-color: #fff;
+    border-radius: 50%; animation: spin .7s linear infinite;
+  }
+  .loading-box .txt { color: #fff; font-size: 13px; }
+
+  .success-box {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    width: 260px; padding: 24px 20px;
+    background: #fff; border-radius: 14px;
+    display: flex; flex-direction: column; align-items: center;
+    z-index: 61;
+    text-align: center;
+  }
+  .success-box .check {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: linear-gradient(180deg,#52c41a,#43a008);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px;
+  }
+  .success-box .s-title { font-size: 17px; font-weight: 600; color: #333; }
+  .success-box .s-sub { margin-top: 8px; font-size: 13px; color: #999; line-height: 19px; }
+  .success-box .s-btn {
+    margin-top: 18px; width: 100%; height: 42px;
+    border-radius: 8px; background: linear-gradient(180deg,#ffb248,#ff9f26);
+    color: #fff; font-size: 15px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <div class="notch"></div>
+
+    <!-- 状态栏 -->
+    <div class="statusbar">
+      <span>9:41</span>
+      <span class="icons">
+        <!-- 信号 -->
+        <svg width="18" height="12" viewBox="0 0 18 12"><g fill="#1a1a1a"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></g></svg>
+        <!-- wifi -->
+        <svg width="17" height="12" viewBox="0 0 17 12"><path d="M8.5 2C5.4 2 2.6 3.2.5 5.2l1.4 1.4C3.6 5 6 4 8.5 4s4.9 1 6.6 2.6l1.4-1.4C14.4 3.2 11.6 2 8.5 2z" fill="#1a1a1a"/><path d="M8.5 6c-1.7 0-3.3.7-4.5 1.8l1.5 1.5C6.3 8.6 7.3 8 8.5 8s2.2.6 3 1.3l1.5-1.5C11.8 6.7 10.2 6 8.5 6z" fill="#1a1a1a"/><circle cx="8.5" cy="11" r="1.6" fill="#1a1a1a"/></svg>
+        <!-- 电池 -->
+        <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" fill="none" stroke="#1a1a1a" stroke-width="1"/><rect x="2" y="2" width="17" height="8" rx="1.5" fill="#1a1a1a"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1a1a1a"/></svg>
+      </span>
+    </div>
+
+    <!-- 导航栏 -->
+    <div class="navbar">
+      <div class="back" onclick="history.back()" title="返回">
+        <svg width="12" height="20" viewBox="0 0 12 20"><path d="M10 2L2 10l8 8" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="title">代付人信息</div>
+    </div>
+
+    <!-- 滚动内容 -->
+    <div class="scroll-area">
+      <div class="content">
+        <div class="page-body">
+          <div class="hero-box">
+            <!-- payment/icon_payment.png 复刻 -->
+            <svg class="hero-icon" viewBox="0 0 96 96">
+              <defs>
+                <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#ffb248"/><stop offset="1" stop-color="#ff9f26"/>
+                </linearGradient>
+              </defs>
+              <rect x="8" y="22" width="80" height="52" rx="10" fill="url(#g1)"/>
+              <rect x="8" y="22" width="80" height="18" rx="10" fill="#ffce8a" opacity=".55"/>
+              <rect x="20" y="52" width="40" height="8" rx="4" fill="#fff" opacity=".9"/>
+              <circle cx="68" cy="56" r="13" fill="#fff"/>
+              <path d="M62 56l4 4 8-8" fill="none" stroke="#ff9f26" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div class="hero-title">请输入代付人信息</div>
+            <div class="hero-desc">为保证资金安全，仅支持同一关系链内的账号代付</div>
+          </div>
+
+          <!-- 输入代付账号 -->
+          <div class="form-card">
+            <div class="form-title-row">
+              <text class="form-title">输入代付账号</text>
+            </div>
+            <input
+              id="payerAccount"
+              class="form-input"
+              type="text"
+              maxlength="30"
+              placeholder="请输入代付账号"
+              autocomplete="off"
+            />
+            <div id="accountMessage" class="form-message"></div>
+          </div>
+
+          <!-- 最近代付人 -->
+          <div class="recent-card" id="recentCard">
+            <div class="recent-title">最近请求过的代付人(可直接选择)</div>
+            <div id="recentList"></div>
+          </div>
+
+          <div class="demo-hint">
+            <b>演示提示：</b>输入任意账号（停顿 0.6s 自动校验），校验通过显示绿色「该账号在同一关系链内」；输入含 <b>fail</b> 的账号模拟校验失败。点击上方最近代付人可直接发起。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部提交栏 -->
+    <div class="bottom-bar">
+      <div id="submitBtn" class="submit-btn disabled" onclick="submitEntrustedPay()">发起代付请求</div>
+    </div>
+
+    <!-- 浮层 -->
+    <div class="overlay" id="overlay"></div>
+  </div>
+
+<script>
+(function () {
+  // ---------- 演示数据 ----------
+  var recentAgents = [
+    { nickName: "Alice", account: "13800001111", quickPay: true,  requestTimeText: "2小时前请求", relationText: "该账号在同一关系链内", proxyUserId: "u_1001", color: "#ff9f26" },
+    { nickName: "老王",  account: "13800002222", quickPay: false, requestTimeText: "昨天 19:30 请求", relationText: "该账号在同一关系链内", proxyUserId: "u_1002", color: "#52c41a" }
+  ];
+
+  var state = {
+    payerAccount: "",
+    selectedAccount: "",
+    accountVerifyState: "",
+    accountVerifyMessage: "",
+    accountValidating: false,
+    verifiedPayerInfo: null,
+    submitLoading: false,
+    successAgentName: ""
+  };
+  var validateTimer = null;
+
+  // ---------- DOM ----------
+  var input = document.getElementById("payerAccount");
+  var msgEl = document.getElementById("accountMessage");
+  var submitBtn = document.getElementById("submitBtn");
+  var recentList = document.getElementById("recentList");
+  var overlay = document.getElementById("overlay");
+
+  // ---------- 工具 ----------
+  function isNull(v) { return v === "" || v == null; }
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  function setMessage(stateName, text) {
+    state.accountVerifyState = stateName;
+    state.accountVerifyMessage = text;
+    msgEl.className = "form-message" + (stateName ? " " + stateName : "");
+    if (stateName === "loading") {
+      msgEl.innerHTML = '<span class="spinner"></span>' + (text || "正在校验账号...");
+    } else {
+      msgEl.textContent = text || "";
+    }
+  }
+
+  function render() {
+    var canSubmit = !isNull(state.payerAccount) && state.accountVerifyState === "success" && !state.accountValidating;
+    if (state.submitLoading) {
+      submitBtn.className = "submit-btn disabled";
+      submitBtn.textContent = "提交中...";
+    } else {
+      submitBtn.className = "submit-btn" + (canSubmit ? "" : " disabled");
+      submitBtn.textContent = "发起代付请求";
+    }
+  }
+
+  // ---------- 浮层 ----------
+  function toast(text) {
+    overlay.className = "overlay show";
+    overlay.innerHTML = '<div class="mask"></div><div class="toast">' + text + '</div>';
+    setTimeout(function () {
+      overlay.className = "overlay"; overlay.innerHTML = "";
+    }, 1600);
+  }
+  function showLoading(text) {
+    overlay.className = "overlay show";
+    overlay.innerHTML = '<div class="mask"></div><div class="loading-box"><div class="big-spin"></div><div class="txt">' + (text || "提交中...") + '</div></div>';
+  }
+  function hideLoading() { overlay.className = "overlay"; overlay.innerHTML = ""; }
+  function showSuccess(name) {
+    overlay.className = "overlay show";
+    overlay.innerHTML = '<div class="mask"></div>' +
+      '<div class="success-box">' +
+        '<div class="check"><svg width="28" height="28" viewBox="0 0 28 28"><path d="M7 14l5 5 9-10" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
+        '<div class="s-title">代付请求已发起</div>' +
+        '<div class="s-sub">已向「' + (name || "对方") + '」发送代付请求，等待对方确认付款</div>' +
+        '<div class="s-btn" onclick="resetAll()">完成</div>' +
+      '</div>';
+  }
+
+  // ---------- mock 校验接口 ----------
+  function mockValidate(account) {
+    return new Promise(function (res) {
+      setTimeout(function () {
+        if (account.indexOf("fail") !== -1 || account === "error") {
+          res({ code: 1, msg: "该账号不在同一关系链内" });
+        } else {
+          res({ code: 0, data: { nickName: account, relationText: "该账号在同一关系链内", proxyUserId: "p_" + account } });
+        }
+      }, 600);
+    });
+  }
+
+  // ---------- 逻辑 ----------
+  function getInputPayerAccount() { return (input.value || "").trim(); }
+
+  function clearTimer() {
+    if (validateTimer) { clearTimeout(validateTimer); validateTimer = null; }
+  }
+
+  function handlePayerAccountInput() {
+    var value = getInputPayerAccount();
+    if (value !== state.selectedAccount) state.selectedAccount = "";
+    state.successAgentName = "";
+    state.verifiedPayerInfo = null;
+    setMessage("", "");
+    clearTimer();
+    if (!isNull(value)) {
+      validateTimer = setTimeout(function () { validatePayerAccount(false); }, 600);
+    }
+    render();
+  }
+
+  async function validatePayerAccount(showToast) {
+    var account = getInputPayerAccount();
+    state.payerAccount = account;
+    if (isNull(account)) {
+      setMessage("error", "请输入代付账号");
+      if (showToast) toast("请输入代付账号");
+      render();
+      return false;
+    }
+    if (state.verifiedPayerInfo && state.verifiedPayerInfo.account === account) { render(); return true; }
+
+    state.accountValidating = true;
+    setMessage("loading", "正在校验账号...");
+    render();
+    try {
+      var res = await mockValidate(account);
+      if (getInputPayerAccount() !== account) return false;
+      if (res.code === 0 && res.data) {
+        state.verifiedPayerInfo = Object.assign({}, res.data, { account: account });
+        state.successAgentName = state.verifiedPayerInfo.nickName;
+        setMessage("success", state.verifiedPayerInfo.relationText);
+        render();
+        return true;
+      }
+      state.verifiedPayerInfo = null;
+      setMessage("error", res.msg || "该账号不在同一关系链内");
+      if (showToast) toast(res.msg || "该账号不在同一关系链内");
+      render();
+      return false;
+    } catch (e) {
+      state.verifiedPayerInfo = null;
+      setMessage("error", "账号校验失败，请稍后重试");
+      if (showToast) toast("账号校验失败，请稍后重试");
+      render();
+      return false;
+    } finally {
+      state.accountValidating = false;
+    }
+  }
+
+  async function submitEntrustedPayByAgent(agent) {
+    if (!agent || !agent.proxyUserId) { toast("未获取到代付人信息，请重新选择"); return; }
+    state.submitLoading = true; render(); showLoading("提交中...");
+    await sleep(700);
+    hideLoading(); state.submitLoading = false; render();
+    showSuccess(agent.nickName);
+  }
+
+  function selectRecentAgent(index) {
+    if (state.submitLoading) return;
+    var agent = recentAgents[index];
+    if (!agent) { toast("代付人信息异常，请重新选择"); return; }
+    var account = agent.account || "";
+    clearTimer();
+    state.selectedAccount = account;
+    state.payerAccount = account;
+    input.value = account;
+    state.successAgentName = agent.nickName;
+    state.verifiedPayerInfo = agent;
+    setMessage("success", agent.relationText || "该账号在同一关系链内");
+    render();
+    submitEntrustedPayByAgent(agent);
+  }
+
+  async function submitEntrustedPay() {
+    if (state.submitLoading) return;
+    var submitAccount = getInputPayerAccount();
+    state.payerAccount = submitAccount;
+    var isValid = await validatePayerAccount(true);
+    var canSubmit = !isNull(submitAccount) && state.accountVerifyState === "success" && !state.accountValidating;
+    if (!isValid || !canSubmit) {
+      toast(state.accountVerifyMessage || "请先完成同链路账号校验");
+      return;
+    }
+    state.submitLoading = true; render(); showLoading("提交中...");
+    await sleep(700);
+    hideLoading(); state.submitLoading = false; render();
+    showSuccess(state.successAgentName || submitAccount);
+  }
+
+  function resetAll() {
+    overlay.className = "overlay"; overlay.innerHTML = "";
+    input.value = "";
+    state = { payerAccount: "", selectedAccount: "", accountVerifyState: "", accountVerifyMessage: "", accountValidating: false, verifiedPayerInfo: null, submitLoading: false, successAgentName: "" };
+    setMessage("", "");
+    render();
+  }
+
+  // ---------- 渲染最近代付人 ----------
+  function renderRecent() {
+    if (!recentAgents.length) { document.getElementById("recentCard").style.display = "none"; return; }
+    recentList.innerHTML = "";
+    recentAgents.forEach(function (item, index) {
+      var el = document.createElement("div");
+      el.className = "recent-item";
+      el.setAttribute("data-index", index);
+      var initial = (item.nickName || "?").charAt(0);
+      el.innerHTML =
+        '<div class="recent-avatar" style="background:' + (item.color || "#ff9f26") + '">' + initial + '</div>' +
+        '<div class="recent-info">' +
+          '<div class="recent-name-row">' +
+            '<span class="recent-name">' + item.nickName + '</span>' +
+            (item.quickPay ? '<span class="quick-tag">快速代付</span>' : '') +
+          '</div>' +
+          '<div class="recent-time">' + item.requestTimeText + '</div>' +
+        '</div>' +
+        '<div class="recent-arrow"></div>';
+      el.addEventListener("click", function () { selectRecentAgent(index); });
+      recentList.appendChild(el);
+    });
+  }
+
+  // ---------- 绑定 ----------
+  input.addEventListener("input", handlePayerAccountInput);
+  input.addEventListener("blur", function () { validatePayerAccount(false); });
+  input.addEventListener("keydown", function (e) { if (e.key === "Enter") validatePayerAccount(false); });
+
+  // 暴露给内联 onclick
+  window.submitEntrustedPay = submitEntrustedPay;
+  window.resetAll = resetAll;
+  window.selectRecentAgent = selectRecentAgent;
+
+  renderRecent();
+  render();
+})();
+</script>
+</body>
+</html>
