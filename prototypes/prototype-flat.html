@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>绿韵家 202607期 · 平铺静态原型（可一键复制源码）</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; background:#eef0f4; color:#333; }
+
+/* ===== 顶部条 ===== */
+.flat-topbar { position:sticky; top:0; z-index:100; background:#fff; border-bottom:1px solid #e6e6e6; padding:12px 24px; display:flex; align-items:center; gap:16px; box-shadow:0 1px 6px rgba(0,0,0,.06); }
+.flat-topbar .logo { font-size:16px; font-weight:800; color:#e4393c; letter-spacing:1px; }
+.flat-topbar .logo span { color:#333; font-weight:600; font-size:13px; margin-left:8px; }
+.flat-topbar .hint { font-size:12px; color:#bbb; }
+.flat-copy-btn { margin-left:auto; background:#1e1e1e; color:#fff; border:none; padding:9px 22px; border-radius:8px; font-size:14px; cursor:pointer; font-weight:600; transition:.15s; white-space:nowrap; }
+.flat-copy-btn:hover { background:#000; }
+.flat-copy-btn.copied { background:#16a34a; }
+
+/* ===== 分区 ===== */
+.flat-section { max-width:1440px; margin:0 auto; padding:28px 24px 10px; }
+.flat-sec-title { font-size:19px; font-weight:800; color:#222; display:flex; align-items:center; gap:9px; }
+.flat-sec-title .bar { width:4px; height:19px; background:#e4393c; border-radius:2px; }
+.flat-sec-desc { font-size:13px; color:#999; margin:6px 0 20px 13px; line-height:1.6; }
+.flat-screens { display:flex; gap:28px; flex-wrap:wrap; align-items:flex-start; }
+.phone-wrap { display:flex; flex-direction:column; align-items:center; }
+.flat-cap { text-align:center; font-size:13px; color:#555; margin-top:12px; font-weight:600; }
+.flat-cap small { display:block; color:#aaa; font-weight:400; font-size:11.5px; margin-top:2px; }
+
+/* 手机外壳 */
+.phone { width:340px; height:720px; background:#000; border-radius:40px; padding:11px; box-shadow:0 18px 44px rgba(0,0,0,.26); flex-shrink:0; position:relative; }
+.phone::before { content:''; position:absolute; top:18px; left:50%; transform:translateX(-50%); width:120px; height:24px; background:#000; border-radius:0 0 16px 16px; z-index:20; }
+.phone-screen { width:100%; height:100%; background:#f5f6fa; border-radius:31px; overflow:hidden; position:relative; }
+.status-bar { height:36px; display:flex; align-items:center; justify-content:space-between; padding:0 22px 0 26px; font-size:13px; font-weight:600; color:#000; background:#fff; }
+.status-bar .r { display:flex; gap:5px; align-items:center; }
+
+/* 屏幕内页面（平铺：常显、relative） */
+.screen { position:absolute; top:36px; left:0; right:0; bottom:0; overflow-y:auto; display:flex; flex-direction:column; }
+.scr-header { background:#fff; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eee; flex-shrink:0; }
+.scr-header .back { font-size:22px; width:26px; color:#333; }
+.scr-header h1 { font-size:16px; font-weight:600; }
+.scr-header .ph { width:26px; }
+
+/* 收银台 */
+.order-info { background:#fff; margin:12px; border-radius:12px; padding:16px; }
+.order-info .label { font-size:13px; color:#999; margin-bottom:4px; }
+.order-info .amount { font-size:30px; font-weight:700; color:#e4393c; }
+.order-info .amount span { font-size:15px; font-weight:400; }
+.order-info .order-no { font-size:12px; color:#bbb; margin-top:8px; }
+.section-title { padding:14px 16px 8px; font-size:13px; color:#999; }
+.method-list { padding:0 12px; }
+.method-item { background:#fff; border-radius:12px; padding:14px; margin-bottom:10px; display:flex; align-items:center; position:relative; border:2px solid transparent; }
+.method-item.selected { border-color:#1677ff; background:#f0f7ff; }
+.method-item.disabled { opacity:.45; }
+.method-icon { width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; margin-right:12px; flex-shrink:0; }
+.mi-new { background:#e4393c; color:#fff; } .mi-wx { background:#07c160; color:#fff; } .mi-ali { background:#1677ff; color:#fff; } .mi-old { background:#ccc; color:#666; }
+.method-name { font-size:15px; font-weight:600; } .method-desc { font-size:12px; color:#999; margin-top:2px; }
+.method-tag { position:absolute; right:14px; top:14px; font-size:11px; padding:2px 8px; border-radius:10px; }
+.tag-rec { background:#e6f4ff; color:#1677ff; border:1px solid #91caff; }
+.tag-off { background:#f5f5f5; color:#999; border:1px solid #d9d9d9; }
+.check-circle { position:absolute; right:14px; bottom:12px; width:20px; height:20px; border-radius:50%; border:2px solid #ddd; }
+.check-circle.checked { border-color:#1677ff; background:#1677ff; }
+.check-circle.checked::after { content:''; position:absolute; left:5px; top:1px; width:5px; height:9px; border-left:2px solid #fff; border-bottom:2px solid #fff; transform:rotate(-45deg); }
+.bottom-bar { margin-top:auto; background:#fff; padding:12px 16px 22px; border-top:1px solid #eee; flex-shrink:0; }
+.bottom-bar button { width:100%; height:46px; border-radius:23px; border:none; background:linear-gradient(135deg,#1677ff,#0958d9); color:#fff; font-size:16px; font-weight:600; letter-spacing:2px; }
+
+/* 支付表单页 */
+.bank-card { background:#fff; margin:16px 12px 0; border-radius:12px; padding:16px; }
+.bank-row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+.bank-name { font-size:16px; font-weight:700; } .bank-no { font-size:16px; font-weight:700; letter-spacing:1px; }
+.bank-type { font-size:12px; color:#999; width:100%; margin-top:2px; }
+.btn-sm { background:#1677ff; color:#fff; border:none; padding:6px 14px; border-radius:6px; font-size:13px; white-space:nowrap; }
+.info-row { display:flex; align-items:center; justify-content:space-between; padding:16px; background:#fff; margin:12px 12px 0; border-radius:12px; }
+.info-label { font-size:15px; } .info-value { font-size:15px; }
+.form-section { background:#fff; margin:12px; border-radius:12px; overflow:hidden; }
+.form-row { display:flex; align-items:center; padding:15px 16px; border-bottom:1px solid #f5f5f5; }
+.form-row:last-child { border-bottom:none; }
+.form-label { font-size:15px; margin-right:auto; white-space:nowrap; } .form-req { color:#e4393c; margin-right:3px; }
+.form-input { border:none; outline:none; font-size:15px; text-align:right; flex:1; background:transparent; font-family:inherit; }
+.form-input::placeholder { color:#c0c0c0; }
+.pay-btn-wrap { padding:24px 12px 30px; margin-top:auto; }
+.pay-btn { width:100%; height:46px; border-radius:23px; border:none; background:linear-gradient(135deg,#1677ff,#0958d9); color:#fff; font-size:16px; font-weight:600; letter-spacing:3px; }
+
+/* 结果页 */
+.result-wrap { flex:1; display:flex; align-items:center; justify-content:center; padding:20px; }
+.result-card { background:#fff; border-radius:16px; width:100%; padding:44px 28px 32px; text-align:center; box-shadow:0 4px 24px rgba(0,0,0,.06); }
+.icon-wrap { width:66px; height:66px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; margin-bottom:18px; font-size:34px; }
+.icon-success { background:#f0fdf4; color:#16a34a; } .icon-fail { background:#fef2f2; color:#dc2626; } .icon-cancel { background:#f9fafb; color:#9ca3af; }
+.result-title { font-size:21px; font-weight:700; margin-bottom:8px; }
+.rt-success { color:#16a34a; } .rt-fail { color:#dc2626; } .rt-cancel { color:#6b7280; }
+.result-amount { font-size:14px; color:#888; margin-bottom:6px; }
+.result-msg { font-size:14px; color:#666; margin-bottom:24px; min-height:20px; }
+.countdown { font-size:13px; color:#aaa; margin-bottom:20px; }
+.rbtn-group { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+.rbtn { padding:10px 26px; border-radius:22px; border:none; font-size:15px; font-weight:500; }
+.rbtn-primary { background:#1677ff; color:#fff; } .rbtn-default { background:#f5f5f5; color:#333; border:1px solid #e0e0e0; } .rbtn-danger { background:#e4393c; color:#fff; }
+
+/* ================= 商品管理后台 ================= */
+.flat-admin { background:#fff; border:1px solid #e8e8e8; border-radius:10px; overflow:hidden; box-shadow:0 2px 14px rgba(0,0,0,.05); }
+.admin-layout { display:flex; }
+.sidebar { width:150px; background:#222; color:#ccc; flex-shrink:0; display:flex; flex-direction:column; }
+.sidebar-brand { padding:16px 14px; font-size:14px; font-weight:700; color:#fff; border-bottom:1px solid #333; letter-spacing:1px; }
+.nav-group { padding:6px 0; }
+.nav-group-tit { padding:6px 14px 2px; font-size:11px; color:#666; letter-spacing:1px; }
+.nav-item { padding:9px 14px; font-size:13px; color:#aaa; display:flex; align-items:center; gap:7px; }
+.nav-item.active { color:#fff; background:#e4393c; border-left:3px solid #e4393c; }
+.nav-icon { font-size:14px; width:18px; text-align:center; }
+.admin-main { flex:1; display:flex; flex-direction:column; min-width:0; }
+.topbar { background:#fff; height:48px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; padding:0 20px; gap:4px; flex-shrink:0; }
+.tb-tab { padding:7px 18px; font-size:13px; color:#666; border-radius:4px 4px 0 0; }
+.tb-tab.active { color:#e4393c; font-weight:600; border-bottom:2px solid #e4393c; }
+.tb-tab-red { background:#e4393c; color:#fff !important; }
+.tb-spacer { margin-left:auto; }
+.tb-action { padding:5px 14px; border-radius:4px; font-size:13px; border:none; margin-left:6px; }
+.btn-red { background:#e4393c; color:#fff; }
+.btn-white { background:#fff; border:1px solid #d9d9d9; color:#333; }
+.admin-content { padding:20px 24px; background:#f5f6fa; }
+.page-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.page-head h2 { font-size:18px; font-weight:700; }
+.page-tip { font-size:12px; color:#999; }
+.filter-section { background:#fff; border-radius:6px; border:1px solid #e8e8e8; margin-bottom:14px; }
+.filter-tabs { display:flex; border-bottom:1px solid #f0f0f0; padding:0 14px; }
+.ftab { padding:10px 16px; font-size:13px; color:#666; border-bottom:2px solid transparent; margin-bottom:-1px; }
+.ftab.active { color:#e4393c; border-bottom-color:#e4393c; font-weight:600; }
+.fcount { color:#e4393c; font-weight:600; margin-left:4px; }
+.filter-body { padding:12px 14px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+.fi { display:flex; align-items:center; gap:4px; }
+.fi label { font-size:13px; color:#666; white-space:nowrap; }
+.fi select, .fi input { border:1px solid #d9d9d9; border-radius:4px; padding:5px 8px; font-size:13px; outline:none; font-family:inherit; }
+.fi select { min-width:120px; } .fi input { width:140px; }
+.fi-btn { padding:5px 14px; border-radius:4px; border:1px solid #d9d9d9; background:#fff; font-size:13px; }
+.data-table { background:#fff; border-radius:6px; border:1px solid #e8e8e8; overflow:auto; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+thead th { background:#fafafa; padding:10px 12px; text-align:left; font-weight:600; color:#666; border-bottom:1px solid #e8e8e8; font-size:12.5px; white-space:nowrap; }
+tbody td { padding:10px 12px; border-bottom:1px solid #f0f0f0; vertical-align:middle; }
+.td-img { width:42px; height:42px; border-radius:6px; object-fit:cover; border:1px solid #eee; }
+.td-name { font-weight:600; color:#333; }
+.td-sub { font-size:12px; color:#999; margin-top:2px; }
+.tag-op { display:inline-block; padding:2px 8px; border-radius:3px; font-size:11.5px; margin:1px 2px; }
+.to-edit { color:#1677ff; } .to-del { color:#e4393c; } .to-on { color:#52c41a; } .to-off { color:#999; }
+.pagination { display:flex; align-items:center; justify-content:flex-end; gap:8px; padding:12px 14px; font-size:12.5px; color:#999; border-top:1px solid #f0f0f0; }
+.pg-btn { padding:3px 9px; border:1px solid #d9d9d9; border-radius:3px; background:#fff; font-size:12px; }
+.pg-btn.active { background:#e4393c; color:#fff; border-color:#e4393c; }
+
+/* 商品表单 */
+.form-page { }
+.sec-block { background:#fff; border-radius:6px; border:1px solid #e8e8e8; margin-bottom:16px; overflow:hidden; }
+.sec-head { padding:14px 18px; font-size:15px; font-weight:700; border-bottom:1px solid #f0f0f0; }
+.sec-body { padding:16px 18px; }
+.fl-row { display:flex; align-items:center; padding:10px 0; gap:12px; flex-wrap:wrap; }
+.fl-label { width:90px; font-size:13.5px; color:#333; flex-shrink:0; text-align:right; }
+.fl-label .req { color:#e4393c; margin-right:2px; }
+.fl-field { flex:1; min-width:200px; }
+.fl-in { width:100%; border:1px solid #d9d9d9; border-radius:4px; padding:7px 10px; font-size:13.5px; outline:none; font-family:inherit; }
+.fl-sel { width:100%; border:1px solid #d9d9d9; border-radius:4px; padding:7px 10px; font-size:13.5px; outline:none; font-family:inherit; background:#fff; }
+.fl-textarea { width:100%; border:1px solid #d9d9d9; border-radius:4px; padding:8px 10px; font-size:13.5px; outline:none; font-family:inherit; resize:vertical; min-height:60px; }
+.fl-hint { font-size:12px; color:#bbb; margin-top:4px; }
+.type-tags { display:flex; gap:6px; flex-wrap:wrap; }
+.type-tag { padding:4px 12px; border-radius:4px; font-size:12.5px; border:1px solid #d9d9d9; }
+.type-tag.on-red { background:#e4393c; color:#fff; border-color:#e4393c; }
+.num-ctrl { display:inline-flex; align-items:center; border:1px solid #d9d9d9; border-radius:4px; }
+.num-ctrl button { width:28px; height:28px; border:none; background:#f5f5f5; font-size:14px; color:#666; }
+.num-ctrl input { width:46px; height:28px; border:none; text-align:center; font-size:13.5px; outline:none; border-left:1px solid #eee; border-right:1px solid #eee; }
+.spec-area { border:1px dashed #d9d9d9; border-radius:6px; padding:14px; background:#fafbfc; }
+.spec-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px dotted #eee; flex-wrap:wrap; }
+.spec-row:last-child { border-bottom:none; }
+.spec-name { font-size:13px; font-weight:600; color:#e4393c; min-width:70px; }
+.spec-val-in { width:140px; border:1px solid #d9d9d9; border-radius:4px; padding:6px 10px; font-size:13.5px; outline:none; }
+.spec-del { color:#e4393c; font-size:16px; opacity:.5; }
+.spec-add-sub { font-size:12.5px; color:#666; display:inline-flex; align-items:center; gap:4px; margin-top:6px; }
+.spec-new-link { font-size:12.5px; color:#999; margin-top:10px; display:inline-flex; align-items:center; gap:4px; }
+.buy-level-sel { width:140px; border:1px solid #e4393c; border-radius:4px; padding:6px 10px; font-size:13px; outline:none; font-family:inherit; background:#fff; color:#e4393c; font-weight:500; }
+.buy-level-label { font-size:12px; color:#e4393c; white-space:nowrap; font-weight:500; }
+.price-table { width:100%; border-collapse:collapse; font-size:13px; margin:10px 0; }
+.price-table th { background:#f8f9fa; padding:8px 10px; text-align:left; font-weight:600; color:#666; border:1px solid #eee; font-size:12.5px; white-space:nowrap; }
+.price-table td { padding:8px 10px; border:1px solid #eee; }
+.price-table input { width:100%; border:1px solid #d9d9d9; border-radius:3px; padding:5px 8px; font-size:13px; outline:none; }
+.img-group-title { font-size:13px; font-weight:600; margin:8px 0 4px; color:#333; }
+.img-group { display:flex; gap:10px; flex-wrap:wrap; margin:8px 0; }
+.img-upload-area { border:2px dashed #ddd; border-radius:6px; width:90px; height:90px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#fafafa; }
+.img-upload-area .plus { font-size:24px; color:#ccc; }
+.img-upload-area .txt { font-size:11px; color:#ccc; margin-top:2px; }
+.img-hint { font-size:11.5px; color:#bbb; margin-top:4px; line-height:1.5; }
+.form-footer { padding:16px 18px; display:flex; justify-content:flex-end; gap:12px; border-top:1px solid #f0f0f0; }
+.btn-cancel { padding:8px 32px; border-radius:4px; border:1px solid #d9d9d9; background:#fff; font-size:14px; }
+.btn-submit { padding:8px 36px; border-radius:4px; border:none; background:#e4393c; color:#fff; font-size:14px; font-weight:600; }
+.hl-new { display:inline-block; padding:1px 6px; border-radius:3px; font-size:11px; background:#e4393c; color:#fff; font-weight:600; margin-left:4px; vertical-align:middle; }
+
+/* 前端 H5 详情 */
+.fe-phone { width:340px; background:#fff; border-radius:28px; box-shadow:0 16px 44px rgba(0,0,0,.2); overflow:hidden; position:relative; flex-shrink:0; }
+.fe-status { height:34px; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:12px; font-weight:600; background:#fff; }
+.fe-scroll { height:560px; overflow-y:auto; position:relative; background:#f5f6fa; }
+.fe-banner { width:100%; height:210px; background:linear-gradient(135deg,#d9f2e0,#b7e4c7); display:flex; align-items:center; justify-content:center; font-size:64px; }
+.fe-body { padding:14px 16px; background:#fff; }
+.fe-price { color:#e4393c; font-size:25px; font-weight:800; }
+.fe-price small { font-size:14px; font-weight:600; }
+.fe-title { font-size:16px; font-weight:700; margin:8px 0 4px; line-height:1.4; }
+.fe-subtitle { font-size:12px; color:#999; }
+.fe-block { margin-top:14px; padding-top:14px; border-top:1px solid #f0f0f0; }
+.fe-block-tit { font-size:13px; color:#333; font-weight:600; margin-bottom:10px; }
+.fe-specs { display:flex; gap:10px; flex-wrap:wrap; }
+.fe-spec { padding:8px 18px; border:1px solid #ddd; border-radius:20px; font-size:13px; background:#f7f7f7; cursor:pointer; }
+.fe-spec.on { border-color:#e4393c; color:#e4393c; background:#fef0f0; font-weight:600; }
+.fe-spec .lock { font-size:11px; color:#e4393c; margin-left:3px; }
+.fe-buybar { position:absolute; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #eee; padding:10px 14px; display:flex; gap:10px; }
+.fe-btn-cart { flex:1; height:42px; border-radius:21px; border:1px solid #ffb800; background:#fff7e6; color:#ff9500; font-size:15px; font-weight:600; cursor:pointer; }
+.fe-btn-buy { flex:1; height:42px; border-radius:21px; border:none; background:linear-gradient(135deg,#ff6034,#e4393c); color:#fff; font-size:15px; font-weight:600; cursor:pointer; }
+
+.flat-note { max-width:1440px; margin:0 auto; padding:6px 24px 40px; }
+.flat-note .box { background:#fff; border:1px solid #e8e8e8; border-radius:10px; padding:16px 20px; font-size:13px; color:#555; line-height:1.9; }
+.flat-note .box b { color:#e4393c; }
+.flat-toast { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(.9); background:rgba(0,0,0,.78); color:#fff; padding:12px 26px; border-radius:8px; font-size:14px; z-index:999; opacity:0; transition:.25s; pointer-events:none; }
+.flat-toast.show { opacity:1; transform:translate(-50%,-50%) scale(1); }
+</style>
+</head>
+<body>
+
+<!-- 顶部条 + 一键复制 -->
+<div class="flat-topbar">
+  <div class="logo">绿韵家<span>202607期 · 平铺静态原型</span></div>
+  <div class="hint">所有页面已平铺展开 · 无需点击切换 · 点右侧按钮复制整份源码</div>
+  <button class="flat-copy-btn" id="copyAllBtn" onclick="copyAll()">📋 一键复制全部源码</button>
+</div>
+
+<!-- ============ 一、快捷支付更换（用户端 H5） ============ -->
+<div class="flat-section">
+  <div class="flat-sec-title"><span class="bar"></span>一、快捷支付更换（用户端 H5 · 完整链路）</div>
+  <div class="flat-sec-desc">用户下单 → 收银台选支付方式 → H5快捷支付表单 → 中间页（成功 / 失败 / 取消 三态）</div>
+  <div class="flat-screens">
+
+    <!-- 屏1：收银台 -->
+    <div class="phone-wrap">
+      <div class="phone"><div class="phone-screen">
+        <div class="status-bar"><span>9:41</span><span class="r">📶 📴 🔋</span></div>
+        <div class="screen">
+          <div class="scr-header"><div class="ph"></div><h1>收银台</h1><div class="ph"></div></div>
+          <div class="order-info">
+            <div class="label">支付金额</div>
+            <div class="amount"><span>¥</span>128.00</div>
+            <div class="order-no">订单号：LYJ202607211540001</div>
+          </div>
+          <div class="section-title">选择支付方式</div>
+          <div class="method-list">
+            <div class="method-item selected" data-m="quick_new">
+              <div class="method-icon mi-new">💳</div>
+              <div><div class="method-name">快捷支付</div><div class="method-desc">新通道 · 秒级到账</div></div>
+              <span class="method-tag tag-rec">推荐</span>
+              <div class="check-circle checked"></div>
+            </div>
+            <div class="method-item" data-m="wechat">
+              <div class="method-icon mi-wx">微</div>
+              <div><div class="method-name">微信支付</div><div class="method-desc">微信 8.0 以上版本</div></div>
+              <div class="check-circle"></div>
+            </div>
+            <div class="method-item" data-m="alipay">
+              <div class="method-icon mi-ali">支</div>
+              <div><div class="method-name">支付宝</div><div class="method-desc">安全快速</div></div>
+              <div class="check-circle"></div>
+            </div>
+            <div class="method-item disabled" data-m="quick_old">
+              <div class="method-icon mi-old">卡</div>
+              <div><div class="method-name">快捷支付（旧）</div><div class="method-desc">保客通道</div></div>
+              <span class="method-tag tag-off">即将下线</span>
+              <div class="check-circle"></div>
+            </div>
+          </div>
+          <div class="bottom-bar"><button>确认支付</button></div>
+        </div>
+      </div></div>
+      <div class="flat-cap">屏1 · 收银台<small>支付方式选择（快捷支付新通道推荐）</small></div>
+    </div>
+
+    <!-- 屏2：支付表单 -->
+    <div class="phone-wrap">
+      <div class="phone"><div class="phone-screen">
+        <div class="status-bar"><span>9:41</span><span class="r">📶 📴 🔋</span></div>
+        <div class="screen">
+          <div class="scr-header"><div class="back">‹</div><h1>快捷支付</h1><div class="ph"></div></div>
+          <div class="bank-card">
+            <div class="bank-row">
+              <div><span class="bank-name">招商银行</span> <span class="bank-no">****4555</span></div>
+              <button class="btn-sm">更换银行卡</button>
+              <div class="bank-type">借记卡</div>
+            </div>
+          </div>
+          <div class="info-row"><span class="info-label">付款金额</span><span class="info-value">128.00</span></div>
+          <div class="form-section">
+            <div class="form-row"><span class="form-label"><span class="form-req">*</span>手机号</span><input class="form-input" value="18307448442" maxlength="11"></div>
+            <div class="form-row"><span class="form-label"><span class="form-req">*</span>验证码</span><input class="form-input" placeholder="请输入验证码" maxlength="6"><button class="btn-sm" style="margin-left:10px">发送验证码</button></div>
+          </div>
+          <div class="pay-btn-wrap"><button class="pay-btn">立即支付</button></div>
+        </div>
+      </div></div>
+      <div class="flat-cap">屏2 · H5快捷支付表单<small>银行卡 + 手机号 + 验证码</small></div>
+    </div>
+
+    <!-- 屏3：结果-成功 -->
+    <div class="phone-wrap">
+      <div class="phone"><div class="phone-screen">
+        <div class="status-bar"><span>9:41</span><span class="r">📶 📴 🔋</span></div>
+        <div class="screen">
+          <div class="result-wrap"><div class="result-card">
+            <div class="icon-wrap icon-success">✓</div>
+            <div class="result-title rt-success">支付成功</div>
+            <div class="result-amount">付款金额：￥128.00</div>
+            <div class="result-msg">&nbsp;</div>
+            <div class="countdown">正在返回商城，3s 后自动跳转...</div>
+            <div class="rbtn-group"><button class="rbtn rbtn-primary">立即返回</button></div>
+          </div></div>
+        </div>
+      </div></div>
+      <div class="flat-cap">屏3-A · 中间页：支付成功<small>3秒倒计时自动跳回来源页</small></div>
+    </div>
+
+    <!-- 屏3：结果-失败 -->
+    <div class="phone-wrap">
+      <div class="phone"><div class="phone-screen">
+        <div class="status-bar"><span>9:41</span><span class="r">📶 📴 🔋</span></div>
+        <div class="screen">
+          <div class="result-wrap"><div class="result-card">
+            <div class="icon-wrap icon-fail">✗</div>
+            <div class="result-title rt-fail">支付失败</div>
+            <div class="result-amount">付款金额：￥128.00</div>
+            <div class="result-msg">余额不足，请更换银行卡或稍后重试</div>
+            <div class="rbtn-group"><button class="rbtn rbtn-danger">重新支付</button><button class="rbtn rbtn-default">返回订单</button></div>
+          </div></div>
+        </div>
+      </div></div>
+      <div class="flat-cap">屏3-B · 中间页：支付失败<small>展示原因 + 重试 / 返回</small></div>
+    </div>
+
+    <!-- 屏3：结果-取消 -->
+    <div class="phone-wrap">
+      <div class="phone"><div class="phone-screen">
+        <div class="status-bar"><span>9:41</span><span class="r">📶 📴 🔋</span></div>
+        <div class="screen">
+          <div class="result-wrap"><div class="result-card">
+            <div class="icon-wrap icon-cancel">⊘</div>
+            <div class="result-title rt-cancel">支付已取消</div>
+            <div class="result-amount">付款金额：￥128.00</div>
+            <div class="result-msg">您已取消本次支付</div>
+            <div class="rbtn-group"><button class="rbtn rbtn-primary">返回订单</button></div>
+          </div></div>
+        </div>
+      </div></div>
+      <div class="flat-cap">屏3-C · 中间页：取消支付<small>用户主动放弃 + 返回订单</small></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ 二、商品管理后台 · 商品列表页 ============ -->
+<div class="flat-section">
+  <div class="flat-sec-title"><span class="bar"></span>二、商品管理后台 · 商品列表页</div>
+  <div class="flat-sec-desc">参考绿韵家已有后台风格：筛选栏（分类/采购主体/品牌/状态/编号/名称）+ 商品数据表格 + 分页</div>
+  <div class="flat-admin">
+    <div class="admin-layout">
+      <aside class="sidebar">
+        <div class="sidebar-brand">绿韵家管理系统</div>
+        <div class="nav-group"><div class="nav-group-tit">运营中心</div>
+          <div class="nav-item"><span class="nav-icon">📦</span>套餐管理</div>
+          <div class="nav-item active"><span class="nav-icon">🛒</span>商品管理</div>
+          <div class="nav-item"><span class="nav-icon">📡</span>权益管理</div>
+          <div class="nav-item"><span class="nav-icon">👥</span>权益用户</div>
+        </div>
+        <div class="nav-group"><div class="nav-group-tit">水权站</div>
+          <div class="nav-item"><span class="nav-icon">🔄</span>补水管理</div>
+        </div>
+        <div class="nav-group"><div class="nav-group-tit">系统</div>
+          <div class="nav-item"><span class="nav-icon">⚙️</span>权限设置</div>
+        </div>
+      </aside>
+      <main class="admin-main">
+        <header class="topbar">
+          <div class="tb-tab">基础管理</div>
+          <div class="tb-tab">套餐管理</div>
+          <div class="tb-tab active tb-tab-red">商品管理</div>
+          <div class="tb-tab">新增商品</div>
+          <div class="tb-tab">📱 前端购买效果</div>
+          <div class="tb-spacer"></div>
+          <button class="tb-action btn-red">发布</button>
+          <button class="tb-action btn-white">申请品牌</button>
+          <button class="tb-action btn-white">查看</button>
+        </header>
+        <div class="admin-content">
+          <div class="page-head"><h2>商品管理</h2><span class="page-tip">已筛选 <b style="color:#e4393c">0</b> 条</span></div>
+          <div class="filter-section">
+            <div class="filter-tabs">
+              <div class="ftab active">已上架(<span class="fcount">0</span>)</div>
+              <div class="ftab">已下架(<span class="fcount">1</span>)</div>
+              <div class="ftab">待评价的价</div>
+            </div>
+            <div class="filter-body">
+              <div class="fi"><label>商品分类</label><select><option>请选择分类</option><option>食品保健</option><option>美妆个护</option></select></div>
+              <div class="fi"><label>采购主体</label><select><option>请选择</option><option>惠有所有下级</option></select></div>
+              <div class="fi"><label>品牌</label><input placeholder="品牌"></div>
+              <div class="fi"><label>商品状态</label><select><option>全部</option><option>上架</option><option>下架</option></select></div>
+              <div class="fi"><label>商品编号</label><input placeholder="商品编号"></div>
+              <div class="fi"><label>商品名称</label><input placeholder="商品名称"></div>
+              <button class="fi-btn">搜索</button>
+              <button class="fi-btn" style="border-color:#e4393c;color:#e4393c">添加筛选</button>
+            </div>
+          </div>
+          <div class="data-table">
+            <table>
+              <thead><tr><th style="width:34px"><input type="checkbox"></th><th>商品编号</th><th style="min-width:200px">商品信息</th><th>品牌分类</th><th>采购主体</th><th>商品状态</th><th>库存</th><th>销量</th><th>售价</th><th>推荐 ⬆</th><th>销量 ⬇</th><th>创建时间</th><th>操作标签</th><th style="min-width:130px">操作</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td>888</td>
+                  <td>
+                    <div style="display:flex;gap:10px;align-items:center">
+                      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23e8f5e9'/%3E%3Cpath d='M32 12c-8 0-16 8-16 18s8 18 16 18 16-8 16-18-8-18-16-18zm0 32c-7.7 0-14-6.3-14-14S24.3 16 32 16s14 6.3 14 14-6.3 14-14 14z' fill='%234caf50'/%3E%3C/svg%3E" class="td-img">
+                      <div><div class="td-name">222222</div><div class="td-sub">绿韵家测试本商品</div></div>
+                    </div>
+                  </td>
+                  <td>后端/水果蔬菜<br><span style="color:#999;font-size:11.5px">公域: 食品相关交叉支持</span></td>
+                  <td>惠有补<br><span style="color:#999;font-size:11.5px">未上线店</span></td>
+                  <td><span style="color:#52c41a">●</span> 上架</td>
+                  <td style="color:#1677ff;text-decoration:underline">8.2</td>
+                  <td style="color:#1677ff;text-decoration:underline">9.2</td>
+                  <td>—</td><td>⚪</td><td>1</td>
+                  <td>2026-06-30 09:00<br>2026-07-01 05:00</td>
+                  <td><span style="background:#f0f0f0;padding:2px 6px;border-radius:3px;font-size:11px;color:#999">品控完成/审核<br>待打标/审核<br>单据</span></td>
+                  <td>
+                    <span class="tag-op to-edit">查看</span>
+                    <span class="tag-op to-edit">编辑</span>
+                    <span class="tag-op to-on">上架</span>
+                    <span class="tag-op to-del">下架</span>
+                    <span class="tag-op">复制</span>
+                    <span class="tag-op to-del">删除</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="pagination">
+              <span>共 1 条</span><span>10条/页</span><button class="pg-btn active">1</button>
+              <span style="margin-left:auto">跳至 <input style="width:36px;border:1px solid #d9d9d9;border-radius:3px;padding:2px 4px;text-align:center;font-size:12px"> 页</span>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 三、商品管理后台 · 新增/编辑页（含购买级别） ============ -->
+<div class="flat-section">
+  <div class="flat-sec-title"><span class="bar"></span>三、商品管理后台 · 新增/编辑页<span class="hl-new">NEW 购买级别</span></div>
+  <div class="flat-admin">
+    <div class="admin-layout">
+      <aside class="sidebar">
+        <div class="sidebar-brand">绿韵家管理系统</div>
+        <div class="nav-group"><div class="nav-group-tit">运营中心</div>
+          <div class="nav-item"><span class="nav-icon">📦</span>套餐管理</div>
+          <div class="nav-item active"><span class="nav-icon">🛒</span>商品管理</div>
+          <div class="nav-item"><span class="nav-icon">📡</span>权益管理</div>
+          <div class="nav-item"><span class="nav-icon">👥</span>权益用户</div>
+        </div>
+      </aside>
+      <main class="admin-main">
+        <header class="topbar">
+          <div class="tb-tab">基础管理</div>
+          <div class="tb-tab">套餐管理</div>
+          <div class="tb-tab">商品管理</div>
+          <div class="tb-tab active tb-tab-red">新增商品</div>
+          <div class="tb-spacer"></div>
+        </header>
+        <div class="admin-content form-page">
+          <!-- 基础信息 -->
+          <div class="sec-block">
+            <div class="sec-head">基础信息</div>
+            <div class="sec-body">
+              <div class="fl-row"><div class="fl-label">分类</div><div class="fl-field"><select class="fl-sel"><option>查看 / 编辑 / 20%折扣</option></select></div></div>
+              <div class="fl-row"><div class="fl-label">品牌</div><div class="fl-field"><select class="fl-sel"><option>请选择品牌</option></select></div></div>
+              <div class="fl-row"><div class="fl-label"><span class="req">*</span>商品编号</div><div class="fl-field"><input class="fl-in" value="222222" readonly style="background:#f5f5f5"></div></div>
+              <div class="fl-row"><div class="fl-label">商品类型</div><div class="fl-field"><div class="type-tags"><span class="type-tag on-red">● 非虚拟商品</span><span class="type-tag">☐ 虚拟商品</span><span class="type-tag">☐ 有券</span><span class="type-tag">☐ 普通</span></div></div></div>
+              <div class="fl-row"><div class="fl-label">运费类型</div><div class="fl-field"><div class="type-tags"><span class="type-tag on-red">● 卖家包邮</span><span class="type-tag">☐ 秒杀</span><span class="type-tag">☐ 新人福利</span><span class="type-tag on-red">● 满减活动</span><span class="type-tag">☐ 退货包退</span></div></div></div>
+              <div class="fl-row"><div class="fl-label">限购时间</div><div class="fl-field"><input class="fl-in" value="2026-06-30 00:00:00" style="width:170px"> ~ <input class="fl-in" value="2026-07-01 00:00:00" style="width:170px"></div></div>
+              <div class="fl-row"><div class="fl-label"><span class="req">*</span>起购数量</div><div class="fl-field"><div class="num-ctrl"><button>-</button><input value="1"><button>+</button></div></div></div>
+              <div class="fl-row"><div class="fl-label"><span class="req">*</span>限购数量</div><div class="fl-field"><div class="num-ctrl"><button>-</button><input value="1"><button>+</button></div></div></div>
+              <div class="fl-row"><div class="fl-label">商品描述</div><div class="fl-field"><textarea class="fl-textarea"></textarea></div></div>
+              <div class="fl-row"><div class="fl-label">备注</div><div class="fl-field"><textarea class="fl-textarea" placeholder="用户产品描述，仅对内可见"></textarea><span class="fl-hint">0/99</span></div></div>
+            </div>
+          </div>
+          <!-- 商品规格 ★ 含购买级别 -->
+          <div class="sec-block">
+            <div class="sec-head">商品规格 <span class="hl-new">NEW 购买级别</span></div>
+            <div class="sec-body">
+                <div class="spec-area">
+                <div class="spec-row"><span class="spec-name">* 规格名</span><select class="fl-sel" style="width:180px"><option>装量（自定义规格名称）</option></select></div>
+                <div class="spec-row" style="padding-left:78px">
+                  <input class="spec-val-in" value="标准装">
+                  <span class="buy-level-label">购买级别(≥)</span>
+                  <select class="buy-level-sel"><option value="0" selected>不限制</option><option value="1">普通会员</option><option value="2">高级会员</option><option value="3">VIP会员</option><option value="4">至尊会员</option></select>
+                  <span style="color:#e4393c;font-size:12px">上传规格图片</span>
+                  <span class="spec-del">✕</span>
+                </div>
+                <div class="spec-row" style="padding-left:78px;background:#fef0f0;border-radius:6px;border-bottom:none">
+                  <input class="spec-val-in" value="豪华装">
+                  <span class="buy-level-label">购买级别(≥)</span>
+                  <select class="buy-level-sel" style="border-color:#e4393c"><option value="0">不限制</option><option value="1">普通会员</option><option value="2" selected>高级会员</option><option value="3">VIP会员</option><option value="4">至尊会员</option></select>
+                  <span style="color:#e4393c;font-size:12px">上传规格图片</span>
+                  <span class="spec-del">✕</span>
+                </div>
+                <div class="spec-add-sub">⊕ 添加规格值</div>
+              </div>
+              <div class="spec-new-link">⊕ 创建新规格</div>
+              <div style="margin-top:20px">
+                <div style="font-size:14px;font-weight:700;margin-bottom:10px">规格价格与库存</div>
+                <table class="price-table">
+                  <thead><tr><th>规格</th><th>市场价</th><th>销售价</th><th>积分</th><th>PV值</th><th>初始价</th><th>库存</th><th>商品编码</th></tr></thead>
+                  <tbody>
+                    <tr><td>标准装-S</td><td><input value="1"></td><td><input value="99"></td><td><input value="0"></td><td><input value="0"></td><td><input value="0"></td><td><input value="100"></td><td><input placeholder=""></td></tr>
+                    <tr style="background:#fef0f0"><td>豪华装-L</td><td><input value="1"></td><td><input value="199"></td><td><input value="0"></td><td><input value="0"></td><td><input value="0"></td><td><input value="50"></td><td><input placeholder=""></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div style="margin-top:20px;border-top:1px solid #f0f0f0;padding-top:16px">
+                <div class="img-group-title">* 商品详情图</div>
+                <div class="img-group"><div class="img-upload-area"><div class="plus">+</div><div class="txt">上传</div></div></div>
+                <div class="img-hint">要求上传1张，限制单张图规格800x800AU；建议尺寸：750*750 像素</div>
+              </div>
+            </div>
+            <div class="form-footer"><button class="btn-cancel">取消</button><button class="btn-submit">提交</button></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 四、前端购买效果（H5 · 受限规格拦截提示） ============ -->
+<div class="flat-section">
+  <div class="flat-sec-title"><span class="bar"></span>四、前端购买效果（H5 · 受限规格拦截）</div>
+  <div class="flat-screens">
+    <div class="phone-wrap">
+      <div class="fe-phone">
+        <div class="fe-status"><span>9:41</span><span>📶 📴 🔋</span></div>
+        <div class="fe-scroll">
+          <div class="fe-banner">🧴</div>
+          <div class="fe-body">
+            <div class="fe-price"><small>¥</small>99<small> 起</small></div>
+            <div class="fe-title">绿韵家 天然植物洗护套装</div>
+            <div class="fe-subtitle">绿韵家自营 · 满900元赠水卡</div>
+            <div class="fe-block">
+              <div class="fe-block-tit">选择规格</div>
+              <div class="fe-specs">
+                <div class="fe-spec" onclick="pickSpec(this,0)">标准装</div>
+                <div class="fe-spec on" onclick="pickSpec(this,2)">豪华装</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="fe-buybar">
+          <button class="fe-btn-cart" onclick="tryBuy('cart')">加入购物车</button>
+          <button class="fe-btn-buy" onclick="tryBuy('buy')">立即购买</button>
+        </div>
+      </div>
+      <div class="flat-cap">前端商品详情 · 选中受限规格后点加购/购买提示</div>
+    </div>
+  </div>
+</div>
+
+<div class="flat-note">
+  <div class="box">
+    <b>说明：</b>本页为「平铺静态版」原型，所有页面一次性铺开、无需点击切换，便于评审与截图。需要真实点击流转的交互演示，请打开 <b>prototype-all.html</b>（整合交互版）。点击顶部「📋 一键复制全部源码」可直接复制本页完整 HTML 交付开发。
+  </div>
+</div>
+
+<div class="flat-toast" id="flatToast"></div>
+
+<script>
+/* 平铺版仅保留一个功能：一键复制本页完整源码 */
+function copyAll(){
+  var src = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+  var done = function(){
+    var b=document.getElementById('copyAllBtn');
+    b.textContent='✅ 已复制全部源码！'; b.classList.add('copied');
+    flatToast('已复制整份 HTML 源码到剪贴板');
+    setTimeout(function(){ b.textContent='📋 一键复制全部源码'; b.classList.remove('copied'); },2200);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(src).then(done).catch(function(){ fallback(src); done(); });
+  } else { fallback(src); done(); }
+}
+function fallback(text){
+  var ta=document.createElement('textarea'); ta.value=text;
+  ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta);
+  ta.select(); try{ document.execCommand('copy'); }catch(e){} document.body.removeChild(ta);
+}
+function flatToast(m){
+  var t=document.getElementById('flatToast'); t.textContent=m; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(function(){ t.classList.remove('show'); },1800);
+}
+/* 前端购买级别拦截（仅加购/购买时提示） */
+var FE_MEMBER_LEVEL = 1;
+var LEVEL_NAME = {2:'高级会员',3:'VIP会员',4:'至尊会员'};
+var feSpecLevel = 2;
+function pickSpec(el, level){
+  document.querySelectorAll('.fe-spec').forEach(function(s){ s.classList.remove('on'); });
+  el.classList.add('on');
+  feSpecLevel = level;
+}
+function tryBuy(mode){
+  if(feSpecLevel > FE_MEMBER_LEVEL){
+    flatToast('该商品仅限'+(LEVEL_NAME[feSpecLevel]||'高级会员')+'及以上才能购买');
+    return;
+  }
+  flatToast(mode==='cart' ? '已加入购物车' : '正在下单...');
+}
+</script>
+</body>
+</html>
