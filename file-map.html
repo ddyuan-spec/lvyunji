@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文件对应导航 · 绿韵家 202607期 V4.0</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:#eef0f4;color:#333;padding:20px}
+h1{font-size:20px;font-weight:800;margin-bottom:6px}
+.sub{font-size:12px;color:#999;margin-bottom:24px}
+
+/* Word路径卡片 */
+.word-box{background:linear-gradient(135deg,#1677ff,#0958d9);color:#fff;border-radius:10px;padding:18px 22px;margin-bottom:20px}
+.word-box h3{font-size:15px;font-weight:700;margin-bottom:12px}
+.word-item{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px}
+.word-path{font-family:Consolas,monospace;background:rgba(255,255,255,.15);padding:4px 10px;border-radius:4px;flex:1;word-break:break-all;cursor:pointer}
+.word-item .lbl{white-space:nowrap;font-size:12px;opacity:.8}
+
+/* 卡片 */
+.card{background:#fff;border-radius:8px;border:1px solid #e0e0e0;margin-bottom:16px;overflow:hidden}
+.card-head{background:#f8f9fa;padding:12px 18px;font-size:15px;font-weight:700;border-bottom:1px solid #eee;display:flex;align-items:center;gap:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#fafafa;padding:10px 14px;text-align:left;font-weight:600;color:#666;border-bottom:1px solid #eee;white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid #f5f5f5;vertical-align:top}
+tr:hover td{background:#fafafa}
+.file-link{color:#1677ff;text-decoration:none;font-weight:500;cursor:pointer}
+.file-link:hover{text-decoration:underline}
+.fname{font-size:11.5px;color:#999;display:block;margin-top:2px}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.tag-pay{background:#e6f4ff;color:#1677ff;border:1px solid #91caff}
+.tag-goods{background:#f0fdf4;color:#16a34a;border:1px solid #86efac}
+.tag-doc{background:#fef9e9;color:#ad6800;border:1px solid #ffe58f}
+.tag-del{background:#f5f5f5;color:#999;border:1px solid #ddd;text-decoration:line-through}
+.tree-box{background:#1e1e1e;color:#d4d4d4;padding:16px 20px;border-radius:8px;font-family:Consolas,monospace;font-size:12.5px;line-height:1.7;overflow-x:auto}
+.footer{text-align:center;padding:16px;font-size:12px;color:#bbb}
+</style>
+</head>
+<body>
+
+<h1>📋 文件对应导航 <span style="font-size:13px;font-weight:400;color:#999">V4.0</span></h1>
+<div class="sub">绿韵家 202607期 — 功能点 ↔ PRD 章节 ↔ 原型文件 一一对应（点击链接打开）</div>
+
+<!-- 本地Word路径 -->
+<div class="word-box">
+  <h3>📄 本地 Word 文档绝对路径（复制到资源管理器地址栏可直接打开）</h3>
+  <div class="word-item"><span class="lbl">PRD文档:</span><span class="word-path" onclick="this.selectText?.();document.execCommand('selectAll')">C:\Users\13364\WorkBuddy\绿韵家\PRD-绿韵家202607期.docx</span></div>
+  <div class="word-item"><span class="lbl">导航文档:</span><span class="word-path" onclick="this.selectText?.();document.execCommand('selectAll')">C:\Users\13364\WorkBuddy\绿韵家\文件对应导航.docx</span></div>
+</div>
+
+<!-- 主表 -->
+<div class="card">
+  <div class="card-head">📋 功能点 → PRD章节 → 文件 对应总表</div>
+  <table>
+    <thead><tr><th>#</th><th>功能点</th><th>PRD章节</th><th>原型/文件</th><th>类型</th><th>V4.0状态</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>D.3</td>
+        <td>快捷支付更换·用户端链路</td>
+        <td>§D.3</td>
+        <td>
+          <a class="file-link" href="prototypes/prototype-all.html">prototypes/prototype-all.html</a><br>
+          <span class="fname">「💳 快捷支付链路」Tab → 手机壳内收银台→表单→结果三态 + 右侧场景切换 + 📋源码复制</span>
+        </td>
+        <td><span class="tag tag-pay">支付链路</span></td>
+        <td>保留</td>
+      </tr>
+      <tr>
+        <td>D.5</td>
+        <td>商品规格增加购买级别字段</td>
+        <td>§D.5</td>
+        <td>
+          <a class="file-link" href="prototypes/prototype-all.html">prototypes/prototype-all.html</a><br>
+          <span class="fname">「🛒 商品管理」Tab → 列表页 / 新增编辑页(商品规格区含<span style="color:#e4393c">购买级别≥下拉</span>) / 拦截弹窗预览</span>
+        </td>
+        <td><span class="tag tag-goods">商品管理</span></td>
+        <td><b style="color:#e4393c">新增</b></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 文档类 -->
+<div class="card">
+  <div class="card-head">📄 文档与汇总类文件</div>
+  <table>
+    <thead><tr><th style="width:38px">#</th><th style="width:170px">文件用途</th><th style="width:80px">类型</th><th style="width:320px">文件路径</th><th style="width:90px">说明</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>—</td>
+        <td>PRD 需求文档</td>
+        <td>Word ★</td>
+        <td>
+          <span class="fname">C:\Users\13364\WorkBuddy\绿韵家\PRD-绿韵家202607期.docx</span>
+        </td>
+        <td><span class="tag tag-doc">主文档V4.0</span></td>
+      </tr>
+      <tr>
+        <td>—</td>
+        <td>PRD 需求文档</td>
+        <td>Markdown</td>
+        <td><a class="file-link" href="PRD-绿韵家202607期.md">PRD-绿韵家202607期.md</a><br><span class="fname">A~I 完整结构 · D.4已删除/D.5重写为商品管理</span></td>
+        <td><span class="tag tag-doc">Markdown版</span></td>
+      </tr>
+      <tr>
+        <td>—</td>
+        <td>文件对应导航</td>
+        <td>Word ★</td>
+        <td><span class="fname">C:\Users\13364\WorkBuddy\绿韵家\文件对应导航.docx</span></td>
+        <td><span class="tag tag-doc">导航V4.0</span></td>
+      </tr>
+      <tr>
+        <td>—</td>
+        <td>原型入口页</td>
+        <td>HTML</td>
+        <td><a class="file-link" href="index.html">index.html</a><br><span class="fname">指向整合原型+本地Word路径</span></td>
+        <td>入口页</td>
+      </tr>
+      <tr>
+        <td>—</td>
+        <td>整合交互原型（唯一）</td>
+        <td>HTML</td>
+        <td><a class="file-link" href="prototypes/prototype-all.html">prototypes/prototype-all.html</a><br><span class="fname">💳支付链路三态+🛒商品管理全流程+📋中间页源码复制</span></td>
+        <td>⭐ 唯一原型</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 不做项 -->
+<div class="card" style="border-color:#ffd8d8">
+  <div class="card-head">❌ 本期不做项</div>
+  <table>
+    <tbody>
+      <tr><td style="color:#e4393c;width:30px">✗</td><td>D.4 筛选项字典管理 — 已从本期移除，原型和PRD均已删除</td></tr>
+      <tr><td style="color:#e4393c;width:30px">✗</td><td>海报管理 — 本期不做</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 目录树 -->
+<div class="card">
+  <div class="card-head">📂 目录结构（根目录：C:\Users\13364\WorkBuddy\绿韵家\）</div>
+  <div class="tree-box">绿韵家\
+├── PRD-绿韵家202607期.md            ← PRD Markdown 版
+├── PRD-绿韵家202607期.docx          ← PRD Word 版 ★
+├── index.html                       ← 原型入口页
+├── file-map.html                    ← 本导航表
+├── 文件对应导航.docx                ← 导航 Word 版 ★
+└── prototypes\
+    └── prototype-all.html           ← 整合版交互原型（唯一）
+                                       · 💳 快捷支付链路（收银台/表单/结果三态+源码复制）
+                                       · 🛒 商品管理（列表页+新增编辑页+购买级别≥字段+拦截弹窗）</div>
+</div>
+
+<div class="footer">绿韵家 202607期 V4.0 · 生成时间 2026-07-21</div>
+
+</body>
+</html>
