@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>绿韵家 App · 版本更新原型</title>
+<link rel="stylesheet" href="../kb/design-spec/lvyun-app-design-base.css">
+<style>
+  *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+  body{font-family:var(--lv-font); background:#e9ebee; color:var(--lv-text-2);}
+  .phone{width:375px; min-height:812px; margin:20px auto; background:var(--lv-bg); position:relative; display:flex; flex-direction:column; box-shadow:0 0 30px rgba(0,0,0,.12); overflow:hidden;}
+  .statusbar{height:44px; background:#fff; display:flex; align-items:center; justify-content:space-between; padding:0 16px; font-size:14px; font-weight:600; color:#1A211E; flex-shrink:0;}
+  .statusbar .icons{display:flex; gap:5px; align-items:center; font-size:12px;}
+  .scroll{flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:20px;}
+
+  .panel{background:#fff; border-radius:14px; padding:18px; margin-bottom:16px; box-shadow:0 1px 4px rgba(0,0,0,.04);}
+  .panel h3{font-size:15px; font-weight:800; color:var(--lv-text-1); margin-bottom:12px;}
+  .row{display:flex; align-items:center; justify-content:space-between; margin:10px 0; font-size:13px;}
+  .row label{color:var(--lv-text-3);}
+  .row span{color:var(--lv-text-2); font-weight:600;}
+  .btn{width:100%; height:44px; border-radius:22px; border:none; font-size:15px; font-weight:700; cursor:pointer; margin-top:10px;}
+  .btn-primary{background:var(--lv-primary); color:#fff;}
+  .btn-default{background:#f5f5f5; color:var(--lv-text-2);}
+
+  .mask{position:fixed; top:0; left:0; right:0; bottom:0; background:var(--lv-mask); z-index:100; display:none; align-items:center; justify-content:center;}
+  .mask.show{display:flex;}
+  .popup{width:300px; background:#fff; border-radius:var(--lv-radius-lg); padding:24px 20px 20px; text-align:center; position:relative;}
+  .popup .close{position:absolute; top:10px; right:10px; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--lv-text-3); cursor:pointer; font-size:18px;}
+  .popup .icon{font-size:48px; margin-bottom:10px;}
+  .popup .title{font-size:17px; font-weight:800; color:var(--lv-text-1); margin-bottom:6px;}
+  .popup .version{font-size:13px; color:var(--lv-primary); margin-bottom:12px;}
+  .popup .content{font-size:13px; color:var(--lv-text-3); line-height:1.6; text-align:left; margin-bottom:18px;}
+  .popup .actions{display:flex; flex-direction:column; gap:10px;}
+  .popup .actions.horizontal{flex-direction:row;}
+  .popup .actions.horizontal .btn{margin-top:0;}
+
+  .toast{position:fixed; left:50%; top:45%; transform:translate(-50%,-50%) scale(0); background:rgba(0,0,0,.75); color:#fff; padding:10px 18px; border-radius:8px; font-size:13px; z-index:200; transition:transform .2s;}
+  .toast.show{transform:translate(-50%,-50%) scale(1);}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="statusbar">
+    <span>9:41</span>
+    <span class="icons"><span>5G</span><span>100%</span></span>
+  </div>
+  <div class="scroll">
+    <div class="panel">
+      <h3>版本更新测试面板</h3>
+      <div class="row"><label>当前版本</label><span>V1.1.0</span></div>
+      <div class="row"><label>服务器最新版本</label><span>V1.2.0</span></div>
+      <div class="row"><label>最低兼容版本</label><span>V1.1.5</span></div>
+      <button class="btn btn-primary" onclick="showForce()">模拟强制更新</button>
+      <button class="btn btn-primary" style="margin-top:10px;" onclick="showNormal()">模拟非强制更新</button>
+    </div>
+
+    <div class="panel">
+      <h3>更新说明示例</h3>
+      <div class="content" style="margin-bottom:0;">
+        1. 全新 AI 健康问答入口「数智」上线<br>
+        2. 首页支持瀑布流推荐，选品更便捷<br>
+        3. 修复已知问题，提升稳定性
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 强制更新弹窗 -->
+<div class="mask" id="forceMask">
+  <div class="popup">
+    <div class="icon">🚀</div>
+    <div class="title">版本过低，请升级</div>
+    <div class="version">V1.2.0</div>
+    <div class="content">
+      当前版本 V1.1.0 已停止服务，请升级到最新版本继续使用。<br><br>
+      更新内容：<br>
+      1. 新增 AI 健康问答<br>
+      2. 首页瀑布流推荐<br>
+      3. 修复已知问题
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="toast('跳转应用商店下载')">立即更新</button>
+    </div>
+  </div>
+</div>
+
+<!-- 非强制更新弹窗 -->
+<div class="mask" id="normalMask">
+  <div class="popup">
+    <div class="close" onclick="hideNormal()">×</div>
+    <div class="icon">✨</div>
+    <div class="title">发现新版本</div>
+    <div class="version">V1.2.0</div>
+    <div class="content">
+      更新内容：<br>
+      1. 新增 AI 健康问答入口「数智」<br>
+      2. 首页支持瀑布流推荐，选品更便捷<br>
+      3. 修复已知问题，提升稳定性
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="toast('跳转应用商店下载')">立即更新</button>
+      <button class="btn btn-default" onclick="hideNormal(); toast('今日不再提示')">暂不更新</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+function showForce(){document.getElementById('forceMask').classList.add('show');}
+function showNormal(){document.getElementById('normalMask').classList.add('show');}
+function hideForce(){document.getElementById('forceMask').classList.remove('show');}
+function hideNormal(){document.getElementById('normalMask').classList.remove('show');}
+function toast(text){
+  var t=document.getElementById('toast');
+  t.textContent=text; t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},1600);
+}
+</script>
+</body>
+</html>
