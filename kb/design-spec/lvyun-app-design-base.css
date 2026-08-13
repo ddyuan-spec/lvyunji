@@ -1,0 +1,110 @@
+/* ============================================================
+   绿韵家 App 设计基准 (Design Baseline)
+   ============================================================
+   来源：绿韵家 App 设计规范导出（0812 版，设计工具整页 CSS 导出）
+   覆盖屏幕：绿韵家 / 更多 / 积分商城 / 消息 / 我的
+            / 数智 / 数智-对话页面 / 我的-数商服务
+   原始逐屏坐标导出：同目录「绿韵家APP设计规范导出.css」（56K 行，仅供核对，不直接套用）
+   ------------------------------------------------------------
+   用法：
+     1) App 原型 HTML <head> 中 <link rel="stylesheet" href=".../lvyun-app-design-base.css">
+     2) 样式统一用 var(--lv-*) 变量，禁止在原型里硬编码本文件已定义的颜色/字号/圆角
+     3) 字号/字重/圆角取值优先从下方变量挑，不要随意新增未定义的值
+   ============================================================ */
+
+:root {
+  /* ============ 品牌色 ============ */
+  --lv-primary: #2EBC87;          /* 主品牌绿：按钮 / 选中态 / 主操作 */
+  --lv-primary-deep: #42AB6B;     /* 深品牌绿：强调文字 / 激活标签 */
+  --lv-primary-light: #E2FCF3;    /* 品牌绿浅底（约 10% 透明） */
+  --lv-primary-tint: #F4FBF9;     /* 品牌绿极浅底 */
+
+  /* ============ 文字色 ============ */
+  --lv-text-1: #1A211E;           /* 一级文字（近黑，标题/重点） */
+  --lv-text-2: #333333;           /* 正文 */
+  --lv-text-3: #666666;           /* 次要文字 */
+  --lv-text-4: #999999;           /* 辅助 / 占位符 */
+  --lv-text-disabled: #CCCCCC;    /* 禁用 */
+
+  /* ============ 背景 / 分割线 ============ */
+  --lv-bg: #FFFFFF;               /* 页面主背景 */
+  --lv-bg-grey: #F8F8F8;          /* 浅灰背景 */
+  --lv-bg-grey-2: #F5F6F5;
+  --lv-bg-grey-3: #F1F1F1;
+  --lv-divider: #EEEEEE;          /* 分割线（最常用） */
+  --lv-divider-strong: #D9D9D9;   /* 较强分割线 */
+  --lv-mask: rgba(0, 0, 0, 0.5);  /* 弹窗遮罩 */
+
+  /* ============ 状态 / 强调色 ============ */
+  --lv-price: #FF4D00;            /* 价格 / 促销 橙红 */
+  --lv-red: #FF5656;              /* 警示红 */
+  --lv-red-deep: #F53F3F;
+  --lv-orange: #FF8810;           /* 橙（徽标/标签） */
+  --lv-yellow: #FFDA00;           /* 黄（积分/星标） */
+  --lv-blue: #279AC5;             /* 蓝（链接/信息） */
+  --lv-blue-2: #3490F9;
+  --lv-teal: #0FC6C2;             /* 青（次要品牌/图标） */
+  --lv-purple: #E13EDB;           /* 紫（活动/特殊） */
+
+  /* ============ 圆角 ============ */
+  --lv-radius-xs: 2px;            /* 细元素 */
+  --lv-radius-sm: 4px;
+  --lv-radius: 8px;              /* 卡片默认 */
+  --lv-radius-lg: 16px;          /* 大卡片 / 弹窗 */
+  --lv-radius-pill: 100px;       /* 胶囊按钮 / 标签 */
+  --lv-radius-round: 222px;      /* 圆形头像 */
+
+  /* ============ 字号（px） ============ */
+  --lv-fs-caption: 11px;         /* 角标 / 极辅助 */
+  --lv-fs-xs: 12px;              /* 辅助说明 */
+  --lv-fs-sm: 13px;
+  --lv-fs-base: 14px;            /* 正文基准 */
+  --lv-fs-md: 16px;             /* 次级标题 */
+  --lv-fs-lg: 18px;
+  --lv-fs-xl: 20px;
+  --lv-fs-2xl: 24px;            /* 区块大标题 */
+  --lv-fs-price: 28px;          /* 大价格数字 */
+  --lv-fs-hero: 72px;           /* 巨号（极少用） */
+
+  /* ============ 字重 ============ */
+  --lv-fw-regular: 400;
+  --lv-fw-medium: 500;
+  --lv-fw-semibold: 600;
+  --lv-fw-bold: 700;
+
+  /* ============ 字体族 ============ */
+  --lv-font: 'PingFang SC', 'PingFang HK', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  --lv-font-num: 'DIN Alternate', 'D-DIN-PRO', 'DIN Pro', 'PingFang SC', sans-serif;   /* 数字 / 价格 */
+  --lv-font-logo: 'LogoSC Unbounded Sans', 'Alimama ShuHeiTi', sans-serif;             /* Logo / 展示字 */
+}
+
+/* ============ 通用基础类（原型可直接用） ============ */
+.lv-page {
+  box-sizing: border-box;
+  width: 375px;                 /* 标准 iPhone 逻辑宽度 */
+  min-height: 812px;
+  margin: 0 auto;
+  background: var(--lv-bg);
+  font-family: var(--lv-font);
+  color: var(--lv-text-2);
+  font-size: var(--lv-fs-base);
+  font-weight: var(--lv-fw-regular);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.lv-title { font-size: var(--lv-fs-md); font-weight: var(--lv-fw-semibold); color: var(--lv-text-1); }
+.lv-title-lg { font-size: var(--lv-fs-2xl); font-weight: var(--lv-fw-bold); color: var(--lv-text-1); }
+.lv-sub { font-size: var(--lv-fs-xs); color: var(--lv-text-4); }
+.lv-card { background: var(--lv-bg); border-radius: var(--lv-radius); padding: 12px; }
+.lv-divider { height: 1px; background: var(--lv-divider); border: 0; margin: 0; }
+.lv-btn-primary {
+  background: var(--lv-primary); color: #fff; border: 0;
+  border-radius: var(--lv-radius-pill); font-size: var(--lv-fs-base);
+  font-weight: var(--lv-fw-medium); padding: 12px 0; width: 100%; cursor: pointer;
+}
+.lv-btn-primary:disabled { background: var(--lv-text-disabled); cursor: not-allowed; }
+.lv-price { color: var(--lv-price); font-family: var(--lv-font-num); font-weight: var(--lv-fw-bold); }
+.lv-tag {
+  display: inline-block; background: var(--lv-primary-light); color: var(--lv-primary-deep);
+  font-size: var(--lv-fs-caption); border-radius: var(--lv-radius-sm); padding: 2px 6px;
+}
