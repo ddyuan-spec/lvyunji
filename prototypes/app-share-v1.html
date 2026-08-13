@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>绿韵家 App · 分享原型</title>
+<link rel="stylesheet" href="../kb/design-spec/lvyun-app-design-base.css">
+<style>
+  *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+  body{font-family:var(--lv-font); background:#e9ebee; color:var(--lv-text-2);}
+  .phone{width:375px; min-height:812px; margin:20px auto; background:var(--lv-bg); position:relative; display:flex; flex-direction:column; box-shadow:0 0 30px rgba(0,0,0,.12); overflow:hidden;}
+  .statusbar{height:44px; background:#fff; display:flex; align-items:center; justify-content:space-between; padding:0 16px; font-size:14px; font-weight:600; color:#1A211E; flex-shrink:0;}
+  .statusbar .icons{display:flex; gap:5px; align-items:center; font-size:12px;}
+  .scroll{flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:16px;}
+
+  .goods-card{background:#fff; border-radius:14px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.04);}
+  .goods-card .img{height:240px; background:linear-gradient(135deg,#EAF6EF,#DFF1E8); display:flex; align-items:center; justify-content:center; font-size:60px; color:#bfe3cf; position:relative;}
+  .share-btn{position:absolute; top:12px; right:12px; width:36px; height:36px; background:rgba(255,255,255,.9); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; color:#444; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.1);}
+  .goods-card .body{padding:14px;}
+  .goods-card .name{font-size:16px; font-weight:800; color:var(--lv-text-1); line-height:1.4;}
+  .goods-card .desc{font-size:13px; color:var(--lv-text-3); margin-top:6px;}
+  .goods-card .price-row{display:flex; align-items:baseline; gap:8px; margin-top:12px;}
+  .goods-card .price{font-size:24px; font-weight:800; color:var(--lv-price); font-family:var(--lv-font-num);}
+  .goods-card .price small{font-size:14px;}
+  .goods-card .old{font-size:13px; color:var(--lv-text-4); text-decoration:line-through;}
+
+  .mask{position:fixed; top:0; left:0; right:0; bottom:0; background:var(--lv-mask); z-index:100; display:none;}
+  .mask.show{display:block;}
+  .sheet{position:absolute; bottom:0; left:0; width:100%; background:#fff; border-radius:var(--lv-radius-lg) var(--lv-radius-lg) 0 0; padding:16px 0 24px; transform:translateY(100%); transition:transform .3s;}
+  .mask.show .sheet{transform:translateY(0);}
+  .sheet-title{text-align:center; font-size:14px; color:var(--lv-text-3); margin-bottom:16px;}
+  .sheet-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:16px 0; text-align:center; margin-bottom:20px;}
+  .sheet-item{cursor:pointer;}
+  .sheet-item .ic{width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; margin:0 auto 8px; color:#fff;}
+  .sheet-item .ic.wx{background:#07C160;}
+  .sheet-item .ic.moment{background:#22C55E;}
+  .sheet-item .ic.poster{background:linear-gradient(135deg,#42AB6B,#2EBC87);}
+  .sheet-item .ic.link{background:#3490F9;}
+  .sheet-item .txt{font-size:12px; color:var(--lv-text-2);}
+  .sheet-cancel{margin:0 16px; height:46px; border-radius:23px; background:#f5f5f5; color:var(--lv-text-2); font-size:15px; font-weight:700; border:none; cursor:pointer;}
+
+  .poster-modal{position:fixed; top:0; left:0; right:0; bottom:0; background:var(--lv-mask); z-index:200; display:none; align-items:center; justify-content:center;}
+  .poster-modal.show{display:flex;}
+  .poster-card{width:280px; background:#fff; border-radius:12px; overflow:hidden; text-align:center;}
+  .poster-card .head{background:linear-gradient(135deg,#42AB6B,#2EBC87); color:#fff; padding:20px;}
+  .poster-card .head .t{font-size:20px; font-weight:800;}
+  .poster-card .head .s{font-size:13px; opacity:.9; margin-top:4px;}
+  .poster-card .body{padding:20px;}
+  .poster-card .qr{width:120px; height:120px; background:#f5f5f5; border-radius:8px; margin:0 auto; display:flex; align-items:center; justify-content:center; font-size:60px; color:var(--lv-primary);}
+  .poster-card .tip{font-size:12px; color:var(--lv-text-3); margin-top:14px;}
+  .poster-card .actions{display:flex; gap:10px; padding:0 16px 16px;}
+  .poster-card .actions .btn{flex:1; height:40px; border-radius:20px; border:none; font-size:14px; font-weight:700; cursor:pointer;}
+  .poster-card .actions .btn-primary{background:var(--lv-primary); color:#fff;}
+  .poster-card .actions .btn-default{background:#f5f5f5; color:var(--lv-text-2);}
+
+  .toast{position:fixed; left:50%; top:45%; transform:translate(-50%,-50%) scale(0); background:rgba(0,0,0,.75); color:#fff; padding:10px 18px; border-radius:8px; font-size:13px; z-index:300; transition:transform .2s;}
+  .toast.show{transform:translate(-50%,-50%) scale(1);}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="statusbar">
+    <span>9:41</span>
+    <span class="icons"><span>5G</span><span>100%</span></span>
+  </div>
+  <div class="scroll">
+    <div class="goods-card">
+      <div class="img">🚰
+        <div class="share-btn" onclick="openSheet()">↗</div>
+      </div>
+      <div class="body">
+        <div class="name">绿韵家智能净水器滤芯</div>
+        <div class="desc">家用直饮净水机通用替换芯 · 惠民补贴</div>
+        <div class="price-row">
+          <span class="price"><small>¥</small>299</span>
+          <span class="old">¥599</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 分享面板 -->
+<div class="mask" id="sheetMask" onclick="closeSheet(event)">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-title">分享给好友</div>
+    <div class="sheet-grid">
+      <div class="sheet-item" onclick="toast('调起微信：选择好友')">
+        <div class="ic wx">💬</div>
+        <div class="txt">微信好友</div>
+      </div>
+      <div class="sheet-item" onclick="openPoster()">
+        <div class="ic moment">📢</div>
+        <div class="txt">朋友圈</div>
+      </div>
+      <div class="sheet-item" onclick="openPoster()">
+        <div class="ic poster">🖼️</div>
+        <div class="txt">保存海报</div>
+      </div>
+      <div class="sheet-item" onclick="toast('链接已复制')">
+        <div class="ic link">🔗</div>
+        <div class="txt">复制链接</div>
+      </div>
+    </div>
+    <button class="sheet-cancel" onclick="closeSheet()">取消</button>
+  </div>
+</div>
+
+<!-- 海报预览 -->
+<div class="poster-modal" id="posterModal" onclick="closePoster(event)">
+  <div class="poster-card" onclick="event.stopPropagation()">
+    <div class="head">
+      <div class="t">绿韵家</div>
+      <div class="s">AI 健康 · 品质生活</div>
+    </div>
+    <div class="body">
+      <div class="qr">▣</div>
+      <div class="tip">长按识别二维码，立即抢购</div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="closePoster(); toast('已保存到相册')">保存海报</button>
+      <button class="btn btn-default" onclick="closePoster()">取消</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+function openSheet(){document.getElementById('sheetMask').classList.add('show');}
+function closeSheet(e){
+  if(e && e.target !== document.getElementById('sheetMask')) return;
+  document.getElementById('sheetMask').classList.remove('show');
+}
+function openPoster(){closeSheet(); document.getElementById('posterModal').classList.add('show');}
+function closePoster(e){
+  if(e && e.target !== document.getElementById('posterModal')) return;
+  document.getElementById('posterModal').classList.remove('show');
+}
+function toast(text){
+  var t=document.getElementById('toast');
+  t.textContent=text; t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},1600);
+}
+</script>
+</body>
+</html>
