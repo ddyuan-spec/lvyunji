@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>绿韵家 App · 首页通用弹窗原型</title>
+<link rel="stylesheet" href="../kb/design-spec/lvyun-app-design-base.css">
+<style>
+  *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+  body{font-family:var(--lv-font); background:#e9ebee; color:var(--lv-text-2);}
+
+  /* 手机框架 */
+  .phone{width:375px; min-height:812px; margin:20px auto; background:var(--lv-bg); position:relative; display:flex; flex-direction:column; box-shadow:0 0 30px rgba(0,0,0,.12); border-radius:0; overflow:hidden;}
+
+  /* 状态栏 */
+  .statusbar{height:44px; background:#fff; display:flex; align-items:center; justify-content:space-between; padding:0 16px; font-size:14px; font-weight:600; color:#1A211E; flex-shrink:0;}
+  .statusbar .icons{display:flex; gap:5px; align-items:center; font-size:12px;}
+  .statusbar .icons span{opacity:.85;}
+
+  /* 滚动区 */
+  .scroll{flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding-bottom:64px;}
+
+  /* 顶部搜索栏 */
+  .topbar{background:#fff; padding:8px 12px 10px; display:flex; align-items:center; gap:10px; position:sticky; top:0; z-index:5;}
+  .logo{font-size:18px; font-weight:800; color:var(--lv-primary); white-space:nowrap; letter-spacing:.5px;}
+  .search{flex:1; background:#F2F3F5; border-radius:18px; height:34px; display:flex; align-items:center; padding:0 14px; color:var(--lv-text-4); font-size:13px; gap:6px;}
+  .top-icon{width:24px; text-align:center; font-size:18px; color:#444; cursor:pointer;}
+
+  /* 金刚区 */
+  .kingkong{background:#fff; display:grid; grid-template-columns:repeat(5,1fr); gap:14px 0; padding:14px 6px 16px;}
+  .kk{display:flex; flex-direction:column; align-items:center; gap:6px; font-size:11px; color:#444; cursor:pointer;}
+  .kk .ic{width:44px; height:44px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:22px; color:#fff;}
+  .kk:nth-child(1) .ic{background:linear-gradient(135deg,#42AB6B,#2EBC87);}
+  .kk:nth-child(2) .ic{background:linear-gradient(135deg,#FF7D00,#FF4D00);}
+  .kk:nth-child(3) .ic{background:linear-gradient(135deg,#00C2C0,#00ECE4);}
+  .kk:nth-child(4) .ic{background:linear-gradient(135deg,#6B49E3,#9A7BFF);}
+  .kk:nth-child(5) .ic{background:linear-gradient(135deg,#F5A623,#FFCE3D);}
+  .kk:nth-child(6) .ic{background:linear-gradient(135deg,#2EBC87,#00ECE4);}
+  .kk:nth-child(7) .ic{background:linear-gradient(135deg,#FF4D00,#F53F50);}
+  .kk:nth-child(8) .ic{background:linear-gradient(135deg,#3490F9,#6B49E3);}
+  .kk:nth-child(9) .ic{background:linear-gradient(135deg,#F77234,#FFDA00);}
+  .kk:nth-child(10) .ic{background:linear-gradient(135deg,#999,#BBB);}
+
+  /* Banner */
+  .banner{margin:10px 12px; border-radius:14px; padding:18px 16px; color:#fff; background:linear-gradient(120deg,#2EBC87,#42AB6B);}
+  .banner .t{font-size:18px; font-weight:800;}
+  .banner .s{font-size:12px; opacity:.9; margin-top:4px;}
+  .banner.orange{background:linear-gradient(120deg,#FF7D00,#F53F50);}
+
+  /* 区块标题 */
+  .sec-head{display:flex; align-items:baseline; justify-content:space-between; padding:16px 14px 8px;}
+  .sec-head .t{font-size:16px; font-weight:800; color:var(--lv-text-1);}
+  .sec-head .sub{font-size:11px; color:var(--lv-text-4);}
+  .sec-head .more{font-size:12px; color:var(--lv-primary); cursor:pointer;}
+
+  /* 商品瀑布流 */
+  .waterfall{columns:2; column-gap:10px; padding:0 12px;}
+  .goods{break-inside:avoid; background:#fff; border-radius:12px; overflow:hidden; margin-bottom:10px; box-shadow:0 1px 4px rgba(0,0,0,.04);}
+  .goods .ph{height:150px; background:linear-gradient(135deg,#EAF6EF,#DFF1E8); display:flex; align-items:center; justify-content:center; font-size:34px; color:#bfe3cf;}
+  .goods .body{padding:8px 10px 12px;}
+  .goods .name{font-size:13px; line-height:1.35; height:36px; overflow:hidden; color:var(--lv-text-2);}
+  .goods .tag{display:inline-block; font-size:10px; color:var(--lv-primary); border:1px solid var(--lv-primary); border-radius:4px; padding:0 4px; margin:6px 0;}
+  .goods .price{color:var(--lv-price); font-weight:800; font-size:15px; font-family:var(--lv-font-num);}
+  .goods .price small{font-size:10px; font-weight:600;}
+  .goods .old{color:var(--lv-text-4); text-decoration:line-through; font-size:11px; margin-left:4px;}
+  .goods .sold{font-size:10px; color:var(--lv-text-3); margin-left:6px;}
+
+  /* 底部 Tab */
+  .tabbar{position:absolute; bottom:0; left:0; width:100%; height:58px; background:#fff; border-top:1px solid var(--lv-divider); display:flex; z-index:10;}
+  .tab{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:11px; color:var(--lv-text-4); cursor:pointer;}
+  .tab .ti{font-size:21px;}
+  .tab.on{color:var(--lv-primary); font-weight:700;}
+
+  /* ============================================================
+     弹窗组件（核心）
+     ============================================================ */
+
+  /* 遮罩层 */
+  .popup-mask{
+    position:fixed; top:0; left:0; right:0; bottom:0;
+    background:var(--lv-mask);
+    z-index:100;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none;
+    transition:opacity .3s ease;
+  }
+  .popup-mask.show{ opacity:1; pointer-events:auto; }
+
+  /* 弹窗容器 - 飘转动画 */
+  .popup-box{
+    width:300px; background:#fff; border-radius:var(--lv-radius-lg);
+    position:relative; overflow:hidden;
+    transform:scale(.3) rotate(-15deg) translateY(-60px);
+    opacity:0;
+    transition:all .5s cubic-bezier(.34,1.56,.64,1);
+  }
+  .popup-mask.show .popup-box{
+    transform:scale(1) rotate(0deg) translateY(0);
+    opacity:1;
+  }
+
+  /* 关闭按钮 */
+  .popup-close{
+    position:absolute; top:10px; right:10px;
+    width:28px; height:28px; border-radius:50%;
+    background:rgba(0,0,0,.2); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; cursor:pointer; z-index:5;
+    transition:background .2s;
+  }
+  .popup-close:hover{ background:rgba(0,0,0,.4); }
+
+  /* 弹窗图片区域 */
+  .popup-img{
+    width:100%; height:200px; background:linear-gradient(135deg,#2EBC87,#42AB6B);
+    display:flex; align-items:center; justify-content:center;
+    font-size:60px; color:rgba(255,255,255,.7);
+    position:relative; overflow:hidden;
+  }
+  /* 图片角标 */
+  .popup-badge{
+    position:absolute; top:10px; left:10px;
+    background:var(--lv-price); color:#fff;
+    font-size:10px; font-weight:600;
+    padding:3px 8px; border-radius:var(--radius-pill,100px);
+  }
+
+  /* 弹窗内容区 */
+  .popup-body{ padding:18px 16px 16px; text-align:center; }
+  .popup-title{
+    font-size:var(--lv-fs-lg); font-weight:var(--lv-fw-bold);
+    color:var(--lv-text-1); line-height:1.4; margin-bottom:6px;
+  }
+  .popup-subtitle{
+    font-size:var(--lv-fs-xs); color:var(--lv-text-3);
+    line-height:1.5; margin-bottom:16px;
+  }
+  .popup-desc{
+    font-size:var(--lv-fs-xs); color:var(--lv-text-4);
+    line-height:1.5; margin-bottom:16px;
+  }
+
+  /* 弹窗按钮组 */
+  .popup-actions{ display:flex; flex-direction:column; gap:10px; }
+  .popup-btn{
+    height:42px; border-radius:var(--lv-radius-pill);
+    display:flex; align-items:center; justify-content:center;
+    font-size:var(--lv-fs-base); font-weight:var(--lv-fw-medium);
+    cursor:pointer; border:none; transition:opacity .2s;
+  }
+  .popup-btn:hover{ opacity:.9; }
+  .popup-btn-primary{
+    background:var(--lv-primary); color:#fff;
+  }
+  .popup-btn-secondary{
+    background:transparent; color:var(--lv-primary);
+    border:1px solid var(--lv-primary);
+  }
+  .popup-btn-outline{
+    background:transparent; color:var(--lv-text-3);
+    border:1px solid var(--lv-divider);
+  }
+
+  /* 底部勾选（不再提示） */
+  .popup-footer{
+    display:flex; align-items:center; justify-content:center;
+    gap:6px; padding:0 16px 14px;
+  }
+  .popup-check{
+    width:16px; height:16px; border-radius:50%;
+    border:1.5px solid var(--lv-divider);
+    display:flex; align-items:center; justify-content:center;
+    font-size:10px; cursor:pointer; flex-shrink:0;
+    transition:all .2s;
+  }
+  .popup-check.checked{
+    border-color:var(--lv-primary); background:var(--lv-primary); color:#fff;
+  }
+  .popup-check-label{
+    font-size:11px; color:var(--lv-text-4); cursor:pointer;
+  }
+
+  /* 倒计时关闭 */
+  .popup-countdown{
+    position:absolute; bottom:8px; right:10px;
+    font-size:11px; color:rgba(255,255,255,.7);
+    background:rgba(0,0,0,.2); padding:2px 8px; border-radius:10px;
+  }
+
+  /* ========== 不同弹窗类型样式变体 ========== */
+
+  /* 营销活动型 - 有大图 + 主按钮 */
+  .popup-type-promo .popup-img{ height:180px; }
+  .popup-type-promo .popup-title{ color:var(--lv-price); }
+
+  /* 公告通知型 - 无图，纯文字 */
+  .popup-type-notice .popup-img{ display:none; }
+  .popup-type-notice .popup-body{ padding-top:24px; }
+
+  /* 新人福利型 - 强调感 */
+  .popup-type-newbie .popup-img{
+    background:linear-gradient(135deg,#FF7D00,#FF4D00);
+    height:160px;
+  }
+  .popup-type-newbie .popup-badge{ background:var(--lv-yellow); color:#333; }
+
+  /* 版本更新型 */
+  .popup-type-update .popup-img{
+    background:linear-gradient(135deg,#3490F9,#6B49E3);
+    height:140px;
+  }
+
+  /* ============================================================
+     原型控制面板（切换不同弹窗状态）
+     ============================================================ */
+  .control-panel{
+    position:fixed; top:10px; right:10px;
+    background:#fff; border-radius:12px; padding:12px;
+    box-shadow:0 4px 20px rgba(0,0,0,.15);
+    z-index:200; font-size:12px; min-width:160px;
+  }
+  .control-panel h4{
+    font-size:13px; font-weight:700; margin-bottom:8px;
+    color:var(--lv-text-1);
+  }
+  .control-btn{
+    display:block; width:100%; padding:6px 10px; margin-bottom:4px;
+    border:1px solid var(--lv-divider); border-radius:8px;
+    background:#fff; color:var(--lv-text-2); font-size:12px;
+    cursor:pointer; text-align:left; transition:all .15s;
+  }
+  .control-btn:hover{ border-color:var(--lv-primary); color:var(--lv-primary); }
+  .control-btn.active{ background:var(--lv-primary-light); border-color:var(--lv-primary); color:var(--lv-primary-deep); }
+</style>
+</head>
+<body>
+
+<!-- 控制面板（仅原型调试用，上线无此元素） -->
+<div class="control-panel">
+  <h4>🎛️ 弹窗状态切换</h4>
+  <button class="control-btn active" onclick="showPopup('promo')">🎁 营销活动弹窗</button>
+  <button class="control-btn" onclick="showPopup('newbie')">🎉 新人福利弹窗</button>
+  <button class="control-btn" onclick="showPopup('notice')">📢 公告通知弹窗</button>
+  <button class="control-btn" onclick="showPopup('update')">🆕 版本更新弹窗</button>
+  <hr style="border:0;border-top:1px solid #EEE;margin:8px 0;">
+  <button class="control-btn" onclick="hidePopup()">✖ 关闭弹窗</button>
+  <button class="control-btn" onclick="resetDemo()">🔄 重置演示</button>
+</div>
+
+<div class="phone">
+  <!-- 状态栏 -->
+  <div class="statusbar">
+    <span>9:41</span>
+    <span class="icons"><span>●●●</span><span>📶</span><span>🔋</span></span>
+  </div>
+
+  <div class="scroll">
+    <!-- 首页内容 -->
+    <section id="s-home">
+      <div class="topbar">
+        <span class="logo">绿韵家</span>
+        <div class="search">🔍 搜索商品</div>
+        <span class="top-icon" onclick="showPopup('promo')">🛒</span>
+      </div>
+      <div class="kingkong">
+        <div class="kk"><div class="ic">🆕</div>新品上市</div>
+        <div class="kk"><div class="ic">💚</div>健康专区</div>
+        <div class="kk"><div class="ic">🏬</div>自营专区</div>
+        <div class="kk"><div class="ic">🦠</div>微生态专区</div>
+        <div class="kk"><div class="ic">💰</div>惠民补贴</div>
+        <div class="kk"><div class="ic">🎉</div>每日活动</div>
+        <div class="kk"><div class="ic">🔥</div>限时特惠</div>
+        <div class="kk"><div class="ic">⭐</div>精品推荐</div>
+        <div class="kk"><div class="ic">🎁</div>超级品牌</div>
+        <div class="kk"><div class="ic">➡️</div>更多</div>
+      </div>
+
+      <div class="banner">
+        <div class="t">超级爆款</div>
+        <div class="s">质优价又好 · 闭眼入</div>
+      </div>
+      <div class="banner orange">
+        <div class="t">限时特惠 · 好物限量抢</div>
+        <div class="s">手慢无，错过等一年</div>
+      </div>
+
+      <div class="sec-head"><span class="t">猜你喜欢</span><span class="more">更多 ›</span></div>
+      <div class="waterfall">
+        <div class="goods"><div class="ph">🧴</div><div class="body"><div class="name">韵宜生 蜂胶黄精胶囊</div><span class="tag">自营</span><div><span class="price"><small>￥</small>468.00</span><span class="old">￥698</span><span class="sold">已售 999+</span></div></div></div>
+        <div class="goods"><div class="ph">🏕️</div><div class="body"><div class="name">青少年领袖素质训练营套餐二</div><div><span class="price"><small>￥</small>7188.00</span><span class="old">￥13188</span></div></div></div>
+        <div class="goods"><div class="ph">🥤</div><div class="body"><div class="name">微是韵享复合益生菌固体饮料(拍一发四)</div><span class="tag">自营</span><div><span class="price"><small>￥</small>392.00</span><span class="old">￥499</span></div></div></div>
+        <div class="goods"><div class="ph">🧼</div><div class="body"><div class="name">洗面奶男士专用控油祛痘秋冬保湿氨基酸洁面</div><div><span class="price"><small>￥</small>59.9</span><span class="sold">已售 999+</span></div></div></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 底部 Tab -->
+  <div class="tabbar">
+    <div class="tab on"><div class="ti">🏠</div>首页</div>
+    <div class="tab"><div class="ti">🤖</div>数智</div>
+    <div class="tab"><div class="ti">💬</div>消息</div>
+    <div class="tab"><div class="ti">👤</div>我的</div>
+  </div>
+</div>
+
+<!-- ==================== 弹窗 DOM ==================== -->
+<div class="popup-mask" id="popupMask" onclick="onMaskClick(event)">
+  <div class="popup-box" id="popupBox" onclick="event.stopPropagation()">
+
+    <!-- 关闭按钮 -->
+    <div class="popup-close" onclick="hidePopup()">✕</div>
+
+    <!-- 角标（可选） -->
+    <div class="popup-badge" id="popupBadge">限时</div>
+
+    <!-- 倒计时（可选） -->
+    <div class="popup-countdown" id="popupCountdown"></div>
+
+    <!-- 图片区域 -->
+    <div class="popup-img" id="popupImg">🎁</div>
+
+    <!-- 内容区 -->
+    <div class="popup-body" id="popupBody">
+      <div class="popup-title" id="popupTitle">新人专享优惠</div>
+      <div class="popup-subtitle" id="popupSubtitle">欢迎来到绿韵家！</div>
+      <div class="popup-desc" id="popupDesc">首单立减 ¥20，更有超多会员权益等你解锁~</div>
+
+      <!-- 按钮组 -->
+      <div class="popup-actions" id="popupActions">
+        <button class="popup-btn popup-btn-primary" id="popupBtnMain">立即领取</button>
+        <button class="popup-btn popup-btn-outline" id="popupBtnSub">稍后再说</button>
+      </div>
+    </div>
+
+    <!-- 底部：不再提示 -->
+    <div class="popup-footer" id="popupFooter">
+      <div class="popup-check" id="popupCheck" onclick="toggleNoPrompt()">✓</div>
+      <span class="popup-check-label" onclick="toggleNoPrompt()">不再提示</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// 弹窗配置数据（模拟后台下发）
+// ============================================================
+var POPUP_CONFIGS = {
+  promo: {
+    type: 'promo',
+    badge: '限时',
+    imgEmoji: '🎁',
+    imgBg: 'linear-gradient(135deg,#2EBC87,#42AB6B)',
+    title: '超级品牌日',
+    subtitle: '全场低至 5 折起',
+    desc: '精选好物限时特惠，叠加优惠券更划算，错过再等一年！',
+    btnMain: '立即抢购',
+    btnSecondary: '稍后再说',
+    showFooter: true,
+    countdown: 0,
+    autoClose: false
+  },
+  newbie: {
+    type: 'newbie',
+    badge: '新人',
+    imgEmoji: '🎉',
+    imgBg: 'linear-gradient(135deg,#FF7D00,#FF4D00)',
+    title: '新人专享礼包',
+    subtitle: '欢迎来到绿韵家！',
+    desc: '首单立减 ¥20 + 送 3 张优惠券，更有超多会员权益等你解锁~',
+    btnMain: '立即领取',
+    btnSecondary: '稍后再说',
+    showFooter: true,
+    countdown: 0,
+    autoClose: false
+  },
+  notice: {
+    type: 'notice',
+    badge: '',
+    imgEmoji: '',
+    imgBg: '',
+    title: '系统公告',
+    subtitle: '关于惠民套餐服务升级的通知',
+    desc: '为提供更好的服务体验，我们将于 2026 年 8 月 20 日 02:00-06:00 进行系统升级维护，期间部分功能暂时不可用，敬请谅解。',
+    btnMain: '我知道了',
+    btnSecondary: '',
+    showFooter: false,
+    countdown: 0,
+    autoClose: false
+  },
+  update: {
+    type: 'update',
+    badge: 'NEW',
+    imgEmoji: '🚀',
+    imgBg: 'linear-gradient(135deg,#3490F9,#6B49E3)',
+    title: '发现新版本',
+    subtitle: 'v2.1.0 更新可用',
+    desc: '· 新增 AI 健康问答功能\n· 优化首页加载速度\n· 修复已知问题',
+    btnMain: '立即更新',
+    btnSecondary: '暂不更新',
+    showFooter: true,
+    countdown: 0,
+    autoClose: false
+  }
+};
+
+var currentType = 'promo';
+var countdownTimer = null;
+
+// ============================================================
+// 弹窗核心逻辑
+// ============================================================
+
+function showPopup(type) {
+  var cfg = POPUP_CONFIGS[type];
+  if (!cfg) return;
+  currentType = type;
+
+  // 更新控制面板高亮
+  document.querySelectorAll('.control-btn').forEach(function(b){ b.classList.remove('active'); });
+  event && event.target.classList.add('active');
+
+  var box = document.getElementById('popupBox');
+  box.className = 'popup-box popup-type-' + cfg.type;
+
+  // 角标
+  var badge = document.getElementById('popupBadge');
+  badge.style.display = cfg.badge ? 'block' : 'none';
+  badge.textContent = cfg.badge;
+
+  // 图片
+  var img = document.getElementById('popupImg');
+  if (cfg.imgEmoji) {
+    img.style.display = 'flex';
+    img.style.background = cfg.imgBg;
+    img.textContent = cfg.imgEmoji;
+  } else {
+    img.style.display = 'none';
+  }
+
+  // 文字内容
+  document.getElementById('popupTitle').textContent = cfg.title;
+  document.getElementById('popupSubtitle').textContent = cfg.subtitle;
+  document.getElementById('popupDesc').textContent = cfg.desc;
+  document.getElementById('popupDesc').style.whiteSpace = 'pre-line';
+
+  // 按钮
+  var btnMain = document.getElementById('popupBtnMain');
+  var btnSub = document.getElementById('popupBtnSub');
+  btnMain.textContent = cfg.btnMain;
+  btnMain.style.display = 'block';
+  if (cfg.btnSecondary) {
+    btnSub.textContent = cfg.btnSecondary;
+    btnSub.style.display = 'block';
+    btnSub.className = 'popup-btn popup-btn-outline';
+  } else {
+    btnSub.style.display = 'none';
+  }
+
+  // 底部"不再提示"
+  document.getElementById('popupFooter').style.display = cfg.showFooter ? 'flex' : 'none';
+
+  // 倒计时
+  var cdEl = document.getElementById('popupCountdown');
+  if (cfg.countdown > 0) {
+    cdEl.style.display = 'block';
+    startCountdown(cfg.countdown);
+  } else {
+    cdEl.style.display = 'none';
+    stopCountdown();
+  }
+
+  // 显示弹窗（触发飘转入场动画）
+  document.getElementById('popupMask').classList.add('show');
+}
+
+function hidePopup() {
+  document.getElementById('popupMask').classList.remove('show');
+  stopCountdown();
+}
+
+function onMaskClick(e) {
+  // 点击遮罩关闭弹窗
+  if (e.target === e.currentTarget) {
+    hidePopup();
+  }
+}
+
+function toggleNoPrompt() {
+  var check = document.getElementById('popupCheck');
+  check.classList.toggle('checked');
+  var isChecked = check.classList.contains('checked');
+  check.textContent = isChecked ? '✓' : '';
+  // 实际逻辑：记录 localStorage / 上报后端
+  console.log('[弹窗] 不再提示:', isChecked);
+}
+
+// 倒计时自动关闭
+function startCountdown(seconds) {
+  var el = document.getElementById('popupCountdown');
+  var n = seconds;
+  el.textContent = n + 's 后关闭';
+  stopCountdown();
+  countdownTimer = setInterval(function() {
+    n--;
+    if (n <= 0) {
+      hidePopup();
+      stopCountdown();
+    } else {
+      el.textContent = n + 's 后关闭';
+    }
+  }, 1000);
+}
+
+function stopCountdown() {
+  if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+}
+
+function resetDemo() {
+  hidePopup();
+  document.getElementById('popupCheck').classList.remove('checked');
+  document.getElementById('popupCheck').textContent = '';
+  setTimeout(function(){ showPopup('promo'); }, 300);
+}
+
+// 按钮事件绑定
+document.getElementById('popupBtnMain').addEventListener('click', function() {
+  console.log('[弹窗] 主按钮点击:', currentType);
+  // 根据类型执行不同跳转
+  var actions = {
+    promo: function() { alert('→ 跳转到活动页'); },
+    newbie: function() { alert('→ 领取新人礼包'); },
+    notice: function() { hidePopup(); },
+    update: function() { alert('→ 跳转到应用商店'); }
+  };
+  if (actions[currentType]) actions[currentType]();
+});
+
+document.getElementById('popupBtnSub').addEventListener('click', function() {
+  console.log('[弹窗] 次按钮点击:', currentType);
+  hidePopup();
+});
+
+// ============================================================
+// 页面加载：模拟条件触发（实际由后端接口控制是否弹出）
+// ============================================================
+setTimeout(function(){
+  showPopup('promo');
+}, 600);
+</script>
+</body>
+</html>
