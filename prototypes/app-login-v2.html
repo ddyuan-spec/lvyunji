@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>绿韵家 App · 登录注册原型</title>
+<style>
+  :root{
+    --brand:#42AB6B; --brand-d:#33C66D; --brand-l:#E8F9F0;
+    --accent:#FF4D00;
+    --text:#333; --text-2:#666; --text-3:#999; --text-4:#CCC;
+    --bg:#F5F5F5; --card:#FFF; --line:#EEE;
+    --error:#F53F3F;
+  }
+  *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+  body{font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:#e9ebee; color:var(--text);}
+  .phone{max-width:390px; margin:0 auto; background:var(--bg); min-height:100vh; position:relative; display:flex; flex-direction:column; box-shadow:0 0 24px rgba(0,0,0,.08); overflow:hidden;}
+
+  /* 状态栏 */
+  .statusbar{height:44px; background:#fff; display:flex; align-items:center; justify-content:space-between; padding:0 16px; font-size:14px; font-weight:600; color:#1A211E; flex-shrink:0;}
+  .statusbar .icons{display:flex; gap:5px; align-items:center; font-size:12px;}
+
+  /* 页面容器 */
+  .page{flex:1; display:none; flex-direction:column; overflow:hidden;}
+  .page.active{display:flex;}
+
+  /* 顶部导航 */
+  .navbar{height:46px; background:#fff; display:flex; align-items:center; justify-content:center; position:relative; flex-shrink:0;}
+  .navbar .back{position:absolute; left:12px; top:50%; transform:translateY(-50%); width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-size:20px; color:#333;}
+  .navbar .title{font-size:17px; font-weight:700;}
+  .navbar .right{position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:14px; color:var(--text-2);}
+
+  /* 登录页品牌区 */
+  .brand{padding:48px 28px 32px; text-align:center;}
+  .brand .logo{width:72px; height:72px; margin:0 auto 16px; border-radius:22px; background:linear-gradient(135deg,#42AB6B,#2EBC87); display:flex; align-items:center; justify-content:center; font-size:36px; color:#fff; box-shadow:0 8px 24px rgba(66,171,107,.25);}
+  .brand .name{font-size:24px; font-weight:800; color:var(--text);}
+  .brand .slogan{font-size:13px; color:var(--text-3); margin-top:8px;}
+
+  /* 登录方式切换 */
+  .login-tabs{display:flex; justify-content:center; gap:28px; margin:0 28px 24px;}
+  .login-tabs .tab{font-size:16px; color:var(--text-3); padding-bottom:6px; position:relative;}
+  .login-tabs .tab.on{color:var(--text); font-weight:700;}
+  .login-tabs .tab.on::after{content:""; position:absolute; left:50%; transform:translateX(-50%); bottom:0; width:20px; height:3px; background:var(--brand); border-radius:2px;}
+
+  /* 表单 */
+  .form{padding:0 28px;}
+  .input-row{background:var(--card); border-radius:12px; padding:14px 16px; display:flex; align-items:center; gap:12px; margin-bottom:14px; box-shadow:0 1px 4px rgba(0,0,0,.04);}
+  .input-row .prefix{font-size:15px; color:var(--text); font-weight:500; min-width:32px;}
+  .input-row input{flex:1; border:none; outline:none; font-size:15px; color:var(--text); background:transparent;}
+  .input-row input::placeholder{color:var(--text-4);}
+  .input-row .suffix{font-size:14px; color:var(--text-3);}
+  .input-row .eye{font-size:18px; color:var(--text-3); padding:0 4px;}
+
+  /* 获取验证码 */
+  .get-code{font-size:14px; color:var(--brand); font-weight:600; white-space:nowrap; padding-left:12px; border-left:1px solid var(--line); min-width:84px; text-align:right;}
+  .get-code.disabled{color:var(--text-4); font-weight:400;}
+
+  /* 协议 */
+  .agree-row{display:flex; align-items:flex-start; gap:8px; padding:8px 28px 24px;}
+  .agree-row .checkbox{width:16px; height:16px; border:1.5px solid var(--text-4); border-radius:50%; margin-top:1px; flex-shrink:0; display:flex; align-items:center; justify-content:center;}
+  .agree-row .checkbox.on{border-color:var(--brand); background:var(--brand); color:#fff; font-size:10px;}
+  .agree-row .txt{font-size:13px; color:var(--text-2); line-height:1.5;}
+  .agree-row .txt a{color:var(--brand); text-decoration:none;}
+
+  /* 主按钮 */
+  .btn-primary{margin:0 28px; height:48px; border-radius:24px; background:var(--brand); color:#fff; font-size:16px; font-weight:700; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 18px rgba(66,171,107,.3);}
+  .btn-primary.disabled{background:#B8E0C8; box-shadow:none;}
+
+  /* 辅助链接 */
+  .extra-links{display:flex; justify-content:center; gap:24px; margin-top:20px;}
+  .extra-links .link{font-size:14px; color:var(--brand);}
+
+  /* 协议页 */
+  .agree-body{flex:1; background:#fff; padding:16px 18px; overflow-y:auto; line-height:1.7; font-size:14px; color:var(--text-2);}
+  .agree-body h4{font-size:16px; color:var(--text); margin:16px 0 8px;}
+  .agree-body p{margin-bottom:10px;}
+
+  /* 底部安全提示 */
+  .safe-tip{position:absolute; bottom:24px; left:0; right:0; text-align:center; font-size:12px; color:var(--text-4);}
+
+  /* Toast */
+  .toast{position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,.75); color:#fff; font-size:14px; padding:12px 20px; border-radius:8px; opacity:0; pointer-events:none; transition:opacity .2s; z-index:100; max-width:280px; text-align:center;}
+  .toast.show{opacity:1;}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="statusbar">
+    <span>17:25</span>
+    <div class="icons"><span>5G</span><span>80%</span></div>
+  </div>
+
+  <!-- 验证码登录 -->
+  <div class="page active" id="code-login">
+    <div class="brand">
+      <div class="logo">🌿</div>
+      <div class="name">绿韵家</div>
+      <div class="slogan">AI 健康 · 品质生活</div>
+    </div>
+    <div class="login-tabs">
+      <div class="tab on" onclick="go('code-login')">验证码登录</div>
+      <div class="tab" onclick="go('pwd-login')">账号密码</div>
+    </div>
+    <div class="form">
+      <div class="input-row">
+        <span class="prefix">+86</span>
+        <input type="tel" id="phone-code" placeholder="请输入手机号" maxlength="11" oninput="toggleLogin('code')">
+      </div>
+      <div class="input-row">
+        <input type="tel" id="code" placeholder="请输入验证码" maxlength="6">
+        <span class="get-code" id="get-code" onclick="sendCode()">获取验证码</span>
+      </div>
+    </div>
+    <div class="agree-row">
+      <div class="checkbox" id="agree-check" onclick="toggleAgree()"></div>
+      <div class="txt">已阅读并同意<a class="agree-link" data-target="user">《用户协议》</a>和<a class="agree-link" data-target="privacy">《隐私政策》</a></div>
+    </div>
+    <div class="btn-primary disabled" id="btn-code" onclick="doLogin('code')">登录</div>
+    <div class="extra-links">
+      <span class="link" onclick="go('forgot')">忘记密码</span>
+    </div>
+  </div>
+
+  <!-- 账号密码登录 -->
+  <div class="page" id="pwd-login">
+    <div class="brand">
+      <div class="logo">🌿</div>
+      <div class="name">绿韵家</div>
+      <div class="slogan">AI 健康 · 品质生活</div>
+    </div>
+    <div class="login-tabs">
+      <div class="tab" onclick="go('code-login')">验证码登录</div>
+      <div class="tab on" onclick="go('pwd-login')">账号密码</div>
+    </div>
+    <div class="form">
+      <div class="input-row">
+        <span class="prefix">+86</span>
+        <input type="tel" id="phone-pwd" placeholder="请输入手机号" maxlength="11" oninput="toggleLogin('pwd')">
+      </div>
+      <div class="input-row">
+        <input type="password" id="password" placeholder="请输入密码" maxlength="20">
+        <span class="eye" onclick="toggleEye(this)">👁</span>
+      </div>
+    </div>
+    <div class="agree-row">
+      <div class="checkbox" id="agree-check2" onclick="toggleAgree()"></div>
+      <div class="txt">已阅读并同意<a class="agree-link" data-target="user">《用户协议》</a>和<a class="agree-link" data-target="privacy">《隐私政策》</a></div>
+    </div>
+    <div class="btn-primary disabled" id="btn-pwd" onclick="doLogin('pwd')">登录</div>
+    <div class="extra-links">
+      <span class="link" onclick="go('code-login')">验证码登录</span>
+      <span class="link" onclick="go('forgot')">忘记密码</span>
+    </div>
+  </div>
+
+  <!-- 忘记密码 -->
+  <div class="page" id="forgot">
+    <div class="navbar">
+      <div class="back" onclick="goBackFromForgot()">‹</div>
+      <div class="title">忘记密码</div>
+    </div>
+    <div style="padding-top:24px;">
+      <div class="form">
+        <div class="input-row">
+          <span class="prefix">+86</span>
+          <input type="tel" id="phone-forgot" placeholder="请输入手机号" maxlength="11" oninput="toggleLogin('forgot')">
+        </div>
+        <div class="input-row">
+          <input type="tel" id="code-forgot" placeholder="请输入验证码" maxlength="6">
+          <span class="get-code" id="get-code-forgot" onclick="sendCodeForgot()">获取验证码</span>
+        </div>
+        <div class="input-row">
+          <input type="password" id="new-pwd" placeholder="设置新密码（6-20位）" maxlength="20">
+        </div>
+        <div class="input-row">
+          <input type="password" id="new-pwd2" placeholder="确认新密码" maxlength="20">
+        </div>
+      </div>
+      <div class="btn-primary disabled" style="margin-top:24px;" id="btn-reset" onclick="doReset()">重置密码</div>
+    </div>
+  </div>
+
+  <!-- 协议页 -->
+  <div class="page" id="agreement">
+    <div class="navbar">
+      <div class="back" onclick="goBackFromAgreement()">‹</div>
+      <div class="title" id="agree-title">用户协议</div>
+    </div>
+    <div class="msg-tabs" style="background:#fff; border-bottom:1px solid var(--line); display:flex;">
+      <div id="tab-user" style="flex:1; text-align:center; padding:12px 0; font-size:14px; color:#999;" onclick="switchAgree('user')">用户协议</div>
+      <div id="tab-privacy" style="flex:1; text-align:center; padding:12px 0; font-size:14px; color:#999;" onclick="switchAgree('privacy')">隐私政策</div>
+    </div>
+    <div class="agree-body" id="agree-body">
+      <p>协议正文由后台控制台「协议文档」维护并下发。点击登录页勾选即表示同意本协议全部条款。</p>
+      <h4>一、服务条款</h4>
+      <p>1.1 用户在使用绿韵家 App 服务前，须先注册成为绿韵家会员，按页面提示填写真实、准确、合法、有效的注册信息。</p>
+      <p>1.2 用户注册成功后，绿韵家将为用户开通一个账号，作为用户使用绿韵家服务的唯一身份标识。</p>
+      <h4>二、账号安全</h4>
+      <p>2.1 用户应妥善保管账号、密码及验证码，因用户保管不善导致的损失由用户自行承担。</p>
+      <p>2.2 如发现任何未经授权使用账号登录或其他可能导致账号被盗的情况，应立即通知绿韵家。</p>
+    </div>
+  </div>
+
+  <div class="safe-tip">绿韵家安全保障中</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  var agree = false;
+  var countdownCode = 0;
+  var countdownForgot = 0;
+  var lastPage = 'code-login';
+  var colors = { brand: '#42AB6B', text3: '#999' };
+
+  function go(id, param){
+    var cur = document.querySelector('.page.active');
+    if(cur) lastPage = cur.id;
+    document.querySelectorAll('.page').forEach(function(el){ el.classList.remove('active'); });
+    document.getElementById(id).classList.add('active');
+    if(id === 'agreement' && param) switchAgree(param);
+    toggleLogin(id === 'code-login' ? 'code' : (id === 'pwd-login' ? 'pwd' : ''));
+  }
+
+  function goBackFromForgot(){ go(lastPage || 'code-login'); }
+  function goBackFromAgreement(){ go(lastPage || 'code-login'); }
+
+  function toast(msg){
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 2000);
+  }
+
+  function toggleAgree(){
+    agree = !agree;
+    var cls = agree ? 'checkbox on' : 'checkbox';
+    document.getElementById('agree-check').className = cls;
+    var c2 = document.getElementById('agree-check2');
+    if(c2) c2.className = cls;
+    toggleLogin('code');
+    toggleLogin('pwd');
+  }
+
+  function validPhone(v){ return /^1[3-9]\d{9}$/.test(v); }
+
+  function toggleLogin(type){
+    if(type === 'code'){
+      var p = document.getElementById('phone-code').value;
+      var c = document.getElementById('code').value;
+      var ok = validPhone(p) && c.length >= 4 && agree;
+      var btn = document.getElementById('btn-code');
+      btn.className = ok ? 'btn-primary' : 'btn-primary disabled';
+    }
+    if(type === 'pwd'){
+      var p = document.getElementById('phone-pwd').value;
+      var pwd = document.getElementById('password').value;
+      var ok = validPhone(p) && pwd.length >= 6 && agree;
+      var btn = document.getElementById('btn-pwd');
+      btn.className = ok ? 'btn-primary' : 'btn-primary disabled';
+    }
+    if(type === 'forgot' || type === ''){
+      var p = document.getElementById('phone-forgot').value;
+      var c = document.getElementById('code-forgot').value;
+      var p1 = document.getElementById('new-pwd').value;
+      var p2 = document.getElementById('new-pwd2').value;
+      var ok = validPhone(p) && c.length >= 4 && p1.length >= 6 && p1 === p2;
+      document.getElementById('btn-reset').className = ok ? 'btn-primary' : 'btn-primary disabled';
+    }
+  }
+
+  function toggleEye(el){
+    var input = el.previousElementSibling;
+    if(input.type === 'password'){ input.type = 'text'; el.textContent = '🙈'; }
+    else { input.type = 'password'; el.textContent = '👁'; }
+  }
+
+  function startCountdown(btnId, label){
+    var n = 60;
+    var btn = document.getElementById(btnId);
+    btn.classList.add('disabled');
+    btn.textContent = n + 's';
+    var timer = setInterval(function(){
+      n--;
+      if(n <= 0){ clearInterval(timer); btn.classList.remove('disabled'); btn.textContent = label; }
+      else { btn.textContent = n + 's'; }
+    }, 1000);
+  }
+
+  function sendCode(){
+    var btn = document.getElementById('get-code');
+    if(btn.classList.contains('disabled')) return;
+    var p = document.getElementById('phone-code').value;
+    if(!p){ toast('请输入手机号'); return; }
+    if(!validPhone(p)){ toast('请输入正确的手机号码'); return; }
+    startCountdown('get-code', '获取验证码');
+    toast('验证码已发送');
+    document.getElementById('code').focus();
+  }
+
+  function sendCodeForgot(){
+    var btn = document.getElementById('get-code-forgot');
+    if(btn.classList.contains('disabled')) return;
+    var p = document.getElementById('phone-forgot').value;
+    if(!p){ toast('请输入手机号'); return; }
+    if(!validPhone(p)){ toast('请输入正确的手机号码'); return; }
+    startCountdown('get-code-forgot', '获取验证码');
+    toast('验证码已发送');
+  }
+
+  function doLogin(type){
+    var btn = document.getElementById(type==='code'?'btn-code':'btn-pwd');
+    if(btn.classList.contains('disabled')){
+      if(!agree){ toast('请先阅读并同意用户协议与隐私政策'); return; }
+      var p = document.getElementById(type==='code'?'phone-code':'phone-pwd').value;
+      if(!p || !validPhone(p)){ toast('请输入正确的手机号码'); return; }
+      if(type==='code' && document.getElementById('code').value.length < 4){ toast('请输入正确的验证码'); return; }
+      if(type==='pwd' && document.getElementById('password').value.length < 6){ toast('密码不能少于6位'); return; }
+      return;
+    }
+    var phone = document.getElementById(type==='code'?'phone-code':'phone-pwd').value;
+    if(phone === '13800138000'){ toast('验证码错误或已过期'); return; }
+    toast('登录成功');
+  }
+
+  function doReset(){
+    var btn = document.getElementById('btn-reset');
+    if(btn.classList.contains('disabled')){
+      var p1 = document.getElementById('new-pwd').value;
+      var p2 = document.getElementById('new-pwd2').value;
+      if(p1 !== p2){ toast('两次输入的密码不一致'); return; }
+      if(p1.length < 6){ toast('密码长度不能少于6位'); return; }
+      return;
+    }
+    toast('密码重置成功');
+    setTimeout(function(){ go('code-login'); }, 800);
+  }
+
+  function switchAgree(tab){
+    var tUser = document.getElementById('tab-user');
+    var tPrivacy = document.getElementById('tab-privacy');
+    var body = document.getElementById('agree-body');
+    var title = document.getElementById('agree-title');
+    if(tab === 'user'){
+      tUser.style.color = colors.brand; tUser.style.fontWeight = '700';
+      tPrivacy.style.color = colors.text3; tPrivacy.style.fontWeight = '400';
+      title.textContent = '用户协议';
+      body.innerHTML = '<p>协议正文由后台控制台「协议文档」维护并下发。点击登录页勾选即表示同意本协议全部条款。</p><h4>一、服务条款</h4><p>1.1 用户在使用绿韵家 App 服务前，须先注册成为绿韵家会员，按页面提示填写真实、准确、合法、有效的注册信息。</p><p>1.2 用户注册成功后，绿韵家将为用户开通一个账号，作为用户使用绿韵家服务的唯一身份标识。</p><h4>二、账号安全</h4><p>2.1 用户应妥善保管账号、密码及验证码，因用户保管不善导致的损失由用户自行承担。</p><p>2.2 如发现任何未经授权使用账号登录或其他可能导致账号被盗的情况，应立即通知绿韵家。</p>';
+    } else {
+      tPrivacy.style.color = colors.brand; tPrivacy.style.fontWeight = '700';
+      tUser.style.color = colors.text3; tUser.style.fontWeight = '400';
+      title.textContent = '隐私政策';
+      body.innerHTML = '<p>隐私政策正文由后台控制台「协议文档」维护并下发。勾选登录即表示同意本政策全部条款。</p><h4>一、信息收集</h4><p>1.1 为向您提供登录、会员权益、订单履约等服务，我们可能会收集您的手机号、设备信息、日志信息等。</p><p>1.2 您上传的舌面皮肤、健康报告等图片，仅用于泰小虎健康服务分析，不会用于其他商业用途。</p><h4>二、信息保护</h4><p>2.1 我们采用加密传输、访问控制等技术措施保护您的个人信息。</p><p>2.2 未经您同意，我们不会向第三方共享可识别您个人身份的信息，法律法规另有规定的除外。</p>';
+    }
+  }
+
+  // 协议链接事件绑定（阻止冒泡触发勾选）
+  document.querySelectorAll('.agree-link').forEach(function(a){
+    a.addEventListener('click', function(e){
+      e.stopPropagation();
+      go('agreement', a.getAttribute('data-target'));
+    });
+  });
+
+  // 输入监听
+  ['code','phone-pwd','password','code-forgot','new-pwd','new-pwd2'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.addEventListener('input', function(){
+      if(id === 'code') toggleLogin('code');
+      if(id === 'phone-pwd' || id === 'password') toggleLogin('pwd');
+      if(['code-forgot','new-pwd','new-pwd2'].indexOf(id) >= 0) toggleLogin('forgot');
+    });
+  });
+
+  // 默认态
+  toggleLogin('code');
+</script>
+</body>
+</html>
