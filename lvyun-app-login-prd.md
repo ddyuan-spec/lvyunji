@@ -37,14 +37,11 @@
   - 验证码错误 / 过期 → Toast「验证码错误或已过期」
   - 频繁获取 → 服务端频控 + 前端 60s 倒计时禁用
 
-### 3.3 用户协议 / 隐私政策 勾选与查看
+### 3.3 用户协议 / 隐私政策 勾选
 - 登录按钮前置勾选项：「已阅读并同意《用户协议》《隐私政策》」
 - 未勾选点击登录 → Toast「请先阅读并同意用户协议与隐私政策」
-- 协议名可点击 → 打开对应协议详情（独立文件，见附录 / GitHub 链接）
+- 协议正文由后台控制台「协议文档」维护并下发，本期不展开交互细节
 - 不强制冷启动弹窗
-- 协议线上版：
-  - 《绿韵家 App 用户协议》：https://ddyuan-spec.github.io/lvyunji/lvyun-app-user-agreement.md
-  - 《绿韵家 App 隐私政策》：https://ddyuan-spec.github.io/lvyunji/lvyun-app-privacy-policy.md
 
 ### 3.4 登出 / 注销（待确认）
 - 登出：我的 - 设置（是否一期待确认）
@@ -82,8 +79,3 @@
 3. **登出 / 注销 / 换绑手机号**：是否纳入一期
 4. **推荐人绑定（拉新）**：App 这版是否保留（关联 `kb/business-flow.md`）
 5. **老用户合并**：原小程序用户用同手机号登录是否自动合并账号
-
-## 附录：协议文档（单独文件，待法务确认）
-- 《绿韵家 App 用户协议》（线上版）：https://ddyuan-spec.github.io/lvyunji/lvyun-app-user-agreement.md
-- 《绿韵家 App 隐私政策》（线上版）：https://ddyuan-spec.github.io/lvyunji/lvyun-app-privacy-policy.md
-- 两份协议均为初稿，待法务确认；运营主体公司全称、法务联系邮箱/地址等占位项以法务回稿为准。
