@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>绿韵家 App · 首页展示原型</title>
+<link rel="stylesheet" href="../kb/design-spec/lvyun-app-design-base.css">
+<style>
+  *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+  body{font-family:var(--lv-font); background:#e9ebee; color:var(--lv-text-2);}
+  .phone{width:375px; min-height:812px; margin:20px auto; background:var(--lv-bg); position:relative; display:flex; flex-direction:column; box-shadow:0 0 30px rgba(0,0,0,.12); overflow:hidden;}
+  .statusbar{height:44px; background:#fff; display:flex; align-items:center; justify-content:space-between; padding:0 16px; font-size:14px; font-weight:600; color:#1A211E; flex-shrink:0;}
+  .statusbar .icons{display:flex; gap:5px; align-items:center; font-size:12px;}
+  .scroll{flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding-bottom:64px;}
+
+  .topbar{background:#fff; padding:8px 12px 10px; display:flex; align-items:center; gap:10px; position:sticky; top:0; z-index:5;}
+  .logo{font-size:18px; font-weight:800; color:var(--lv-primary); white-space:nowrap; letter-spacing:.5px;}
+  .search{flex:1; background:#F2F3F5; border-radius:18px; height:34px; display:flex; align-items:center; padding:0 14px; color:var(--lv-text-4); font-size:13px; gap:6px; cursor:pointer;}
+  .msg-icon{width:24px; text-align:center; font-size:18px; color:#444; cursor:pointer; position:relative;}
+  .msg-icon::after{content:''; position:absolute; top:-2px; right:-2px; width:8px; height:8px; background:#F53F50; border-radius:50%;}
+
+  .kingkong{background:#fff; display:grid; grid-template-columns:repeat(5,1fr); gap:14px 0; padding:14px 6px 16px;}
+  .kk{display:flex; flex-direction:column; align-items:center; gap:6px; font-size:11px; color:#444; cursor:pointer;}
+  .kk .ic{width:44px; height:44px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:22px; color:#fff;}
+  .kk:nth-child(1) .ic{background:linear-gradient(135deg,#42AB6B,#2EBC87);}
+  .kk:nth-child(2) .ic{background:linear-gradient(135deg,#FF7D00,#FF4D00);}
+  .kk:nth-child(3) .ic{background:linear-gradient(135deg,#00C2C0,#00ECE4);}
+  .kk:nth-child(4) .ic{background:linear-gradient(135deg,#6B49E3,#9A7BFF);}
+  .kk:nth-child(5) .ic{background:linear-gradient(135deg,#F5A623,#FFCE3D);}
+  .kk:nth-child(6) .ic{background:linear-gradient(135deg,#2EBC87,#00ECE4);}
+  .kk:nth-child(7) .ic{background:linear-gradient(135deg,#FF4D00,#F53F50);}
+  .kk:nth-child(8) .ic{background:linear-gradient(135deg,#3490F9,#6B49E3);}
+  .kk:nth-child(9) .ic{background:linear-gradient(135deg,#F77234,#FFDA00);}
+  .kk:nth-child(10) .ic{background:linear-gradient(135deg,#999,#BBB);}
+
+  .banner{margin:10px 12px; border-radius:14px; padding:18px 16px; color:#fff; background:linear-gradient(120deg,#2EBC87,#42AB6B); position:relative;}
+  .banner .t{font-size:18px; font-weight:800;}
+  .banner .s{font-size:12px; opacity:.9; margin-top:4px;}
+  .banner .dots{position:absolute; bottom:8px; left:50%; transform:translateX(-50%); display:flex; gap:5px;}
+  .banner .dots span{width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.5);}
+  .banner .dots span.on{background:#fff;}
+
+  .promo{background:#fff; margin:10px 12px; border-radius:14px; padding:14px; display:flex; align-items:center; justify-content:space-between;}
+  .promo .info{flex:1;}
+  .promo .t{font-size:16px; font-weight:800; color:var(--lv-text-1);}
+  .promo .s{font-size:12px; color:var(--lv-text-3); margin-top:4px;}
+  .promo .btn{background:linear-gradient(135deg,#FF7D00,#FF4D00); color:#fff; font-size:12px; padding:7px 14px; border-radius:16px;}
+
+  .sec-head{display:flex; align-items:baseline; justify-content:space-between; padding:16px 14px 8px;}
+  .sec-head .t{font-size:16px; font-weight:800; color:var(--lv-text-1);}
+  .sec-head .more{font-size:12px; color:var(--lv-primary); cursor:pointer;}
+
+  .waterfall{columns:2; column-gap:10px; padding:0 12px;}
+  .goods{break-inside:avoid; background:#fff; border-radius:12px; overflow:hidden; margin-bottom:10px; box-shadow:0 1px 4px rgba(0,0,0,.04); cursor:pointer;}
+  .goods .ph{height:150px; background:linear-gradient(135deg,#EAF6EF,#DFF1E8); display:flex; align-items:center; justify-content:center; font-size:34px; color:#bfe3cf;}
+  .goods .body{padding:8px 10px 12px;}
+  .goods .name{font-size:13px; line-height:1.35; height:36px; overflow:hidden; color:var(--lv-text-2);}
+  .goods .tag{display:inline-block; font-size:10px; color:var(--lv-primary); border:1px solid var(--lv-primary); border-radius:4px; padding:0 4px; margin:6px 0;}
+  .goods .price{color:var(--lv-price); font-weight:800; font-size:15px; font-family:var(--lv-font-num);}
+  .goods .price small{font-size:10px; font-weight:600;}
+  .goods .old{color:var(--lv-text-4); text-decoration:line-through; font-size:11px; margin-left:4px;}
+  .goods .sold{font-size:10px; color:var(--lv-text-3); margin-left:6px;}
+
+  .tabbar{position:absolute; bottom:0; left:0; width:100%; height:58px; background:#fff; border-top:1px solid var(--lv-divider); display:flex; z-index:10;}
+  .tab{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:11px; color:var(--lv-text-4); cursor:pointer;}
+  .tab .ti{font-size:21px;}
+  .tab.on{color:var(--lv-primary); font-weight:700;}
+
+  .toast{position:fixed; left:50%; top:45%; transform:translate(-50%,-50%) scale(0); background:rgba(0,0,0,.75); color:#fff; padding:10px 18px; border-radius:8px; font-size:13px; z-index:200; transition:transform .2s;}
+  .toast.show{transform:translate(-50%,-50%) scale(1);}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="statusbar">
+    <span>9:41</span>
+    <span class="icons"><span>5G</span><span>100%</span></span>
+  </div>
+  <div class="scroll">
+    <div class="topbar">
+      <div class="logo">绿韵家</div>
+      <div class="search" onclick="toast('跳转搜索页')">🔍 搜索商品/活动/健康问答</div>
+      <div class="msg-icon" onclick="toast('跳转消息中心')">🔔</div>
+    </div>
+
+    <div class="kingkong">
+      <div class="kk" onclick="toast('新品上市')"><div class="ic">🆕</div><div>新品上市</div></div>
+      <div class="kk" onclick="toast('健康专区')"><div class="ic">💚</div><div>健康专区</div></div>
+      <div class="kk" onclick="toast('惠民补贴')"><div class="ic">🏷️</div><div>惠民补贴</div></div>
+      <div class="kk" onclick="toast('积分兑换')"><div class="ic">🎁</div><div>积分兑换</div></div>
+      <div class="kk" onclick="toast('每日活动')"><div class="ic">📅</div><div>每日活动</div></div>
+      <div class="kk" onclick="toast('爆款榜单')"><div class="ic">🔥</div><div>爆款榜单</div></div>
+      <div class="kk" onclick="toast('我的订单')"><div class="ic">📋</div><div>我的订单</div></div>
+      <div class="kk" onclick="toast('我的权益')"><div class="ic">💳</div><div>我的权益</div></div>
+      <div class="kk" onclick="toast('优惠券')"><div class="ic">🎟️</div><div>优惠券</div></div>
+      <div class="kk" onclick="toast('全部频道')"><div class="ic">⋮⋮</div><div>全部频道</div></div>
+    </div>
+
+    <div class="banner" onclick="toast('跳转活动详情')">
+      <div class="t">夏季健康补贴季</div>
+      <div class="s">惠民套餐限时补贴 100,000 积分</div>
+      <div class="dots"><span class="on"></span><span></span><span></span></div>
+    </div>
+
+    <div class="promo" onclick="toast('跳转新人专享')">
+      <div class="info">
+        <div class="t">新人专享礼包</div>
+        <div class="s">注册即领 ¥188 优惠券包</div>
+      </div>
+      <div class="btn">立即领取</div>
+    </div>
+
+    <div class="sec-head">
+      <div class="t">为你推荐</div>
+      <div class="more">更多 &gt;</div>
+    </div>
+
+    <div class="waterfall">
+      <div class="goods" onclick="toast('跳转商品详情：净水器滤芯')">
+        <div class="ph">🚰</div>
+        <div class="body">
+          <div class="name">绿韵家智能净水器滤芯 家用直饮净水机通用替换芯</div>
+          <div class="tag">惠民补贴</div>
+          <div><span class="price"><small>¥</small>299</span><span class="old">¥599</span><span class="sold">已售 1.2万</span></div>
+        </div>
+      </div>
+      <div class="goods" onclick="toast('跳转商品详情：健康套餐')">
+        <div class="ph">🥗</div>
+        <div class="body">
+          <div class="name">绿韵家惠民健康套餐 30天营养补给包</div>
+          <div class="tag">限时特惠</div>
+          <div><span class="price"><small>¥</small>899</span><span class="old">¥1299</span><span class="sold">已售 8321</span></div>
+        </div>
+      </div>
+      <div class="goods" onclick="toast('跳转商品详情：智能水杯')">
+        <div class="ph">🥤</div>
+        <div class="body">
+          <div class="name">智能提醒饮水杯 316不锈钢保温杯</div>
+          <div class="tag">新品</div>
+          <div><span class="price"><small>¥</small>159</span><span class="old">¥199</span><span class="sold">已售 3420</span></div>
+        </div>
+      </div>
+      <div class="goods" onclick="toast('跳转商品详情：空气净化器')">
+        <div class="ph">🌬️</div>
+        <div class="body">
+          <div class="name">家用空气净化器 除醛除菌静音卧室适用</div>
+          <div class="tag">爆款</div>
+          <div><span class="price"><small>¥</small>1299</span><span class="old">¥1699</span><span class="sold">已售 5678</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabbar">
+    <div class="tab on"><span class="ti">🏠</span><span>首页</span></div>
+    <div class="tab" onclick="toast('跳转数智')"><span class="ti">🤖</span><span>数智</span></div>
+    <div class="tab" onclick="toast('跳转消息')"><span class="ti">💬</span><span>消息</span></div>
+    <div class="tab" onclick="toast('跳转购物车')"><span class="ti">🛒</span><span>购物车</span></div>
+    <div class="tab" onclick="toast('跳转我的')"><span class="ti">👤</span><span>我的</span></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+function toast(text){
+  var t=document.getElementById('toast');
+  t.textContent=text; t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},1600);
+}
+</script>
+</body>
+</html>
