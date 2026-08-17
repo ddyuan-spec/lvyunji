@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>绿韵家App - 平铺源码原型</title>
+  <style>
+    :root {
+      --primary: #4CAF50;
+      --primary-light: #81C784;
+      --primary-bg: #f4f9f4;
+      --blue: #2196F3;
+      --blue-light: #E3F2FD;
+      --orange: #FF9800;
+      --orange-light: #FFF3E0;
+      --red: #F44336;
+      --red-light: #FFEBEE;
+      --text: #1a1a1a;
+      --text-secondary: #666666;
+      --text-tertiary: #999999;
+      --border: #eeeeee;
+      --card-bg: #ffffff;
+      --bg: #f5f5f5;
+      --page-bg: #f7f8fa;
+      --gradient-start: #e8f5e9;
+      --gradient-end: #f1f8e9;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; background: #e5e5e5; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+    .phone { width: 375px; height: 812px; background: var(--page-bg); position: relative; overflow: hidden; border-radius: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); margin: 20px 0; }
+    .status-bar { height: 44px; background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; font-size: 14px; font-weight: 600; color: var(--text); position: absolute; top: 0; left: 0; right: 0; z-index: 100; }
+    .status-bar.light { background: #fff; }
+    .status-bar .right { display: flex; gap: 4px; align-items: center; }
+
+    /* 页面容器 */
+    .page { position: absolute; top: 44px; left: 0; right: 0; bottom: 0; display: none; overflow: hidden; background: var(--page-bg); }
+    .page.active { display: block; }
+    .scroll-view { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+    .has-tab-bar .scroll-view { bottom: 56px; }
+    .has-nav .scroll-view { top: 44px; bottom: 0; }
+    .has-nav.has-tab-bar .scroll-view { top: 44px; bottom: 56px; }
+
+    /* 导航栏 */
+    .nav-bar { height: 44px; background: #fff; display: flex; align-items: center; justify-content: center; position: absolute; top: 0; left: 0; right: 0; z-index: 99; font-size: 17px; font-weight: 600; color: var(--text); border-bottom: 1px solid var(--border); }
+    .nav-bar .back { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--text); cursor: pointer; position: absolute; left: 0; }
+
+    /* 底部Tab */
+    .tab-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 56px; background: var(--card-bg); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 98; }
+    .tab-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 10px; color: var(--text-tertiary); cursor: pointer; }
+    .tab-item .icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .tab-item .icon.ai-icon { font-size: 16px; font-weight: 700; border: 1.5px solid currentColor; border-radius: 6px; width: 22px; height: 22px; }
+    .tab-item.active { color: var(--primary); }
+
+    /* 通用卡片 */
+    .card { background: var(--card-bg); border-radius: 12px; margin: 0 12px 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    .section-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+    .section-title .more { font-size: 13px; color: var(--text-tertiary); font-weight: 400; }
+
+    /* Toast */
+    #toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.75); color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 14px; display: none; z-index: 999; white-space: nowrap; }
+    #toast.active { display: block; }
+
+    /* ================== 首页 ================== */
+    .home-header { background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%); padding: 8px 16px 16px; }
+    .home-top { display: flex; align-items: center; gap: 12px; }
+    .home-location { font-size: 16px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 4px; }
+    .home-search { flex: 1; height: 36px; background: #fff; border-radius: 18px; display: flex; align-items: center; padding: 0 12px; gap: 6px; color: var(--text-tertiary); font-size: 13px; }
+    .home-search-btn { width: 44px; height: 28px; background: var(--primary); color: #fff; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 13px; margin-left: 8px; }
+    .home-cart { position: relative; font-size: 22px; color: var(--text); }
+    .home-cart .badge { position: absolute; top: -6px; right: -6px; min-width: 16px; height: 16px; background: var(--red); color: #fff; border-radius: 8px; font-size: 10px; display: flex; align-items: center; justify-content: center; padding: 0 4px; }
+    .home-banner { margin: 12px 0 0; height: 120px; background: linear-gradient(135deg, #c8e6c9, #a5d6a7); border-radius: 12px; display: flex; align-items: center; padding: 0 20px; position: relative; overflow: hidden; }
+    .home-banner .text { flex: 1; }
+    .home-banner .t1 { font-size: 18px; font-weight: 700; color: #1b5e20; }
+    .home-banner .t2 { font-size: 13px; color: #2e7d32; margin-top: 4px; }
+    .home-banner .btn { margin-top: 10px; width: 80px; height: 28px; background: #1b5e20; color: #fff; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+    .home-banner .img { position: absolute; right: 10px; bottom: -10px; font-size: 80px; opacity: 0.7; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px 8px; padding: 4px; }
+    .grid-item { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
+    .grid-item .g-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; position: relative; }
+    .grid-item .g-icon .new-tag { position: absolute; top: -4px; left: -4px; background: var(--primary); color: #fff; font-size: 9px; padding: 1px 4px; border-radius: 6px; }
+    .grid-item .g-name { font-size: 12px; color: var(--text-secondary); }
+    .floor-title { font-size: 16px; font-weight: 800; color: var(--text); margin: 16px 12px 12px; display: flex; align-items: center; gap: 8px; }
+    .floor-title .tag { font-size: 11px; color: var(--primary); background: var(--primary-bg); padding: 2px 8px; border-radius: 10px; font-weight: 500; }
+    .brand-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 12px; }
+    .brand-card { background: var(--card-bg); border-radius: 12px; padding: 12px; min-height: 120px; display: flex; flex-direction: column; justify-content: space-between; }
+    .brand-card .b-title { font-size: 15px; font-weight: 700; color: var(--text); }
+    .brand-card .b-sub { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+    .brand-card .b-img { font-size: 48px; align-self: flex-end; }
+    .product-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 12px 12px; }
+    .p-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    .p-card .thumb { width: 100%; aspect-ratio: 1 / 1; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 40px; position: relative; }
+    .p-card .thumb .tag-img { position: absolute; top: 6px; left: 6px; background: var(--primary); color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 8px; }
+    .p-card .info { padding: 10px; }
+    .p-card .p-title { font-size: 13px; color: var(--text); line-height: 1.4; height: 36px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: 8px; }
+    .p-card .p-desc { font-size: 11px; color: var(--text-tertiary); margin-bottom: 6px; }
+    .p-card .price-row { display: flex; align-items: baseline; gap: 6px; }
+    .p-card .price { font-size: 15px; font-weight: 700; color: var(--red); }
+    .p-card .origin { font-size: 11px; color: var(--text-tertiary); text-decoration: line-through; }
+
+    /* ================== 我的页 ================== */
+    .mine-top { background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%); padding: 16px 16px 20px; border-radius: 0 0 20px 20px; position: relative; }
+    .mine-settings { position: absolute; top: 12px; right: 16px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); font-size: 20px; border: 1.5px solid var(--text-secondary); border-radius: 8px; transform: rotate(0deg); }
+    .mine-profile { display: flex; align-items: center; gap: 12px; }
+    .avatar { width: 64px; height: 64px; border-radius: 50%; background: #ddd; display: flex; align-items: center; justify-content: center; overflow: hidden; font-size: 28px; color: #fff; }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .mine-info { flex: 1; }
+    .mine-name { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .mine-tags { display: flex; gap: 6px; margin-bottom: 8px; }
+    .m-tag { display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+    .m-tag.orange { background: #fff3e0; color: #ef6c00; }
+    .m-tag.red { background: #ffebee; color: #c62828; }
+    .m-tag .crown { font-size: 12px; }
+    .mine-account { font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
+    .mine-arrow { font-size: 22px; color: var(--text-tertiary); }
+    .order-row { display: flex; justify-content: space-around; margin-top: 4px; }
+    .order-cell { display: flex; flex-direction: column; align-items: center; gap: 6px; position: relative; cursor: pointer; }
+    .order-cell .o-icon { width: 40px; height: 40px; background: var(--primary-bg); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--primary); position: relative; }
+    .order-cell .o-badge { position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; background: var(--red); color: #fff; border-radius: 9px; font-size: 10px; display: flex; align-items: center; justify-content: center; padding: 0 4px; }
+    .order-cell .o-name { font-size: 12px; color: var(--text-secondary); }
+    .invite-banner { background: linear-gradient(90deg, #e8f5e9, #f1f8e9); border-radius: 12px; padding: 14px 16px; margin: 0 12px 12px; display: flex; align-items: center; justify-content: space-between; }
+    .invite-banner .l1 { font-size: 16px; font-weight: 700; color: #1b5e20; }
+    .invite-banner .l2 { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+    .invite-banner .gift { font-size: 40px; }
+    .service-grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px 4px; padding: 4px; }
+    .service-cell { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
+    .service-cell .s-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .service-cell .s-icon.green { background: var(--primary-bg); color: var(--primary); }
+    .service-cell .s-icon.blue { background: var(--blue-light); color: var(--blue); }
+    .service-cell .s-icon.orange { background: var(--orange-light); color: var(--orange); }
+    .service-cell .s-name { font-size: 11px; color: var(--text-secondary); text-align: center; }
+
+    /* ================== 数商服务首页 ================== */
+    .shushang-top { background: linear-gradient(135deg, #e3f2fd 0%, #f4f9f4 100%); padding: 16px; border-radius: 0 0 20px 20px; }
+    .shushang-user { display: flex; align-items: center; justify-content: space-between; }
+    .shushang-hi { display: flex; align-items: center; gap: 10px; }
+    .shushang-hi .hi-text { font-size: 22px; font-weight: 500; color: var(--text); }
+    .shushang-hi .hi-text b { font-weight: 700; }
+    .shushang-hi .hi-text i { font-style: italic; color: var(--blue); font-family: Georgia, serif; }
+    .ai-tools { display: flex; justify-content: space-between; padding: 4px 8px; }
+    .ai-tool { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
+    .ai-tool .a-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; background: var(--primary-bg); color: var(--primary); border: 1px solid #e8f5e9; }
+    .ai-tool .a-name { font-size: 11px; color: var(--text-secondary); }
+    .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    .stat-card { background: var(--card-bg); border-radius: 12px; padding: 14px; position: relative; }
+    .stat-card .label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+    .stat-card .value { font-size: 22px; font-weight: 700; color: var(--text); }
+    .stat-card .change { font-size: 11px; margin-top: 6px; display: flex; align-items: center; gap: 2px; }
+    .stat-card .change.up { color: var(--primary); }
+    .stat-card .change.down { color: var(--red); }
+    .stat-card .warn { font-size: 12px; color: var(--red); margin-top: 8px; display: flex; align-items: center; justify-content: space-between; }
+    .stat-card .warn-btn { color: var(--blue); font-size: 12px; }
+    .chart-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+    .chart-tab { padding: 6px 14px; border-radius: 14px; font-size: 13px; color: var(--text-secondary); background: #f5f5f5; cursor: pointer; }
+    .chart-tab.active { background: var(--primary-bg); color: var(--primary); }
+    .chart-area { height: 160px; background: var(--card-bg); border-radius: 12px; padding: 16px; position: relative; }
+    .chart-line { position: absolute; left: 40px; right: 16px; top: 30px; bottom: 40px; }
+    .chart-line svg { width: 100%; height: 100%; }
+    .business-banner { height: 100px; background: linear-gradient(90deg, #ffe0b2, #ffcc80); border-radius: 12px; display: flex; align-items: center; padding: 0 20px; position: relative; overflow: hidden; }
+    .business-banner .t1 { font-size: 20px; font-weight: 800; color: #e65100; }
+    .business-banner .t2 { width: 80px; height: 28px; background: #e65100; color: #fff; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 12px; margin-top: 10px; }
+    .business-banner .img { position: absolute; right: 10px; font-size: 60px; opacity: 0.8; }
+
+    /* ================== 客户列表 ================== */
+    .filter-tabs { display: flex; background: #fff; padding: 0 12px; border-bottom: 1px solid var(--border); position: absolute; top: 44px; left: 0; right: 0; z-index: 10; }
+    .filter-tab { flex: 1; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--text-secondary); cursor: pointer; position: relative; }
+    .filter-tab.active { color: var(--blue); font-weight: 600; }
+    .filter-tab.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 24px; height: 3px; background: var(--blue); border-radius: 2px; }
+    .customer-item { background: #fff; margin: 0 12px 10px; border-radius: 16px; padding: 16px; display: flex; align-items: flex-start; gap: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    .customer-item .c-avatar { width: 50px; height: 50px; border-radius: 50%; background: #e0e0e0; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff; flex-shrink: 0; }
+    .customer-item .c-body { flex: 1; min-width: 0; }
+    .customer-item .c-row { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 6px; }
+    .customer-item .c-left { flex: 1; min-width: 0; }
+    .customer-item .c-name { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .customer-item .c-phone { font-size: 12px; color: var(--text-tertiary); display: flex; align-items: center; gap: 4px; }
+    .customer-item .c-phone .phone-icon { width: 10px; height: 14px; background: var(--blue); border-radius: 2px; position: relative; }
+    .customer-item .c-phone .phone-icon::before { content: ''; position: absolute; top: 2px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: #fff; border-radius: 50%; }
+    .customer-item .c-phone .phone-icon::after { content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); width: 6px; height: 2px; background: #fff; border-radius: 1px; }
+    .customer-item .c-status { font-size: 11px; padding: 4px 10px; border-radius: 999px; flex-shrink: 0; margin-top: 2px; }
+    .customer-item .c-status.active { background: #e8f5e9; color: #2e7d32; }
+    .customer-item .c-status.week { background: #fff3e0; color: #ef6c00; }
+    .customer-item .c-status.inactive { background: #ffebee; color: #c62828; }
+    .customer-item .c-level { font-size: 11px; padding: 4px 10px; border-radius: 999px; flex-shrink: 0; margin-top: 2px; background: linear-gradient(135deg,#fff8e1,#ffecb3); color: #f57f17; border: 1px solid #ffe082; }
+    .customer-item .c-meta { font-size: 12px; color: var(--text-tertiary); margin-top: 10px; display: flex; align-items: center; justify-content: space-between; }
+    .customer-item .c-detail { font-size: 12px; color: var(--text-tertiary); display: flex; align-items: center; gap: 2px; }
+    .customer-item .c-achieve { font-size: 11px; color: var(--text-tertiary); margin-top: 6px; }
+    .float-wake { width: 100%; height: 44px; background: var(--blue); color: #fff; border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 15px; box-shadow: 0 4px 16px rgba(33,150,243,0.35); cursor: pointer; margin: 16px 0 8px; }
+
+    /* ================== 客户详情 ================== */
+    .detail-user-card { background: #fff; margin: 12px; border-radius: 12px; padding: 16px; display: flex; gap: 12px; }
+    .detail-user-card .du-avatar { width: 64px; height: 64px; border-radius: 50%; background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff; overflow: hidden; }
+    .detail-user-card .du-info { flex: 1; }
+    .detail-user-card .du-name { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .detail-user-card .du-row { font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; }
+    .info-block { background: #fff; margin: 0 12px 12px; border-radius: 12px; padding: 16px; }
+    .info-block-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+    .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .label { color: var(--text-secondary); }
+    .info-row .value { color: var(--text); font-weight: 500; }
+    .order-filter-bar { display: flex; gap: 10px; margin-bottom: 12px; }
+    .order-filter { flex: 1; height: 34px; background: #f5f5f5; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--text-secondary); }
+    .order-item { border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+    .order-item .o-head { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-tertiary); margin-bottom: 8px; }
+    .order-item .o-body { display: flex; gap: 10px; }
+    .order-item .o-thumb { width: 60px; height: 60px; background: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+    .order-item .o-info { flex: 1; }
+    .order-item .o-title { font-size: 14px; color: var(--text); margin-bottom: 4px; }
+    .order-item .o-sku { font-size: 12px; color: var(--text-tertiary); }
+    .order-item .o-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+    .order-item .o-price { font-size: 14px; color: var(--text); font-weight: 600; }
+    .order-item .o-status { font-size: 12px; color: var(--primary); }
+
+    .customer-item .c-level { font-size: 10px; color: var(--text-tertiary); background: #f0f0f0; padding: 1px 6px; border-radius: 8px; margin-left: 4px; font-weight: 400; }
+    .customer-item .c-valuable { font-size: 10px; color: #fff; background: var(--orange); padding: 1px 6px; border-radius: 8px; margin-left: 4px; font-weight: 600; }
+    .customer-item .c-amount { color: var(--text-secondary); }
+  </style>
+</head>
+<body>
+<div class="phone">
+  <div class="status-bar" id="statusBar">
+    <span>9:41</span>
+    <span class="right">📶 🔋</span>
+  </div>
+
+  <!-- ================== 首页 ================== -->
+  <div class="page active has-tab-bar" id="pageHome">
+    <div class="scroll-view">
+      <div class="home-header">
+        <div class="home-top">
+          <div class="home-location">📍 长沙</div>
+          <div class="home-search" onclick="toast('搜索商品')">🔍 搜索商品</div>
+          <div class="home-search-btn" onclick="toast('搜索')">搜索</div>
+          <div class="home-cart" onclick="toast('购物车')">🛒<span class="badge">99</span></div>
+        </div>
+        <div class="home-banner" onclick="toast('Banner 详情')">
+          <div class="text">
+            <div class="t1">草本配方 辅助调糖脂</div>
+            <div class="t2">糖脂乐片</div>
+            <div class="btn">立即查看</div>
+          </div>
+          <div class="img">💊</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:-10px; position:relative; z-index:2;">
+        <div class="grid-4">
+          <div class="grid-item" onclick="toast('新品上市')"><div class="g-icon" style="background:#e8f5e9; color:#4caf50;"><span class="new-tag">NEW</span>🎁</div><div class="g-name">新品上市</div></div>
+          <div class="grid-item" onclick="toast('健康专区')"><div class="g-icon" style="background:#e3f2fd; color:#2196f3;">❤️</div><div class="g-name">健康专区</div></div>
+          <div class="grid-item" onclick="toast('自营专区')"><div class="g-icon" style="background:#fff3e0; color:#ff9800;">🏪</div><div class="g-name">自营专区</div></div>
+          <div class="grid-item" onclick="toast('微生态专区')"><div class="g-icon" style="background:#f3e5f5; color:#9c27b0;">🧬</div><div class="g-name">微生态专区</div></div>
+          <div class="grid-item" onclick="toast('惠民补贴')"><div class="g-icon" style="background:#e0f2f1; color:#009688;">¥</div><div class="g-name">惠民补贴</div></div>
+          <div class="grid-item" onclick="toast('每日活动')"><div class="g-icon" style="background:#ffebee; color:#f44336;">🎉</div><div class="g-name">每日活动</div></div>
+          <div class="grid-item" onclick="toast('精品推荐')"><div class="g-icon" style="background:#fff8e1; color:#ffc107;">⭐</div><div class="g-name">精品推荐</div></div>
+          <div class="grid-item" onclick="toast('更多分类')"><div class="g-icon" style="background:#f5f5f5; color:#666;">➕</div><div class="g-name">更多</div></div>
+        </div>
+      </div>
+
+      <div class="floor-title">超级品牌 <span class="tag">闭眼放心购</span></div>
+      <div class="brand-grid">
+        <div class="brand-card" onclick="toast('超级品牌')">
+          <div><div class="b-title">超级品牌</div><div class="b-sub">品质好物</div></div>
+          <div class="b-img">💊</div>
+        </div>
+        <div class="brand-card" onclick="toast('超级爆款')">
+          <div><div class="b-title">超级爆款</div><div class="b-sub">质优价又好</div></div>
+          <div class="b-img">🔥</div>
+        </div>
+      </div>
+
+      <div class="floor-title">限时特惠 <span class="tag">好物限量抢</span></div>
+      <div class="brand-grid" style="margin-bottom:4px;">
+        <div class="brand-card" onclick="toast('限时特惠1')">
+          <div><div class="b-title">¥299</div><div class="b-sub" style="text-decoration:line-through;">¥399</div></div>
+          <div class="b-img">🌿</div>
+        </div>
+        <div class="brand-card" onclick="toast('限时特惠2')">
+          <div><div class="b-title">¥49</div><div class="b-sub" style="text-decoration:line-through;">¥88</div></div>
+          <div class="b-img">🍵</div>
+        </div>
+      </div>
+
+      <div class="floor-title">猜你喜欢</div>
+      <div class="product-grid-2" id="guessYouLike"></div>
+    </div>
+    <div class="tab-bar">
+      <div class="tab-item active" onclick="switchTab('pageHome', this)"><div class="icon">🏠</div>首页</div>
+      <div class="tab-item" onclick="switchTab('pageAI', this)"><div class="icon ai-icon">AI</div>AI</div>
+      <div class="tab-item" onclick="switchTab('pageZhishu', this)"><div class="icon">🧠</div>数智</div>
+      <div class="tab-item" onclick="switchTab('pageMessage', this)"><div class="icon">💬</div>消息</div>
+      <div class="tab-item" onclick="switchTab('pageMine', this)"><div class="icon">👤</div>我的</div>
+    </div>
+  </div>
+
+  <!-- ================== AI 页 ================== -->
+  <div class="page has-tab-bar" id="pageAI">
+    <div class="scroll-view" style="display:flex; align-items:center; justify-content:center;">
+      <div style="text-align:center; color:var(--text-tertiary);">
+        <div style="font-size:60px; margin-bottom:16px;">🤖</div>
+        <div style="font-size:16px;">AI 助手页面</div>
+        <div style="font-size:13px; margin-top:8px;">暂未提供设计稿</div>
+      </div>
+    </div>
+    <div class="tab-bar">
+      <div class="tab-item" onclick="switchTab('pageHome', this)"><div class="icon">🏠</div>首页</div>
+      <div class="tab-item active" onclick="switchTab('pageAI', this)"><div class="icon ai-icon">AI</div>AI</div>
+      <div class="tab-item" onclick="switchTab('pageZhishu', this)"><div class="icon">🧠</div>数智</div>
+      <div class="tab-item" onclick="switchTab('pageMessage', this)"><div class="icon">💬</div>消息</div>
+      <div class="tab-item" onclick="switchTab('pageMine', this)"><div class="icon">👤</div>我的</div>
+    </div>
+  </div>
+
+  <!-- ================== 数智页 ================== -->
+  <div class="page has-tab-bar" id="pageZhishu">
+    <div class="scroll-view" style="display:flex; align-items:center; justify-content:center;">
+      <div style="text-align:center; color:var(--text-tertiary);">
+        <div style="font-size:60px; margin-bottom:16px;">📊</div>
+        <div style="font-size:16px;">数智页面</div>
+        <div style="font-size:13px; margin-top:8px;">暂未提供设计稿</div>
+      </div>
+    </div>
+    <div class="tab-bar">
+      <div class="tab-item" onclick="switchTab('pageHome', this)"><div class="icon">🏠</div>首页</div>
+      <div class="tab-item" onclick="switchTab('pageAI', this)"><div class="icon ai-icon">AI</div>AI</div>
+      <div class="tab-item active" onclick="switchTab('pageZhishu', this)"><div class="icon">🧠</div>数智</div>
+      <div class="tab-item" onclick="switchTab('pageMessage', this)"><div class="icon">💬</div>消息</div>
+      <div class="tab-item" onclick="switchTab('pageMine', this)"><div class="icon">👤</div>我的</div>
+    </div>
+  </div>
+
+  <!-- ================== 消息页 ================== -->
+  <div class="page has-tab-bar" id="pageMessage">
+    <div class="scroll-view" style="display:flex; align-items:center; justify-content:center;">
+      <div style="text-align:center; color:var(--text-tertiary);">
+        <div style="font-size:60px; margin-bottom:16px;">💬</div>
+        <div style="font-size:16px;">消息页面</div>
+        <div style="font-size:13px; margin-top:8px;">暂未提供设计稿</div>
+      </div>
+    </div>
+    <div class="tab-bar">
+      <div class="tab-item" onclick="switchTab('pageHome', this)"><div class="icon">🏠</div>首页</div>
+      <div class="tab-item" onclick="switchTab('pageAI', this)"><div class="icon ai-icon">AI</div>AI</div>
+      <div class="tab-item" onclick="switchTab('pageZhishu', this)"><div class="icon">🧠</div>数智</div>
+      <div class="tab-item active" onclick="switchTab('pageMessage', this)"><div class="icon">💬</div>消息</div>
+      <div class="tab-item" onclick="switchTab('pageMine', this)"><div class="icon">👤</div>我的</div>
+    </div>
+  </div>
+
+  <!-- ================== 我的页 ================== -->
+  <div class="page has-tab-bar" id="pageMine">
+    <div class="scroll-view">
+      <div class="mine-top">
+        <div class="mine-settings" onclick="toast('打开设置')">⚙️</div>
+        <div class="mine-profile" onclick="toast('个人信息')">
+          <div class="avatar">👩</div>
+          <div class="mine-info">
+            <div class="mine-name">大不列颠蛋黄酥啊啊啊</div>
+            <div class="mine-tags">
+              <span class="m-tag orange"><span class="crown">👑</span> 至尊达人</span>
+              <span class="m-tag red">⚡ 执行委</span>
+            </div>
+            <div class="mine-account">账号：12345678 📋</div>
+          </div>
+          <div class="mine-arrow">›</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:-10px; position:relative; z-index:2;">
+        <div class="section-title">我的订单 <span class="more">全部订单 ›</span></div>
+        <div class="order-row">
+          <div class="order-cell" onclick="toast('待支付')"><div class="o-icon">💰<span class="o-badge">99+</span></div><div class="o-name">待支付</div></div>
+          <div class="order-cell" onclick="toast('待发货/核销')"><div class="o-icon">📦<span class="o-badge">99</span></div><div class="o-name">待发货/核销</div></div>
+          <div class="order-cell" onclick="toast('待收货')"><div class="o-icon">🚚<span class="o-badge">1</span></div><div class="o-name">待收货</div></div>
+          <div class="order-cell" onclick="toast('待评价')"><div class="o-icon">💬</div><div class="o-name">待评价</div></div>
+          <div class="order-cell" onclick="toast('退换/售后')"><div class="o-icon">↩️</div><div class="o-name">退换/售后</div></div>
+        </div>
+      </div>
+
+      <div class="invite-banner" onclick="toast('邀请好友')">
+        <div>
+          <div class="l1">邀请好友·福利多多</div>
+          <div class="l2">超多福利，等你来领取！</div>
+        </div>
+        <div class="gift">🎁</div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">我的服务</div>
+        <div class="service-grid-5">
+          <div class="service-cell" onclick="go('pageShushang')">
+            <div class="s-icon green">🤝</div>
+            <div class="s-name">数商服务</div>
+          </div>
+          <div class="service-cell" onclick="toast('网格水站')">
+            <div class="s-icon blue">💧</div>
+            <div class="s-name">网格水站</div>
+          </div>
+          <div class="service-cell" onclick="toast('排行榜')">
+            <div class="s-icon orange">📊</div>
+            <div class="s-name">排行榜</div>
+          </div>
+          <div class="service-cell" onclick="toast('优惠券')">
+            <div class="s-icon green">🎟️</div>
+            <div class="s-name">优惠券</div>
+          </div>
+          <div class="service-cell" onclick="toast('我的积分')">
+            <div class="s-icon orange">💎</div>
+            <div class="s-name">我的积分</div>
+          </div>
+          <div class="service-cell" onclick="toast('收货地址')">
+            <div class="s-icon blue">📍</div>
+            <div class="s-name">收货地址</div>
+          </div>
+          <div class="service-cell" onclick="toast('我的收藏')">
+            <div class="s-icon orange">⭐</div>
+            <div class="s-name">我的收藏</div>
+          </div>
+          <div class="service-cell" onclick="toast('联系客服')">
+            <div class="s-icon green">🎧</div>
+            <div class="s-name">联系客服</div>
+          </div>
+          <div class="service-cell" onclick="toast('意见反馈')">
+            <div class="s-icon blue">✉️</div>
+            <div class="s-name">意见反馈</div>
+          </div>
+          <div class="service-cell" onclick="toast('代注册')">
+            <div class="s-icon green">➕</div>
+            <div class="s-name">代注册</div>
+          </div>
+          <div class="service-cell" onclick="toast('签到打卡')">
+            <div class="s-icon orange">📅</div>
+            <div class="s-name">签到打卡</div>
+          </div>
+          <div class="service-cell" onclick="toast('推广')">
+            <div class="s-icon blue">📢</div>
+            <div class="s-name">推广</div>
+          </div>
+          <div class="service-cell" onclick="toast('直播广场')">
+            <div class="s-icon orange">📺</div>
+            <div class="s-name">直播广场</div>
+          </div>
+          <div class="service-cell" onclick="toast('公司资质')">
+            <div class="s-icon green">📋</div>
+            <div class="s-name">公司资质</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:12px 12px 4px;">
+        <div class="section-title">推荐商品</div>
+        <div class="product-grid-2" id="recommendGrid"></div>
+      </div>
+    </div>
+    <div class="tab-bar">
+      <div class="tab-item" onclick="switchTab('pageHome', this)"><div class="icon">🏠</div>首页</div>
+      <div class="tab-item" onclick="switchTab('pageAI', this)"><div class="icon ai-icon">AI</div>AI</div>
+      <div class="tab-item" onclick="switchTab('pageZhishu', this)"><div class="icon">🧠</div>数智</div>
+      <div class="tab-item" onclick="switchTab('pageMessage', this)"><div class="icon">💬</div>消息</div>
+      <div class="tab-item active" onclick="switchTab('pageMine', this)"><div class="icon">👤</div>我的</div>
+    </div>
+  </div>
+
+  <!-- ================== 数商服务首页 ================== -->
+  <div class="page has-nav has-tab-bar" id="pageShushang">
+    <div class="nav-bar">
+      <div class="back" onclick="go('pageMine')">‹</div>
+      <div>数商服务</div>
+    </div>
+    <div class="scroll-view">
+      <div class="shushang-top">
+        <div class="shushang-user">
+          <div class="shushang-hi">
+            <div class="avatar" style="width:48px;height:48px;font-size:20px;">👩</div>
+            <div>
+              <div class="hi-text"><i>Hi</i> <b>大不列颠蛋黄酥啊啊啊</b></div>
+              <div class="mine-tags" style="margin-top:6px;">
+                <span class="m-tag orange"><span class="crown">👑</span> 至尊达人</span>
+                <span class="m-tag red">⚡ 执行委</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:-10px; position:relative; z-index:2;">
+        <div class="section-title">AI工具</div>
+        <div class="ai-tools">
+          <div class="ai-tool" onclick="toast('素材库')"><div class="a-icon">🎨</div><div class="a-name">素材库</div></div>
+          <div class="ai-tool" onclick="toast('生成视频')"><div class="a-icon" style="background:#e3f2fd; color:#2196f3;">▶️</div><div class="a-name">生成视频</div></div>
+          <div class="ai-tool" onclick="toast('图片生成')"><div class="a-icon" style="background:#fff3e0; color:#ff9800;">🖼️</div><div class="a-name">图片生成</div></div>
+          <div class="ai-tool" onclick="toast('数字人分身')"><div class="a-icon" style="background:#f3e5f5; color:#9c27b0;">👤</div><div class="a-name">数字人分身</div></div>
+          <div class="ai-tool" onclick="toast('风控律师')"><div class="a-icon" style="background:#e8f5e9; color:#4caf50;">🛡️</div><div class="a-name">风控律师</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">客户管理 <span class="more" onclick="go('pageCustomerList')">查看详情 ›</span></div>
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="label">直推总客户</div>
+            <div class="value">678人</div>
+            <div class="change up">↗ 环比 +81.5%</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">今日活跃</div>
+            <div class="value">678人</div>
+            <div class="change down">↘ 环比 -81.5%</div>
+          </div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="label">沉寂预警</div>
+            <div class="value" style="color:var(--red);">18人</div>
+            <div class="warn"><span>需立即唤醒</span><span class="warn-btn" onclick="go('pageCustomerList')">一键查看 ›</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="label">高价值核心客户</div>
+            <div class="value">399人</div>
+            <div class="change down">↘ 环比 -81.5%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">活跃走势图</div>
+        <div class="chart-tabs">
+          <div class="chart-tab active" onclick="switchChartTab(this)">近7天</div>
+          <div class="chart-tab" onclick="switchChartTab(this)">近15天</div>
+          <div class="chart-tab" onclick="switchChartTab(this)">近30天</div>
+        </div>
+        <div class="chart-area">
+          <svg viewBox="0 0 300 120" preserveAspectRatio="none">
+            <polyline points="0,90 40,100 80,70 120,60 160,40 200,35 240,20 280,15 300,10" fill="none" stroke="#2196F3" stroke-width="2"/>
+            <circle cx="240" cy="20" r="4" fill="#fff" stroke="#2196F3" stroke-width="2"/>
+            <line x1="240" y1="20" x2="240" y2="120" stroke="#2196F3" stroke-width="1" stroke-dasharray="4"/>
+          </svg>
+          <div style="position:absolute; bottom:10px; left:40px; right:16px; display:flex; justify-content:space-between; font-size:10px; color:#999;">
+            <span>08-11</span><span>08-12</span><span>08-13</span><span>08-14</span><span>08-15</span><span>08-16</span><span>08-17</span>
+          </div>
+          <div style="position:absolute; left:10px; top:20px; bottom:40px; display:flex; flex-direction:column; justify-content:space-between; font-size:10px; color:#999;">
+            <span>12000</span><span>6000</span><span>3000</span><span>0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">商学院</div>
+        <div class="business-banner" onclick="toast('线上课堂')">
+          <div>
+            <div class="t1">线上课堂</div>
+            <div class="t2">立即查看</div>
+          </div>
+          <div class="img">📚</div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-bar">
+      <div class="tab-item" onclick="switchTab('pageHome', this)"><div class="icon">🏠</div>首页</div>
+      <div class="tab-item" onclick="switchTab('pageAI', this)"><div class="icon ai-icon">AI</div>AI</div>
+      <div class="tab-item" onclick="switchTab('pageZhishu', this)"><div class="icon">🧠</div>数智</div>
+      <div class="tab-item" onclick="switchTab('pageMessage', this)"><div class="icon">💬</div>消息</div>
+      <div class="tab-item active" onclick="switchTab('pageShushang', this)"><div class="icon">🤝</div>数商</div>
+    </div>
+  </div>
+
+  <!-- ================== 客户列表 ================== -->
+  <div class="page has-nav" id="pageCustomerList">
+    <div class="nav-bar">
+      <div class="back" onclick="go('pageShushang')">‹</div>
+      <div>客户列表</div>
+    </div>
+    <div class="filter-tabs">
+      <div class="filter-tab active" onclick="switchFilter(0, this)">全部客户</div>
+      <div class="filter-tab" onclick="switchFilter(1, this)">今日活跃</div>
+      <div class="filter-tab" onclick="switchFilter(2, this)">沉寂客户</div>
+      <div class="filter-tab" onclick="switchFilter(3, this)">高价值客户</div>
+    </div>
+    <div class="scroll-view" style="top:90px;">
+      <div id="customerListWrap"></div>
+      <div class="float-wake" onclick="toast('一键唤醒沉寂客户')">一键唤醒</div>
+      <div style="height:16px;"></div>
+    </div>
+  </div>
+
+  <!-- ================== 客户详情 ================== -->
+  <div class="page has-nav" id="pageCustomerDetail">
+    <div class="nav-bar">
+      <div class="back" onclick="go('pageCustomerList')">‹</div>
+      <div>客户详情</div>
+    </div>
+    <div class="scroll-view">
+      <div class="detail-user-card">
+        <div class="du-avatar" id="duAvatar">👩</div>
+        <div class="du-info">
+          <div class="du-name" id="duName">用户名用户名用户名</div>
+          <div class="du-row" id="duPhone">📱 135****8988</div>
+          <div class="du-row" id="duAccount">账号：135****8988</div>
+          <div class="du-row" id="duLast">上次登录：2024-08-17 10:30</div>
+        </div>
+        <div class="c-status active" id="duStatus" style="margin-top:4px;">今日活跃</div>
+      </div>
+
+      <div class="info-block">
+        <div class="info-block-title">客户基础信息</div>
+        <div class="info-row"><span class="label">注册时间</span><span class="value">2024-01-15</span></div>
+        <div class="info-row"><span class="label">注册渠道</span><span class="value">App邀请</span></div>
+        <div class="info-row"><span class="label">会员等级</span><span class="value" id="duLevel">金卡会员</span></div>
+        <div class="info-row"><span class="label">客户类型</span><span class="value" id="duDirect">直推客户</span></div>
+        <div class="info-row"><span class="label">累计消费</span><span class="value">¥12,580.00</span></div>
+      </div>
+
+      <div class="info-block">
+        <div class="info-block-title">客户交易数据</div>
+        <div class="order-filter-bar">
+          <div class="order-filter" onclick="toast('订单状态筛选')">订单状态 ▾</div>
+          <div class="order-filter" onclick="toast('订单日期筛选')">订单日期 ▾</div>
+        </div>
+        <div id="orderListWrap"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+</div>
+
+<script>
+  /* ========== 页面切换 ========== */
+  function go(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById(id);
+    if (target) target.classList.add('active');
+    // 状态栏适配浅色页
+    const lightPages = ['pageCustomerList', 'pageCustomerDetail', 'pageShushang'];
+    const sb = document.getElementById('statusBar');
+    if (lightPages.includes(id)) sb.classList.add('light');
+    else sb.classList.remove('light');
+    if (window.scrollTo && !/jsdom/i.test(window.navigator.userAgent)) window.scrollTo(0,0);
+  }
+  function switchTab(id, el) {
+    go(id);
+    const bar = el.closest('.tab-bar');
+    bar.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  let toastTimer;
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('active');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('active'), 1800);
+  }
+
+  /* ========== 首页商品渲染 ========== */
+  const GUESS_PRODUCTS = [
+    { title:'韵宜生 蜂胶黄精胶囊', desc:'这款产品超好超好超好吃哈...', price:'468.00', origin:'698', tag:'自营', icon:'💊', color:'#fff8e1' },
+    { title:'青少年领袖素质训练营套餐一', desc:'赠送1张水卡', price:'2888.00', origin:'5888', tag:'自营', icon:'🎓', color:'#f1f8e9' }
+  ];
+  function renderGuess() {
+    const grid = document.getElementById('guessYouLike');
+    if (!grid) return;
+    grid.innerHTML = GUESS_PRODUCTS.map(p => `
+      <div class="p-card" onclick="toast('跳转商品：${p.title}')">
+        <div class="thumb" style="background:${p.color};">
+          <span class="tag-img">${p.tag}</span>
+          <span style="font-size:48px;">${p.icon}</span>
+        </div>
+        <div class="info">
+          <div class="p-title">${p.title}</div>
+          <div class="p-desc">${p.desc}</div>
+          <div class="price-row"><span class="price">¥${p.price}</span><span class="origin">¥${p.origin}</span></div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  /* ========== 我的页推荐商品 ========== */
+  const RECOMMEND_PRODUCTS = [
+    { title:'韵宜生 蜂胶黄精胶囊', price:'468.00', origin:'698', icon:'💊', color:'#fff8e1' },
+    { title:'青少年领袖素质训练营', price:'2888.00', origin:'5888', icon:'🎓', color:'#f1f8e9' }
+  ];
+  function renderRecommend() {
+    const grid = document.getElementById('recommendGrid');
+    if (!grid) return;
+    grid.innerHTML = RECOMMEND_PRODUCTS.map(p => `
+      <div class="p-card" onclick="toast('跳转商品：${p.title}')">
+        <div class="thumb" style="background:${p.color};"><span style="font-size:48px;">${p.icon}</span></div>
+        <div class="info">
+          <div class="p-title">${p.title}</div>
+          <div class="price-row"><span class="price">¥${p.price}</span><span class="origin">¥${p.origin}</span></div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  /* ========== 数商服务：走势图 Tab ========== */
+  function switchChartTab(el) {
+    document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    toast('切换至：' + el.textContent);
+  }
+
+  /* ========== 客户列表数据与渲染 ========== */
+  // 会员等级表（等级值越大越高级）
+  const LEVEL_MAP = {
+    '普通用户':0,'初级会员':1,'中级会员':2,'高级会员':3,'体验达人':4,
+    '分享达人1':5,'成长达人2':6,'潜力达人3':7,'服务达人4':8,
+    '精英达人5':9,'领航达人6':10,'尊荣达人7':11,'至尊达人8':12
+  };
+  // 客户主数据：orderAmount = 该客户代表订单金额（同一订单含多个 SKU，金额为 SKU 合计）
+  const CUSTOMERS = [
+    { name:'林小美', phone:'135****8988', status:'active', statusText:'今日活跃', last:'10分钟前', isDirect:true, memberLevel:'至尊达人8', orderAmount:8920, achieveTime:'2024-08-16 14:30' },
+    { name:'王建国', phone:'135****8988', status:'active', statusText:'今日活跃', last:'10分钟前', isDirect:true, memberLevel:'尊荣达人7', orderAmount:5600, achieveTime:'2024-08-15 09:00' },
+    { name:'李小红', phone:'135****8988', status:'inactive', statusText:'非活跃用户', last:'7日前活跃', isDirect:false, memberLevel:'高级会员', orderAmount:1200, achieveTime:'2024-07-20 10:00' },
+    { name:'赵大伟', phone:'135****8988', status:'week', statusText:'本周活跃', last:'3日前活跃', isDirect:true, memberLevel:'至尊达人8', orderAmount:4500, achieveTime:'2024-08-14 11:00' },
+    { name:'孙小丽', phone:'135****8988', status:'inactive', statusText:'非活跃用户', last:'7日前活跃', isDirect:false, memberLevel:'普通用户', orderAmount:399, achieveTime:'2024-07-10 10:00' },
+    { name:'周小杰', phone:'135****8988', status:'active', statusText:'今日活跃', last:'7日前活跃', isDirect:true, memberLevel:'精英达人5', orderAmount:3200, achieveTime:'2024-08-13 16:00' },
+    { name:'吴小芳', phone:'135****8988', status:'active', statusText:'今日活跃', last:'3日前活跃', isDirect:true, memberLevel:'领航达人6', orderAmount:4800, achieveTime:'2024-08-12 12:00' },
+    { name:'郑小强', phone:'135****8988', status:'active', statusText:'今日活跃', last:'7日前活跃', isDirect:true, memberLevel:'分享达人1', orderAmount:2600, achieveTime:'2024-08-11 10:00' },
+    { name:'钱小波', phone:'135****8988', status:'inactive', statusText:'非活跃用户', last:'7日前活跃', isDirect:false, memberLevel:'中级会员', orderAmount:899, achieveTime:'2024-07-05 10:00' },
+    { name:'冯小敏', phone:'135****8988', status:'inactive', statusText:'非活跃用户', last:'7日前活跃', isDirect:false, memberLevel:'初级会员', orderAmount:299, achieveTime:'2024-07-01 10:00' },
+    { name:'陈小东', phone:'135****8988', status:'inactive', statusText:'非活跃用户', last:'7日前活跃', isDirect:false, memberLevel:'体验达人', orderAmount:599, achieveTime:'2024-07-08 10:00' }
+  ];
+  // 高价值客户：取达人及以上（等级 >=5），按会员等级降序；同等级按达成时间倒序（越晚越靠前）
+  function getCustomerList(type) {
+    if (type === 1) return CUSTOMERS.filter(c => c.status === 'active');
+    if (type === 2) return CUSTOMERS.filter(c => c.status === 'inactive');
+    if (type === 3) {
+      return CUSTOMERS.filter(c => LEVEL_MAP[c.memberLevel] >= 5).slice().sort((a, b) =>
+        (LEVEL_MAP[b.memberLevel] - LEVEL_MAP[a.memberLevel]) || (new Date(b.achieveTime) - new Date(a.achieveTime))
+      );
+    }
+    return CUSTOMERS.slice();
+  }
+  function renderCustomerList(type) {
+    const wrap = document.getElementById('customerListWrap');
+    const list = getCustomerList(type);
+    const isHighValue = type === 3;
+    wrap.innerHTML = list.map((c, idx) => {
+      const amountText = '¥' + c.orderAmount.toLocaleString();
+      if (isHighValue) {
+        return `
+        <div class="customer-item" onclick="openCustomerDetail(${type}, ${idx})">
+          <div class="c-avatar">👩</div>
+          <div class="c-body">
+            <div class="c-row">
+              <div class="c-left">
+                <div class="c-name">${c.name}</div>
+                <div class="c-phone"><span class="phone-icon"></span>${c.phone}</div>
+                <div class="c-achieve">达成时间：${c.achieveTime}</div>
+              </div>
+              <div class="c-level">${c.memberLevel}</div>
+            </div>
+            <div class="c-meta">
+              <span>上次活跃：${c.last}</span>
+              <span class="c-amount">订单金额：${amountText}</span>
+              <span class="c-detail">查看详情 ›</span>
+            </div>
+          </div>
+        </div>`;
+      }
+      return `
+      <div class="customer-item" onclick="openCustomerDetail(${type}, ${idx})">
+        <div class="c-avatar">👩</div>
+        <div class="c-body">
+          <div class="c-row">
+            <div class="c-left">
+              <div class="c-name">${c.name}</div>
+              <div class="c-phone"><span class="phone-icon"></span>${c.phone}</div>
+            </div>
+            <div class="c-status ${c.status}">${c.statusText}</div>
+          </div>
+          <div class="c-meta">
+            <span>上次活跃：${c.last}</span>
+            <span class="c-detail">查看详情 ›</span>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  function switchFilter(type, el) {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    renderCustomerList(type);
+  }
+
+  /* ========== 客户详情 ========== */
+  // 同一订单含多个 SKU，订单金额 = 各 SKU(单价×数量) 合计
+  const ORDER_DATA = [
+    { no:'20240816001', time:'2024-08-16 14:30', title:'韵宜生 蜂胶黄精胶囊', icon:'💊', status:'已完成', skus:[{spec:'60粒/瓶', qty:1, price:468.00},{spec:'120粒/瓶', qty:2, price:899.00}] },
+    { no:'20240810002', time:'2024-08-10 09:15', title:'青少年领袖素质训练营', icon:'🎓', status:'待发货', skus:[{spec:'套餐一', qty:1, price:2888.00}] },
+    { no:'20240805003', time:'2024-08-05 20:00', title:'绿韵家 益生菌冻干粉', icon:'🧪', status:'已完成', skus:[{spec:'20袋/盒', qty:2, price:218.00}] }
+  ];
+  function openCustomerDetail(type, idx) {
+    const c = getCustomerList(type)[idx];
+    document.getElementById('duName').textContent = c.name;
+    document.getElementById('duPhone').textContent = '📱 ' + c.phone;
+    document.getElementById('duAccount').textContent = '账号：' + c.phone;
+    document.getElementById('duLast').textContent = '上次登录：' + c.last;
+    const st = document.getElementById('duStatus');
+    st.className = 'c-status ' + c.status;
+    st.textContent = c.statusText;
+    document.getElementById('duAvatar').textContent = '👩';
+    document.getElementById('duLevel').textContent = c.memberLevel;
+    document.getElementById('duDirect').textContent = c.isDirect ? '直推客户' : '间推客户';
+    renderOrders();
+    go('pageCustomerDetail');
+  }
+  function renderOrders() {
+    const wrap = document.getElementById('orderListWrap');
+    wrap.innerHTML = ORDER_DATA.map(o => {
+      const total = o.skus.reduce((s, k) => s + k.price * k.qty, 0);
+      const skuLines = o.skus.map(k => `<div class="o-sku">规格：${k.spec} ×${k.qty} · ¥${k.price.toFixed(2)}</div>`).join('');
+      return `
+      <div class="order-item" onclick="toast('订单详情：' + '${o.no}')">
+        <div class="o-head"><span>订单号：${o.no}</span><span>${o.time}</span></div>
+        <div class="o-body">
+          <div class="o-thumb">${o.icon}</div>
+          <div class="o-info">
+            <div class="o-title">${o.title}</div>
+            ${skuLines}
+          </div>
+        </div>
+        <div class="o-foot">
+          <div class="o-price">实付：¥${total.toFixed(2)}（${o.skus.length}个SKU）</div>
+          <div class="o-status">${o.status}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  /* ========== 初始化 ========== */
+  renderGuess();
+  renderRecommend();
+  renderCustomerList(0);
+</script>
+</body>
+</html>
