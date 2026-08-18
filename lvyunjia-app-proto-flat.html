@@ -122,6 +122,7 @@
     .invite-banner .l2 { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
     .invite-banner .gift { font-size: 40px; }
     .service-grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px 4px; padding: 4px; }
+    .service-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 8px; padding: 4px; }
     .service-cell { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
     .service-cell .s-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
     .service-cell .s-icon.green { background: var(--primary-bg); color: var(--primary); }
@@ -141,7 +142,7 @@
     .ai-tool .a-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; background: var(--primary-bg); color: var(--primary); border: 1px solid #e8f5e9; }
     .ai-tool .a-name { font-size: 11px; color: var(--text-secondary); }
     .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-    .stat-card { background: var(--card-bg); border-radius: 12px; padding: 14px; position: relative; }
+    .stat-card { background: var(--card-bg); border-radius: 12px; padding: 14px; position: relative; cursor: pointer; }
     .stat-card .label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
     .stat-card .value { font-size: 22px; font-weight: 700; color: var(--text); }
     .stat-card .change { font-size: 11px; margin-top: 6px; display: flex; align-items: center; gap: 2px; }
@@ -284,63 +285,42 @@
     </div>
     <div class="tab-bar">
       <div class="tab-item active" onclick="switchTab('pageHome', this)"><div class="icon">🏠</div>首页</div>
-      <div class="tab-item" onclick="switchTab('pageAI', this)"><div class="icon ai-icon">AI</div>AI</div>
-      <div class="tab-item" onclick="switchTab('pageZhishu', this)"><div class="icon">🧠</div>数智</div>
-      <div class="tab-item" onclick="switchTab('pageMessage', this)"><div class="icon">💬</div>消息</div>
+      <div class="tab-item" onclick="switchTab('pageCategory', this)"><div class="icon">🗂️</div>分类</div>
+      <div class="tab-item" onclick="switchTab('pageCart', this)"><div class="icon">🛒</div>购物车</div>
       <div class="tab-item" onclick="switchTab('pageMine', this)"><div class="icon">👤</div>我的</div>
     </div>
   </div>
 
-  <!-- ================== AI 页 ================== -->
-  <div class="page has-tab-bar" id="pageAI">
+  <!-- ================== 分类页（占位） ================== -->
+  <div class="page has-tab-bar" id="pageCategory">
     <div class="scroll-view" style="display:flex; align-items:center; justify-content:center;">
       <div style="text-align:center; color:var(--text-tertiary);">
-        <div style="font-size:60px; margin-bottom:16px;">🤖</div>
-        <div style="font-size:16px;">AI 助手页面</div>
+        <div style="font-size:60px; margin-bottom:16px;">🗂️</div>
+        <div style="font-size:16px;">分类页面</div>
         <div style="font-size:13px; margin-top:8px;">暂未提供设计稿</div>
       </div>
     </div>
     <div class="tab-bar">
       <div class="tab-item" onclick="switchTab('pageHome', this)"><div class="icon">🏠</div>首页</div>
-      <div class="tab-item active" onclick="switchTab('pageAI', this)"><div class="icon ai-icon">AI</div>AI</div>
-      <div class="tab-item" onclick="switchTab('pageZhishu', this)"><div class="icon">🧠</div>数智</div>
-      <div class="tab-item" onclick="switchTab('pageMessage', this)"><div class="icon">💬</div>消息</div>
+      <div class="tab-item active" onclick="switchTab('pageCategory', this)"><div class="icon">🗂️</div>分类</div>
+      <div class="tab-item" onclick="switchTab('pageCart', this)"><div class="icon">🛒</div>购物车</div>
       <div class="tab-item" onclick="switchTab('pageMine', this)"><div class="icon">👤</div>我的</div>
     </div>
   </div>
 
-  <!-- ================== 数智页 ================== -->
-  <div class="page has-tab-bar" id="pageZhishu">
+  <!-- ================== 购物车页（占位） ================== -->
+  <div class="page has-tab-bar" id="pageCart">
     <div class="scroll-view" style="display:flex; align-items:center; justify-content:center;">
       <div style="text-align:center; color:var(--text-tertiary);">
-        <div style="font-size:60px; margin-bottom:16px;">📊</div>
-        <div style="font-size:16px;">数智页面</div>
+        <div style="font-size:60px; margin-bottom:16px;">🛒</div>
+        <div style="font-size:16px;">购物车页面</div>
         <div style="font-size:13px; margin-top:8px;">暂未提供设计稿</div>
       </div>
     </div>
     <div class="tab-bar">
       <div class="tab-item" onclick="switchTab('pageHome', this)"><div class="icon">🏠</div>首页</div>
-      <div class="tab-item" onclick="switchTab('pageAI', this)"><div class="icon ai-icon">AI</div>AI</div>
-      <div class="tab-item active" onclick="switchTab('pageZhishu', this)"><div class="icon">🧠</div>数智</div>
-      <div class="tab-item" onclick="switchTab('pageMessage', this)"><div class="icon">💬</div>消息</div>
-      <div class="tab-item" onclick="switchTab('pageMine', this)"><div class="icon">👤</div>我的</div>
-    </div>
-  </div>
-
-  <!-- ================== 消息页 ================== -->
-  <div class="page has-tab-bar" id="pageMessage">
-    <div class="scroll-view" style="display:flex; align-items:center; justify-content:center;">
-      <div style="text-align:center; color:var(--text-tertiary);">
-        <div style="font-size:60px; margin-bottom:16px;">💬</div>
-        <div style="font-size:16px;">消息页面</div>
-        <div style="font-size:13px; margin-top:8px;">暂未提供设计稿</div>
-      </div>
-    </div>
-    <div class="tab-bar">
-      <div class="tab-item" onclick="switchTab('pageHome', this)"><div class="icon">🏠</div>首页</div>
-      <div class="tab-item" onclick="switchTab('pageAI', this)"><div class="icon ai-icon">AI</div>AI</div>
-      <div class="tab-item" onclick="switchTab('pageZhishu', this)"><div class="icon">🧠</div>数智</div>
-      <div class="tab-item active" onclick="switchTab('pageMessage', this)"><div class="icon">💬</div>消息</div>
+      <div class="tab-item" onclick="switchTab('pageCategory', this)"><div class="icon">🗂️</div>分类</div>
+      <div class="tab-item active" onclick="switchTab('pageCart', this)"><div class="icon">🛒</div>购物车</div>
       <div class="tab-item" onclick="switchTab('pageMine', this)"><div class="icon">👤</div>我的</div>
     </div>
   </div>
@@ -385,7 +365,7 @@
 
       <div class="card">
         <div class="section-title">我的服务</div>
-        <div class="service-grid-5">
+        <div class="service-grid-4">
           <div class="service-cell" onclick="go('pageShushang')">
             <div class="s-icon green">🤝</div>
             <div class="s-name">数商服务</div>
@@ -393,10 +373,6 @@
           <div class="service-cell" onclick="toast('网格水站')">
             <div class="s-icon blue">💧</div>
             <div class="s-name">网格水站</div>
-          </div>
-          <div class="service-cell" onclick="toast('排行榜')">
-            <div class="s-icon orange">📊</div>
-            <div class="s-name">排行榜</div>
           </div>
           <div class="service-cell" onclick="toast('优惠券')">
             <div class="s-icon green">🎟️</div>
@@ -422,26 +398,6 @@
             <div class="s-icon blue">✉️</div>
             <div class="s-name">意见反馈</div>
           </div>
-          <div class="service-cell" onclick="toast('代注册')">
-            <div class="s-icon green">➕</div>
-            <div class="s-name">代注册</div>
-          </div>
-          <div class="service-cell" onclick="toast('签到打卡')">
-            <div class="s-icon orange">📅</div>
-            <div class="s-name">签到打卡</div>
-          </div>
-          <div class="service-cell" onclick="toast('推广')">
-            <div class="s-icon blue">📢</div>
-            <div class="s-name">推广</div>
-          </div>
-          <div class="service-cell" onclick="toast('直播广场')">
-            <div class="s-icon orange">📺</div>
-            <div class="s-name">直播广场</div>
-          </div>
-          <div class="service-cell" onclick="toast('公司资质')">
-            <div class="s-icon green">📋</div>
-            <div class="s-name">公司资质</div>
-          </div>
         </div>
       </div>
 
@@ -452,9 +408,8 @@
     </div>
     <div class="tab-bar">
       <div class="tab-item" onclick="switchTab('pageHome', this)"><div class="icon">🏠</div>首页</div>
-      <div class="tab-item" onclick="switchTab('pageAI', this)"><div class="icon ai-icon">AI</div>AI</div>
-      <div class="tab-item" onclick="switchTab('pageZhishu', this)"><div class="icon">🧠</div>数智</div>
-      <div class="tab-item" onclick="switchTab('pageMessage', this)"><div class="icon">💬</div>消息</div>
+      <div class="tab-item" onclick="switchTab('pageCategory', this)"><div class="icon">🗂️</div>分类</div>
+      <div class="tab-item" onclick="switchTab('pageCart', this)"><div class="icon">🛒</div>购物车</div>
       <div class="tab-item active" onclick="switchTab('pageMine', this)"><div class="icon">👤</div>我的</div>
     </div>
   </div>
@@ -493,28 +448,37 @@
       </div>
 
       <div class="card">
+        <div class="section-title">其他工具</div>
+        <div class="ai-tools">
+          <div class="ai-tool" onclick="toast('代注册')"><div class="a-icon" style="background:#e3f2fd; color:#2196f3;">➕</div><div class="a-name">代注册</div></div>
+          <div class="ai-tool" onclick="toast('公司资质')"><div class="a-icon" style="background:#fff3e0; color:#ff9800;">📋</div><div class="a-name">公司资质</div></div>
+          <div class="ai-tool" onclick="toast('工业游')"><div class="a-icon" style="background:#f3e5f5; color:#9c27b0;">🏭</div><div class="a-name">工业游</div></div>
+        </div>
+      </div>
+
+      <div class="card">
         <div class="section-title">客户管理 <span class="more" onclick="go('pageCustomerList')">查看详情 ›</span></div>
         <div class="stat-row">
-          <div class="stat-card">
-            <div class="label">直推总客户</div>
-            <div class="value">678人</div>
+          <div class="stat-card" onclick="goCustomerListTab(0)">
+            <div class="label">总客户数量</div>
+            <div class="value" id="statTotal">0人</div>
             <div class="change up">↗ 环比 +81.5%</div>
           </div>
-          <div class="stat-card">
+          <div class="stat-card" onclick="goCustomerListTab(1)">
             <div class="label">今日活跃</div>
-            <div class="value">678人</div>
+            <div class="value" id="statActive">0人</div>
             <div class="change down">↘ 环比 -81.5%</div>
           </div>
         </div>
         <div class="stat-row">
-          <div class="stat-card">
+          <div class="stat-card" onclick="goCustomerListTab(2)">
             <div class="label">沉寂预警</div>
-            <div class="value" style="color:var(--red);">18人</div>
-            <div class="warn"><span>需立即唤醒</span><span class="warn-btn" onclick="go('pageCustomerList')">一键查看 ›</span></div>
+            <div class="value" style="color:var(--red);" id="statInactive">0人</div>
+            <div class="warn"><span>需立即唤醒</span><span class="warn-btn">一键查看 ›</span></div>
           </div>
-          <div class="stat-card">
+          <div class="stat-card" onclick="goCustomerListTab(3)">
             <div class="label">高价值核心客户</div>
-            <div class="value">399人</div>
+            <div class="value" id="statHigh">0人</div>
             <div class="change down">↘ 环比 -81.5%</div>
           </div>
         </div>
@@ -523,22 +487,14 @@
       <div class="card">
         <div class="section-title">活跃走势图</div>
         <div class="chart-tabs">
-          <div class="chart-tab active" onclick="switchChartTab(this)">近7天</div>
-          <div class="chart-tab" onclick="switchChartTab(this)">近15天</div>
-          <div class="chart-tab" onclick="switchChartTab(this)">近30天</div>
+          <div class="chart-tab active" data-days="7" onclick="switchChartTab(this)">近7天</div>
+          <div class="chart-tab" data-days="15" onclick="switchChartTab(this)">近15天</div>
+          <div class="chart-tab" data-days="30" onclick="switchChartTab(this)">近30天</div>
         </div>
-        <div class="chart-area">
-          <svg viewBox="0 0 300 120" preserveAspectRatio="none">
-            <polyline points="0,90 40,100 80,70 120,60 160,40 200,35 240,20 280,15 300,10" fill="none" stroke="#2196F3" stroke-width="2"/>
-            <circle cx="240" cy="20" r="4" fill="#fff" stroke="#2196F3" stroke-width="2"/>
-            <line x1="240" y1="20" x2="240" y2="120" stroke="#2196F3" stroke-width="1" stroke-dasharray="4"/>
-          </svg>
-          <div style="position:absolute; bottom:10px; left:40px; right:16px; display:flex; justify-content:space-between; font-size:10px; color:#999;">
-            <span>08-11</span><span>08-12</span><span>08-13</span><span>08-14</span><span>08-15</span><span>08-16</span><span>08-17</span>
-          </div>
-          <div style="position:absolute; left:10px; top:20px; bottom:40px; display:flex; flex-direction:column; justify-content:space-between; font-size:10px; color:#999;">
-            <span>12000</span><span>6000</span><span>3000</span><span>0</span>
-          </div>
+        <div class="chart-area" id="activeChartArea">
+          <svg id="activeChartSvg" viewBox="0 0 300 120" preserveAspectRatio="none"></svg>
+          <div id="activeChartX" style="position:absolute; bottom:10px; left:40px; right:16px; display:flex; justify-content:space-between; font-size:10px; color:#999;"></div>
+          <div id="activeChartY" style="position:absolute; left:10px; top:20px; bottom:40px; display:flex; flex-direction:column; justify-content:space-between; font-size:10px; color:#999;"></div>
         </div>
       </div>
 
@@ -555,9 +511,8 @@
     </div>
     <div class="tab-bar">
       <div class="tab-item" onclick="switchTab('pageHome', this)"><div class="icon">🏠</div>首页</div>
-      <div class="tab-item" onclick="switchTab('pageAI', this)"><div class="icon ai-icon">AI</div>AI</div>
-      <div class="tab-item" onclick="switchTab('pageZhishu', this)"><div class="icon">🧠</div>数智</div>
-      <div class="tab-item" onclick="switchTab('pageMessage', this)"><div class="icon">💬</div>消息</div>
+      <div class="tab-item" onclick="switchTab('pageCategory', this)"><div class="icon">🗂️</div>分类</div>
+      <div class="tab-item" onclick="switchTab('pageCart', this)"><div class="icon">🛒</div>购物车</div>
       <div class="tab-item active" onclick="switchTab('pageShushang', this)"><div class="icon">🤝</div>数商</div>
     </div>
   </div>
@@ -576,7 +531,7 @@
     </div>
     <div class="scroll-view" style="top:90px;">
       <div id="customerListWrap"></div>
-      <div class="float-wake" onclick="toast('一键唤醒沉寂客户')">一键唤醒</div>
+      <div class="float-wake" onclick="wakeInactiveCustomers()">一键唤醒</div>
       <div style="height:16px;"></div>
     </div>
   </div>
@@ -693,11 +648,55 @@
     `).join('');
   }
 
-  /* ========== 数商服务：走势图 Tab ========== */
+  /* ========== 数商服务：活跃走势图（曲线图，X轴日期，Y轴客户数量） ========== */
   function switchChartTab(el) {
     document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
     el.classList.add('active');
-    toast('切换至：' + el.textContent);
+    renderActiveChart(parseInt(el.dataset.days, 10));
+  }
+  // 模拟近 30 天每日活跃客户数（当前自然日登录过的用户数）
+  const ACTIVE_TREND_DATA = [820, 1350, 1100, 980, 1450, 1600, 1380, 1220, 1500, 1700, 1650, 1580, 1720, 1850, 1900, 1750, 1820, 1950, 2100, 2050, 1980, 2200, 2350, 2280, 2400, 2550, 2480, 2600, 2750, 2880];
+  function renderActiveChart(days) {
+    const data = ACTIVE_TREND_DATA.slice(-days);
+    const labels = [];
+    const today = new Date('2024-08-17');
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(today); d.setDate(d.getDate() - i);
+      labels.push((d.getMonth() + 1).toString().padStart(2, '0') + '-' + d.getDate().toString().padStart(2, '0'));
+    }
+    const max = Math.max(...data, 1);
+    const stepY = Math.ceil(max / 4);
+    const yTicks = [stepY * 4, stepY * 3, stepY * 2, stepY, 0];
+    // 生成平滑曲线（三次贝塞尔）
+    const w = 260, h = 90, padL = 40, padR = 0, padT = 10, padB = 10;
+    const xScale = (i) => padL + i * (w / (data.length - 1));
+    const yScale = (v) => padT + h - (v / (stepY * 4)) * h;
+    let path = `M ${xScale(0)} ${yScale(data[0])}`;
+    for (let i = 0; i < data.length - 1; i++) {
+      const x0 = xScale(i), y0 = yScale(data[i]);
+      const x1 = xScale(i + 1), y1 = yScale(data[i + 1]);
+      const cp1x = x0 + (x1 - x0) / 2, cp1y = y0;
+      const cp2x = x0 + (x1 - x0) / 2, cp2y = y1;
+      path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x1} ${y1}`;
+    }
+    // 最后一个点高亮
+    const lastIdx = data.length - 1;
+    const lastX = xScale(lastIdx), lastY = yScale(data[lastIdx]);
+    const svg = document.getElementById('activeChartSvg');
+    svg.innerHTML = `
+      <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT + h}" stroke="#eee" stroke-width="1"/>
+      <line x1="${padL}" y1="${padT + h}" x2="${padL + w}" y2="${padT + h}" stroke="#eee" stroke-width="1"/>
+      <path d="${path}" fill="none" stroke="#2196F3" stroke-width="2"/>
+      <circle cx="${lastX}" cy="${lastY}" r="4" fill="#fff" stroke="#2196F3" stroke-width="2"/>
+      <line x1="${lastX}" y1="${lastY}" x2="${lastX}" y2="${padT + h}" stroke="#2196F3" stroke-width="1" stroke-dasharray="4"/>
+    `;
+    document.getElementById('activeChartX').innerHTML = labels.map((l, i) => {
+      if (days <= 7) return `<span>${l}</span>`;
+      // 15/30 天只显示首尾 + 中间若干，避免重叠
+      const show = i === 0 || i === labels.length - 1 || (i % Math.ceil(days / 6) === 0);
+      return show ? `<span>${l}</span>` : `<span></span>`;
+    }).join('');
+    document.getElementById('activeChartY').innerHTML = yTicks.map(v => `<span>${v}</span>`).join('');
   }
 
   /* ========== 客户列表数据与渲染 ========== */
@@ -708,20 +707,21 @@
     '精英达人5':9,'领航达人6':10,'尊荣达人7':11,'至尊达人8':12
   };
   // 客户主数据：orderAmount = 该客户代表订单金额（同一订单含多个 SKU，金额为 SKU 合计）
+  // status 定义：active=今日活跃（当前自然日登录过）；inactive=沉寂预警（7天未登录）；week=本周活跃（7天内登录但非今日）
   const CUSTOMERS = [
     { name:'林小美', phone:'135****8988', status:'active', statusText:'今日活跃', last:'10分钟前', isDirect:true, memberLevel:'至尊达人8', orderAmount:8920, achieveTime:'2024-08-16 14:30' },
-    { name:'王建国', phone:'135****8988', status:'active', statusText:'今日活跃', last:'10分钟前', isDirect:true, memberLevel:'尊荣达人7', orderAmount:5600, achieveTime:'2024-08-15 09:00' },
-    { name:'李小红', phone:'135****8988', status:'inactive', statusText:'非活跃用户', last:'7日前活跃', isDirect:false, memberLevel:'高级会员', orderAmount:1200, achieveTime:'2024-07-20 10:00' },
+    { name:'王建国', phone:'135****8988', status:'active', statusText:'今日活跃', last:'2小时前', isDirect:true, memberLevel:'尊荣达人7', orderAmount:5600, achieveTime:'2024-08-15 09:00' },
     { name:'赵大伟', phone:'135****8988', status:'week', statusText:'本周活跃', last:'3日前活跃', isDirect:true, memberLevel:'至尊达人8', orderAmount:4500, achieveTime:'2024-08-14 11:00' },
-    { name:'孙小丽', phone:'135****8988', status:'inactive', statusText:'非活跃用户', last:'7日前活跃', isDirect:false, memberLevel:'普通用户', orderAmount:399, achieveTime:'2024-07-10 10:00' },
-    { name:'周小杰', phone:'135****8988', status:'active', statusText:'今日活跃', last:'7日前活跃', isDirect:true, memberLevel:'精英达人5', orderAmount:3200, achieveTime:'2024-08-13 16:00' },
-    { name:'吴小芳', phone:'135****8988', status:'active', statusText:'今日活跃', last:'3日前活跃', isDirect:true, memberLevel:'领航达人6', orderAmount:4800, achieveTime:'2024-08-12 12:00' },
-    { name:'郑小强', phone:'135****8988', status:'active', statusText:'今日活跃', last:'7日前活跃', isDirect:true, memberLevel:'分享达人1', orderAmount:2600, achieveTime:'2024-08-11 10:00' },
-    { name:'钱小波', phone:'135****8988', status:'inactive', statusText:'非活跃用户', last:'7日前活跃', isDirect:false, memberLevel:'中级会员', orderAmount:899, achieveTime:'2024-07-05 10:00' },
-    { name:'冯小敏', phone:'135****8988', status:'inactive', statusText:'非活跃用户', last:'7日前活跃', isDirect:false, memberLevel:'初级会员', orderAmount:299, achieveTime:'2024-07-01 10:00' },
-    { name:'陈小东', phone:'135****8988', status:'inactive', statusText:'非活跃用户', last:'7日前活跃', isDirect:false, memberLevel:'体验达人', orderAmount:599, achieveTime:'2024-07-08 10:00' }
+    { name:'周小杰', phone:'135****8988', status:'active', statusText:'今日活跃', last:'1小时前', isDirect:true, memberLevel:'精英达人5', orderAmount:3200, achieveTime:'2024-08-13 16:00' },
+    { name:'吴小芳', phone:'135****8988', status:'active', statusText:'今日活跃', last:'30分钟前', isDirect:true, memberLevel:'领航达人6', orderAmount:4800, achieveTime:'2024-08-12 12:00' },
+    { name:'郑小强', phone:'135****8988', status:'active', statusText:'今日活跃', last:'5小时前', isDirect:true, memberLevel:'分享达人1', orderAmount:2600, achieveTime:'2024-08-11 10:00' },
+    { name:'李小红', phone:'135****8988', status:'inactive', statusText:'沉寂预警', last:'8天前活跃', isDirect:false, memberLevel:'高级会员', orderAmount:1200, achieveTime:'2024-07-20 10:00' },
+    { name:'孙小丽', phone:'135****8988', status:'inactive', statusText:'沉寂预警', last:'10天前活跃', isDirect:false, memberLevel:'普通用户', orderAmount:399, achieveTime:'2024-07-10 10:00' },
+    { name:'钱小波', phone:'135****8988', status:'inactive', statusText:'沉寂预警', last:'12天前活跃', isDirect:false, memberLevel:'中级会员', orderAmount:899, achieveTime:'2024-07-05 10:00' },
+    { name:'冯小敏', phone:'135****8988', status:'inactive', statusText:'沉寂预警', last:'15天前活跃', isDirect:false, memberLevel:'初级会员', orderAmount:299, achieveTime:'2024-07-01 10:00' },
+    { name:'陈小东', phone:'135****8988', status:'inactive', statusText:'沉寂预警', last:'9天前活跃', isDirect:false, memberLevel:'体验达人', orderAmount:599, achieveTime:'2024-07-08 10:00' }
   ];
-  // 高价值客户：取达人及以上（等级 >=5），按会员等级降序；同等级按达成时间倒序（越晚越靠前）
+  // 客户列表筛选：0=全部；1=今日活跃；2=沉寂预警（7天未登录）；3=高价值核心客户（达人及以上）
   function getCustomerList(type) {
     if (type === 1) return CUSTOMERS.filter(c => c.status === 'active');
     if (type === 2) return CUSTOMERS.filter(c => c.status === 'inactive');
@@ -731,6 +731,24 @@
       );
     }
     return CUSTOMERS.slice();
+  }
+  function updateCustomerStats() {
+    document.getElementById('statTotal').textContent = CUSTOMERS.length + '人';
+    document.getElementById('statActive').textContent = CUSTOMERS.filter(c => c.status === 'active').length + '人';
+    document.getElementById('statInactive').textContent = CUSTOMERS.filter(c => c.status === 'inactive').length + '人';
+    document.getElementById('statHigh').textContent = CUSTOMERS.filter(c => LEVEL_MAP[c.memberLevel] >= 5).length + '人';
+  }
+  function goCustomerListTab(type) {
+    go('pageCustomerList');
+    const tabs = document.querySelectorAll('#pageCustomerList .filter-tab');
+    tabs.forEach(t => t.classList.remove('active'));
+    if (tabs[type]) tabs[type].classList.add('active');
+    renderCustomerList(type);
+  }
+  // 一键唤醒：针对用户状态 ≠ 今日活跃 的用户，通过 App Push 触达
+  function wakeInactiveCustomers() {
+    const targets = CUSTOMERS.filter(c => c.status !== 'active');
+    toast('已发送 App Push 唤醒 ' + targets.length + ' 位非活跃用户');
   }
   function renderCustomerList(type) {
     const wrap = document.getElementById('customerListWrap');
@@ -832,6 +850,8 @@
   /* ========== 初始化 ========== */
   renderGuess();
   renderRecommend();
+  updateCustomerStats();
+  renderActiveChart(7);
   renderCustomerList(0);
 </script>
 </body>
