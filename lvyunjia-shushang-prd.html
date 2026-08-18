@@ -22,6 +22,7 @@
   .tag-new { background: #e3f2fd; color: #1565c0; }
   .tag-keep { background: #eeeeee; color: #777; }
   .tag-change { background: #fff3e0; color: #e65100; }
+  .tag-del { background: #ffebee; color: #c62828; }
   .tbc { color: var(--orange); font-weight: 600; }
   .note { background: #fff8e1; border-left: 4px solid #ffc107; padding: 10px 14px; margin: 12px 0; font-size: 13px; }
   .toconfirm { background: #fdecea; border-left: 4px solid #e53935; padding: 10px 14px; margin: 12px 0; font-size: 13.5px; }
@@ -40,25 +41,33 @@
 <!-- ================= 一、文档基本信息 ================= -->
 <h2>一、文档基本信息</h2>
 <table>
-  <tr><th style="width:30%">项目名称</th><td>绿韵家 App 数商服务模块（重构）</td></tr>
+  <tr><th style="width:30%">项目名称</th><td>绿韵家 App 数商服务模块</td></tr>
   <tr><th>创建时间</th><td>2026-08-17</td></tr>
+  <tr><th>最近修订</th><td>2026-08-18</td></tr>
   <tr><th>负责人</th><td>PM：袁中天｜技术 Owner：⚠️ 待确认 @技术负责人｜测试负责人：⚠️ 待确认 @测试负责人</td></tr>
   <tr><th>文档状态</th><td>草稿（评审中）</td></tr>
   <tr><th>关联原型</th><td><a href="https://ddyuan-spec.github.io/lvyunji/lvyunjia-app-proto-flat.html">绿韵家 App 数商服务原型（线上预览）</a></td></tr>
 </table>
-<p class="sub">配套原型截图见 <a href="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/shot-mine.png">我的</a> / <a href="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/shot-shushang.png">数商服务</a> / <a href="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/shot-customer-list.png">客户列表</a> / <a href="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/shot-customer-detail.png">客户详情</a>。</p>
+<p class="sub">配套原型截图：
+  <a href="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/home.png">首页</a> /
+  <a href="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/mine.png">我的</a> /
+  <a href="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/shushang.png">数商服务</a> /
+  <a href="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/customer-list.png">客户列表</a> /
+  <a href="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/customer-detail.png">客户详情</a>。
+</p>
 
 <h3>历史修订记录</h3>
 <table>
   <tr><th style="width:12%">版本号</th><th style="width:14%">修订日期</th><th style="width:14%">修订人</th><th style="width:30%">修订内容简述</th><th>状态</th></tr>
   <tr><td>V0.1</td><td>2026-08-17</td><td>袁中天</td><td>初稿：基于数商服务原型梳理一~九结构，含我的/数商服务/客户列表/客户详情功能详情</td><td>评审中</td></tr>
+  <tr><td>V0.2</td><td>2026-08-18</td><td>袁中天</td><td>按设计稿调整：① 删除智联猫相关入口与页面；② 我的服务入口精简为 8 个；③ 数商服务改为单页（AI工具+其他工具+客户管理+活跃走势图+商学院）；④ 客户管理四指标口径明确；⑤ 活跃走势图改为曲线图；⑥ 一键唤醒改为 App Push 触达非今日活跃用户</td><td>评审中</td></tr>
 </table>
 
 <!-- ================= 二、项目背景与目标 ================= -->
 <h2>二、项目背景与目标</h2>
 <h3>业务背景（痛点分析）</h3>
-<p>绿韵家为会员制电商（含惠民套餐/水卡/健康专区 + 水机 IoT + 直播 + 团购 + 积分优惠券 + AI 客服智联猫）。在原有「推广/分销」能力基础上，本期将相关能力重构为统一的<strong>数商服务模块</strong>，让店主/推广员在 App 内一站式查看自己所发展的客户关系、客户分层与经营数据，并通过「一键唤醒」将高价值客户引导至下单/复购。</p>
-<p class="meta">核心痛点：① 客户关系分散、无统一视图；② 高价值客户识别依赖人工经验，缺乏按会员等级的客观分层；③ 客户经营数据（活跃/画像/报表）未闭环呈现。</p>
+<p>绿韵家为会员制电商（含惠民套餐/水卡/健康专区 + 水机 IoT + 直播 + 团购 + 积分优惠券）。在原有「推广/分销」能力基础上，本期将相关能力重构为统一的<strong>数商服务模块</strong>，让店主/推广员在 App 内一站式查看自己所发展的客户关系、客户分层与经营数据，并通过「一键唤醒」将非活跃用户引导至复购/活跃。</p>
+<p class="meta">核心痛点：① 客户关系分散、无统一视图；② 高价值客户识别依赖人工经验，缺乏按会员等级的客观分层；③ 客户经营数据（活跃/沉寂/高价值）未闭环呈现。</p>
 
 <h3>项目目标</h3>
 <ul>
@@ -71,36 +80,32 @@
   <tr><th style="width:34%">指标</th><th>口径说明</th><th>备注</th></tr>
   <tr><td>数商服务页访问 UV/PV</td><td>进入数商服务页的去重/累计访问</td><td>⚠️ 待确认 @数据</td></tr>
   <tr><td>客户详情访问率</td><td>从客户列表点击进入详情的客户占比</td><td>⚠️ 待确认 @数据</td></tr>
-  <tr><td>一键唤醒转化率</td><td>唤醒后产生下单/分享行为的客户占比</td><td>⚠️ 待确认 @数据</td></tr>
-  <tr><td>高价值客户触达率</td><td>高价值 Tab 客户被唤醒/查看的覆盖度</td><td>⚠️ 待确认 @数据</td></tr>
+  <tr><td>一键唤醒触达率</td><td>点击一键唤醒后成功发出 App Push 的占比</td><td>⚠️ 待确认 @数据</td></tr>
+  <tr><td>高价值客户查看率</td><td>高价值 Tab 客户被查看的覆盖度</td><td>⚠️ 待确认 @数据</td></tr>
 </table>
 
 <!-- ================= 三、业务流程与架构 ================= -->
 <h2>三、业务流程与架构</h2>
 
 <h3>3.1 业务流程图</h3>
-<p class="sub">📎 本流程图为依据《绿韵家 App 数商服务模块需求梳理（本期）》绘制，为本期权威流程源；⚠️ 禁止在 PRD 中自行简化/重绘/修改节点与泳道，AI 无权擅自改动。</p>
 <svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" font-family="Microsoft YaHei, sans-serif" font-size="12">
   <defs>
     <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
       <path d="M0,0 L8,3 L0,6 Z" fill="#333"></path>
     </marker>
   </defs>
-  <!-- 泳道标题 -->
   <rect x="10" y="10" width="740" height="300" fill="none" stroke="#ccc"></rect>
   <rect x="10" y="10" width="120" height="300" fill="#eef4fb"></rect>
   <text x="70" y="32" text-anchor="middle" font-weight="bold">经营角色</text>
   <text x="200" y="32" font-weight="bold">前端（App）</text>
   <text x="470" y="32" font-weight="bold">后端 / 数据层</text>
-  <!-- 角色 -->
   <rect x="22" y="50" width="96" height="40" rx="6" fill="#fff" stroke="#2196f3"></rect>
   <text x="70" y="74" text-anchor="middle">店主 / 推广员</text>
-  <!-- 步骤 -->
   <rect x="160" y="50" width="150" height="40" rx="6" fill="#fff" stroke="#333"></rect>
   <text x="235" y="74" text-anchor="middle">我的 → 数商服务入口</text>
   <line x1="310" y1="70" x2="345" y2="70" stroke="#333" marker-end="url(#arr)"></line>
   <rect x="350" y="50" width="150" height="40" rx="6" fill="#fff" stroke="#333"></rect>
-  <text x="425" y="74" text-anchor="middle">数商服务（三 Tab）</text>
+  <text x="425" y="74" text-anchor="middle">数商服务首页</text>
   <line x1="500" y1="70" x2="535" y2="70" stroke="#333" marker-end="url(#arr)"></line>
   <rect x="540" y="50" width="190" height="40" rx="6" fill="#fff" stroke="#333"></rect>
   <text x="635" y="70" text-anchor="middle">聚合用户/订单/等级数据</text>
@@ -121,22 +126,21 @@
   <line x1="425" y1="230" x2="425" y2="255" stroke="#333" marker-end="url(#arr)"></line>
 
   <rect x="350" y="255" width="150" height="40" rx="6" fill="#fff" stroke="#ff6b35"></rect>
-  <text x="425" y="279" text-anchor="middle">一键唤醒 / 触达</text>
+  <text x="425" y="279" text-anchor="middle">一键唤醒 / App Push</text>
   <line x1="310" y1="275" x2="350" y2="275" stroke="#ff6b35" marker-end="url(#arr)"></line>
   <rect x="160" y="255" width="150" height="40" rx="6" fill="#fff" stroke="#ff6b35"></rect>
-  <text x="235" y="279" text-anchor="middle">引导下单 / 复购</text>
+  <text x="235" y="279" text-anchor="middle">引导复购 / 活跃</text>
 </svg>
 
 <h3>3.2 信息架构</h3>
 <table>
   <tr><th style="width:22%">层级</th><th>映射关系</th></tr>
-  <tr><td>前端展示层</td><td>我的（数商服务入口 + 我的服务 14 入口）→ 数商服务（用户活跃 / 用户画像 / 报表 三 Tab）→ 客户列表（全部 / 今日活跃 / 沉寂 / 高价值）→ 客户详情 → 一键唤醒</td></tr>
-  <tr><td>后端配置层</td><td>会员等级配置、运营标签配置、客户分层规则（活跃度/等级阈值）、唤醒触达通道 ⚠️ 待确认 @后端</td></tr>
-  <tr><td>数据层</td><td>用户表、会员等级表、订单表（多 SKU）、客户关系（直推/间推）表、运营标签表 ⚠️ 待确认 @后端 具体表名</td></tr>
+  <tr><td>前端展示层</td><td>我的（数商服务入口 + 我的服务 8 入口）→ 数商服务（AI工具 / 其他工具 / 客户管理 / 活跃走势图 / 商学院）→ 客户列表（全部 / 今日活跃 / 沉寂 / 高价值）→ 客户详情 → 一键唤醒</td></tr>
+  <tr><td>后端配置层</td><td>会员等级配置、客户分层规则（活跃度/等级阈值）、App Push 触达通道 ⚠️ 待确认 @后端</td></tr>
+  <tr><td>数据层</td><td>用户表、会员等级表、订单表（多 SKU）、客户关系（直推/间推）表 ⚠️ 待确认 @后端 具体表名</td></tr>
 </table>
 
 <h3>3.3 状态机与状态流转规则</h3>
-<p class="sub">📎 下列状态枚举为依据本期需求梳理，禁止 AI 擅自增删枚举值；接口真实枚举以研发接口文档为准。</p>
 <h4>3.3.1 客户分层状态（客户列表四 Tab）</h4>
 <table>
   <tr><th style="width:20%">起始状态</th><th style="width:22%">触发动作</th><th style="width:24%">前置/后置条件</th><th style="width:20%">目标状态</th><th>说明</th></tr>
@@ -151,58 +155,106 @@
 
 <!-- ================= 四、功能需求详情 ================= -->
 <h2 id="sec4">四、功能需求详情</h2>
-<p class="meta">本期范围：绿韵家 App「数商服务模块」相关页面（我的、数商服务、客户列表、客户详情、AI 智联猫入口）。范围标注：<span class="tag tag-new">本期新增</span> <span class="tag tag-change">本期改动</span> <span class="tag tag-keep">已有-沿用</span>。</p>
-<p class="meta"><strong>涉及终端</strong>：绿韵家 App（iOS / Android / H5 小程序）。<strong>需求影响范围</strong>：本期聚焦数商服务模块（我的 / 数商服务 / 客户列表 / 客户详情），为新增 + 改动范畴，不影响商城下单 / 支付主链路，不影响既有会员制电商交易流程。</p>
+<p class="meta">本期范围：绿韵家 App「数商服务模块」相关页面（首页 Tab、我的、数商服务、客户列表、客户详情）。范围标注：<span class="tag tag-new">本期新增</span> <span class="tag tag-change">本期改动</span> <span class="tag tag-keep">已有-沿用</span> <span class="tag tag-del">本期删除</span>。</p>
+<p class="meta"><strong>涉及终端</strong>：绿韵家 App（iOS / Android / H5 小程序）。<strong>需求影响范围</strong>：本期聚焦数商服务模块（首页底部 Tab / 我的 / 数商服务 / 客户列表 / 客户详情），为新增 + 改动范畴；删除原底部 Tab 中「AI / 数智 / 消息（智联猫）」相关入口与页面，不影响商城下单 / 支付主链路。</p>
 
-<!-- 4.1 我的 -->
-<h3>4.1 我的</h3>
+<!-- 4.1 首页底部 Tab -->
+<h3>4.1 首页底部 Tab</h3>
 <span class="tag tag-change">本期改动</span>
 <h4>4.1.1 页面原型与交互示意</h4>
-<p>我的页新增「数商服务」入口，并入「我的服务」14 入口网格（移除原「更多服务」）。</p>
-<img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/shot-mine.png" alt="我的页原型（含数商服务入口与我的服务14入口）">
+<img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/home.png" alt="首页原型（底部 Tab 为首页/分类/购物车/我的）">
 <h4>4.1.2 详细逻辑规则</h4>
-<h5>界面与展示规则</h5>
-<p><strong>我的服务 14 入口网格</strong>（字段名称 / 需求说明 / 备注）：</p>
+<table>
+  <tr><th style="width:22%">Tab</th><th>需求说明</th><th>备注</th></tr>
+  <tr><td>首页</td><td>沿用现有商城首页</td><td><span class="tag tag-keep">已有-沿用</span></td></tr>
+  <tr><td>分类</td><td>商品分类页（本期占位，设计稿未提供）</td><td><span class="tag tag-keep">已有-沿用</span> 仅保留入口</td></tr>
+  <tr><td>购物车</td><td>购物车页（本期占位，设计稿未提供）</td><td><span class="tag tag-keep">已有-沿用</span> 仅保留入口</td></tr>
+  <tr><td>我的</td><td>个人中心，含「我的服务」入口</td><td><span class="tag tag-keep">已有-沿用</span></td></tr>
+  <tr><td>AI / 数智 / 消息</td><td>原智联猫相关入口与页面全部删除</td><td><span class="tag tag-del">本期删除</span></td></tr>
+</table>
+<div class="toconfirm">⚠️ 待确认 @产品：分类 / 购物车 Tab 的具体页面设计是否沿用旧版，或本期同步提供新设计稿。</div>
+
+<!-- 4.2 我的 -->
+<h3>4.2 我的</h3>
+<span class="tag tag-change">本期改动</span>
+<h4>4.2.1 页面原型与交互示意</h4>
+<p>我的页新增「数商服务」入口，并入「我的服务」8 入口网格。</p>
+<img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/mine.png" alt="我的页原型（含数商服务入口与我的服务8入口）">
+<h4>4.2.2 详细逻辑规则</h4>
+<h5>界面与展示规则 —— 我的服务 8 入口</h5>
 <table>
   <tr><th style="width:30%">入口名称</th><th>需求说明</th><th>备注</th></tr>
-  <tr><td>数商服务</td><td>本期新增入口，跳转数商服务页（4.2）</td><td><span class="tag tag-change">本期改动</span></td></tr>
-  <tr><td>网格水站 / 排行榜 / 优惠券 / 我的积分 / 收货地址 / 我的收藏 / 联系客服 / 意见反馈 / 代注册 / 签到打卡 / 推广 / 直播广场 / 公司资质</td><td>沿用现有模块入口，跳转既有页面</td><td><span class="tag tag-keep">已有-沿用</span> 仅保留入口，不展开字段</td></tr>
+  <tr><td>数商服务</td><td>本期新增入口，跳转数商服务页（4.3）</td><td><span class="tag tag-new">本期新增</span></td></tr>
+  <tr><td>网格水站</td><td>沿用现有模块入口</td><td><span class="tag tag-keep">已有-沿用</span></td></tr>
+  <tr><td>优惠券</td><td>沿用现有模块入口</td><td><span class="tag tag-keep">已有-沿用</span></td></tr>
+  <tr><td>我的积分</td><td>沿用现有模块入口</td><td><span class="tag tag-keep">已有-沿用</span></td></tr>
+  <tr><td>收货地址</td><td>沿用现有模块入口</td><td><span class="tag tag-keep">已有-沿用</span></td></tr>
+  <tr><td>我的收藏</td><td>沿用现有模块入口</td><td><span class="tag tag-keep">已有-沿用</span></td></tr>
+  <tr><td>联系客服</td><td>沿用现有模块入口</td><td><span class="tag tag-keep">已有-沿用</span></td></tr>
+  <tr><td>意见反馈</td><td>沿用现有模块入口</td><td><span class="tag tag-keep">已有-沿用</span></td></tr>
+  <tr><td>排行榜</td><td>从我的服务移除</td><td><span class="tag tag-del">本期删除</span></td></tr>
+  <tr><td>直播广场</td><td>从我的服务移除</td><td><span class="tag tag-del">本期删除</span></td></tr>
+  <tr><td>签到打卡</td><td>从我的服务移除</td><td><span class="tag tag-del">本期删除</span></td></tr>
+  <tr><td>推广</td><td>从我的服务移除</td><td><span class="tag tag-del">本期删除</span></td></tr>
+  <tr><td>代注册</td><td>从我的服务移入数商服务「其他工具」</td><td><span class="tag tag-change">位置调整</span></td></tr>
+  <tr><td>公司资质</td><td>从我的服务移入数商服务「其他工具」</td><td><span class="tag tag-change">位置调整</span></td></tr>
 </table>
-<div class="toconfirm">⚠️ 待确认 @产品：我的服务 14 入口的完整清单与顺序是否以此为准（依据设计稿推断）。</div>
 <h5>业务逻辑与边界条件</h5>
 <table>
   <tr><th style="width:30%">功能</th><th>说明</th><th>备注</th></tr>
-  <tr><td>数商服务入口</td><td>点击跳转数商服务页（4.2）</td><td>权限：登录用户且具备经营身份（店主/推广员）可见，普通会员隐藏 ⚠️ 待确认 @产品</td></tr>
-  <tr><td>其余 13 入口</td><td>沿用现有跳转逻辑</td><td>沿用现有功能</td></tr>
+  <tr><td>数商服务入口</td><td>点击跳转数商服务页（4.3）</td><td>权限：登录用户且具备经营身份（店主/推广员）可见，普通会员隐藏 ⚠️ 待确认 @产品</td></tr>
+  <tr><td>其余 7 入口</td><td>沿用现有跳转逻辑</td><td>沿用现有功能</td></tr>
 </table>
 
-<!-- 4.2 数商服务 -->
-<h3>4.2 数商服务（用户活跃 / 用户画像 / 报表 三 Tab）</h3>
-<span class="tag tag-new">本期新增</span>
-<h4>4.2.1 页面原型与交互示意</h4>
-<img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/shot-shushang.png" alt="数商服务页原型（三Tab：用户活跃/用户画像/报表）">
-<h4>4.2.2 详细逻辑规则</h4>
+<!-- 4.3 数商服务 -->
+<h3>4.3 数商服务首页</h3>
+<span class="tag tag-change">本期改动</span>
+<h4>4.3.1 页面原型与交互示意</h4>
+<img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/shushang.png" alt="数商服务页原型（AI工具/其他工具/客户管理/活跃走势图/商学院）">
+<h4>4.3.2 详细逻辑规则</h4>
 <h5>界面与展示规则</h5>
 <table>
-  <tr><th style="width:22%">Tab</th><th>展示内容</th><th>备注</th></tr>
-  <tr><td>用户活跃</td><td>客户活跃概览（今日活跃数、沉寂数、活跃趋势等）</td><td>指标口径 ⚠️ 待确认 @数据</td></tr>
-  <tr><td>用户画像</td><td>客户分布画像（等级分布、地域、消费偏好等）</td><td>维度 ⚠️ 待确认 @数据</td></tr>
-  <tr><td>报表</td><td>经营报表（客户数、订单、业绩等聚合）</td><td><span class="tbc">不展示推广收益 / 佣金</span></td></tr>
+  <tr><th style="width:22%">区块</th><th>展示内容</th><th>备注</th></tr>
+  <tr><td>用户头像 / 等级</td><td>展示当前经营者头像、昵称、会员等级、执行委等身份标签</td><td>取《用户表》《会员等级表》</td></tr>
+  <tr><td>AI工具</td><td>素材库、生成视频、图片生成、数字人分身、风控律师</td><td><span class="tag tag-keep">已有-沿用</span> 本期仅保留入口</td></tr>
+  <tr><td>其他工具</td><td>代注册、公司资质、工业游</td><td><span class="tag tag-change">本期改动</span> 代注册/公司资质从我的服务移入，工业游为新增入口</td></tr>
+  <tr><td>客户管理</td><td>四指标卡片：总客户数量 / 今日活跃 / 沉寂预警 / 高价值核心客户</td><td><span class="tag tag-change">本期改动</span> 详见 4.3.3</td></tr>
+  <tr><td>活跃走势图</td><td>近 7/15/30 天活跃客户数曲线图</td><td><span class="tag tag-change">本期改动</span> X轴日期，Y轴客户数量</td></tr>
+  <tr><td>商学院</td><td>线上课堂入口 Banner</td><td><span class="tag tag-keep">已有-沿用</span></td></tr>
 </table>
 <h5>业务逻辑与边界条件</h5>
 <table>
   <tr><th style="width:26%">功能</th><th>说明</th><th>备注</th></tr>
-  <tr><td>Tab 切换</td><td>点击顶部 Tab 切换内容区，当前 Tab 高亮</td><td>纯前端视图切换，不埋点（无业务分析价值）</td></tr>
-  <tr><td>报表口径</td><td>报表仅展示客户经营相关数据，<span class="tbc">明确不包含推广收益、佣金字段</span></td><td><span class="tbc">红线：禁止在报表中出现收益/佣金</span></td></tr>
+  <tr><td>客户管理指标点击</td><td>点击任意指标卡片，跳转客户列表并自动选中对应 Tab（总客户→全部；今日活跃→今日活跃；沉寂预警→沉寂；高价值→高价值）</td><td>整卡可点击，「一键查看」为同一跳转</td></tr>
+  <tr><td>活跃走势图 Tab 切换</td><td>点击「近7天/近15天/近30天」切换时间范围，曲线图重绘</td><td>纯前端视图切换，不埋点</td></tr>
 </table>
-<div class="toconfirm">⚠️ 待确认 @产品/@数据：三 Tab 各自的具体指标、聚合算法与数据来源（《XX 表》/接口）。</div>
 
-<!-- 4.3 客户列表 -->
-<h3>4.3 客户列表（全部 / 今日活跃 / 沉寂 / 高价值）</h3>
+<h5>4.3.3 客户管理四指标口径</h5>
+<table>
+  <tr><th style="width:22%">指标名称</th><th>口径定义</th><th>数据来源</th><th>跳转目标</th></tr>
+  <tr><td>总客户数量</td><td>全部客户数量（不区分直推/间推）</td><td>《客户关系表》/《用户表》</td><td>客户列表「全部客户」Tab</td></tr>
+  <tr><td>今日活跃</td><td>当前自然日有登录过的用户</td><td>《用户登录日志表》</td><td>客户列表「今日活跃」Tab</td></tr>
+  <tr><td>沉寂预警</td><td>7 天未登录的用户</td><td>《用户登录日志表》</td><td>客户列表「沉寂客户」Tab</td></tr>
+  <tr><td>高价值核心客户</td><td>达人及以上等级用户，按等级降序、同等级达成时间倒序排列</td><td>《会员等级表》</td><td>客户列表「高价值客户」Tab</td></tr>
+</table>
+
+<h5>4.3.4 活跃走势图规格</h5>
+<table>
+  <tr><th style="width:22%">项</th><th>规格</th><th>备注</th></tr>
+  <tr><td>图表类型</td><td>曲线图（平滑曲线）</td><td>非柱状图/折线图硬折线</td></tr>
+  <tr><td>X 轴</td><td>日期</td><td>按所选时间范围等分展示，15/30 天可稀疏显示避免重叠</td></tr>
+  <tr><td>Y 轴</td><td>客户数量</td><td>取每日「今日活跃」客户数</td></tr>
+  <tr><td>时间范围</td><td>近 7 天 / 近 15 天 / 近 30 天</td><td>默认近 7 天</td></tr>
+  <tr><td>高亮</td><td>默认高亮最后一个数据点，并向下绘制虚线</td><td>参考设计稿</td></tr>
+</table>
+<div class="toconfirm">⚠️ 待确认 @数据：活跃走势图的每日数据是取「今日活跃」（当日登录）还是「活跃客户」（任意活跃行为，如下单/分享）？当前按当日登录口径处理。</div>
+
+<!-- 4.4 客户列表 -->
+<h3>4.4 客户列表（全部 / 今日活跃 / 沉寂 / 高价值）</h3>
 <span class="tag tag-new">本期新增</span>
-<h4>4.3.1 页面原型与交互示意</h4>
-<img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/shot-customer-list.png" alt="客户列表页原型（四Tab：全部/今日活跃/沉寂/高价值 + 一键唤醒）">
-<h4>4.3.2 详细逻辑规则</h4>
+<h4>4.4.1 页面原型与交互示意</h4>
+<img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/customer-list.png" alt="客户列表页原型（四Tab：全部/今日活跃/沉寂/高价值 + 一键唤醒）">
+<h4>4.4.2 详细逻辑规则</h4>
 <h5>界面与展示规则 —— 客户列表字段表</h5>
 <table>
   <tr><th style="width:24%">字段名称</th><th>需求说明</th><th>备注</th></tr>
@@ -211,32 +263,32 @@
   <tr><td>手机号</td><td>脱敏展示</td><td>取《用户表》.phone，脱敏规则 ⚠️ 待确认 @安全</td></tr>
   <tr><td>会员等级</td><td>显示客户会员等级（达人层级）</td><td>取《会员等级表》.level_name</td></tr>
   <tr><td>关系标识</td><td>直推 / 间推标记</td><td>取《客户关系表》.relation_type</td></tr>
-  <tr><td>订单金额</td><td>该客户最高订单金额（多 SKU 合计）</td><td>取《订单表》，按订单 SKU 合计后取最大单</td></tr>
+  <tr><td>订单金额</td><td>该客户代表订单金额（多 SKU 合计）</td><td>取《订单表》，按订单 SKU 合计后取最大单</td></tr>
   <tr><td>达成时间</td><td>当前等级达成时间</td><td>取《会员等级表》.achieve_time</td></tr>
 </table>
 <h5>四 Tab 筛选规则</h5>
 <table>
   <tr><th style="width:22%">Tab</th><th>筛选逻辑</th><th>备注</th></tr>
-  <tr><td>全部</td><td>展示全部客户</td><td>默认页</td></tr>
-  <tr><td>今日活跃</td><td>筛选当日有活跃行为的客户</td><td>活跃定义 ⚠️ 待确认 @数据</td></tr>
-  <tr><td>沉寂</td><td>超过阈值无活跃的客户</td><td>阈值（如 N 天）⚠️ 待确认 @运营</td></tr>
-  <tr><td>高价值</td><td>按会员等级降序，取最高等级的若干档；同级按达成时间倒序（越晚达成越靠前）</td><td><span class="tbc">等级门槛 cutoff（取最高几档）⚠️ 待确认 @产品</span></td></tr>
+  <tr><td>全部客户</td><td>展示全部客户</td><td>默认页</td></tr>
+  <tr><td>今日活跃</td><td>筛选当前自然日有登录的用户</td><td>口径同 4.3.3</td></tr>
+  <tr><td>沉寂客户</td><td>筛选 7 天未登录的用户</td><td>口径同 4.3.3</td></tr>
+  <tr><td>高价值客户</td><td>按会员等级降序，取达人及以上；同级按达成时间倒序（越晚达成越靠前）</td><td><span class="tbc">等级门槛 cutoff（取最高几档）⚠️ 待确认 @产品</span></td></tr>
 </table>
 <h5>业务逻辑与边界条件</h5>
 <table>
   <tr><th style="width:26%">功能</th><th>说明</th><th>备注</th></tr>
-  <tr><td>客户条目点击</td><td>跳转客户详情（4.4）</td><td>权限：经营身份可见</td></tr>
-  <tr><td>一键唤醒</td><td>页内按钮（非浮层），点击对客户发起触达（引导下单/复购/分享）</td><td>置于列表下方页内；具体触达通道与文案 ⚠️ 待确认 @运营</td></tr>
+  <tr><td>客户条目点击</td><td>跳转客户详情（4.5）</td><td>权限：经营身份可见</td></tr>
+  <tr><td>一键唤醒</td><td>页内按钮（非浮层），点击后对「用户状态 ≠ 今日活跃」的全部客户发起 App Push 触达</td><td>触达通道与文案 ⚠️ 待确认 @运营</td></tr>
   <tr><td>高价值排序</td><td>等级权重降序 + 达成时间倒序</td><td>等级权重：至尊8&gt;尊荣7&gt;领航6&gt;精英5&gt;服务4&gt;潜力3&gt;成长2&gt;分享1</td></tr>
 </table>
-<div class="toconfirm">⚠️ 待确认 @产品：高价值客户的等级 cutoff（取最高几档达人）；⚠️ 待确认 @运营：一键唤醒的触达通道（微信/短信/App 推送）与文案模板。</div>
+<div class="toconfirm">⚠️ 待确认 @产品：高价值客户的等级 cutoff（取最高几档达人）；⚠️ 待确认 @运营：一键唤醒的 App Push 文案模板与发送频率限制。</div>
 
-<!-- 4.4 客户详情 -->
-<h3>4.4 客户详情</h3>
+<!-- 4.5 客户详情 -->
+<h3>4.5 客户详情</h3>
 <span class="tag tag-new">本期新增</span>
-<h4>4.4.1 页面原型与交互示意</h4>
-<img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/shot-customer-detail.png" alt="客户详情页原型（会员等级/订单/关系）">
-<h4>4.4.2 详细逻辑规则</h4>
+<h4>4.5.1 页面原型与交互示意</h4>
+<img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/customer-detail.png" alt="客户详情页原型（会员等级/订单/关系）">
+<h4>4.5.2 详细逻辑规则</h4>
 <h5>界面与展示规则 —— 详情字段表</h5>
 <table>
   <tr><th style="width:24%">字段名称</th><th>需求说明</th><th>备注</th></tr>
@@ -250,14 +302,8 @@
 <table>
   <tr><th style="width:26%">功能</th><th>说明</th><th>备注</th></tr>
   <tr><td>订单多 SKU 金额</td><td>同一订单含多个 SKU 时，订单金额 = 各 SKU 小计之和</td><td>计算公式：order_amount = Σ(sku_price × sku_qty)</td></tr>
-  <tr><td>一键唤醒</td><td>详情页也可发起唤醒（同 4.3）</td><td>⚠️ 待确认 @运营 触达方式</td></tr>
+  <tr><td>状态标签</td><td>详情页顶部显示客户当前活跃状态（今日活跃/本周活跃/沉寂预警）</td><td>状态定义同 4.3.3 / 4.4</td></tr>
 </table>
-
-<!-- 4.5 AI 智联猫 -->
-<h3>4.5 AI 智联猫（入口 / 客服）</h3>
-<span class="tag tag-keep">已有-沿用</span>
-<p>沿用现有 AI 客服（智联猫）能力，本期不在数商模块内新增 AI 功能；如需在客户详情内嵌智能问答入口，作为后续迭代。</p>
-<div class="toconfirm">⚠️ 待确认 @产品：客户详情是否内嵌智联猫快捷入口（本期暂按不内嵌处理）。</div>
 
 <!-- ================= 五、非功能性需求 ================= -->
 <h2>五、非功能性需求</h2>
@@ -279,6 +325,7 @@
   <tr><td>⚠️ 待确认</td><td>进入数商服务页</td><td>页面层</td><td>App</td><td>打开数商服务页</td><td>页面名称、入口来源</td><td>候选 page_enter</td></tr>
   <tr><td>⚠️ 待确认</td><td>查看客户详情</td><td>行为层</td><td>App</td><td>点击客户条目进入详情</td><td>客户ID、会员等级</td><td>候选 item_click</td></tr>
   <tr><td>⚠️ 待确认</td><td>点击一键唤醒</td><td>行为层</td><td>App</td><td>点击唤醒按钮</td><td>客户ID、触发位置</td><td>候选 button_click</td></tr>
+  <tr><td>⚠️ 待确认</td><td>切换活跃走势图时间范围</td><td>行为层</td><td>App</td><td>点击近7/15/30天</td><td>时间范围</td><td>候选 button_click</td></tr>
 </table>
 <p class="sub">说明：纯交互（Tab 切换/折叠/滚动）无业务分析价值，不埋点；结果类数据后端业务表已落库可直接统计，不重复埋。</p>
 
@@ -287,10 +334,13 @@
 <table>
   <tr><th style="width:34%">验收场景</th><th>Given → When → Then</th></tr>
   <tr><td>客户列表高价值排序</td><td><strong>Given</strong> 店主进入客户列表高价值 Tab，<strong>When</strong> 加载数据，<strong>Then</strong> 列表按会员等级权重降序、同级按达成时间倒序（越晚越靠前）排列</td></tr>
-  <tr><td>报表不含收益/佣金</td><td><strong>Given</strong> 进入数商服务-报表 Tab，<strong>When</strong> 查看报表，<strong>Then</strong> 页面无任何推广收益/佣金字段与金额</td></tr>
   <tr><td>多 SKU 订单金额</td><td><strong>Given</strong> 客户某订单含 3 个 SKU，<strong>When</strong> 查看订单/详情，<strong>Then</strong> 订单金额 = 各 SKU 小计之和</td></tr>
   <tr><td>一键唤醒在页内</td><td><strong>Given</strong> 客户列表页，<strong>When</strong> 下滑到底部，<strong>Then</strong> 出现页内「一键唤醒」按钮（非浮层）</td></tr>
-  <tr><td>我的服务入口</td><td><strong>Given</strong> 我的页，<strong>When</strong> 查看我的服务，<strong>Then</strong> 展示 14 个入口且含「数商服务」、无「更多服务」</td></tr>
+  <tr><td>一键唤醒范围</td><td><strong>Given</strong> 客户列表页，<strong>When</strong> 点击一键唤醒，<strong>Then</strong> 仅对「非今日活跃」用户发起 App Push 触达</td></tr>
+  <tr><td>我的服务入口</td><td><strong>Given</strong> 我的页，<strong>When</strong> 查看我的服务，<strong>Then</strong> 展示 8 个入口且含「数商服务」、无「排行榜/直播广场/签到打卡/推广」</td></tr>
+  <tr><td>数商服务指标跳转</td><td><strong>Given</strong> 数商服务页，<strong>When</strong> 点击客户管理四指标卡片，<strong>Then</strong> 跳转客户列表并自动选中对应 Tab</td></tr>
+  <tr><td>活跃走势图</td><td><strong>Given</strong> 数商服务页，<strong>When</strong> 查看活跃走势图，<strong>Then</strong> X 轴为日期、Y 轴为客户数量、图表为曲线图、支持近 7/15/30 天切换</td></tr>
+  <tr><td>删除智联猫</td><td><strong>Given</strong> 首页底部 Tab，<strong>When</strong> 查看 Tab 列表，<strong>Then</strong> 无 AI / 数智 / 消息入口，且不存在对应页面</td></tr>
 </table>
 
 <!-- ================= 七、关键边界设计检查清单 ================= -->
@@ -302,7 +352,7 @@
   <tr><td>极限值与空状态</td><td>客户列表为空、订单为空、会员等级未达成均需有缺省图与文案</td></tr>
   <tr><td>版本兼容性</td><td>Vue2→Vue3 过渡期双端表现一致 ⚠️ 待确认 @技术</td></tr>
   <tr><td>逆向流（退款/取消）</td><td>订单退款后「最高订单金额」口径是否回滚 ⚠️ 待确认 @后端</td></tr>
-  <tr><td>高并发与防重</td><td>一键唤醒防重复点击，避免重复触达</td></tr>
+  <tr><td>高并发与防重</td><td>一键唤醒防重复点击，避免重复发送 App Push</td></tr>
 </table>
 
 <!-- ================= 八、文档维护与变更规范 ================= -->
@@ -316,18 +366,22 @@
 <!-- ================= 九、待确认项汇总 ================= -->
 <h2>九、待确认项汇总</h2>
 <table>
-  <tr><th style="width:6%">#</th><th style="width:20%">待确认事项</th><th style="width:14%">责任方</th><th>当前占位 / 备注</th></tr>
-  <tr><td>1</td><td>高价值客户等级 cutoff（取最高几档达人）</td><td>@产品</td><td>按等级权重降序取最高若干档，具体档位待定</td></tr>
-  <tr><td>2</td><td>一键唤醒触达通道与文案模板</td><td>@运营</td><td>微信/短信/App 推送？文案待定</td></tr>
-  <tr><td>3</td><td>三 Tab（活跃/画像/报表）具体指标与聚合算法</td><td>@数据</td><td>指标口径、数据来源表待定</td></tr>
-  <tr><td>4</td><td>会员等级达成门槛（各档金额/人数）</td><td>@运营</td><td>等级表权重已定，门槛值待定</td></tr>
-  <tr><td>5</td><td>客户手机号脱敏规则</td><td>@安全</td><td>中间四位/后四位掩码待定</td></tr>
-  <tr><td>6</td><td>数商服务入口权限（哪些身份可见）</td><td>@产品</td><td>店主/推广员可见，普通会员隐藏？</td></tr>
-  <tr><td>7</td><td>客户列表分页条数 / 沉寂阈值（N 天）</td><td>@前端 @运营</td><td>每页条数、沉寂天数待定</td></tr>
-  <tr><td>8</td><td>埋点事件英文名对齐 v2.3 目录</td><td>@数据</td><td>候选事件须对齐既有目录，走埋点评审</td></tr>
-  <tr><td>9</td><td>客户详情是否内嵌智联猫入口</td><td>@产品</td><td>本期暂按不内嵌</td></tr>
-  <tr><td>10</td><td>订单退款后「最高订单金额」是否回滚</td><td>@后端</td><td>口径待定</td></tr>
-  <tr><td>11</td><td>技术 Owner / 测试负责人</td><td>@技术负责人</td><td>文档基本信息待补全</td></tr>
+  <thead>
+    <tr><th style="width:6%">#</th><th style="width:20%">待确认事项</th><th style="width:14%">责任方</th><th>当前占位 / 备注</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td>高价值客户等级 cutoff（取最高几档达人）</td><td>@产品</td><td>按等级权重降序取达人及以上，具体档位待定</td></tr>
+    <tr><td>2</td><td>一键唤醒 App Push 文案模板与频率限制</td><td>@运营</td><td>文案、发送时段、单用户日上限待定</td></tr>
+    <tr><td>3</td><td>活跃走势图「活跃」口径（登录/任意活跃行为）</td><td>@数据</td><td>当前按当日登录口径</td></tr>
+    <tr><td>4</td><td>会员等级达成门槛（各档金额/人数）</td><td>@运营</td><td>等级表权重已定，门槛值待定</td></tr>
+    <tr><td>5</td><td>客户手机号脱敏规则</td><td>@安全</td><td>中间四位/后四位掩码待定</td></tr>
+    <tr><td>6</td><td>数商服务入口权限（哪些身份可见）</td><td>@产品</td><td>店主/推广员可见，普通会员隐藏？</td></tr>
+    <tr><td>7</td><td>客户列表分页条数</td><td>@前端</td><td>每页条数待定</td></tr>
+    <tr><td>8</td><td>埋点事件英文名对齐 v2.3 目录</td><td>@数据</td><td>候选事件须对齐既有目录，走埋点评审</td></tr>
+    <tr><td>9</td><td>分类 / 购物车 Tab 页面设计</td><td>@产品</td><td>本期按沿用旧版占位处理</td></tr>
+    <tr><td>10</td><td>订单退款后「最高订单金额」是否回滚</td><td>@后端</td><td>口径待定</td></tr>
+    <tr><td>11</td><td>技术 Owner / 测试负责人</td><td>@技术负责人</td><td>文档基本信息待补全</td></tr>
+  </tbody>
 </table>
 <p class="sub">以上待确认项需在评审会逐条澄清后回填，回填完成方可定稿。</p>
 
