@@ -61,6 +61,7 @@
   <tr><th style="width:12%">版本号</th><th style="width:14%">修订日期</th><th style="width:14%">修订人</th><th style="width:30%">修订内容简述</th><th>状态</th></tr>
   <tr><td>V0.1</td><td>2026-08-17</td><td>袁中天</td><td>初稿：基于数商服务原型梳理一~九结构，含我的/数商服务/客户列表/客户详情功能详情</td><td>评审中</td></tr>
   <tr><td>V0.2</td><td>2026-08-18</td><td>袁中天</td><td>按设计稿调整：① 删除智联猫相关入口与页面；② 我的服务入口精简为 8 个；③ 数商服务改为单页（AI工具+其他工具+客户管理+活跃走势图+商学院）；④ 客户管理四指标口径明确；⑤ 活跃走势图改为曲线图；⑥ 一键唤醒改为 App Push 触达非今日活跃用户</td><td>评审中</td></tr>
+  <tr><td>V0.3</td><td>2026-08-18</td><td>袁中天</td><td>删除数商服务页「商学院」入口与线上课堂 Banner</td><td>评审中</td></tr>
 </table>
 
 <!-- ================= 二、项目背景与目标 ================= -->
@@ -135,7 +136,7 @@
 <h3>3.2 信息架构</h3>
 <table>
   <tr><th style="width:22%">层级</th><th>映射关系</th></tr>
-  <tr><td>前端展示层</td><td>我的（数商服务入口 + 我的服务 8 入口）→ 数商服务（AI工具 / 其他工具 / 客户管理 / 活跃走势图 / 商学院）→ 客户列表（全部 / 今日活跃 / 沉寂 / 高价值）→ 客户详情 → 一键唤醒</td></tr>
+  <tr><td>前端展示层</td><td>我的（数商服务入口 + 我的服务 8 入口）→ 数商服务（AI工具 / 其他工具 / 客户管理 / 活跃走势图）→ 客户列表（全部 / 今日活跃 / 沉寂 / 高价值）→ 客户详情 → 一键唤醒</td></tr>
   <tr><td>后端配置层</td><td>会员等级配置、客户分层规则（活跃度/等级阈值）、App Push 触达通道 ⚠️ 待确认 @后端</td></tr>
   <tr><td>数据层</td><td>用户表、会员等级表、订单表（多 SKU）、客户关系（直推/间推）表 ⚠️ 待确认 @后端 具体表名</td></tr>
 </table>
@@ -210,7 +211,7 @@
 <h3>4.3 数商服务首页</h3>
 <span class="tag tag-change">本期改动</span>
 <h4>4.3.1 页面原型与交互示意</h4>
-<img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/shushang.png" alt="数商服务页原型（AI工具/其他工具/客户管理/活跃走势图/商学院）">
+<img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/shushang.png" alt="数商服务页原型（AI工具/其他工具/客户管理/活跃走势图）">
 <h4>4.3.2 详细逻辑规则</h4>
 <h5>界面与展示规则</h5>
 <table>
@@ -220,7 +221,6 @@
   <tr><td>其他工具</td><td>代注册、公司资质、工业游</td><td><span class="tag tag-change">本期改动</span> 代注册/公司资质从我的服务移入，工业游为新增入口</td></tr>
   <tr><td>客户管理</td><td>四指标卡片：总客户数量 / 今日活跃 / 沉寂预警 / 高价值核心客户</td><td><span class="tag tag-change">本期改动</span> 详见 4.3.3</td></tr>
   <tr><td>活跃走势图</td><td>近 7/15/30 天活跃客户数曲线图</td><td><span class="tag tag-change">本期改动</span> X轴日期，Y轴客户数量</td></tr>
-  <tr><td>商学院</td><td>线上课堂入口 Banner</td><td><span class="tag tag-keep">已有-沿用</span></td></tr>
 </table>
 <h5>业务逻辑与边界条件</h5>
 <table>
