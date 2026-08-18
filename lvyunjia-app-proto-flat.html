@@ -207,6 +207,35 @@
     .order-item .o-price { font-size: 14px; color: var(--text); font-weight: 600; }
     .order-item .o-status { font-size: 12px; color: var(--primary); }
 
+    /* ================== 联系记录 ================== */
+    .contact-block { background: #fff; margin: 0 12px 12px; border-radius: 12px; padding: 16px; }
+    .contact-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .contact-head .contact-title { font-size: 15px; font-weight: 700; color: var(--text); }
+    .contact-head .add-record { font-size: 14px; color: var(--blue); cursor: pointer; }
+    .timeline { position: relative; padding-left: 22px; }
+    .timeline::before { content: ''; position: absolute; left: 6px; top: 4px; bottom: 4px; width: 2px; background: #e0e0e0; }
+    .timeline-item { position: relative; margin-bottom: 16px; }
+    .timeline-item:last-child { margin-bottom: 0; }
+    .timeline-dot { position: absolute; left: -20px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #bdbdbd; border: 2px solid #fff; box-shadow: 0 0 0 1px #e0e0e0; }
+    .timeline-item:first-child .timeline-dot { background: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
+    .timeline-time { font-size: 13px; color: var(--text); font-weight: 500; margin-bottom: 4px; }
+    .timeline-content { font-size: 13px; color: var(--text-secondary); line-height: 1.5; word-break: break-all; }
+    .timeline-empty { font-size: 13px; color: var(--text-tertiary); text-align: center; padding: 20px 0; }
+
+    /* ================== 添加记录弹窗 ================== */
+    #recordModal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500; display: none; align-items: center; justify-content: center; }
+    #recordModal.active { display: flex; }
+    #recordModal .rm-box { width: 86%; max-width: 360px; background: #fff; border-radius: 8px; padding: 20px; box-sizing: border-box; border: 1px solid var(--blue); }
+    #recordModal .rm-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    #recordModal .rm-title { font-size: 18px; font-weight: 700; color: var(--text); }
+    #recordModal .rm-close { font-size: 22px; color: var(--text); cursor: pointer; line-height: 1; }
+    #recordModal .rm-label { font-size: 14px; color: var(--text); margin-bottom: 8px; }
+    #recordModal textarea { width: 100%; height: 110px; border: 1px solid #ccc; border-radius: 0; padding: 10px; font-size: 14px; box-sizing: border-box; resize: none; outline: none; }
+    #recordModal .rm-btns { display: flex; justify-content: space-between; margin-top: 20px; }
+    #recordModal .rm-btn { width: 46%; height: 40px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; }
+    #recordModal .rm-btn.primary { background: var(--blue); color: #fff; border: none; }
+    #recordModal .rm-btn.default { background: #fff; color: var(--blue); border: 1px solid var(--blue); }
+
     .customer-item .c-level { font-size: 10px; color: var(--text-tertiary); background: #f0f0f0; padding: 1px 6px; border-radius: 8px; margin-left: 4px; font-weight: 400; }
     .customer-item .c-valuable { font-size: 10px; color: #fff; background: var(--orange); padding: 1px 6px; border-radius: 8px; margin-left: 4px; font-weight: 600; }
     .customer-item .c-amount { color: var(--text-secondary); }
@@ -568,7 +597,7 @@
         <div class="info-row"><span class="label">注册渠道</span><span class="value">App邀请</span></div>
         <div class="info-row"><span class="label">会员等级</span><span class="value" id="duLevel">金卡会员</span></div>
         <div class="info-row"><span class="label">客户类型</span><span class="value" id="duDirect">直推客户</span></div>
-        <div class="info-row"><span class="label">累计消费</span><span class="value">¥12,580.00</span></div>
+        <div class="info-row"><span class="label">累计消费</span><span class="value" id="duConsume">¥12,580.00</span></div>
       </div>
 
       <div class="info-block">
@@ -578,6 +607,29 @@
           <div class="order-filter" onclick="toast('订单日期筛选')">订单日期 ▾</div>
         </div>
         <div id="orderListWrap"></div>
+      </div>
+
+      <div class="contact-block">
+        <div class="contact-head">
+          <div class="contact-title">联系记录</div>
+          <div class="add-record" onclick="openRecordModal()">添加记录</div>
+        </div>
+        <div id="contactTimelineWrap"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="recordModal">
+    <div class="rm-box">
+      <div class="rm-head">
+        <div class="rm-title">添加记录</div>
+        <div class="rm-close" onclick="closeRecordModal()">✕</div>
+      </div>
+      <div class="rm-label">输入备注内容</div>
+      <textarea id="recordInput" placeholder="请输入"></textarea>
+      <div class="rm-btns">
+        <div class="rm-btn primary" onclick="saveRecord()">确定</div>
+        <div class="rm-btn default" onclick="closeRecordModal()">取消</div>
       </div>
     </div>
   </div>
@@ -714,37 +766,56 @@
     '分享达人1':5,'成长达人2':6,'潜力达人3':7,'服务达人4':8,
     '精英达人5':9,'领航达人6':10,'尊荣达人7':11,'至尊达人8':12
   };
-  // 客户主数据：orderAmount = 该客户代表订单金额（同一订单含多个 SKU，金额为 SKU 合计）
-  // status 定义：active=今日活跃（当前自然日登录过）；inactive=沉寂预警（7天未登录）；week=本周活跃（7天内登录但非今日）
+  // 客户主数据
+  // status 定义：active=今日活跃；week=本周活跃；inactive=沉寂预警（7天内无浏览商品详情）
+  // 排序字段：activeTime 最近活跃时间；silentSince 进入沉寂时间；totalConsume 累计消费（下单实付-退单）；lastOrderTime 最近下单时间
   const CUSTOMERS = [
-    { name:'林小美', phone:'135****8988', status:'active', statusText:'今日活跃', last:'10分钟前', isDirect:true, memberLevel:'至尊达人8', orderAmount:8920, achieveTime:'2024-08-16 14:30' },
-    { name:'王建国', phone:'135****8988', status:'active', statusText:'今日活跃', last:'2小时前', isDirect:true, memberLevel:'尊荣达人7', orderAmount:5600, achieveTime:'2024-08-15 09:00' },
-    { name:'赵大伟', phone:'135****8988', status:'week', statusText:'本周活跃', last:'3日前活跃', isDirect:true, memberLevel:'至尊达人8', orderAmount:4500, achieveTime:'2024-08-14 11:00' },
-    { name:'周小杰', phone:'135****8988', status:'active', statusText:'今日活跃', last:'1小时前', isDirect:true, memberLevel:'精英达人5', orderAmount:3200, achieveTime:'2024-08-13 16:00' },
-    { name:'吴小芳', phone:'135****8988', status:'active', statusText:'今日活跃', last:'30分钟前', isDirect:true, memberLevel:'领航达人6', orderAmount:4800, achieveTime:'2024-08-12 12:00' },
-    { name:'郑小强', phone:'135****8988', status:'active', statusText:'今日活跃', last:'5小时前', isDirect:true, memberLevel:'分享达人1', orderAmount:2600, achieveTime:'2024-08-11 10:00' },
-    { name:'李小红', phone:'135****8988', status:'inactive', statusText:'沉寂预警', last:'8天前活跃', isDirect:false, memberLevel:'高级会员', orderAmount:1200, achieveTime:'2024-07-20 10:00' },
-    { name:'孙小丽', phone:'135****8988', status:'inactive', statusText:'沉寂预警', last:'10天前活跃', isDirect:false, memberLevel:'普通用户', orderAmount:399, achieveTime:'2024-07-10 10:00' },
-    { name:'钱小波', phone:'135****8988', status:'inactive', statusText:'沉寂预警', last:'12天前活跃', isDirect:false, memberLevel:'中级会员', orderAmount:899, achieveTime:'2024-07-05 10:00' },
-    { name:'冯小敏', phone:'135****8988', status:'inactive', statusText:'沉寂预警', last:'15天前活跃', isDirect:false, memberLevel:'初级会员', orderAmount:299, achieveTime:'2024-07-01 10:00' },
-    { name:'陈小东', phone:'135****8988', status:'inactive', statusText:'沉寂预警', last:'9天前活跃', isDirect:false, memberLevel:'体验达人', orderAmount:599, achieveTime:'2024-07-08 10:00' }
+    { name:'林小美', phone:'135****8988', status:'active', statusText:'今日活跃', last:'10分钟前', isDirect:true, memberLevel:'至尊达人8', activeTime:'2024-08-18 10:30', silentSince:'', totalConsume:12580, lastOrderTime:'2024-08-16 14:30', contactRecords:[{time:'2024-08-16 15:00', content:'[广州市]已确认收货，客户反馈满意'}] },
+    { name:'王建国', phone:'135****8988', status:'active', statusText:'今日活跃', last:'2小时前', isDirect:true, memberLevel:'尊荣达人7', activeTime:'2024-08-18 08:20', silentSince:'', totalConsume:9800, lastOrderTime:'2024-08-15 09:00', contactRecords:[] },
+    { name:'赵大伟', phone:'135****8988', status:'week', statusText:'本周活跃', last:'3日前活跃', isDirect:true, memberLevel:'至尊达人8', activeTime:'2024-08-15 18:00', silentSince:'', totalConsume:7200, lastOrderTime:'2024-08-14 11:00', contactRecords:[] },
+    { name:'吴小芳', phone:'135****8988', status:'active', statusText:'今日活跃', last:'30分钟前', isDirect:true, memberLevel:'领航达人6', activeTime:'2024-08-18 10:00', silentSince:'', totalConsume:4800, lastOrderTime:'2024-08-12 12:00', contactRecords:[] },
+    { name:'周小杰', phone:'135****8988', status:'active', statusText:'今日活跃', last:'1小时前', isDirect:true, memberLevel:'精英达人5', activeTime:'2024-08-18 09:30', silentSince:'', totalConsume:3200, lastOrderTime:'2024-08-13 16:00', contactRecords:[] },
+    { name:'郑小强', phone:'135****8988', status:'active', statusText:'今日活跃', last:'5小时前', isDirect:true, memberLevel:'分享达人1', activeTime:'2024-08-18 05:00', silentSince:'', totalConsume:2600, lastOrderTime:'2024-08-11 10:00', contactRecords:[] },
+    { name:'李小红', phone:'135****8988', status:'inactive', statusText:'沉寂预警', last:'8天前活跃', isDirect:false, memberLevel:'高级会员', activeTime:'2024-08-10 12:00', silentSince:'2024-08-11 00:00', totalConsume:1200, lastOrderTime:'2024-07-20 10:00', contactRecords:[{time:'2024-08-05 11:00', content:'[广州市]电话回访，客户表示近期无需求'}] },
+    { name:'陈小东', phone:'135****8988', status:'inactive', statusText:'沉寂预警', last:'9天前活跃', isDirect:false, memberLevel:'体验达人', activeTime:'2024-08-09 10:00', silentSince:'2024-08-10 00:00', totalConsume:599, lastOrderTime:'2024-07-08 10:00', contactRecords:[] },
+    { name:'孙小丽', phone:'135****8988', status:'inactive', statusText:'沉寂预警', last:'10天前活跃', isDirect:false, memberLevel:'普通用户', activeTime:'2024-08-08 14:00', silentSince:'2024-08-09 00:00', totalConsume:399, lastOrderTime:'2024-07-10 10:00', contactRecords:[] },
+    { name:'钱小波', phone:'135****8988', status:'inactive', statusText:'沉寂预警', last:'12天前活跃', isDirect:false, memberLevel:'中级会员', activeTime:'2024-08-06 09:00', silentSince:'2024-08-07 00:00', totalConsume:899, lastOrderTime:'2024-07-05 10:00', contactRecords:[] },
+    { name:'冯小敏', phone:'135****8988', status:'inactive', statusText:'沉寂预警', last:'15天前活跃', isDirect:false, memberLevel:'初级会员', activeTime:'2024-08-03 16:00', silentSince:'2024-08-04 00:00', totalConsume:299, lastOrderTime:'2024-07-01 10:00', contactRecords:[{time:'2024-07-15 10:00', content:'[广州市]首次下单回访，记录客户偏好'}] }
   ];
-  // 客户列表筛选：0=全部；1=今日活跃；2=沉寂预警（7天未登录）；3=高价值核心客户（达人及以上）
-  function getCustomerList(type) {
-    if (type === 1) return CUSTOMERS.filter(c => c.status === 'active');
-    if (type === 2) return CUSTOMERS.filter(c => c.status === 'inactive');
+  // 客户列表筛选：0=全部；1=今日活跃；2=沉寂预警；3=高价值核心客户
+  // 排序规则：
+  //   全部：按 activeTime 倒序（最近活跃最前）
+  //   今日活跃：按 activeTime 倒序
+  //   沉寂：按 silentSince 升序（越早进入沉寂越前）
+  //   高价值：按 totalConsume 倒序；同金额按 lastOrderTime 倒序
+  // 高价值定义：会员等级 >= 高级会员（LEVEL_MAP >= 3）
+  const HIGH_VALUE_MIN_LEVEL = 3;
+  function sortCustomers(list, type) {
+    const cp = list.slice();
+    if (type === 0 || type === 1) {
+      return cp.sort((a, b) => new Date(b.activeTime) - new Date(a.activeTime));
+    }
+    if (type === 2) {
+      return cp.sort((a, b) => new Date(a.silentSince) - new Date(b.silentSince));
+    }
     if (type === 3) {
-      return CUSTOMERS.filter(c => LEVEL_MAP[c.memberLevel] >= 5).slice().sort((a, b) =>
-        (LEVEL_MAP[b.memberLevel] - LEVEL_MAP[a.memberLevel]) || (new Date(b.achieveTime) - new Date(a.achieveTime))
+      return cp.sort((a, b) =>
+        (b.totalConsume - a.totalConsume) || (new Date(b.lastOrderTime) - new Date(a.lastOrderTime))
       );
     }
-    return CUSTOMERS.slice();
+    return cp;
+  }
+  function getCustomerList(type) {
+    if (type === 1) return sortCustomers(CUSTOMERS.filter(c => c.status === 'active'), 1);
+    if (type === 2) return sortCustomers(CUSTOMERS.filter(c => c.status === 'inactive'), 2);
+    if (type === 3) return sortCustomers(CUSTOMERS.filter(c => LEVEL_MAP[c.memberLevel] >= HIGH_VALUE_MIN_LEVEL), 3);
+    return sortCustomers(CUSTOMERS.slice(), 0);
   }
   function updateCustomerStats() {
     document.getElementById('statTotal').textContent = CUSTOMERS.length + '人';
     document.getElementById('statActive').textContent = CUSTOMERS.filter(c => c.status === 'active').length + '人';
     document.getElementById('statInactive').textContent = CUSTOMERS.filter(c => c.status === 'inactive').length + '人';
-    document.getElementById('statHigh').textContent = CUSTOMERS.filter(c => LEVEL_MAP[c.memberLevel] >= 5).length + '人';
+    document.getElementById('statHigh').textContent = CUSTOMERS.filter(c => LEVEL_MAP[c.memberLevel] >= HIGH_VALUE_MIN_LEVEL).length + '人';
   }
   function goCustomerListTab(type) {
     go('pageCustomerList');
@@ -763,7 +834,7 @@
     const list = getCustomerList(type);
     const isHighValue = type === 3;
     wrap.innerHTML = list.map((c, idx) => {
-      const amountText = '¥' + c.orderAmount.toLocaleString();
+      const consumeText = '¥' + c.totalConsume.toLocaleString();
       if (isHighValue) {
         return `
         <div class="customer-item" onclick="openCustomerDetail(${type}, ${idx})">
@@ -773,13 +844,12 @@
               <div class="c-left">
                 <div class="c-name">${c.name}</div>
                 <div class="c-phone"><span class="phone-icon"></span>${c.phone}</div>
-                <div class="c-achieve">达成时间：${c.achieveTime}</div>
+                <div class="c-achieve">最近下单：${c.lastOrderTime}</div>
               </div>
               <div class="c-level">${c.memberLevel}</div>
             </div>
             <div class="c-meta">
-              <span>上次活跃：${c.last}</span>
-              <span class="c-amount">订单金额：${amountText}</span>
+              <span>累计消费：${consumeText}</span>
               <span class="c-detail">查看详情 ›</span>
             </div>
           </div>
@@ -817,8 +887,10 @@
     { no:'20240810002', time:'2024-08-10 09:15', title:'青少年领袖素质训练营', icon:'🎓', status:'待发货', skus:[{spec:'套餐一', qty:1, price:2888.00}] },
     { no:'20240805003', time:'2024-08-05 20:00', title:'绿韵家 益生菌冻干粉', icon:'🧪', status:'已完成', skus:[{spec:'20袋/盒', qty:2, price:218.00}] }
   ];
+  let currentDetailCustomer = null;
   function openCustomerDetail(type, idx) {
     const c = getCustomerList(type)[idx];
+    currentDetailCustomer = c;
     document.getElementById('duName').textContent = c.name;
     document.getElementById('duPhone').textContent = '📱 ' + c.phone;
     document.getElementById('duAccount').textContent = '账号：' + c.phone;
@@ -829,7 +901,9 @@
     document.getElementById('duAvatar').textContent = '👩';
     document.getElementById('duLevel').textContent = c.memberLevel;
     document.getElementById('duDirect').textContent = c.isDirect ? '直推客户' : '间推客户';
+    document.getElementById('duConsume').textContent = '¥' + c.totalConsume.toLocaleString();
     renderOrders();
+    renderContactRecords();
     go('pageCustomerDetail');
   }
   function renderOrders() {
@@ -853,6 +927,44 @@
         </div>
       </div>`;
     }).join('');
+  }
+
+  /* ========== 联系记录（仅新增，不可修改） ========== */
+  function renderContactRecords() {
+    const wrap = document.getElementById('contactTimelineWrap');
+    if (!currentDetailCustomer) return;
+    const records = (currentDetailCustomer.contactRecords || []).slice().sort((a, b) => new Date(b.time) - new Date(a.time));
+    if (records.length === 0) {
+      wrap.innerHTML = '<div class="timeline-empty">暂无联系记录</div>';
+      return;
+    }
+    wrap.innerHTML = '<div class="timeline">' + records.map(r => `
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-time">${r.time}</div>
+        <div class="timeline-content">${r.content}</div>
+      </div>
+    `).join('') + '</div>';
+  }
+  function openRecordModal() {
+    document.getElementById('recordInput').value = '';
+    document.getElementById('recordModal').classList.add('active');
+  }
+  function closeRecordModal() {
+    document.getElementById('recordModal').classList.remove('active');
+  }
+  function saveRecord() {
+    const input = document.getElementById('recordInput');
+    const val = input.value.trim();
+    if (!val) { toast('请输入备注内容'); return; }
+    if (!currentDetailCustomer) return;
+    if (!currentDetailCustomer.contactRecords) currentDetailCustomer.contactRecords = [];
+    const now = new Date();
+    const time = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getDate().toString().padStart(2,'0')} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+    currentDetailCustomer.contactRecords.push({ time, content: val });
+    renderContactRecords();
+    closeRecordModal();
+    toast('添加记录成功');
   }
 
   /* ========== 初始化 ========== */
