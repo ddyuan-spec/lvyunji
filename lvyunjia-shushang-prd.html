@@ -60,7 +60,7 @@
 <table>
   <tr><th style="width:12%">版本号</th><th style="width:14%">修订日期</th><th style="width:14%">修订人</th><th style="width:30%">修订内容简述</th><th>状态</th></tr>
   <tr><td>V0.1</td><td>2026-08-17</td><td>袁中天</td><td>初稿：基于数商服务原型梳理一~九结构，含我的/数商服务/客户列表/客户详情功能详情</td><td>评审中</td></tr>
-  <tr><td>V0.2</td><td>2026-08-18</td><td>袁中天</td><td>按设计稿调整：① 删除智联猫相关入口与页面；② 我的服务入口精简为 8 个；③ 数商服务改为单页（AI工具+其他工具+客户管理+活跃走势图+商学院）；④ 客户管理四指标口径明确；⑤ 活跃走势图改为曲线图；⑥ 一键唤醒改为 App Push 触达非今日活跃用户</td><td>评审中</td></tr>
+  <tr><td>V0.2</td><td>2026-08-18</td><td>袁中天</td><td>按设计稿调整：① 底部 Tab 统一为首页/分类/AI/消息/我的；② 我的服务入口精简为 8 个；③ 数商服务改为单页（AI工具+其他工具+客户管理+活跃走势图+商学院）；④ 客户管理四指标口径明确；⑤ 活跃走势图改为曲线图；⑥ 一键唤醒改为 App Push 触达非今日活跃用户</td><td>评审中</td></tr>
   <tr><td>V0.3</td><td>2026-08-18</td><td>袁中天</td><td>删除数商服务页「商学院」入口与线上课堂 Banner</td><td>评审中</td></tr>
   <tr><td>V0.3.1</td><td>2026-08-18</td><td>袁中天</td><td>重绘 §3.1 业务流程图：修正箭头方向与前后端数据流，明确「请求→后端处理→返回指标/列表/详情」及「一键唤醒→引导复购/活跃」的正向流程</td><td>评审中</td></tr>
 </table>
@@ -197,23 +197,23 @@
 <!-- ================= 四、功能需求详情 ================= -->
 <h2 id="sec4">四、功能需求详情</h2>
 <p class="meta">本期范围：绿韵家 App「数商服务模块」相关页面（首页 Tab、我的、数商服务、客户列表、客户详情）。范围标注：<span class="tag tag-new">本期新增</span> <span class="tag tag-change">本期改动</span> <span class="tag tag-keep">已有-沿用</span> <span class="tag tag-del">本期删除</span>。</p>
-<p class="meta"><strong>涉及终端</strong>：绿韵家 App（iOS / Android / H5 小程序）。<strong>需求影响范围</strong>：本期聚焦数商服务模块（首页底部 Tab / 我的 / 数商服务 / 客户列表 / 客户详情），为新增 + 改动范畴；删除原底部 Tab 中「AI / 数智 / 消息（智联猫）」相关入口与页面，不影响商城下单 / 支付主链路。</p>
+<p class="meta"><strong>涉及终端</strong>：绿韵家 App（iOS / Android / H5 小程序）。<strong>需求影响范围</strong>：本期聚焦数商服务模块（首页底部 Tab / 我的 / 数商服务 / 客户列表 / 客户详情），为新增 + 改动范畴；底部 Tab 严格按设计稿执行（首页 / 分类 / AI / 消息 / 我的），不影响商城下单 / 支付主链路。</p>
 
 <!-- 4.1 首页底部 Tab -->
 <h3>4.1 首页底部 Tab</h3>
-<span class="tag tag-change">本期改动</span>
+<span class="tag tag-keep">已有-沿用</span>
 <h4>4.1.1 页面原型与交互示意</h4>
-<img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/home.png" alt="首页原型（底部 Tab 为首页/分类/购物车/我的）">
+<img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/home.png" alt="首页原型（底部 Tab 为首页/分类/AI/消息/我的）">
 <h4>4.1.2 详细逻辑规则</h4>
 <table>
   <tr><th style="width:22%">Tab</th><th>需求说明</th><th>备注</th></tr>
   <tr><td>首页</td><td>沿用现有商城首页</td><td><span class="tag tag-keep">已有-沿用</span></td></tr>
   <tr><td>分类</td><td>商品分类页（本期占位，设计稿未提供）</td><td><span class="tag tag-keep">已有-沿用</span> 仅保留入口</td></tr>
-  <tr><td>购物车</td><td>购物车页（本期占位，设计稿未提供）</td><td><span class="tag tag-keep">已有-沿用</span> 仅保留入口</td></tr>
+  <tr><td>AI</td><td>AI 助手入口页（本期占位，设计稿未提供）</td><td><span class="tag tag-keep">已有-沿用</span> 仅保留入口</td></tr>
+  <tr><td>消息</td><td>消息中心（本期占位，设计稿未提供）</td><td><span class="tag tag-keep">已有-沿用</span> 仅保留入口</td></tr>
   <tr><td>我的</td><td>个人中心，含「我的服务」入口</td><td><span class="tag tag-keep">已有-沿用</span></td></tr>
-  <tr><td>AI / 数智 / 消息</td><td>原智联猫相关入口与页面全部删除</td><td><span class="tag tag-del">本期删除</span></td></tr>
 </table>
-<div class="toconfirm">⚠️ 待确认 @产品：分类 / 购物车 Tab 的具体页面设计是否沿用旧版，或本期同步提供新设计稿。</div>
+<div class="toconfirm">⚠️ 待确认 @产品：分类 / AI / 消息 Tab 的具体页面设计是否沿用旧版，或本期同步提供新设计稿。</div>
 
 <!-- 4.2 我的 -->
 <h3>4.2 我的</h3>
@@ -380,7 +380,7 @@
   <tr><td>我的服务入口</td><td><strong>Given</strong> 我的页，<strong>When</strong> 查看我的服务，<strong>Then</strong> 展示 8 个入口且含「数商服务」、无「排行榜/直播广场/签到打卡/推广」</td></tr>
   <tr><td>数商服务指标跳转</td><td><strong>Given</strong> 数商服务页，<strong>When</strong> 点击客户管理四指标卡片，<strong>Then</strong> 跳转客户列表并自动选中对应 Tab</td></tr>
   <tr><td>活跃走势图</td><td><strong>Given</strong> 数商服务页，<strong>When</strong> 查看活跃走势图，<strong>Then</strong> X 轴为日期、Y 轴为客户数量、图表为曲线图、支持近 7/15/30 天切换</td></tr>
-  <tr><td>删除智联猫</td><td><strong>Given</strong> 首页底部 Tab，<strong>When</strong> 查看 Tab 列表，<strong>Then</strong> 无 AI / 数智 / 消息入口，且不存在对应页面</td></tr>
+  <tr><td>底部 Tab 结构</td><td><strong>Given</strong> 首页底部 Tab，<strong>When</strong> 查看 Tab 列表，<strong>Then</strong> 展示「首页 / 分类 / AI / 消息 / 我的」五个入口，顺序与设计稿一致</td></tr>
 </table>
 
 <!-- ================= 七、关键边界设计检查清单 ================= -->
@@ -418,7 +418,7 @@
     <tr><td>6</td><td>数商服务入口权限（哪些身份可见）</td><td>@产品</td><td>店主/推广员可见，普通会员隐藏？</td></tr>
     <tr><td>7</td><td>客户列表分页条数</td><td>@前端</td><td>每页条数待定</td></tr>
     <tr><td>8</td><td>埋点事件英文名对齐 v2.3 目录</td><td>@数据</td><td>候选事件须对齐既有目录，走埋点评审</td></tr>
-    <tr><td>9</td><td>分类 / 购物车 Tab 页面设计</td><td>@产品</td><td>本期按沿用旧版占位处理</td></tr>
+    <tr><td>9</td><td>分类 / AI / 消息 Tab 页面设计</td><td>@产品</td><td>本期按沿用旧版占位处理</td></tr>
     <tr><td>10</td><td>订单退款后「最高订单金额」是否回滚</td><td>@后端</td><td>口径待定</td></tr>
     <tr><td>11</td><td>技术 Owner / 测试负责人</td><td>@技术负责人</td><td>文档基本信息待补全</td></tr>
   </tbody>
