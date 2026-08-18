@@ -63,6 +63,7 @@
   <tr><td>V0.2</td><td>2026-08-18</td><td>袁中天</td><td>按设计稿调整：① 底部 Tab 统一为首页/分类/AI/消息/我的；② 我的服务入口精简为 8 个；③ 数商服务改为单页（AI工具+其他工具+客户管理+活跃走势图+商学院）；④ 客户管理四指标口径明确；⑤ 活跃走势图改为曲线图；⑥ 一键唤醒改为 App Push 触达非今日活跃用户</td><td>评审中</td></tr>
   <tr><td>V0.3</td><td>2026-08-18</td><td>袁中天</td><td>删除数商服务页「商学院」入口与线上课堂 Banner</td><td>评审中</td></tr>
   <tr><td>V0.3.1</td><td>2026-08-18</td><td>袁中天</td><td>重绘 §3.1 业务流程图：修正箭头方向与前后端数据流，明确「请求→后端处理→返回指标/列表/详情」及「一键唤醒→引导复购/活跃」的正向流程</td><td>评审中</td></tr>
+  <tr><td>V0.4</td><td>2026-08-18</td><td>袁中天</td><td>按截图补充功能说明：① 高价值核心客户口径改为「会员等级≥高级会员」；② 沉寂预警口径改为「7天内无浏览商品详情的用户」；③ 累计消费口径改为「下单实付金额，退单扣除」；④ 四 Tab 排序规则细化；⑤ 客户详情新增联系记录时间轴（仅新增不可修改）</td><td>评审中</td></tr>
 </table>
 
 <!-- ================= 二、项目背景与目标 ================= -->
@@ -274,8 +275,18 @@
   <tr><th style="width:22%">指标名称</th><th>口径定义</th><th>数据来源</th><th>跳转目标</th></tr>
   <tr><td>总客户数量</td><td>全部客户数量（不区分直推/间推）</td><td>《客户关系表》/《用户表》</td><td>客户列表「全部客户」Tab</td></tr>
   <tr><td>今日活跃</td><td>当前自然日有登录过的用户</td><td>《用户登录日志表》</td><td>客户列表「今日活跃」Tab</td></tr>
-  <tr><td>沉寂预警</td><td>7 天未登录的用户</td><td>《用户登录日志表》</td><td>客户列表「沉寂客户」Tab</td></tr>
-  <tr><td>高价值核心客户</td><td>达人及以上等级用户，按等级降序、同等级达成时间倒序排列</td><td>《会员等级表》</td><td>客户列表「高价值客户」Tab</td></tr>
+  <tr>
+    <td>沉寂预警</td>
+    <td>7 天内无浏览商品详情的用户<br><img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/inactive-def.png" alt="沉寂客户定义：7天内无浏览商品详情的用户" style="max-width:240px;margin-top:8px;"></td>
+    <td>《商品浏览日志表》</td>
+    <td>客户列表「沉寂客户」Tab</td>
+  </tr>
+  <tr>
+    <td>高价值核心客户</td>
+    <td>会员等级 ≥ 高级会员<br><img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/high-value-def.png" alt="高价值客户定义：会员等级≥高级会员" style="max-width:240px;margin-top:8px;"></td>
+    <td>《会员等级表》</td>
+    <td>客户列表「高价值客户」Tab</td>
+  </tr>
 </table>
 
 <h5>4.3.4 活跃走势图规格</h5>
@@ -301,48 +312,61 @@
   <tr><td>头像</td><td>客户头像</td><td>取《用户表》.avatar</td></tr>
   <tr><td>昵称</td><td>客户昵称</td><td>取《用户表》.nickname</td></tr>
   <tr><td>手机号</td><td>脱敏展示</td><td>取《用户表》.phone，脱敏规则 ⚠️ 待确认 @安全</td></tr>
-  <tr><td>会员等级</td><td>显示客户会员等级（达人层级）</td><td>取《会员等级表》.level_name</td></tr>
+  <tr><td>会员等级</td><td>显示客户会员等级</td><td>取《会员等级表》.level_name</td></tr>
   <tr><td>关系标识</td><td>直推 / 间推标记</td><td>取《客户关系表》.relation_type</td></tr>
-  <tr><td>订单金额</td><td>该客户代表订单金额（多 SKU 合计）</td><td>取《订单表》，按订单 SKU 合计后取最大单</td></tr>
-  <tr><td>达成时间</td><td>当前等级达成时间</td><td>取《会员等级表》.achieve_time</td></tr>
+  <tr><td>上次活跃</td><td>展示最近活跃时间（全部/今日活跃/沉寂 Tab）</td><td>取《用户活跃日志表》.last_active_time</td></tr>
+  <tr><td>累计消费</td><td>高价值 Tab 展示客户累计消费金额（下单实付 - 退单）</td><td>取《订单表》聚合</td></tr>
+  <tr><td>最近下单</td><td>高价值 Tab 展示最近一次下单时间</td><td>取《订单表》.order_time</td></tr>
 </table>
-<h5>四 Tab 筛选规则</h5>
+<h5>四 Tab 筛选与排序规则</h5>
 <table>
-  <tr><th style="width:22%">Tab</th><th>筛选逻辑</th><th>备注</th></tr>
-  <tr><td>全部客户</td><td>展示全部客户</td><td>默认页</td></tr>
-  <tr><td>今日活跃</td><td>筛选当前自然日有登录的用户</td><td>口径同 4.3.3</td></tr>
-  <tr><td>沉寂客户</td><td>筛选 7 天未登录的用户</td><td>口径同 4.3.3</td></tr>
-  <tr><td>高价值客户</td><td>按会员等级降序，取达人及以上；同级按达成时间倒序（越晚达成越靠前）</td><td><span class="tbc">等级门槛 cutoff（取最高几档）⚠️ 待确认 @产品</span></td></tr>
+  <tr><th style="width:22%">Tab</th><th>筛选逻辑</th><th>排序规则</th><th>备注</th></tr>
+  <tr><td>全部客户</td><td>展示全部客户</td><td>按最近活跃时间倒序，最近活跃的排最前面</td><td>默认页</td></tr>
+  <tr><td>今日活跃</td><td>筛选当前自然日有登录的用户</td><td>按最近活跃时间倒序，最近活跃的排最前面</td><td>口径同 4.3.3</td></tr>
+  <tr><td>沉寂客户</td><td>筛选 7 天内无浏览商品详情的用户</td><td>按进入沉寂时间升序，越早进入沉寂的排越前面</td><td>口径同 4.3.3</td></tr>
+  <tr><td>高价值客户</td><td>筛选会员等级 ≥ 高级会员的用户</td><td>按累计消费金额降序；同金额按最近下单时间倒序（越晚下单越靠前）</td><td></td></tr>
 </table>
 <h5>业务逻辑与边界条件</h5>
 <table>
   <tr><th style="width:26%">功能</th><th>说明</th><th>备注</th></tr>
   <tr><td>客户条目点击</td><td>跳转客户详情（4.5）</td><td>权限：经营身份可见</td></tr>
   <tr><td>一键唤醒</td><td>页内按钮（非浮层），点击后对「用户状态 ≠ 今日活跃」的全部客户发起 App Push 触达</td><td>触达通道与文案 ⚠️ 待确认 @运营</td></tr>
-  <tr><td>高价值排序</td><td>等级权重降序 + 达成时间倒序</td><td>等级权重：至尊8&gt;尊荣7&gt;领航6&gt;精英5&gt;服务4&gt;潜力3&gt;成长2&gt;分享1</td></tr>
+  <tr><td>高价值排序</td><td>累计消费金额降序 + 同金额最近下单时间倒序</td><td>消费金额以「下单实付金额 - 退单金额」为准</td></tr>
+  <tr><td>沉寂排序</td><td>进入沉寂时间升序</td><td>进入沉寂时间 = 最近浏览商品详情时间 + 7 天后的首个自然日</td></tr>
 </table>
-<div class="toconfirm">⚠️ 待确认 @产品：高价值客户的等级 cutoff（取最高几档达人）；⚠️ 待确认 @运营：一键唤醒的 App Push 文案模板与发送频率限制。</div>
+<div class="toconfirm">⚠️ 待确认 @运营：一键唤醒的 App Push 文案模板与发送频率限制。</div>
 
 <!-- 4.5 客户详情 -->
 <h3>4.5 客户详情</h3>
 <span class="tag tag-new">本期新增</span>
 <h4>4.5.1 页面原型与交互示意</h4>
-<img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/customer-detail.png" alt="客户详情页原型（会员等级/订单/关系）">
+<img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/customer-detail.png" alt="客户详情页原型（会员等级/订单/关系/联系记录）">
 <h4>4.5.2 详细逻辑规则</h4>
 <h5>界面与展示规则 —— 详情字段表</h5>
 <table>
   <tr><th style="width:24%">字段名称</th><th>需求说明</th><th>备注</th></tr>
   <tr><td>客户基本信息</td><td>头像、昵称、手机号、会员等级</td><td>取《用户表》《会员等级表》</td></tr>
   <tr><td>关系</td><td>直推 / 间推</td><td>取《客户关系表》</td></tr>
+  <tr>
+    <td>累计消费</td>
+    <td>客户累计消费金额 = 下单实付金额 - 退单金额<br><img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/consume-def.png" alt="累计消费：下单实付金额，退单扣除" style="max-width:260px;margin-top:8px;"></td>
+    <td>取《订单表》聚合</td>
+  </tr>
   <tr><td>订单列表</td><td>该客户订单，含多 SKU 商品、金额、状态</td><td>同一订单多 SKU 时金额为 SKU 合计</td></tr>
-  <tr><td>最高订单金额</td><td>展示该客户历史最高单笔订单金额（SKU 合计）</td><td>计算字段，取《订单表》聚合</td></tr>
-  <tr><td>等级达成时间</td><td>当前会员等级达成时间</td><td>取《会员等级表》.achieve_time</td></tr>
+  <tr><td>联系记录</td><td>按时间倒序展示联系备注时间轴<br><img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/contact-list.png" alt="联系记录时间轴" style="max-width:260px;margin-top:8px;"></td><td>取《客户联系记录表》</td></tr>
 </table>
 <h5>业务逻辑与边界条件</h5>
 <table>
   <tr><th style="width:26%">功能</th><th>说明</th><th>备注</th></tr>
   <tr><td>订单多 SKU 金额</td><td>同一订单含多个 SKU 时，订单金额 = 各 SKU 小计之和</td><td>计算公式：order_amount = Σ(sku_price × sku_qty)</td></tr>
   <tr><td>状态标签</td><td>详情页顶部显示客户当前活跃状态（今日活跃/本周活跃/沉寂预警）</td><td>状态定义同 4.3.3 / 4.4</td></tr>
+  <tr>
+    <td>添加联系记录</td>
+    <td>点击「添加记录」弹出输入框，输入备注内容后保存；仅支持新增，不支持修改/删除已有记录</td>
+    <td><img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/add-record.png" alt="添加记录弹窗" style="max-width:260px;margin-top:8px;"></td>
+  </tr>
+  <tr><td>联系记录排序</td><td>按记录时间倒序展示，最新记录在最上方</td><td>记录时间精确到分钟</td></tr>
+  <tr><td>空状态</td><td>无联系记录时显示「暂无联系记录」</td><td></td></tr>
 </table>
 
 <!-- ================= 五、非功能性需求 ================= -->
@@ -373,8 +397,12 @@
 <h2>六、验收标准</h2>
 <table>
   <tr><th style="width:34%">验收场景</th><th>Given → When → Then</th></tr>
-  <tr><td>客户列表高价值排序</td><td><strong>Given</strong> 店主进入客户列表高价值 Tab，<strong>When</strong> 加载数据，<strong>Then</strong> 列表按会员等级权重降序、同级按达成时间倒序（越晚越靠前）排列</td></tr>
+  <tr><td>客户列表高价值排序</td><td><strong>Given</strong> 店主进入客户列表高价值 Tab，<strong>When</strong> 加载数据，<strong>Then</strong> 列表按累计消费金额降序排列，同金额按最近下单时间倒序（越晚越靠前）</td></tr>
+  <tr><td>客户列表全部/今日活跃排序</td><td><strong>Given</strong> 客户列表全部或今日活跃 Tab，<strong>When</strong> 加载数据，<strong>Then</strong> 按最近活跃时间倒序，最近活跃的排最前面</td></tr>
+  <tr><td>客户列表沉寂排序</td><td><strong>Given</strong> 客户列表沉寂 Tab，<strong>When</strong> 加载数据，<strong>Then</strong> 按进入沉寂时间升序，越早进入沉寂的排越前面</td></tr>
   <tr><td>多 SKU 订单金额</td><td><strong>Given</strong> 客户某订单含 3 个 SKU，<strong>When</strong> 查看订单/详情，<strong>Then</strong> 订单金额 = 各 SKU 小计之和</td></tr>
+  <tr><td>累计消费口径</td><td><strong>Given</strong> 客户详情页，<strong>When</strong> 查看累计消费，<strong>Then</strong> 金额 = 下单实付金额 - 退单金额</td></tr>
+  <tr><td>联系记录仅新增</td><td><strong>Given</strong> 客户详情页联系记录区，<strong>When</strong> 点击添加记录并输入备注保存，<strong>Then</strong> 时间轴新增一条记录，且不支持修改/删除历史记录</td></tr>
   <tr><td>一键唤醒在页内</td><td><strong>Given</strong> 客户列表页，<strong>When</strong> 下滑到底部，<strong>Then</strong> 出现页内「一键唤醒」按钮（非浮层）</td></tr>
   <tr><td>一键唤醒范围</td><td><strong>Given</strong> 客户列表页，<strong>When</strong> 点击一键唤醒，<strong>Then</strong> 仅对「非今日活跃」用户发起 App Push 触达</td></tr>
   <tr><td>我的服务入口</td><td><strong>Given</strong> 我的页，<strong>When</strong> 查看我的服务，<strong>Then</strong> 展示 8 个入口且含「数商服务」、无「排行榜/直播广场/签到打卡/推广」</td></tr>
@@ -410,17 +438,14 @@
     <tr><th style="width:6%">#</th><th style="width:20%">待确认事项</th><th style="width:14%">责任方</th><th>当前占位 / 备注</th></tr>
   </thead>
   <tbody>
-    <tr><td>1</td><td>高价值客户等级 cutoff（取最高几档达人）</td><td>@产品</td><td>按等级权重降序取达人及以上，具体档位待定</td></tr>
-    <tr><td>2</td><td>一键唤醒 App Push 文案模板与频率限制</td><td>@运营</td><td>文案、发送时段、单用户日上限待定</td></tr>
-    <tr><td>3</td><td>活跃走势图「活跃」口径（登录/任意活跃行为）</td><td>@数据</td><td>当前按当日登录口径</td></tr>
-    <tr><td>4</td><td>会员等级达成门槛（各档金额/人数）</td><td>@运营</td><td>等级表权重已定，门槛值待定</td></tr>
-    <tr><td>5</td><td>客户手机号脱敏规则</td><td>@安全</td><td>中间四位/后四位掩码待定</td></tr>
-    <tr><td>6</td><td>数商服务入口权限（哪些身份可见）</td><td>@产品</td><td>店主/推广员可见，普通会员隐藏？</td></tr>
-    <tr><td>7</td><td>客户列表分页条数</td><td>@前端</td><td>每页条数待定</td></tr>
-    <tr><td>8</td><td>埋点事件英文名对齐 v2.3 目录</td><td>@数据</td><td>候选事件须对齐既有目录，走埋点评审</td></tr>
-    <tr><td>9</td><td>分类 / AI / 消息 Tab 页面设计</td><td>@产品</td><td>本期按沿用旧版占位处理</td></tr>
-    <tr><td>10</td><td>订单退款后「最高订单金额」是否回滚</td><td>@后端</td><td>口径待定</td></tr>
-    <tr><td>11</td><td>技术 Owner / 测试负责人</td><td>@技术负责人</td><td>文档基本信息待补全</td></tr>
+    <tr><td>1</td><td>一键唤醒 App Push 文案模板与频率限制</td><td>@运营</td><td>文案、发送时段、单用户日上限待定</td></tr>
+    <tr><td>2</td><td>活跃走势图「活跃」口径（登录/任意活跃行为）</td><td>@数据</td><td>当前按当日登录口径</td></tr>
+    <tr><td>3</td><td>客户手机号脱敏规则</td><td>@安全</td><td>中间四位/后四位掩码待定</td></tr>
+    <tr><td>4</td><td>数商服务入口权限（哪些身份可见）</td><td>@产品</td><td>店主/推广员可见，普通会员隐藏？</td></tr>
+    <tr><td>5</td><td>客户列表分页条数</td><td>@前端</td><td>每页条数待定</td></tr>
+    <tr><td>6</td><td>埋点事件英文名对齐 v2.3 目录</td><td>@数据</td><td>候选事件须对齐既有目录，走埋点评审</td></tr>
+    <tr><td>7</td><td>分类 / AI / 消息 Tab 页面设计</td><td>@产品</td><td>本期按沿用旧版占位处理</td></tr>
+    <tr><td>8</td><td>技术 Owner / 测试负责人</td><td>@技术负责人</td><td>文档基本信息待补全</td></tr>
   </tbody>
 </table>
 <p class="sub">以上待确认项需在评审会逐条澄清后回填，回填完成方可定稿。</p>
