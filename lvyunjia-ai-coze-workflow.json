@@ -1,0 +1,216 @@
+{
+  "_meta": {
+    "product": "绿韵家 App · AI 创作（AI 生图 / AI 生视频）",
+    "backend": "Coze（扣子）工作流",
+    "version": "V1.0",
+    "generated_at": "2026-08-19",
+    "source_prd": "lvyunjia-ai-generation-prd.html（§十 附录：Coze 工作流设计）",
+    "import_note": "本文件为与 PRD 节点设计一一对应的 Coze 工作流结构配置，可直接导入 Coze 平台做二次调整；节点 id / position 为示意值，导入后可在画布微调。插件节点 plugin_id 为占位，请按 Coze 平台实际「图像生成 / 视频生成 / 语音转写」插件替换。",
+    "model_defaults": {
+      "image": ["Qwen-Image 3.0", "Wan-Image 1.0", "Coze 默认生图"],
+      "video": ["HappyHorse 1.0/1.1", "Wan 2.6/2.7/3.0"],
+      "llm_for_prompt": "Coze 默认大模型（如 Doubao-pro / 通义千问）"
+    },
+    "quota_rule": "前端生成前校验额度：高清免费、超清 +1 额度、视频时长 15 秒 +1 额度；不足拦截弹窗。Coze 侧不扣额度，仅执行生成。"
+  },
+
+  "workflows": [
+    {
+      "id": "wf_prompt_expand",
+      "name": "提示词扩写",
+      "description": "接收用户自由输入 + 已选标签，拼接标签为模型友好描述并 LLM 补全画面细节，输出结构化提示词。",
+      "parameters": {
+        "input": [
+          {"name": "user_prompt", "type": "String", "required": false, "desc": "用户自由输入的原始意图（可空）"},
+          {"name": "tags", "type": "Array<String>", "required": true, "desc": "前端传来的标签数组，如 [\"国风\",\"唯美\",\"产品图\"]"}
+        ],
+        "output": [
+          {"name": "optimized_prompt", "type": "String", "desc": "扩写后的完整提示词"},
+          {"name": "structured", "type": "Object", "desc": "拆解后的 主体/场景/风格/光线/构图 字段"}
+        ]
+      },
+      "nodes": [
+        {"id": "n_start", "type": "start", "position": {"x": 80, "y": 200},
+         "data": {"inputs": [
+           {"name": "user_prompt", "type": "String"},
+           {"name": "tags", "type": "Array<String>"}
+         ]}},
+        {"id": "n_concat", "type": "variable_assign", "position": {"x": 320, "y": 200},
+         "data": {"assigns": [
+           {"var": "combined_prompt", "value": "{{user_prompt}} 风格标签：{{tags}}"}
+         ]}},
+        {"id": "n_llm", "type": "llm", "position": {"x": 560, "y": 200},
+         "data": {
+           "model": "{{llm_for_prompt}}",
+           "prompt": "【标签转提示词模板】\n用户输入：{{user_prompt}}\n已选标签：{{tags}}\n\n请根据用户输入和标签，生成一段适合图像/视频生成的提示词。要求：\n1. 保留用户原始意图；\n2. 将标签扩展为具体画面元素（风格、场景、光线、构图、镜头运动等）；\n3. 输出一段连贯的中文提示词，必要时补充英文专业术语；\n4. 不要添加用户未提及的人物敏感特征。\n\n输出格式：\n- 主体：...\n- 场景：...\n- 风格：...\n- 光线/氛围：...\n- 构图/镜头：...\n- 完整提示词：...",
+           "output_var": "optimized_prompt"
+         }},
+        {"id": "n_end", "type": "end", "position": {"x": 820, "y": 200},
+         "data": {"outputs": [
+           {"name": "optimized_prompt", "value": "{{optimized_prompt}}"}
+         ]}}
+      ],
+      "edges": [
+        {"source": "n_start", "target": "n_concat"},
+        {"source": "n_concat", "target": "n_llm"},
+        {"source": "n_llm", "target": "n_end"}
+      ]
+    },
+
+    {
+      "id": "wf_voice_to_prompt",
+      "name": "语音转提示词",
+      "description": "接收前端语音转写文本（ASR 结果），走与「提示词扩写」相同的标签拼接 + LLM 补全逻辑，输出结构化提示词。",
+      "parameters": {
+        "input": [
+          {"name": "asr_text", "type": "String", "required": true, "desc": "前端录音经语音识别后的文本"},
+          {"name": "tags", "type": "Array<String>", "required": true, "desc": "前端已选标签"}
+        ],
+        "output": [
+          {"name": "optimized_prompt", "type": "String", "desc": "转写并扩写后的提示词"}
+        ]
+      },
+      "nodes": [
+        {"id": "n_start", "type": "start", "position": {"x": 80, "y": 200},
+         "data": {"inputs": [
+           {"name": "asr_text", "type": "String"},
+           {"name": "tags", "type": "Array<String>"}
+         ]}},
+        {"id": "n_concat", "type": "variable_assign", "position": {"x": 320, "y": 200},
+         "data": {"assigns": [
+           {"var": "combined_prompt", "value": "{{asr_text}} 风格标签：{{tags}}"}
+         ]}},
+        {"id": "n_llm", "type": "llm", "position": {"x": 560, "y": 200},
+         "data": {
+           "model": "{{llm_for_prompt}}",
+           "prompt": "用户通过语音描述了想要的画面：{{asr_text}}\n已选标签：{{tags}}\n请整理为一段适合图像/视频生成的提示词，保留原意、扩展画面细节（风格/场景/光线/构图），输出完整中文提示词。",
+           "output_var": "optimized_prompt"
+         }},
+        {"id": "n_end", "type": "end", "position": {"x": 820, "y": 200},
+         "data": {"outputs": [{"name": "optimized_prompt", "value": "{{optimized_prompt}}"}]}}
+      ],
+      "edges": [
+        {"source": "n_start", "target": "n_concat"},
+        {"source": "n_concat", "target": "n_llm"},
+        {"source": "n_llm", "target": "n_end"}
+      ]
+    },
+
+    {
+      "id": "wf_image_gen",
+      "name": "图片生成",
+      "description": "接收 prompt / model / ratio / 可选参考图，校验参数后调用 Coze 图像生成插件，返回图片 URL。",
+      "parameters": {
+        "input": [
+          {"name": "prompt", "type": "String", "required": true, "desc": "提示词（来自扩写/语音工作流或用户直填）"},
+          {"name": "model", "type": "String", "required": true, "desc": "Qwen-Image 3.0 / Wan-Image 1.0 / Coze 默认生图"},
+          {"name": "ratio", "type": "String", "required": true, "desc": "3:4 / 1:1 / 9:16 / 4:3 / 16:9"},
+          {"name": "reference_image", "type": "String", "required": false, "desc": "参考图 URL，走图生图"}
+        ],
+        "output": [
+          {"name": "image_url", "type": "String", "desc": "生成结果 URL"},
+          {"name": "error", "type": "String", "desc": "失败错误码"}
+        ]
+      },
+      "nodes": [
+        {"id": "n_start", "type": "start", "position": {"x": 80, "y": 220},
+         "data": {"inputs": [
+           {"name": "prompt", "type": "String"},
+           {"name": "model", "type": "String"},
+           {"name": "ratio", "type": "String"},
+           {"name": "reference_image", "type": "String"}
+         ]}},
+        {"id": "n_validate", "type": "condition", "position": {"x": 320, "y": 220},
+         "data": {"expression": "contains(['Qwen-Image 3.0','Wan-Image 1.0','Coze 默认生图'], model) && contains(['3:4','1:1','9:16','4:3','16:9'], ratio)",
+                  "branches": [{"label": "valid", "target": "n_plugin"}, {"label": "invalid", "target": "n_err"}]}},
+        {"id": "n_plugin", "type": "plugin", "position": {"x": 560, "y": 160},
+         "data": {
+           "plugin_id": "PLACEHOLDER_image_generate",
+           "action": "text2image",
+           "inputs": {
+             "prompt": "{{prompt}}",
+             "model": "{{model}}",
+             "ratio": "{{ratio}}",
+             "image": "{{reference_image}}"
+           },
+           "output_var": "image_url"
+         }},
+        {"id": "n_err", "type": "variable_assign", "position": {"x": 560, "y": 320},
+         "data": {"assigns": [{"var": "error", "value": "INVALID_PARAM"}]}},
+        {"id": "n_end", "type": "end", "position": {"x": 820, "y": 220},
+         "data": {"outputs": [
+           {"name": "image_url", "value": "{{image_url}}"},
+           {"name": "error", "value": "{{error}}"}
+         ]}}
+      ],
+      "edges": [
+        {"source": "n_start", "target": "n_validate"},
+        {"source": "n_plugin", "target": "n_end"},
+        {"source": "n_err", "target": "n_end"}
+      ]
+    },
+
+    {
+      "id": "wf_video_gen",
+      "name": "视频生成",
+      "description": "接收 prompt / model / mode / clarity / ratio / duration / 可选参考素材，校验模式后调用 Coze 视频生成插件，返回视频 URL。",
+      "parameters": {
+        "input": [
+          {"name": "prompt", "type": "String", "required": true},
+          {"name": "model", "type": "String", "required": true, "desc": "HappyHorse 1.0/1.1 / Wan 2.6/2.7/3.0"},
+          {"name": "mode", "type": "String", "required": true, "desc": "视频生成 / 多参考图 / 视频编辑"},
+          {"name": "clarity", "type": "String", "required": true, "desc": "高清 / 超清"},
+          {"name": "ratio", "type": "String", "required": true},
+          {"name": "duration", "type": "String", "required": true, "desc": "5秒 / 10秒 / 15秒"},
+          {"name": "reference", "type": "String", "required": false, "desc": "参考素材 URL（视频编辑模式必传视频）"}
+        ],
+        "output": [
+          {"name": "video_url", "type": "String"},
+          {"name": "error", "type": "String"}
+        ]
+      },
+      "nodes": [
+        {"id": "n_start", "type": "start", "position": {"x": 80, "y": 220},
+         "data": {"inputs": [
+           {"name": "prompt", "type": "String"},
+           {"name": "model", "type": "String"},
+           {"name": "mode", "type": "String"},
+           {"name": "clarity", "type": "String"},
+           {"name": "ratio", "type": "String"},
+           {"name": "duration", "type": "String"},
+           {"name": "reference", "type": "String"}
+         ]}},
+        {"id": "n_validate", "type": "condition", "position": {"x": 320, "y": 220},
+         "data": {"expression": "mode != '视频编辑' || (mode == '视频编辑' && reference != '')",
+                  "branches": [{"label": "valid", "target": "n_plugin"}, {"label": "invalid", "target": "n_err"}]}},
+        {"id": "n_plugin", "type": "plugin", "position": {"x": 560, "y": 160},
+         "data": {
+           "plugin_id": "PLACEHOLDER_video_generate",
+           "action": "text2video",
+           "inputs": {
+             "prompt": "{{prompt}}",
+             "model": "{{model}}",
+             "mode": "{{mode}}",
+             "clarity": "{{clarity}}",
+             "ratio": "{{ratio}}",
+             "duration": "{{duration}}",
+             "reference": "{{reference}}"
+           },
+           "output_var": "video_url"
+         }},
+        {"id": "n_err", "type": "variable_assign", "position": {"x": 560, "y": 320},
+         "data": {"assigns": [{"var": "error", "value": "MODE_NEED_VIDEO"}]}},
+        {"id": "n_end", "type": "end", "position": {"x": 820, "y": 220},
+         "data": {"outputs": [
+           {"name": "video_url", "value": "{{video_url}}"},
+           {"name": "error", "value": "{{error}}"}
+         ]}}
+      ],
+      "edges": [
+        {"source": "n_start", "target": "n_validate"},
+        {"source": "n_plugin", "target": "n_end"},
+        {"source": "n_err", "target": "n_end"}
+      ]
+    }
+  ]
+}
