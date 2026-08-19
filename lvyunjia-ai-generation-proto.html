@@ -537,8 +537,8 @@
           </div>
         </div>
         <div style="display:flex;gap:10px;margin-top:14px;">
-          <div class="db primary" style="flex:1;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:var(--primary);color:#fff;font-size:14px;cursor:pointer;" onclick="toast('进入额度购买页')">购买额度</div>
-          <div class="db secondary" style="flex:1;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:#f5f5f5;color:var(--text);font-size:14px;cursor:pointer;" onclick="toast('查看额度明细')">额度明细</div>
+          <div class="db primary" style="flex:1;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:var(--primary);color:#fff;font-size:14px;cursor:pointer;" onclick="go('pageQuotaBuy')">购买额度</div>
+          <div class="db secondary" style="flex:1;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:#f5f5f5;color:var(--text);font-size:14px;cursor:pointer;" onclick="go('pageQuotaDetail')">额度明细</div>
         </div>
       </div>
 
@@ -568,6 +568,121 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ================== 购买额度页 ================== -->
+  <div class="page has-nav has-bottom" id="pageQuotaBuy">
+    <div class="nav-bar">
+      <div class="back" onclick="goBack()">‹</div>
+      <div>购买额度</div>
+    </div>
+    <div class="scroll-view">
+      <div class="card" style="text-align:center;background:linear-gradient(135deg,#E8F5E9,#fff);">
+        <div style="font-size:13px;color:var(--text-tertiary);">当前剩余额度</div>
+        <div style="font-size:40px;font-weight:700;color:var(--primary);margin:4px 0;">12</div>
+        <div style="font-size:12px;color:var(--text-tertiary);">本月已用 36 · 累计充值 88</div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">选择套餐</div>
+        <div id="quotaPackList"></div>
+        <div style="font-size:11px;color:var(--text-tertiary);margin-top:10px;line-height:1.5;">
+          额度=生成次数，1 次 = ¥1；购买后走绿韵家现有下单流程（微信/支付宝/储值钱包支付）。
+        </div>
+      </div>
+    </div>
+    <div class="bottom-bar">
+      <div class="cost">合计 <b id="quotaBuyPrice">¥1</b></div>
+      <div class="gen-btn" onclick="buyQuota()">立即购买</div>
+    </div>
+  </div>
+
+  <!-- ================== 额度明细页 ================== -->
+  <div class="page has-nav" id="pageQuotaDetail">
+    <div class="nav-bar">
+      <div class="back" onclick="goBack()">‹</div>
+      <div>额度明细</div>
+      <div class="right" onclick="go('pageQuotaBuy')">充值</div>
+    </div>
+    <div class="scroll-view" style="top:44px;">
+      <div class="card" style="margin-top:12px;">
+        <div class="section-title">额度账户</div>
+        <div style="display:flex;justify-content:space-around;text-align:center;">
+          <div>
+            <div style="font-size:24px;font-weight:700;color:var(--primary);">12</div>
+            <div style="font-size:12px;color:var(--text-tertiary);">剩余额度</div>
+          </div>
+          <div>
+            <div style="font-size:24px;font-weight:700;color:var(--text);">36</div>
+            <div style="font-size:12px;color:var(--text-tertiary);">本月已用</div>
+          </div>
+          <div>
+            <div style="font-size:24px;font-weight:700;color:var(--blue);">88</div>
+            <div style="font-size:12px;color:var(--text-tertiary);">累计充值</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="square-tabs" style="position:sticky;top:0;">
+        <div class="square-tab active" data-qtab="all" onclick="switchQuotaTab(this,'all')">全部</div>
+        <div class="square-tab" data-qtab="consume" onclick="switchQuotaTab(this,'consume')">消耗</div>
+        <div class="square-tab" data-qtab="recharge" onclick="switchQuotaTab(this,'recharge')">充值</div>
+        <div class="square-tab" data-qtab="gift" onclick="switchQuotaTab(this,'gift')">赠送</div>
+      </div>
+
+      <div class="history-list" style="margin-top:8px;" id="quotaDetailList">
+        <div class="history-item" data-type="consume">
+          <div class="h-thumb" style="background:#FFEBEE;">🎨</div>
+          <div class="h-info">
+            <div class="h-prompt">生成图片 · 消耗 1 额度</div>
+            <div class="h-meta">2026-08-18 14:32 · 操作后余额 11</div>
+          </div>
+          <div style="font-size:15px;font-weight:700;color:var(--red);align-self:center;">-1</div>
+        </div>
+        <div class="history-item" data-type="consume">
+          <div class="h-thumb" style="background:#FFEBEE;">▶️</div>
+          <div class="h-info">
+            <div class="h-prompt">生成视频 · 消耗 1 额度</div>
+            <div class="h-meta">2026-08-18 12:10 · 操作后余额 10</div>
+          </div>
+          <div style="font-size:15px;font-weight:700;color:var(--red);align-self:center;">-1</div>
+        </div>
+        <div class="history-item" data-type="recharge">
+          <div class="h-thumb" style="background:#E8F5E9;">💰</div>
+          <div class="h-info">
+            <div class="h-prompt">购买 30 次套餐 · 充值 30 额度</div>
+            <div class="h-meta">2026-08-17 10:00 · 操作后余额 60</div>
+          </div>
+          <div style="font-size:15px;font-weight:700;color:var(--primary);align-self:center;">+30</div>
+        </div>
+        <div class="history-item" data-type="gift">
+          <div class="h-thumb" style="background:#FFF3E0;">🎁</div>
+          <div class="h-info">
+            <div class="h-prompt">新用户赠送 · 到账 3 额度</div>
+            <div class="h-meta">2026-08-15 09:00 · 操作后余额 13</div>
+          </div>
+          <div style="font-size:15px;font-weight:700;color:var(--orange);align-self:center;">+3</div>
+        </div>
+        <div class="history-item" data-type="consume">
+          <div class="h-thumb" style="background:#FFEBEE;">🎨</div>
+          <div class="h-info">
+            <div class="h-prompt">生成图片 · 消耗 1 额度</div>
+            <div class="h-meta">2026-08-10 16:20 · 操作后余额 10</div>
+          </div>
+          <div style="font-size:15px;font-weight:700;color:var(--red);align-self:center;">-1</div>
+        </div>
+        <div class="history-item" data-type="recharge">
+          <div class="h-thumb" style="background:#E8F5E9;">💰</div>
+          <div class="h-info">
+            <div class="h-prompt">购买 10 次套餐 · 充值 10 额度</div>
+            <div class="h-meta">2026-08-08 20:15 · 操作后余额 11</div>
+          </div>
+          <div style="font-size:15px;font-weight:700;color:var(--primary);align-self:center;">+10</div>
+        </div>
+      </div>
+
+      <div style="text-align:center;font-size:12px;color:var(--text-tertiary);padding:20px 0 30px;">— 已显示全部记录 —</div>
     </div>
   </div>
 
@@ -618,7 +733,7 @@
       <div style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;">本次生成需要 1 个额度，你的剩余额度为 0</div>
       <div style="display:flex;gap:12px;">
         <div style="flex:1;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;background:#f5f5f5;color:var(--text);font-size:15px;cursor:pointer;" onclick="closeModal()">取消</div>
-        <div style="flex:1;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;background:var(--primary);color:#fff;font-size:15px;cursor:pointer;" onclick="toast('进入额度购买页')">购买额度</div>
+        <div style="flex:1;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;background:var(--primary);color:#fff;font-size:15px;cursor:pointer;" onclick="closeModal();go('pageQuotaBuy')">购买额度</div>
       </div>
     </div>
   </div>
@@ -628,8 +743,16 @@
       quota: 12,
       image: { model: 'Qwen-Image 3.0', ratio: '3:4', prompt: '', uploaded: false },
       video: { model: 'HappyHorse 1.0', mode: 'gen', clarity: 'hd', ratio: '9:16', duration: '5', prompt: '', uploaded: false },
-      history: []
+      history: [],
+      quotaPack: 'p1'
     };
+
+    const quotaPacks = [
+      { id: 'p1',  times: 1,   price: 1,  unit: 1.00, save: 0,  tag: '' },
+      { id: 'p10', times: 10,  price: 9,  unit: 0.90, save: 1,  tag: '9折' },
+      { id: 'p30', times: 30,  price: 24, unit: 0.80, save: 6,  tag: '8折' },
+      { id: 'p100',times: 100, price: 50, unit: 0.50, save: 50, tag: '5折' }
+    ];
 
     const models = {
       image: [
@@ -857,11 +980,51 @@
       toast(`切换至${el.textContent}`);
     }
 
+    function renderQuotaPacks() {
+      const list = document.getElementById('quotaPackList');
+      list.innerHTML = '';
+      quotaPacks.forEach(p => {
+        const active = p.id === state.quotaPack ? 'active' : '';
+        const tagHtml = p.tag ? `<span class="m-tag" style="margin-left:6px;">${p.tag}</span>` : '';
+        const saveHtml = p.save > 0 ? `<span style="font-size:12px;color:var(--red);margin-left:6px;">省¥${p.save}</span>` : '';
+        list.innerHTML += `
+          <div class="model-item ${active}" onclick="selectQuotaPack(this,'${p.id}')">
+            <div style="flex:1;">
+              <div class="m-name">${p.times} 次${tagHtml}</div>
+              <div class="m-desc">单价 ¥${p.unit.toFixed(2)}/次${saveHtml}</div>
+            </div>
+            <div style="font-size:18px;font-weight:700;color:var(--text);">¥${p.price}</div>
+          </div>`;
+      });
+    }
+
+    function selectQuotaPack(el, id) {
+      state.quotaPack = id;
+      document.querySelectorAll('#quotaPackList .model-item').forEach(m => m.classList.remove('active'));
+      const pack = quotaPacks.find(p => p.id === id);
+      document.getElementById('quotaBuyPrice').textContent = '¥' + pack.price;
+      el.classList.add('active');
+    }
+
+    function buyQuota() {
+      const pack = quotaPacks.find(p => p.id === state.quotaPack);
+      toast(`已提交订单：${pack.times} 次套餐 ¥${pack.price}，进入下单流程`);
+    }
+
+    function switchQuotaTab(el, tab) {
+      document.querySelectorAll('.square-tab[data-qtab]').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      document.querySelectorAll('#quotaDetailList .history-item').forEach(item => {
+        item.style.display = (tab === 'all' || item.dataset.type === tab) ? 'flex' : 'none';
+      });
+    }
+
     // 监听输入
     document.getElementById('imgPrompt').addEventListener('input', e => state.image.prompt = e.target.value);
     document.getElementById('videoPrompt').addEventListener('input', e => state.video.prompt = e.target.value);
 
     bindModalEvents();
+    renderQuotaPacks();
   </script>
 </div>
 </body>
