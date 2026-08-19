@@ -54,7 +54,7 @@
 
 <h2>三、业务流程与架构</h2>
 <h3>3.1 本期范围与影响</h3>
-<table><thead><tr><th>端口/模块</th><th>本期范围</th><th>影响说明</th></tr></thead><tbody><tr><td>绿韵家 App（C端 H5）</td><td>AI 创作首页、AI 生图、AI 生视频、创作广场、作品详情/做同款、我的作品</td><td>本期新增核心功能页</td></tr><tr><td>数商服务首页</td><td>AI 工具入口改为跳转 AI 创作首页</td><td>本期改动：原入口仅 toast，现进入真实功能</td></tr><tr><td>Coze 工作流</td><td>提示词扩写、关键词标签拼接、语音转提示词、生成任务调用</td><td>本期新增后端能力</td></tr><tr><td>运营后台</td><td>广场官方模板管理、UGC 审核、额度配置</td><td>本期新增后台能力，详见 ⚠️ 待确认 @研发</td></tr></tbody></table>
+<table><thead><tr><th>端口/模块</th><th>本期范围</th><th>影响说明</th></tr></thead><tbody><tr><td>绿韵家 App（C端 H5）</td><td>AI 创作首页、AI 生图、AI 生视频、创作广场、作品详情/做同款、我的作品、购买额度、额度明细</td><td>本期新增核心功能页</td></tr><tr><td>数商服务首页</td><td>AI 工具入口改为跳转 AI 创作首页</td><td>本期改动：原入口仅 toast，现进入真实功能</td></tr><tr><td>Coze 工作流</td><td>提示词扩写、关键词标签拼接、语音转提示词、生成任务调用</td><td>本期新增后端能力</td></tr><tr><td>运营后台</td><td>广场官方模板管理、UGC 审核、额度配置</td><td>本期新增后台能力，详见 ⚠️ 待确认 @研发</td></tr></tbody></table>
 
 <h3>3.2 业务流程图</h3>
 <p>本流程覆盖「空白生成」与「做同款」两条主路径：</p>
@@ -403,6 +403,90 @@
 
 <h5>4.1.6.4 数据来源（字段级）</h5>
 <table><thead><tr><th>字段名称</th><th>取值逻辑说明</th></tr></thead><tbody><tr><td>剩余额度</td><td>调「额度账户接口」取可用额度</td></tr><tr><td>本月已用</td><td>调「额度账户接口」取当月消耗</td></tr><tr><td>我的作品数</td><td>取《作品表》中 user_id = 当前用户且 status = success 的记录数</td></tr><tr><td>生成记录</td><td>取《作品表》中 user_id = 当前用户的记录，按 created_at 倒序分页</td></tr></tbody></table>
+
+<h4>4.1.7 购买额度 <span class="tag y">本期新增</span></h4>
+
+<h5>4.1.7.1 页面原型与交互示意</h5>
+<img src="prd-assets/quota-buy.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="购买额度原型">
+
+<h5>4.1.7.2 详细逻辑规则</h5>
+<ul>
+  <li>入口：「我的作品」页顶部「购买额度」按钮、额度不足弹窗「购买额度」按钮、AI 首页「剩余额度」入口点击后顶部右侧「充值」按钮；</li>
+  <li>顶部当前额度卡片：渐变绿底展示「剩余额度」「本月已用」「累计充值」三项，仅展示不可点击；</li>
+  <li>套餐列表（4 档）：1 次 ¥1 / 10 次 ¥9（9 折省 ¥1）/ 30 次 ¥24（8 折省 ¥6）/ 100 次 ¥50（5 折省 ¥50），单选高亮，名称旁显示折扣角标与节省金额；</li>
+  <li>底部操作栏固定「合计 ¥X」与「立即购买」按钮，选中套餐后实时更新合计；</li>
+  <li>点击「立即购买」→ 提交绿韵家现有「创建订单」流程（商品 SKU = 额度包 ID），由订单页选择支付方式（微信 / 支付宝 / 储值钱包），支付成功后回写《额度账户表》；</li>
+  <li>套餐下单说明小字：标注「1 次 = ¥1；购买后走绿韵家现有下单流程（微信/支付宝/储值钱包支付）」。</li>
+</ul>
+
+<h5>4.1.7.3 套餐列表字段表</h5>
+<table><thead><tr><th>字段名称</th><th>需求说明</th><th>备注</th></tr></thead><tbody>
+<tr><td>套餐 ID</td><td>商品 SKU，唯一标识</td><td>p1 / p10 / p30 / p100</td></tr>
+<tr><td>次数</td><td>充值额度数（生成次数）</td><td>1 / 10 / 30 / 100</td></tr>
+<tr><td>价格</td><td>实付金额（CNY）</td><td>¥1 / ¥9 / ¥24 / ¥50</td></tr>
+<tr><td>单价</td><td>每生成次数单价</td><td>¥1.00 / ¥0.90 / ¥0.80 / ¥0.50</td></tr>
+<tr><td>节省</td><td>相对单次购买所省金额</td><td>¥0 / ¥1 / ¥6 / ¥50</td></tr>
+<tr><td>折扣角标</td><td>名称旁展示的折扣标签</td><td>— / 9 折 / 8 折 / 5 折</td></tr>
+<tr><td>选中态</td><td>默认 1 次套餐选中，列表项整体高亮</td><td>绿色边框 + 浅绿背景</td></tr>
+</tbody></table>
+
+<h5>4.1.7.4 按钮表</h5>
+<table><thead><tr><th>按钮名称</th><th>功能说明</th><th>显示位置</th><th>权限</th><th>前置条件</th></tr></thead><tbody>
+<tr><td>立即购买</td><td>提交订单进入现有下单流程</td><td>底部固定操作栏</td><td>登录用户</td><td>已选中任意套餐（默认 1 次）</td></tr>
+<tr><td>返回</td><td>回到上一页</td><td>导航栏左侧</td><td>所有</td><td>无</td></tr>
+</tbody></table>
+
+<h5>4.1.7.5 数据来源（字段级）</h5>
+<table><thead><tr><th>字段名称</th><th>取值逻辑说明</th></tr></thead><tbody>
+<tr><td>剩余额度</td><td>调「额度账户接口」GET /quota/account</td></tr>
+<tr><td>本月已用</td><td>调「额度账户接口」GET /quota/account.month_used</td></tr>
+<tr><td>累计充值</td><td>调「额度账户接口」GET /quota/account.total_recharged</td></tr>
+<tr><td>套餐列表</td><td>调「商品配置接口」GET /product/list?category=quota_pack，返回静态配置</td></tr>
+<tr><td>合计金额</td><td>前端根据选中套餐实时计算（price 字段）</td></tr>
+<tr><td>订单提交</td><td>POST「创建订单接口」复用绿韵家现有订单服务，body 携带 product_id 与 quantity=1</td></tr>
+</tbody></table>
+
+<h4>4.1.8 额度明细 <span class="tag y">本期新增</span></h4>
+
+<h5>4.1.8.1 页面原型与交互示意</h5>
+<img src="prd-assets/quota-detail.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="额度明细原型">
+
+<h5>4.1.8.2 详细逻辑规则</h5>
+<ul>
+  <li>入口：「我的作品」页「额度明细」按钮、AI 首页「剩余额度」入口；</li>
+  <li>顶部「额度账户」汇总卡：剩余额度（绿）/ 本月已用（黑）/ 累计充值（蓝）三项数据并列；</li>
+  <li>Tab 切换：全部 / 消耗 / 充值 / 赠送，单选高亮底部绿条；切换 Tab 时仅显示 data-type 匹配的流水记录，其他隐藏；</li>
+  <li>流水列表项：左侧彩色图标（消耗红/充值绿/赠送橙）+ 中部两行文案（操作说明 / 时间·操作后余额）+ 右侧「+N / -N」数字（正绿负红橙赠）；</li>
+  <li>列表支持上拉加载更多（⚠️ 待确认 @研发 每页条数与分页策略）；</li>
+  <li>列表底部「— 已显示全部记录 —」占位文案；</li>
+  <li>导航栏右侧「充值」按钮 → 跳转购买额度页（4.1.7）。</li>
+</ul>
+
+<h5>4.1.8.3 流水列表字段表</h5>
+<table><thead><tr><th>字段名称</th><th>需求说明</th><th>备注</th></tr></thead><tbody>
+<tr><td>类型（data-type）</td><td>流水分类</td><td>consume / recharge / gift</td></tr>
+<tr><td>图标</td><td>类型对应 emoji 图标 + 背景色</td><td>🎨/▶️ 消耗（红底）· 💰 充值（绿底）· 🎁 赠送（橙底）</td></tr>
+<tr><td>操作说明</td><td>一行文案说明本次操作</td><td>如「生成图片 · 消耗 1 额度」「购买 30 次套餐 · 充值 30 额度」</td></tr>
+<tr><td>时间·操作后余额</td><td>操作发生时间 + 操作后账户剩余</td><td>取《额度流水表》.created_at + .balance_after</td></tr>
+<tr><td>数量 ±N</td><td>本次操作额度变化量，正负符号</td><td>消耗 -1（红） / 充值 +N（绿） / 赠送 +N（橙）</td></tr>
+</tbody></table>
+
+<h5>4.1.8.4 按钮表</h5>
+<table><thead><tr><th>按钮名称</th><th>功能说明</th><th>显示位置</th><th>权限</th><th>前置条件</th></tr></thead><tbody>
+<tr><td>Tab 全部</td><td>显示所有流水</td><td>列表上方 Tab</td><td>所有</td><td>无</td></tr>
+<tr><td>Tab 消耗</td><td>仅显示消耗类流水</td><td>列表上方 Tab</td><td>所有</td><td>无</td></tr>
+<tr><td>Tab 充值</td><td>仅显示充值类流水</td><td>列表上方 Tab</td><td>所有</td><td>无</td></tr>
+<tr><td>Tab 赠送</td><td>仅显示赠送类流水</td><td>列表上方 Tab</td><td>所有</td><td>无</td></tr>
+<tr><td>充值</td><td>跳转购买额度页</td><td>导航栏右侧</td><td>登录用户</td><td>已登录</td></tr>
+<tr><td>返回</td><td>回到上一页</td><td>导航栏左侧</td><td>所有</td><td>无</td></tr>
+</tbody></table>
+
+<h5>4.1.8.5 数据来源（字段级）</h5>
+<table><thead><tr><th>字段名称</th><th>取值逻辑说明</th></tr></thead><tbody>
+<tr><td>剩余额度 / 本月已用 / 累计充值</td><td>同 4.1.7.5，调「额度账户接口」</td></tr>
+<tr><td>流水列表</td><td>调「额度流水接口」GET /quota/ledger?type={tab}&page=1&size=20</td></tr>
+<tr><td>类型分布</td><td>前端按 data-type 过滤：consume / recharge / gift</td></tr>
+</tbody></table>
 
 <h3>4.2 数商服务首页 AI 工具入口 <span class="tag b">本期改动</span></h3>
 <p><b>需求影响范围</b>：原「生成视频」「图片生成」入口仅 toast 提示，本期改为真实跳转。<br><b>涉及终端明细</b>：绿韵家 App C 端 H5。</p>
