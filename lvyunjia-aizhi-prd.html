@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>绿韵家App · 数智（AI助手）模块 PRD</title>
+<style>
+  :root { --bg:#fff; --fg:#1f2328; --muted:#656d76; --border:#d0d7de; --accent:#2da44e; --warn:#cf222e; --link:#0969da; --code-bg:#f6f8fa; }
+  body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; line-height:1.6; color:var(--fg); max-width:960px; margin:0 auto; padding:24px; background:var(--bg); }
+  h1 { font-size:28px; border-bottom:2px solid var(--border); padding-bottom:8px; }
+  h2 { font-size:22px; margin-top:32px; border-bottom:1px solid var(--border); padding-bottom:6px; }
+  h3 { font-size:18px; margin-top:24px; }
+  h4 { font-size:15px; margin-top:18px; color:var(--fg); }
+  table { border-collapse:collapse; width:100%; margin:12px 0; font-size:14px; }
+  th,td { border:1px solid var(--border); padding:8px 10px; text-align:left; vertical-align:top; }
+  th { background:var(--code-bg); font-weight:600; }
+  code { background:var(--code-bg); padding:2px 5px; border-radius:4px; font-size:13px; }
+  pre { background:var(--code-bg); padding:12px; border-radius:6px; overflow:auto; font-size:13px; }
+  .warn { color:var(--warn); font-weight:600; }
+  .muted { color:var(--muted); }
+  .toc { background:var(--code-bg); padding:16px 20px; border-radius:8px; }
+  .toc ul { margin:8px 0 0 18px; padding:0; }
+  .toc li { margin:4px 0; }
+  a { color:var(--link); text-decoration:none; }
+  a:hover { text-decoration:underline; }
+  .flow-step { display:inline-block; background:#ddf4ff; color:#0550ae; padding:2px 8px; border-radius:12px; font-size:12px; margin-right:4px; }
+  .tag { display:inline-block; background:#ddf4ff; color:#0550ae; padding:2px 8px; border-radius:4px; font-size:12px; margin-right:8px; }
+</style>
+</head>
+<body>
+
+<h1>绿韵家App · 数智（AI助手）模块 产品需求文档</h1>
+<p class="muted">文档版本：V1.0 &nbsp;|&nbsp; 产品负责人：绿韵家产品组 &nbsp;|&nbsp; 状态：需求已确认，待技术评审</p>
+
+<div class="toc">
+<strong>目录</strong>
+<ul>
+  <li><a href="#s1">一、修订记录</a></li>
+  <li><a href="#s2">二、项目背景与目标</a></li>
+  <li><a href="#s3">三、业务流程与架构</a></li>
+  <li><a href="#s4">四、功能需求详情</a></li>
+  <li><a href="#s5">五、非功能性需求</a></li>
+  <li><a href="#s6">六、验收标准</a></li>
+  <li><a href="#s7">七、关键边界设计检查清单</a></li>
+  <li><a href="#s8">八、文档维护与变更规范</a></li>
+  <li><a href="#s9">九、待确认项汇总</a></li>
+</ul>
+</div>
+
+<h2 id="s1">一、修订记录</h2>
+<table>
+<thead>
+<tr><th>版本</th><th>日期</th><th>修订人</th><th>修订内容</th></tr>
+</thead>
+<tbody>
+<tr><td>V1.0</td><td>2026-08-18</td><td>产品组</td><td>初稿：完成数智对话页、四入口、AI帮你看、健康盒子、Coze工作流、埋点需求梳理</td></tr>
+<tr><td>V1.1</td><td>2026-08-19</td><td>产品组</td><td>补充四入口工作流节点级设计：意图识别提示词、商品查询代码节点规格（查哪些字段/怎么排序/取前N名）、知识库召回、回复生成提示词；P9嵌入健康任务参考截图</td></tr>
+<tr><td>V1.2</td><td>2026-08-19</td><td>产品组</td><td>根据绿韵家数智原型确认：P1更名为数智首页（一级页）；AI帮你买固定返回Top 3；AI帮你看主入口直接展开子功能；健康任务页为绿韵家已有页面（样式参考泰小虎）；健康档案入口跳转绿韵家已有页面；健康盒子命名统一</td></tr>
+</tbody>
+</table>
+
+<h2 id="s2">二、项目背景与目标</h2>
+<h3>2.1 背景</h3>
+<p>绿韵家App定位为健康管理与生活服务一体化平台。为提升用户购物与健康决策效率，本期在底部导航新增「数智」Tab，作为AI助手统一入口。数智板块以对话交互为核心，承接「买、看、省、选」四类高频意图，并接入健康检测与家庭健康资产管理能力。</p>
+
+<h3>2.2 概述</h3>
+<p>数智模块采用Coze工作流作为AI对话引擎。整体方案参考泰小虎App已跑通的工作流结构（输入层→预处理层→意图识别→条件分发→各业务分支→输出），将角色、知识库、商品接口替换为绿韵家自有资源，UI按绿韵家设计规范重新落地。</p>
+
+<h3>2.3 术语表</h3>
+<table>
+<thead>
+<tr><th>术语</th><th>说明</th></tr>
+</thead>
+<tbody>
+<tr><td>数智</td><td>绿韵家App底部Tab级AI助手入口</td></tr>
+<tr><td>四入口</td><td>AI帮你买、AI帮你看、AI帮你省、AI帮你选</td></tr>
+<tr><td>健康盒子</td><td>家庭健康用品与使用计划的管理中枢，含拍照添加、物品管理、使用计划、记录使用</td></tr>
+<tr><td>健康任务</td><td>绿韵家已有页面，展示用户健康任务列表与记录入口；本期样式参考泰小虎健康任务页</td></tr>
+<tr><td>Coze工作流</td><td>字节跳动Coze平台的可视化AI工作流，承载意图识别、知识库召回、大模型生成等逻辑</td></tr>
+<tr><td>猜你喜欢</td><td>绿韵家首页推荐算法，基于统一打分模型对商品排序</td></tr>
+</tbody>
+</table>
+
+<h2 id="s3">三、业务流程与架构</h2>
+<h3>3.1 业务流程图</h3>
+<p>数智模块以Coze工作流为AI对话引擎，整体业务流程分为输入层、预处理层、意图识别层、条件分发层、业务分支层、输出层六个阶段。各层节点与数据流如下：</p>
+
+<svg viewBox="0 0 880 520" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;background:#f6f8fa;border:1px solid #d0d7de;border-radius:8px;">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#656d76"/>
+    </marker>
+  </defs>
+  <text x="440" y="28" text-anchor="middle" font-size="16" font-weight="600" fill="#1f2328">数智模块主业务流程图</text>
+  
+  <rect x="20" y="45" width="130" height="450" fill="#fff" stroke="#d0d7de"/>
+  <rect x="150" y="45" width="130" height="450" fill="#fff" stroke="#d0d7de"/>
+  <rect x="280" y="45" width="130" height="450" fill="#fff" stroke="#d0d7de"/>
+  <rect x="410" y="45" width="130" height="450" fill="#fff" stroke="#d0d7de"/>
+  <rect x="540" y="45" width="160" height="450" fill="#fff" stroke="#d0d7de"/>
+  <rect x="700" y="45" width="160" height="450" fill="#fff" stroke="#d0d7de"/>
+  
+  <text x="85" y="70" text-anchor="middle" font-size="12" font-weight="600" fill="#1f2328">输入层</text>
+  <text x="215" y="70" text-anchor="middle" font-size="12" font-weight="600" fill="#1f2328">预处理层</text>
+  <text x="345" y="70" text-anchor="middle" font-size="12" font-weight="600" fill="#1f2328">意图识别层</text>
+  <text x="475" y="70" text-anchor="middle" font-size="12" font-weight="600" fill="#1f2328">条件分发层</text>
+  <text x="620" y="70" text-anchor="middle" font-size="12" font-weight="600" fill="#1f2328">业务分支层</text>
+  <text x="780" y="70" text-anchor="middle" font-size="12" font-weight="600" fill="#1f2328">输出层</text>
+  
+  <rect x="45" y="100" width="80" height="40" rx="6" fill="#ddf4ff" stroke="#0550ae"/>
+  <text x="85" y="125" text-anchor="middle" font-size="11" fill="#0550ae">用户输入</text>
+  
+  <rect x="175" y="100" width="80" height="40" rx="6" fill="#ddf4ff" stroke="#0550ae"/>
+  <text x="215" y="125" text-anchor="middle" font-size="11" fill="#0550ae">ASR/上传</text>
+  
+  <rect x="305" y="100" width="80" height="40" rx="6" fill="#ddf4ff" stroke="#0550ae"/>
+  <text x="345" y="125" text-anchor="middle" font-size="11" fill="#0550ae">意图识别</text>
+  
+  <rect x="435" y="100" width="80" height="40" rx="6" fill="#ddf4ff" stroke="#0550ae"/>
+  <text x="475" y="125" text-anchor="middle" font-size="11" fill="#0550ae">条件路由</text>
+  
+  <rect x="570" y="140" width="100" height="34" rx="6" fill="#fff2cc" stroke="#9a6700"/>
+  <text x="620" y="161" text-anchor="middle" font-size="11" fill="#9a6700">AI帮你买</text>
+  
+  <rect x="570" y="200" width="100" height="34" rx="6" fill="#fff2cc" stroke="#9a6700"/>
+  <text x="620" y="221" text-anchor="middle" font-size="11" fill="#9a6700">AI帮你看</text>
+  
+  <rect x="570" y="260" width="100" height="34" rx="6" fill="#fff2cc" stroke="#9a6700"/>
+  <text x="620" y="281" text-anchor="middle" font-size="11" fill="#9a6700">AI帮你省</text>
+  
+  <rect x="570" y="320" width="100" height="34" rx="6" fill="#fff2cc" stroke="#9a6700"/>
+  <text x="620" y="341" text-anchor="middle" font-size="11" fill="#9a6700">AI帮你选</text>
+  
+  <rect x="570" y="380" width="100" height="34" rx="6" fill="#e6e6e6" stroke="#656d76"/>
+  <text x="620" y="401" text-anchor="middle" font-size="11" fill="#656d76">兜底问答</text>
+  
+  <rect x="740" y="240" width="80" height="40" rx="6" fill="#dafbe1" stroke="#1a7f37"/>
+  <text x="780" y="265" text-anchor="middle" font-size="11" fill="#1a7f37">回复生成</text>
+  
+  <rect x="740" y="310" width="80" height="40" rx="6" fill="#dafbe1" stroke="#1a7f37"/>
+  <text x="780" y="335" text-anchor="middle" font-size="11" fill="#1a7f37">App展示</text>
+  
+  <line x1="125" y1="120" x2="175" y2="120" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="255" y1="120" x2="305" y2="120" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="385" y1="120" x2="435" y2="120" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="515" y1="120" x2="570" y2="120" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrow)"/>
+  
+  <polyline points="620,120 620,140" fill="none" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="620" y1="174" x2="620" y2="200" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="620" y1="234" x2="620" y2="260" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="620" y1="294" x2="620" y2="320" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="620" y1="354" x2="620" y2="380" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrow)"/>
+  
+  <line x1="670" y1="157" x2="740" y2="250" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="670" y1="217" x2="740" y2="255" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="670" y1="277" x2="740" y2="260" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="670" y1="337" x2="740" y2="265" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="670" y1="397" x2="740" y2="270" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrow)"/>
+  
+  <line x1="780" y1="280" x2="780" y2="310" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrow)"/>
+  
+  <path d="M780,310 Q840,310 840,200 Q840,90 305,90 L305,100" fill="none" stroke="#cf222e" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+  <text x="845" y="200" font-size="10" fill="#cf222e">识别失败/超时重试</text>
+</svg>
+<p class="muted">基线说明：本图为数智模块<strong>横向泳道全链路业务流程图</strong>，已梳理并与需求梳理阶段确认的流程图一致。本图引自需求梳理图集（参考泰小虎 <code>txh_app_conversation_center-draft.yaml</code> 与 <code>txh_center_optimize-draft.yaml</code>），阶段/节点与 §4.10 Coze工作流节点设计 一一对应。</p>
+
+<table>
+<thead>
+<tr><th>阶段</th><th>节点</th><th>处理内容</th><th>输出</th></tr>
+</thead>
+<tbody>
+<tr><td>输入层</td><td>用户输入节点</td><td>接收文字、语音、图片、入口点击事件</td><td>原始消息 + 会话ID + user_id</td></tr>
+<tr><td>预处理层</td><td>ASR / 图片上传</td><td>语音转文字、图片上传至绿韵家OSS</td><td>文本消息 或 图片URL</td></tr>
+<tr><td>意图识别层</td><td>LLM意图识别</td><td>判断用户意图：买/看/省/选/兜底</td><td>意图编码 + 改写后的问题</td></tr>
+<tr><td>条件分发层</td><td>条件路由</td><td>按意图编码分发到对应业务分支</td><td>分支路由信号</td></tr>
+<tr><td>业务分支层</td><td>买/看/省/选/兜底子工作流</td><td>调用商品接口、知识库、图像识别、推荐接口</td><td>结构化回复数据</td></tr>
+<tr><td>输出层</td><td>回复生成</td><td>大模型组织话术并拼装卡片</td><td>文本 + 商品卡片/识别结果</td></tr>
+</tbody>
+</table>
+
+<h3>3.2 信息架构</h3>
+<p>数智模块涉及App端、Coze平台、绿韵家中台、泰小虎能力四个部分：</p>
+<ul>
+  <li><strong>App端</strong>：数智首页（一级页）、健康盒子页面、语音/相机交互、卡片渲染。</li>
+  <li><strong>Coze平台</strong>：承载意图识别、知识库召回、大模型生成、条件分发、子工作流编排。</li>
+  <li><strong>绿韵家中台</strong>：商品接口、用户行为数据、健康盒子物品/计划数据、图片上传。</li>
+  <li><strong>泰小虎能力</strong>：图像识别/报告解读模型服务（复用）。</li>
+</ul>
+
+<h3>3.3 状态机与状态流转规则</h3>
+<p>数智模块核心状态流转围绕「AI对话会话」与「健康盒子物品」两类实体展开。</p>
+
+<h4>3.3.1 AI对话会话状态机</h4>
+<p>完整状态枚举：<code>空态/欢迎页</code>、<code>对话中</code>、<code>等待用户输入</code>、<code>失败态</code>。</p>
+<table>
+<thead>
+<tr><th>起始状态</th><th>触发动作</th><th>前置条件</th><th>目标状态</th></tr>
+</thead>
+<tbody>
+<tr><td>空态/欢迎页</td><td>用户发送首条消息</td><td>用户已登录</td><td>对话中</td></tr>
+<tr><td>对话中</td><td>AI返回结果成功</td><td>工作流执行成功</td><td>等待用户输入</td></tr>
+<tr><td>等待用户输入</td><td>用户发送消息</td><td>—</td><td>对话中</td></tr>
+<tr><td>对话中</td><td>AI返回失败/超时</td><td>接口异常或超时</td><td>失败态</td></tr>
+<tr><td>失败态</td><td>用户点击重试</td><td>—</td><td>对话中</td></tr>
+</tbody>
+</table>
+
+<h4>3.3.2 健康盒子物品状态机</h4>
+<p>完整状态枚举：<code>未录入</code>、<code>已录入</code>、<code>已删除</code>。</p>
+<table>
+<thead>
+<tr><th>起始状态</th><th>触发动作</th><th>前置条件</th><th>目标状态</th></tr>
+</thead>
+<tbody>
+<tr><td>未录入</td><td>用户保存新增物品</td><td>必填字段完整</td><td>已录入</td></tr>
+<tr><td>已录入</td><td>用户编辑保存</td><td>—</td><td>已录入</td></tr>
+<tr><td>已录入</td><td>用户删除</td><td>—</td><td>已删除</td></tr>
+</tbody>
+</table>
+
+<h3>3.4 需求目标与范围</h3>
+
+<h4>3.4.1 需求目标</h4>
+<ul>
+  <li>在App内提供统一AI对话入口，降低用户找商品、做检测、省钱的操作成本。</li>
+  <li>复用泰小虎已验证的Coze工作流结构，缩短绿韵家AI能力上线周期。</li>
+  <li>通过健康盒子建立用户家庭健康用品资产，提升留存与复访。</li>
+</ul>
+
+<h4>3.4.2 需求范围</h4>
+<table>
+<thead>
+<tr><th>范围</th><th>内容</th></tr>
+</thead>
+<tbody>
+<tr><td>本期做</td><td>数智首页（一级页）、四入口对话交互、AI帮你看（舌苔/皮肤/面相/报告解读）、健康盒子（拍照添加/物品管理/使用计划/记录使用）、Coze工作流改造、埋点</td></tr>
+<tr><td>本期不做</td><td>底部「消息」Tab、AI语音实时通话、多轮复杂问诊、医生人工服务</td></tr>
+</tbody>
+</table>
+
+<h4>3.4.3 用户场景</h4>
+<table>
+<thead>
+<tr><th>角色</th><th>场景</th><th>期望结果</th></tr>
+</thead>
+<tbody>
+<tr><td>绿韵家会员</td><td>想买蛋白粉，不知道怎么选</td><td>在数智页输入需求，AI返回产品介绍与商品卡片</td></tr>
+<tr><td>绿韵家会员</td><td>想了解最近有哪些降价商品</td><td>点击「AI帮你省」，AI返回折扣最大、价格最低、降价商品</td></tr>
+<tr><td>绿韵家会员</td><td>买了保健品，想记录服用计划</td><td>进入健康盒子，拍照识别物品并设置使用计划</td></tr>
+<tr><td>绿韵家会员</td><td>拍了体检报告，想快速了解异常项</td><td>点击「报告解读」上传图片，AI给出解读建议</td></tr>
+</tbody>
+</table>
+
+<h2 id="s4">四、功能需求详情</h2>
+<p>本章按「页面」拆解功能需求。每个页面/功能点包含：功能说明、显示位置、权限/登录态、前置条件、逐步操作逻辑、异常分支、校验与提示文案、数据来源。</p>
+
+<h3>4.1 页面清单</h3>
+<table>
+<thead>
+<tr><th>页面编号</th><th>页面名称</th><th>路径/入口</th><th>说明</th></tr>
+</thead>
+<tbody>
+<tr><td>P1</td><td>数智首页（一级页）</td><td>底部Tab「数智」</td><td>AI助手一级页，承载问候、四入口、AI帮你看、健康盒子、对话输入；点击四入口后进入对话态</td></tr>
+<tr><td>P2</td><td>AI帮你买对话结果</td><td>P1点击「AI帮你买」或输入商品需求</td><td>在对话流中返回商品卡片与产品介绍</td></tr>
+<tr><td>P3</td><td>AI帮你看对话结果</td><td>P1点击「AI帮你看」或选择子功能</td><td>在对话流中引导拍照/相册并返回识别结果</td></tr>
+<tr><td>P4</td><td>AI帮你省对话结果</td><td>P1点击「AI帮你省」</td><td>在对话流中返回三类省钱商品卡片</td></tr>
+<tr><td>P5</td><td>AI帮你选对话结果</td><td>P1点击「AI帮你选」</td><td>在对话流中返回猜你喜欢Top3商品介绍</td></tr>
+<tr><td>P6</td><td>健康盒子首页</td><td>P1点击「健康盒子」</td><td>物品管理与使用计划双Tab首页</td></tr>
+<tr><td>P7</td><td>新增物品页</td><td>P6或拍照添加入口</td><td>AI识别或手动录入健康用品</td></tr>
+<tr><td>P8</td><td>添加使用计划页</td><td>P6使用计划Tab</td><td>为已有物品设置服用/使用计划</td></tr>
+<tr><td>P9</td><td>健康任务页</td><td>P1健康盒子「记录使用」入口</td><td>绿韵家已有页面，展示健康任务列表与记录入口；本期样式参考泰小虎健康任务页</td></tr>
+</tbody>
+</table>
+
+<h3>4.2 P1 数智首页（一级页）</h3>
+<p><span class="tag">本期新增</span><strong>涉及终端：</strong>iOS App、Android App</p>
+<h4>4.2.0 页面原型与交互示意</h4>
+<p>本期绿韵家数智板块原型参考下图（含数智首页、对话流、健康盒子相关页面）。当前参考泰小虎健康盒子（原百宝箱）/对话页交互逻辑，UI按绿韵家规范重新设计。</p>
+<p><img src="prd-assets/lvyunjia-aizhi-proto.png" alt="绿韵家数智板块原型参考" style="max-width:100%;border:1px solid #d0d7de;border-radius:8px;"></p>
+<p class="warn">⚠️ 待设计 @设计：原型中未定稿细节（如卡片数量、具体文案、空态图）以本PRD文字规格为准。</p>
+<h4>4.2.1 功能说明</h4>
+<p>数智首页（一级页）是AI助手的主页面。用户点击底部Tab「数智」后进入该页面，看到AI助手形象与问候语、四入口、AI帮你看子功能区、健康盒子入口。点击任一入口后，页面切换为对话态，在对话流中展示用户消息与AI回复；用户也可通过底部输入栏手动输入文字、语音或图片。</p>
+
+<h4>4.2.2 显示位置与页面结构</h4>
+<p>页面从上至下依次为：</p>
+<ol>
+  <li>顶部状态栏与标题（可省略标题，以AI形象区替代）</li>
+  <li>AI助手形象 + 问候语：「Hi~ 我是你的AI助手，你的健康生活好帮手」</li>
+  <li>四入口卡片区：AI帮你买、AI帮你看、AI帮你省、AI帮你选</li>
+  <li>AI帮你看子功能区：看舌苔、看皮肤、看面相、报告解读</li>
+  <li>健康盒子入口区</li>
+  <li>对话消息流（点击入口后在此区域展示用户消息与AI回复）</li>
+  <li>底部输入栏：健康档案快捷入口（点击跳转绿韵家已有健康档案页）、语音按钮、输入框、相机按钮</li>
+</ol>
+
+<h4>4.2.3 权限与登录态</h4>
+<ul>
+  <li>进入数智Tab需登录，未登录用户点击「数智」跳转登录页。</li>
+  <li>登录后进入P1，可直接使用全部入口。</li>
+</ul>
+
+<h4>4.2.4 前置条件</h4>
+<ul>
+  <li>用户已登录绿韵家App。</li>
+  <li>网络可用（弱网场景见异常分支）。</li>
+</ul>
+
+<h4>4.2.5 逐步操作逻辑</h4>
+<table>
+<thead>
+<tr><th>步骤</th><th>用户操作</th><th>系统响应</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>点击底部Tab「数智」</td><td>加载数智首页（一级页），展示AI形象、问候语、四入口、AI帮你看、健康盒子入口</td></tr>
+<tr><td>2</td><td>点击任一入口</td><td>在对话流中自动发送对应预设问题（见4.3-4.6），并进入对应AI工作流分支</td></tr>
+<tr><td>3</td><td>在底部输入框输入文字并发送</td><td>文字进入意图识别节点，按识别结果分发到买/看/省/选/兜底分支</td></tr>
+<tr><td>4</td><td>点击语音按钮并按住说话</td><td>调起ASR，松手后把识别文字写入输入框，由用户确认后点击发送</td></tr>
+<tr><td>5</td><td>点击相机按钮</td><td>调起相机/相册，选择图片后作为图片消息发送给AI；工作流自动识别图片类型并进入对应分支</td></tr>
+</tbody>
+</table>
+
+<h4>4.2.6 异常分支</h4>
+<table>
+<thead>
+<tr><th>异常场景</th><th>系统行为</th><th>提示文案</th></tr>
+</thead>
+<tbody>
+<tr><td>未登录</td><td>跳转登录页</td><td>—</td></tr>
+<tr><td>网络断开</td><td>展示缺省页或Toast</td><td>网络异常，请检查网络后重试</td></tr>
+<tr><td>AI接口超时</td><td>展示重试按钮</td><td>AI助手响应超时，点击重试</td></tr>
+<tr><td>ASR识别失败</td><td>停留在输入框，保留未识别状态</td><td>语音识别失败，请重试或手动输入</td></tr>
+</tbody>
+</table>
+
+<h4>4.2.7 数据来源</h4>
+<table>
+<thead>
+<tr><th>元素</th><th>数据来源</th></tr>
+</thead>
+<tbody>
+<tr><td>AI问候语</td><td>前端静态配置，支持按时间/用户画像变化（本期固定一句）</td></tr>
+<tr><td>四入口文案与图标</td><td>前端静态配置</td></tr>
+<tr><td>AI帮你看子功能</td><td>前端静态配置</td></tr>
+<tr><td>健康盒子入口</td><td>前端静态配置</td></tr>
+<tr><td>健康档案入口</td><td>跳转绿韵家已有健康档案页，链接由配置中心下发</td></tr>
+</tbody>
+</table>
+
+<h3>4.3 P2 AI帮你买</h3>
+<p><span class="tag">本期新增</span><strong>涉及终端：</strong>iOS App、Android App</p>
+<h4>4.3.0 页面原型与交互示意</h4>
+<p class="warn">⚠️ 待设计 @设计：本期需输出绿韵家风格UI稿后替换此处原型图。当前参考泰小虎健康盒子（原百宝箱）/对话页交互逻辑，UI按绿韵家规范重新设计。</p>
+<h4>4.3.1 功能说明</h4>
+<p>用户通过文字/语音描述想买的产品，AI从绿韵家商品库中匹配并返回商品卡片与产品介绍。匹配度低时给出兜底回复。</p>
+
+<h4>4.3.2 显示位置</h4>
+<p>入口位于P1四入口区第一项。点击后在P1对话流中自动发送预设问题：「我想买，帮我推荐一下」。</p>
+
+<h4>4.3.3 权限与登录态</h4>
+<p>需登录。</p>
+
+<h4>4.3.4 前置条件</h4>
+<ul>
+  <li>用户已进入P1。</li>
+  <li>绿韵家商品接口可调用。</li>
+</ul>
+
+<h4>4.3.5 逐步操作逻辑</h4>
+<table>
+<thead>
+<tr><th>步骤</th><th>用户操作</th><th>系统响应</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>点击「AI帮你买」入口</td><td>在对话流中自动发送预设消息「我想买，帮我推荐一下」</td></tr>
+<tr><td>2</td><td>输入商品名称/需求描述并发送</td><td>消息进入Coze工作流，意图识别为「买」</td></tr>
+<tr><td>3</td><td>—</td><td>Coze调用绿韵家商品搜索接口，按关键词/语义召回商品</td></tr>
+<tr><td>4</td><td>—</td><td>大模型基于Top 3商品信息生成产品介绍，并拼装商品卡片</td></tr>
+<tr><td>5</td><td>—</td><td>在对话流中展示AI回复：产品介绍 + 3个商品卡片（商品图、名称、价格、查看按钮）</td></tr>
+<tr><td>6</td><td>点击商品卡片「查看」</td><td>跳转绿韵家商品详情H5页（参数待接口对接时确认）</td></tr>
+</tbody>
+</table>
+
+<h4>4.3.6 异常分支与提示文案</h4>
+<table>
+<thead>
+<tr><th>异常场景</th><th>系统行为</th><th>提示文案</th></tr>
+</thead>
+<tbody>
+<tr><td>商品接口无匹配</td><td>返回兜底话术，不展示商品卡片</td><td>不好意思，没有找到符合你说明的产品，可以换个说法再问我</td></tr>
+<tr><td>商品接口异常</td><td>返回友好提示</td><td>商品服务暂不可用，请稍后再试</td></tr>
+<tr><td>用户输入非商品信息</td><td>走兜底分支或提示重新描述</td><td>你可以描述想买的商品名称、功效或适用人群，我来帮你找</td></tr>
+</tbody>
+</table>
+
+<h4>4.3.7 数据与接口</h4>
+<table>
+<thead>
+<tr><th>字段/接口</th><th>说明</th></tr>
+</thead>
+<tbody>
+<tr><td>商品搜索接口</td><td>绿韵家自有商品搜索接口，支持关键词/语义召回</td></tr>
+<tr><td>商品卡片字段</td><td>商品ID、商品名称、商品主图、划线价、售卖价、查看链接</td></tr>
+<tr><td>兜底话术</td><td>由Coze提示词控制</td></tr>
+<tr><td>跳转方式</td><td>点击商品卡片跳转绿韵家商品详情H5页，跳转参数待与后端接口对接确认</td></tr>
+</tbody>
+</table>
+
+<h3>4.4 P3 AI帮你看</h3>
+<p><span class="tag">本期新增</span><strong>涉及终端：</strong>iOS App、Android App</p>
+<h4>4.4.0 页面原型与交互示意</h4>
+<p class="warn">⚠️ 待设计 @设计：本期需输出绿韵家风格UI稿后替换此处原型图。当前参考泰小虎健康盒子（原百宝箱）/对话页交互逻辑，UI按绿韵家规范重新设计。</p>
+<h4>4.4.1 功能说明</h4>
+<p>复用泰小虎健康检测类Coze子工作流，支持看舌苔、看皮肤、看面相、体检报告解读四类图片识别能力。用户拍照或从相册选择图片后，AI返回识别结果与健康建议。</p>
+
+<h4>4.4.2 显示位置</h4>
+<p>入口位于P1四入口区第二项，同时P1中部展示四个子功能快捷图标。点击「AI帮你看」主入口后，直接定位/展开子功能区；点击任一子功能图标后，在对话流中发送对应预设消息并提示用户上传图片。</p>
+
+<h4>4.4.3 权限与登录态</h4>
+<p>需登录。识别图片需相机/相册权限。</p>
+
+<h4>4.4.4 前置条件</h4>
+<ul>
+  <li>用户已授权相机/相册权限。</li>
+  <li>已接入泰小虎对应子工作流（看舌苔/看皮肤/看面相/报告解读）。</li>
+</ul>
+
+<h4>4.4.5 逐步操作逻辑</h4>
+<table>
+<thead>
+<tr><th>步骤</th><th>用户操作</th><th>系统响应</th></tr>
+</thead>
+<tbody>
+<tr><td>1-A</td><td>点击「AI帮你看」主入口</td><td>页面直接定位/展开子功能区（看舌苔/看皮肤/看面相/报告解读），等待用户选择具体子功能</td></tr>
+<tr><td>1-B</td><td>点击子功能图标（如「看舌苔」）</td><td>在对话流中发送对应预设消息（如「帮我看看舌苔」）</td></tr>
+<tr><td>2</td><td>按AI提示拍摄或选择图片</td><td>图片上传至Coze图片识别子工作流，子工作流自动判断图片类型（舌苔/皮肤/面相/报告/其他）</td></tr>
+<tr><td>3</td><td>—</td><td>命中 1111/2222/3333 时进入对应图像识别模型；命中 4444 时先 OCR 提取文字，再进入报告解读或兜底处理</td></tr>
+<tr><td>4</td><td>—</td><td>大模型基于识别结果生成健康建议</td></tr>
+<tr><td>5</td><td>—</td><td>在对话流中展示识别结论与建议</td></tr>
+</tbody>
+</table>
+
+<h4>4.4.6 异常分支</h4>
+<table>
+<thead>
+<tr><th>异常场景</th><th>系统行为</th><th>提示文案</th></tr>
+</thead>
+<tbody>
+<tr><td>图片模糊/无法识别</td><td>提示重新拍摄</td><td>图片识别失败，请重新拍摄清晰照片</td></tr>
+<tr><td>用户取消拍摄</td><td>回到对话页，不做处理</td><td>—</td></tr>
+<tr><td>识别接口超时</td><td>展示重试按钮</td><td>识别超时，请重试</td></tr>
+</tbody>
+</table>
+
+<h4>4.4.7 数据与接口</h4>
+<table>
+<thead>
+<tr><th>字段/接口</th><th>说明</th></tr>
+</thead>
+<tbody>
+<tr><td>图像识别模型</td><td>泰小虎已有模型/服务，以Coze子工作流形式被绿韵家主工作流调用</td></tr>
+<tr><td>报告解读模型</td><td>泰小虎已有模型/服务，以Coze子工作流形式被绿韵家主工作流调用</td></tr>
+<tr><td>图片上传接口</td><td>绿韵家通用图片上传接口</td></tr>
+<tr><td>图片类型判断</td><td>由图片识别子工作流中 LLM 节点输出意图编号：1111=舌头、2222=皮肤、3333=面部、4444=其他/OCR</td></tr>
+</tbody>
+</table>
+
+<h3>4.5 P4 AI帮你省</h3>
+<p><span class="tag">本期新增</span><strong>涉及终端：</strong>iOS App、Android App</p>
+<h4>4.5.0 页面原型与交互示意</h4>
+<p class="warn">⚠️ 待设计 @设计：本期需输出绿韵家风格UI稿后替换此处原型图。当前参考泰小虎健康盒子（原百宝箱）/对话页交互逻辑，UI按绿韵家规范重新设计。</p>
+<h4>4.5.1 功能说明</h4>
+<p>用户点击后，AI通过后端聚合接口返回三类省钱商品：全站折扣金额最大、全站价格最低、用户最近7天买/浏览/加购且降价的商品。</p>
+
+<h4>4.5.2 显示位置</h4>
+<p>入口位于P1四入口区第三项。点击后自动发送预设问题：「帮我看看今天有什么划算的商品」。</p>
+
+<h4>4.5.3 权限与登录态</h4>
+<p>需登录（依赖用户行为数据）。</p>
+
+<h4>4.5.4 前置条件</h4>
+<ul>
+  <li>用户已登录。</li>
+  <li>后端聚合接口可用。</li>
+</ul>
+
+<h4>4.5.5 逐步操作逻辑</h4>
+<table>
+<thead>
+<tr><th>步骤</th><th>用户操作</th><th>系统响应</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>点击「AI帮你省」入口</td><td>自动发送预设问题，进入省钱工作流分支</td></tr>
+<tr><td>2</td><td>—</td><td>Coze调用后端聚合接口 /ai/save-money</td></tr>
+<tr><td>3</td><td>—</td><td>接口返回三类商品：discount_max（折扣最大）、price_min（价格最低）、price_drop（近7天降价商品）</td></tr>
+<tr><td>4</td><td>—</td><td>大模型生成省钱话术，拼装商品卡片列表</td></tr>
+<tr><td>5</td><td>—</td><td>在对话流中展示：省钱总结 + 商品卡片（分类展示）</td></tr>
+<tr><td>6</td><td>点击商品卡片</td><td>跳转商品详情H5页</td></tr>
+</tbody>
+</table>
+
+<h4>4.5.6 异常分支</h4>
+<table>
+<thead>
+<tr><th>异常场景</th><th>系统行为</th><th>提示文案</th></tr>
+</thead>
+<tbody>
+<tr><td>聚合接口无数据</td><td>返回友好提示</td><td>今天暂时没有特别划算的商品，过会儿再来看看吧</td></tr>
+<tr><td>用户无近7天行为数据</td><td>仅返回全站折扣最大与价格最低两类</td><td>根据全站好价，为你推荐以下商品</td></tr>
+<tr><td>接口异常</td><td>展示重试</td><td>省钱服务暂不可用，请稍后再试</td></tr>
+</tbody>
+</table>
+
+<h4>4.5.7 数据与接口</h4>
+<table>
+<thead>
+<tr><th>字段/接口</th><th>说明</th></tr>
+</thead>
+<tbody>
+<tr><td>/ai/save-money</td><td>后端聚合接口，返回三类商品数据</td></tr>
+<tr><td>折扣金额计算</td><td>划线价 - 售卖价</td></tr>
+<tr><td>降价商品判定</td><td>用户近7天有买/浏览/加购记录，且当前售卖价低于历史价</td></tr>
+<tr><td>商品卡片字段</td><td>同4.3.7</td></tr>
+</tbody>
+</table>
+
+<h3>4.6 P5 AI帮你选</h3>
+<p><span class="tag">本期新增</span><strong>涉及终端：</strong>iOS App、Android App</p>
+<h4>4.6.0 页面原型与交互示意</h4>
+<p class="warn">⚠️ 待设计 @设计：本期需输出绿韵家风格UI稿后替换此处原型图。当前参考泰小虎健康盒子（原百宝箱）/对话页交互逻辑，UI按绿韵家规范重新设计。</p>
+<h4>4.6.1 功能说明</h4>
+<p>用户点击后，AI直接调用绿韵家首页「猜你喜欢」统一打分模型，取得分Top3商品，并由AI介绍商品信息。本期不支持用户输入偏好，直接返回结果。</p>
+
+<h4>4.6.2 显示位置</h4>
+<p>入口位于P1四入口区第四项。点击后自动发送预设问题：「帮我选几款适合我的商品」。</p>
+
+<h4>4.6.3 权限与登录态</h4>
+<p>需登录。</p>
+
+<h4>4.6.4 前置条件</h4>
+<ul>
+  <li>用户已登录。</li>
+  <li>猜你喜欢推荐接口可用。</li>
+</ul>
+
+<h4>4.6.5 逐步操作逻辑</h4>
+<table>
+<thead>
+<tr><th>步骤</th><th>用户操作</th><th>系统响应</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>点击「AI帮你选」入口</td><td>自动发送预设问题，进入「选」工作流分支</td></tr>
+<tr><td>2</td><td>—</td><td>Coze调用绿韵家猜你喜欢接口，取Top3商品</td></tr>
+<tr><td>3</td><td>—</td><td>大模型基于Top3商品信息生成推荐理由</td></tr>
+<tr><td>4</td><td>—</td><td>在对话流中展示：推荐理由 + 3个商品卡片</td></tr>
+<tr><td>5</td><td>点击商品卡片</td><td>跳转商品详情H5页</td></tr>
+</tbody>
+</table>
+
+<h4>4.6.6 异常分支</h4>
+<table>
+<thead>
+<tr><th>异常场景</th><th>系统行为</th><th>提示文案</th></tr>
+</thead>
+<tbody>
+<tr><td>推荐接口无数据</td><td>返回热门商品兜底</td><td>为你推荐站内热门商品</td></tr>
+<tr><td>接口异常</td><td>展示重试</td><td>推荐服务暂不可用，请稍后再试</td></tr>
+</tbody>
+</table>
+
+<h4>4.6.7 数据与接口</h4>
+<table>
+<thead>
+<tr><th>字段/接口</th><th>说明</th></tr>
+</thead>
+<tbody>
+<tr><td>猜你喜欢接口</td><td>复用绿韵家首页推荐接口，返回Top3</td></tr>
+<tr><td>商品卡片字段</td><td>同4.3.7</td></tr>
+</tbody>
+</table>
+
+<h3>4.7 P6 健康盒子首页</h3>
+<p><span class="tag">本期新增</span><strong>涉及终端：</strong>iOS App、Android App</p>
+<h4>4.7.0 页面原型与交互示意</h4>
+<p class="warn">⚠️ 待设计 @设计：本期需输出绿韵家风格UI稿后替换此处原型图。当前参考泰小虎健康盒子（原百宝箱）/对话页交互逻辑，UI按绿韵家规范重新设计。</p>
+<h4>4.7.1 功能说明</h4>
+<p>健康盒子是家庭健康用品与使用计划的管理中枢。首页采用双Tab结构：物品管理、使用计划。</p>
+
+<h4>4.7.2 显示位置</h4>
+<p>入口位于P1「健康盒子」区域。点击后进入P6。</p>
+
+<h4>4.7.3 权限与登录态</h4>
+<p>需登录。</p>
+
+<h4>4.7.4 前置条件</h4>
+<ul>
+  <li>用户已登录。</li>
+  <li>首次进入（按用户ID维度）展示引导弹窗，非首次直接进入。</li>
+</ul>
+
+<h4>4.7.5 逐步操作逻辑</h4>
+<table>
+<thead>
+<tr><th>步骤</th><th>用户操作</th><th>系统响应</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>点击P1「健康盒子」入口</td><td>进入P6</td></tr>
+<tr><td>2</td><td>首次进入（用户维度）</td><td>展示引导弹窗：卖点说明 + 流程步骤 + 「稍后说」「拍照识别物品」按钮</td></tr>
+<tr><td>3</td><td>点击「稍后说」</td><td>关闭弹窗，默认展示「物品管理」Tab</td></tr>
+<tr><td>4</td><td>点击「拍照识别物品」</td><td>关闭弹窗并进入P7新增物品流程，直接调起相机</td></tr>
+<tr><td>5</td><td>切换Tab</td><td>在「物品管理」与「使用计划」之间切换</td></tr>
+</tbody>
+</table>
+
+<h4>4.7.6 异常分支</h4>
+<table>
+<thead>
+<tr><th>异常场景</th><th>系统行为</th><th>提示文案</th></tr>
+</thead>
+<tbody>
+<tr><td>无物品/无计划</td><td>展示空态</td><td>你的健康盒子暂无物品 / 暂无使用计划</td></tr>
+<tr><td>相机权限拒绝</td><td>提示去设置开启</td><td>请在设置中开启相机权限，以便识别物品</td></tr>
+</tbody>
+</table>
+
+<h4>4.7.7 数据与接口</h4>
+<table>
+<thead>
+<tr><th>字段/接口</th><th>说明</th></tr>
+</thead>
+<tbody>
+<tr><td>物品列表接口</td><td>获取用户健康用品列表</td></tr>
+<tr><td>使用计划列表接口</td><td>获取用户使用计划列表</td></tr>
+<tr><td>引导弹窗去重</td><td>按用户ID记录「已展示健康盒子引导」，换设备登录后仍不再展示</td></tr>
+</tbody>
+</table>
+
+<h3>4.8 P7 新增物品页</h3>
+<p><span class="tag">本期新增</span><strong>涉及终端：</strong>iOS App、Android App</p>
+<h4>4.8.0 页面原型与交互示意</h4>
+<p class="warn">⚠️ 待设计 @设计：本期需输出绿韵家风格UI稿后替换此处原型图。当前参考泰小虎健康盒子（原百宝箱）/对话页交互逻辑，UI按绿韵家规范重新设计。</p>
+<h4>4.8.1 功能说明</h4>
+<p>用户可通过AI拍照识别或手动录入方式添加健康用品。拍照识别支持拍摄包装六面自动提取物品信息。</p>
+
+<h4>4.8.2 显示位置</h4>
+<p>入口：P6「物品管理」Tab → 新增物品；或P1健康盒子「拍照添加」入口。</p>
+
+<h4>4.8.3 权限与登录态</h4>
+<p>需登录。</p>
+
+<h4>4.8.4 前置条件</h4>
+<ul>
+  <li>用户已登录。</li>
+  <li>相机/相册权限已授权。</li>
+</ul>
+
+<h4>4.8.5 逐步操作逻辑</h4>
+<table>
+<thead>
+<tr><th>步骤</th><th>用户操作</th><th>系统响应</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>点击「新增物品」或「拍照添加」</td><td>进入P7，顶部展示「AI智能识别」入口</td></tr>
+<tr><td>2-A</td><td>点击「AI智能识别」并拍摄包装</td><td>上传图片至AI识别服务，自动填充物品名称、规格、有效期等字段</td></tr>
+<tr><td>2-B</td><td>手动填写表单</td><td>用户自行填写物品图片、名称、规格、数量、有效期、备注</td></tr>
+<tr><td>3</td><td>点击保存</td><td>校验必填项，调用保存接口，成功后返回P6并刷新列表</td></tr>
+</tbody>
+</table>
+
+<h4>4.8.6 异常分支</h4>
+<table>
+<thead>
+<tr><th>异常场景</th><th>系统行为</th><th>提示文案</th></tr>
+</thead>
+<tbody>
+<tr><td>识别失败</td><td>保留图片，字段为空等待手动填写</td><td>识别失败，请手动填写物品信息</td></tr>
+<tr><td>必填项未填</td><td>聚焦到未填项并提示</td><td>请填写物品名称</td></tr>
+<tr><td>保存失败</td><td>展示重试</td><td>保存失败，请重试</td></tr>
+</tbody>
+</table>
+
+<h4>4.8.7 输入限制</h4>
+<table>
+<thead>
+<tr><th>字段</th><th>必填</th><th>类型</th><th>长度/格式</th><th>备注</th></tr>
+</thead>
+<tbody>
+<tr><td>物品图片</td><td>否</td><td>图片</td><td>≤5MB，JPG/PNG</td><td>AI识别时自动填充</td></tr>
+<tr><td>物品名称</td><td>是</td><td>文本</td><td>≤50字</td><td>—</td></tr>
+<tr><td>物品规格</td><td>否</td><td>文本</td><td>≤50字</td><td>如60粒/瓶</td></tr>
+<tr><td>物品数量</td><td>否</td><td>数字</td><td>正整数</td><td>—</td></tr>
+<tr><td>有效期至</td><td>否</td><td>日期</td><td>yyyy-MM-dd</td><td>—</td></tr>
+<tr><td>备注</td><td>否</td><td>文本</td><td>≤200字</td><td>—</td></tr>
+</tbody>
+</table>
+
+<h3>4.9 P8 添加使用计划页</h3>
+<p><span class="tag">本期新增</span><strong>涉及终端：</strong>iOS App、Android App</p>
+<h4>4.9.0 页面原型与交互示意</h4>
+<p class="warn">⚠️ 待设计 @设计：本期需输出绿韵家风格UI稿后替换此处原型图。当前参考泰小虎健康盒子（原百宝箱）/对话页交互逻辑，UI按绿韵家规范重新设计。</p>
+<h4>4.9.1 功能说明</h4>
+<p>为已有物品设置服用/使用计划，系统按频率提醒用户。</p>
+
+<h4>4.9.2 显示位置</h4>
+<p>入口：P6「使用计划」Tab → 新增计划。</p>
+
+<h4>4.9.3 权限与登录态</h4>
+<p>需登录。</p>
+
+<h4>4.9.4 前置条件</h4>
+<ul>
+  <li>用户已登录。</li>
+  <li>至少已添加一个物品（无物品时先引导添加）。</li>
+</ul>
+
+<h4>4.9.5 逐步操作逻辑</h4>
+<table>
+<thead>
+<tr><th>步骤</th><th>用户操作</th><th>系统响应</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>点击「新增计划」</td><td>弹出添加使用计划表单</td></tr>
+<tr><td>2</td><td>选择物品名称</td><td>从已有物品列表中选择</td></tr>
+<tr><td>3</td><td>选择频率、提醒时间、使用数量、使用周期、备注</td><td>表单实时校验</td></tr>
+<tr><td>4</td><td>点击保存</td><td>调用保存接口，成功后刷新使用计划列表</td></tr>
+</tbody>
+</table>
+
+<h4>4.9.6 异常分支</h4>
+<table>
+<thead>
+<tr><th>异常场景</th><th>系统行为</th><th>提示文案</th></tr>
+</thead>
+<tbody>
+<tr><td>无可用物品</td><td>提示先去添加物品</td><td>请先添加物品，再创建使用计划</td></tr>
+<tr><td>保存失败</td><td>展示重试</td><td>保存失败，请重试</td></tr>
+</tbody>
+</table>
+
+<h4>4.9.7 输入限制</h4>
+<table>
+<thead>
+<tr><th>字段</th><th>必填</th><th>类型</th><th>长度/格式</th><th>备注</th></tr>
+</thead>
+<tbody>
+<tr><td>物品名称</td><td>是</td><td>选择</td><td>从已有物品选</td><td>—</td></tr>
+<tr><td>频率</td><td>是</td><td>枚举</td><td>每天/每周/自定义</td><td>—</td></tr>
+<tr><td>提醒时间</td><td>是</td><td>时间</td><td>HH:mm</td><td>—</td></tr>
+<tr><td>使用数量</td><td>否</td><td>文本/数字</td><td>≤20字</td><td>如每次1粒</td></tr>
+<tr><td>使用周期</td><td>否</td><td>日期范围</td><td>yyyy-MM-dd 起止</td><td>—</td></tr>
+<tr><td>备注</td><td>否</td><td>文本</td><td>≤200字</td><td>—</td></tr>
+</tbody>
+</table>
+
+<h3>4.10 P9 健康任务页</h3>
+<p><span class="tag">本期新增入口</span><strong>涉及终端：</strong>iOS App、Android App</p>
+<h4>4.10.0 页面原型与交互示意</h4>
+<p class="warn">⚠️ 待设计 @设计：绿韵家已有健康任务页，本期样式参考泰小虎「健康任务」截图（下图）。顶部展示累计健康生活、连续健康生活、今日健康生活三类统计卡片；下方为任务列表，每个任务展示任务名称、描述、已记录人数及「记录」按钮；底部固定「创建新的任务」按钮。</p>
+<p><img src="prd-assets/p9-health-task-ref.jpg" alt="健康任务页参考截图（样式参考泰小虎）" style="max-width:320px;border:1px solid #d0d7de;border-radius:8px;"></p>
+<h4>4.10.1 功能说明</h4>
+<p>健康任务页为绿韵家已有页面，用于展示用户当前健康任务列表，并支持记录任务完成情况与创建新任务。本期数智模块通过健康盒子「记录使用」入口跳转到该页面，页面样式参考泰小虎健康任务页。</p>
+
+<h4>4.10.2 显示位置</h4>
+<p>入口：P1健康盒子「记录使用」入口。点击后跳转健康任务页。</p>
+
+<h4>4.10.3 权限与登录态</h4>
+<p>需登录。</p>
+
+<h4>4.10.4 前置条件</h4>
+<ul>
+  <li>用户已登录。</li>
+  <li>绿韵家健康任务接口可调用。</li>
+</ul>
+
+<h4>4.10.5 逐步操作逻辑</h4>
+<table>
+<thead>
+<tr><th>步骤</th><th>用户操作</th><th>系统响应</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>点击「记录使用」</td><td>跳转健康任务页</td></tr>
+<tr><td>2</td><td>浏览任务列表</td><td>展示任务名称、描述、已记录人数</td></tr>
+<tr><td>3</td><td>点击任务右侧「记录」</td><td>进入该任务记录详情页或弹出记录表单</td></tr>
+<tr><td>4</td><td>点击底部「创建新的任务」</td><td>进入新建任务流程</td></tr>
+</tbody>
+</table>
+
+<h4>4.10.6 异常分支</h4>
+<table>
+<thead>
+<tr><th>异常场景</th><th>系统行为</th><th>提示文案</th></tr>
+</thead>
+<tbody>
+<tr><td>无任务</td><td>展示空态并引导创建</td><td>暂无健康任务，点击创建新的任务</td></tr>
+<tr><td>接口异常</td><td>展示重试</td><td>任务加载失败，请重试</td></tr>
+</tbody>
+</table>
+
+<h4>4.10.7 数据与接口</h4>
+<table>
+<thead>
+<tr><th>字段/接口</th><th>说明</th></tr>
+</thead>
+<tbody>
+<tr><td>健康任务列表接口</td><td>获取用户健康任务列表、统计卡片数据</td></tr>
+<tr><td>任务记录接口</td><td>提交任务完成记录</td></tr>
+<tr><td>创建任务接口</td><td>新建健康任务</td></tr>
+</tbody>
+</table>
+
+<h3>4.11 Coze工作流节点设计</h3>
+<p><span class="tag">本期新增</span><strong>涉及终端：</strong>iOS App、Android App</p>
+<h4>4.11.0 页面原型与交互示意</h4>
+<p class="warn">⚠️ 待设计 @设计：本期需输出绿韵家风格UI稿后替换此处原型图。当前参考泰小虎健康盒子（原百宝箱）/对话页交互逻辑，UI按绿韵家规范重新设计。</p>
+<h4>4.11.1 工作流拓扑</h4>
+<p>数智模块复用泰小虎工作流结构，节点改造点如下：</p>
+<ol>
+  <li><strong>输入节点</strong>：接收用户文字/语音/图片、user_id、session_id、设备信息。</li>
+  <li><strong>预处理节点</strong>：语音转文字（ASR）、图片上传至绿韵家OSS。</li>
+  <li><strong>图片识别子工作流</strong>：当用户输入包含图片时，先进入图片识别子工作流（参考 <code>txh_center_optimize-draft.yaml</code>），输出图片类型与OCR文本，供主工作流意图识别使用。</li>
+  <li><strong>意图识别节点</strong>：LLM输出意图编码，如 1001=买、1002=看、1003=省、1004=选、9999=兜底。</li>
+  <li><strong>条件分发节点</strong>：根据意图编码进入对应分支。</li>
+  <li><strong>AI帮你买分支</strong>：调用绿韵家商品搜索接口 → 知识库召回（产品FAQ） → 大模型生成回复 → 输出商品卡片。</li>
+  <li><strong>AI帮你看分支</strong>：进入对应子工作流（看舌苔/看皮肤/看面相/报告解读） → 图像识别/报告解析 → 大模型生成建议。</li>
+  <li><strong>AI帮你省分支</strong>：调用 /ai/save-money 聚合接口 → 大模型生成省钱话术 → 输出分类商品卡片。</li>
+  <li><strong>AI帮你选分支</strong>：调用猜你喜欢接口取Top3 → 大模型生成推荐理由 → 输出商品卡片。</li>
+  <li><strong>兜底分支</strong>：通用健康/生活问答，调用绿韵家企业/健康知识库。</li>
+  <li><strong>输出节点</strong>：返回文本、卡片、推荐商品列表给App。</li>
+</ol>
+
+<h4>4.11.2 图片识别子工作流节点说明</h4>
+<p>参考泰小虎 <code>txh_center_optimize-draft.yaml</code>，绿韵家图片识别子工作流设计如下：</p>
+<table>
+<thead>
+<tr><th>节点</th><th>类型</th><th>职责</th><th>输出</th></tr>
+</thead>
+<tbody>
+<tr><td>开始</td><td>start</td><td>接收 userImages、userInput</td><td>图片列表 + 用户输入</td></tr>
+<tr><td>提取用户输入的文案和图片信息</td><td>code</td><td>从 userInput 中提取 Markdown 图片与普通URL，清理文本残留逗号/空格</td><td>parseText（清洗后文本）、parseImageUrls（图片URL列表）</td></tr>
+<tr><td>判断是否有图片</td><td>condition</td><td>判断 parseImageUrls 是否为空</td><td>true/false 分支</td></tr>
+<tr><td>意图识别舌或者其他</td><td>llm</td><td>结合用户文本与图片内容，判断图片类型并改写查询</td><td>imageParseOutput：1111=舌头、2222=皮肤、3333=面部、4444=其他</td></tr>
+<tr><td>判断是否是舌头</td><td>condition</td><td>根据 imageParseOutput 分流</td><td>true（1111/2222/3333）/ false（4444）</td></tr>
+<tr><td>循环（OCR）</td><td>loop</td><td>对 4444 类图片调用 Image2text 插件逐张OCR</td><td>每张图片的识别文字</td></tr>
+<tr><td>清洗OCR内容</td><td>code</td><td>抽取 "text":"..." 内容，过滤垃圾关键词与长数字串</td><td>pureText（清洗后纯文本）</td></tr>
+<tr><td>信息整合</td><td>llm</td><td>合并用户文本与图片OCR结果，输出结构化JSON（含图片类型、关键词、候选商品、报告指标等）</td><td>结构化识别结果</td></tr>
+<tr><td>统一输出内容</td><td>code</td><td>按优先级整合 pureText、imageParseOutput、userInput，输出最终结果</td><td>result + userInput</td></tr>
+<tr><td>结束</td><td>end</td><td>返回 result、imageParseOutput、userInput</td><td>子工作流出参</td></tr>
+</tbody>
+</table>
+
+<h4>4.11.3 知识库与数据源配置</h4>
+<table>
+<thead>
+<tr><th>知识库/数据源</th><th>用途</th><th>来源</th></tr>
+</thead>
+<tbody>
+<tr><td>绿韵家产品知识库</td><td>AI帮你买、AI帮你选的商品介绍与FAQ</td><td>新建，导入绿韵家商品资料</td></tr>
+<tr><td>绿韵家企业/品牌知识库</td><td>兜底问答、品牌介绍</td><td>新建，导入绿韵家官方资料</td></tr>
+<tr><td>绿韵家商品接口</td><td>商品搜索、详情、价格</td><td>绿韵家后端</td></tr>
+<tr><td>绿韵家用户行为数据</td><td>AI帮你省降价商品、猜你喜欢Top3</td><td>绿韵家后端</td></tr>
+<tr><td>泰小虎图像识别服务</td><td>看舌苔/看皮肤/看面相/报告解读</td><td>以Coze子工作流形式复用</td></tr>
+</tbody>
+</table>
+
+
+<h4>4.11.4 四入口工作流节点与提示词详设（买 / 省 / 选）</h4>
+<p>四入口点击后均<strong>自动发送预设消息并进入对应 Coze 工作流分支</strong>。买 / 省 / 选三条分支的<strong>共性链路</strong>为：</p>
+<p><code>意图识别节点（LLM） → 商品查询代码节点（code，调用产品信息，排序取前 N 名） → 知识库召回节点（knowledge，按前 N 名商品检索知识） → 回复生成节点（LLM，结合商品数据 + 知识生成回复）</code></p>
+<p>「调用产品信息」一律以 <strong>Coze 代码节点</strong>实现，提示词只消费代码节点输出的结构化结果，不直接拼接口 / SQL。以下给出各分支的节点序列、代码节点规格与提示词。</p>
+
+<h5>4.11.4.1 公共节点：意图识别（LLM）</h5>
+<pre><code># 角色
+你是绿韵家数智模块的意图识别器。
+# 输入
+- 用户输入（文字或 ASR 改写后）：{{user_input}}
+- 图片识别结果（若有）：{{image_type}}（1111舌 / 2222皮肤 / 3333面相 / 4444报告或OCR）
+# 任务
+判断意图，仅输出以下编码之一，并输出一句改写后的问题：
+1001 买：用户想找 / 购买某商品
+1002 看：用户想做健康检测（舌 / 皮肤 / 面相 / 报告）
+1003 省：用户想找划算 / 优惠商品
+1004 选：用户想被推荐商品
+9999 兜底：其他健康 / 生活问答
+# 输出格式（严格 JSON，不要任何额外解释）
+{"intent":"1001","rewritten_query":"用户想买什么"}
+</code></pre>
+
+<h5>4.11.4.2 AI帮你买 分支节点与提示词</h5>
+<p><strong>节点序列</strong></p>
+<ol>
+  <li>意图识别节点 → intent=1001</li>
+  <li><strong>商品查询代码节点（code）</strong>：调用绿韵家商品搜索接口，按「相关度 + 销量 + 好评率 + 价格竞争力」综合排序，取前 3 名</li>
+  <li><strong>知识库召回节点（knowledge）</strong>：以前 3 名商品的 名称 / ID / 功效标签 检索「绿韵家产品知识库」</li>
+  <li><strong>回复生成节点（LLM）</strong>：结合前 3 名商品数据与知识库片段，生成产品介绍并输出卡片字段</li>
+</ol>
+
+<h6>商品查询代码节点规格（call product info）</h6>
+<table>
+<thead><tr><th>项</th><th>规格</th></tr></thead>
+<tbody>
+<tr><td>节点类型</td><td>code（Python / JS），在 Coze 中以代码节点实现</td></tr>
+<tr><td>调用接口</td><td>GET /api/goods/search（绿韵家商品搜索接口）</td></tr>
+<tr><td>入参</td><td>keyword = {{rewritten_query}}；pageSize=20；可选 categoryId</td></tr>
+<tr><td>查询返回字段（每个商品对象）</td><td>goodsId 商品ID、goodsName 商品名称、mainImage 主图、linePrice 划线价、salePrice 售卖价、categoryId 分类、brandName 品牌、sales 销量、favorableRate 好评率(0-1)、effectTags 功效标签[]、suitableCrowd 适用人群[]、avgPriceInCategory 同类均价</td></tr>
+<tr><td>排序逻辑（节点内计算综合得分）</td><td>relevanceScore 取搜索接口向量召回相关度(0-1)；salesNorm = sales / maxSales；priceCompete = (avgPriceInCategory - salePrice) / avgPriceInCategory（截断0-1）；score = 0.5*relevanceScore + 0.2*salesNorm + 0.15*favorableRate + 0.15*priceCompete</td></tr>
+<tr><td>取前 N 名</td><td>按 score 降序，取 Top 3</td></tr>
+<tr><td>输出变量</td><td>top_products：结构化数组（最多5项，含上述字段）</td></tr>
+</tbody>
+</table>
+
+<h6>知识库召回节点规格</h6>
+<table>
+<thead><tr><th>项</th><th>规格</th></tr></thead>
+<tbody>
+<tr><td>节点类型</td><td>knowledge（知识库检索）</td></tr>
+<tr><td>检索输入</td><td>top_products 中每个商品的 goodsName + goodsId + effectTags（最多 3 个）</td></tr>
+<tr><td>知识库</td><td>绿韵家产品知识库</td></tr>
+<tr><td>召回内容</td><td>各商品的产品介绍、核心功效、FAQ、适用人群、注意事项</td></tr>
+<tr><td>输出变量</td><td>kb_context：拼接的产品知识文本</td></tr>
+</tbody>
+</table>
+
+<h6>回复生成节点提示词（LLM）</h6>
+<pre><code># 角色
+你是绿韵家 AI 健康生活助手，服务于「数智」板块。
+# 任务
+结合候选商品与产品知识，用口语化、有温度的话术为用户介绍商品并给购买建议。
+# 输入
+- 用户问题：{{user_query}}
+- 候选商品（已按相关度排序，固定3个）：{{top_products}}
+- 产品知识片段：{{kb_context}}
+# 输出要求
+1. 先一句共情 / 回应（如「帮你挑了几款合适的」），再逐款介绍；
+2. 每款含：名称、一句话卖点、核心功效、适用人群、当前价格（有划线价则标注优惠）；
+3. 仅基于候选商品与产品知识作答，禁止编造不存在的功效 / 价格 / 资质；知识不足时说明「以商品详情页为准」；
+4. 涉及健康 / 服用建议，结尾加「以上建议仅供参考，具体请遵医嘱或商品说明」；
+5. 输出结构化文本，供 App 端渲染卡片，卡片字段：goodsId、goodsName、mainImage、salePrice。
+</code></pre>
+
+<h5>4.11.4.3 AI帮你省 分支节点与提示词</h5>
+<p><strong>节点序列</strong></p>
+<ol>
+  <li>意图识别节点 → intent=1003</li>
+  <li><strong>省钱聚合代码节点（code）</strong>：调用 /ai/save-money 聚合接口，返回三类商品（折扣最大 / 价格最低 / 近7天降价）</li>
+  <li>知识库召回节点：按三类商品检索产品知识</li>
+  <li>回复生成节点（LLM）</li>
+</ol>
+<h6>省钱聚合代码节点规格（call product info）</h6>
+<table>
+<thead><tr><th>项</th><th>规格</th></tr></thead>
+<tbody>
+<tr><td>节点类型</td><td>code（Python / JS）</td></tr>
+<tr><td>调用接口</td><td>POST /ai/save-money（后端聚合接口）</td></tr>
+<tr><td>入参</td><td>userId；days=7（近7天降价窗口）</td></tr>
+<tr><td>查询字段 / 计算口径</td><td>discount_max：按 (linePrice - salePrice) 降序取最大；price_min：按 salePrice 升序取最小；price_drop：近7天有 买 / 浏览 / 加购 行为且 salePrice &lt; 历史价 的商品</td></tr>
+<tr><td>取前 N 名</td><td>每类取 Top 1，共 3 个商品</td></tr>
+<tr><td>输出变量</td><td>save_products：含 discount_max / price_min / price_drop 三类结构化商品</td></tr>
+</tbody>
+</table>
+<h6>回复生成节点提示词（LLM）</h6>
+<pre><code># 角色
+你是绿韵家 AI 健康生活助手。
+# 任务
+基于下方「省钱商品」为用户总结今日划算清单。
+# 输入
+- 用户问题：{{user_query}}
+- 省钱商品（三类）：折扣最大 {{discount_max}}、价格最低 {{price_min}}、近7天降价 {{price_drop}}
+# 输出要求
+1. 用一句总结开头（如「今天有这几款特别划算」）；
+2. 按「折扣最大 → 价格最低 → 降价商品」三段展示，每段点明省钱点（省了多少 / 降了多少）；
+3. 价格与优惠以接口数据为准，不臆造；
+4. 结尾提示「价格随活动变动，以商品详情页为准」；
+5. 输出结构化文本，供 App 端分段渲染商品卡片。
+</code></pre>
+
+<h5>4.11.4.4 AI帮你选 分支节点与提示词</h5>
+<p><strong>节点序列</strong></p>
+<ol>
+  <li>意图识别节点 → intent=1004</li>
+  <li><strong>推荐代码节点（code）</strong>：调用猜你喜欢接口，取 Top 3（复用首页统一打分模型，本期不支持用户偏好输入）</li>
+  <li>知识库召回节点：按 Top 3 商品检索产品知识</li>
+  <li>回复生成节点（LLM）</li>
+</ol>
+<h6>推荐代码节点规格（call product info）</h6>
+<table>
+<thead><tr><th>项</th><th>规格</th></tr></thead>
+<tbody>
+<tr><td>节点类型</td><td>code（Python / JS）</td></tr>
+<tr><td>调用接口</td><td>GET /api/recommend/guess-you-like（猜你喜欢，复用首页统一打分模型）</td></tr>
+<tr><td>入参</td><td>userId；topN=3</td></tr>
+<tr><td>查询返回字段</td><td>同 4.11.4.2 商品对象（goodsId / goodsName / mainImage / linePrice / salePrice / effectTags / suitableCrowd 等）</td></tr>
+<tr><td>取前 N 名</td><td>按推荐模型得分降序，取 Top 3</td></tr>
+<tr><td>输出变量</td><td>pick_products：结构化数组（3项）</td></tr>
+</tbody>
+</table>
+<h6>回复生成节点提示词（LLM）</h6>
+<pre><code># 角色
+你是绿韵家 AI 健康生活助手。
+# 任务
+基于首页「猜你喜欢」Top3 商品，为用户做个性化推荐并说明理由。
+# 输入
+- 用户问题：{{user_query}}
+- 推荐商品（Top3）：{{pick_products}}
+- 产品知识片段：{{kb_context}}
+# 输出要求
+1. 用一句「根据你的偏好，挑了3款」开头；
+2. 每款给推荐理由（结合功效 / 适用场景），不要堆砌参数；
+3. 仅基于给定商品与知识作答；
+4. 结尾引导「点开看看，不合适我再帮你换」；
+5. 输出结构化文本，供 App 端渲染卡片。
+</code></pre>
+
+<h4>4.11.5 节点与提示词落地约定</h4>
+<ul>
+  <li>「调用产品信息」一律以 Coze <strong>代码节点</strong>实现，提示词只消费代码节点输出的结构化结果，不直接拼接口 / SQL。</li>
+  <li>查询字段与排序权重以本 PRD 4.11.4 为准；研发落地如需调整权重须产品确认。</li>
+  <li>知识库召回必须在「取前 N 名」<strong>之后</strong>进行，避免对全量商品做无谓检索。</li>
+  <li>所有面向用户的健康 / 服用建议类回复须在结尾附「以上建议仅供参考，具体请遵医嘱或商品说明」（见各节点提示词第4条）。</li>
+  <li>代码节点输出的字段名（goodsId / goodsName / salePrice 等）须与 App 端卡片渲染字段一致，由前后端联调对齐。</li>
+</ul>
+
+<h2 id="s5">五、非功能性需求</h2>
+<h3>5.1 埋点需求</h3>
+<p>本需求埋点事件与属性严格遵循《泰小虎埋点规范 v2.3》。在线查阅：<a href="https://ddyuan-spec.github.io/taixiaohu/taixiaohu-tracking-spec.html">泰小虎埋点规范 v2.3</a>。</p>
+
+<h3>5.1.1 本期涉及事件清单</h3>
+<table>
+<thead>
+<tr><th>事件英文名</th><th>事件显示名</th><th>所属层</th><th>平台</th><th>触发时机</th><th>必含上报参数（友盟中文名）</th><th>备注</th></tr>
+</thead>
+<tbody>
+<tr><td>page_view</td><td>页面浏览</td><td>L1</td><td>Android/iOS</td><td>数智首页（一级页）、健康盒子首页等页面加载完成</td><td>页面名称、页面路径、来源页面、停留时长</td><td>page_name新增「lvyun_ai_chat」「lvyun_health_box」「lvyun_health_task」</td></tr>
+<tr><td>tab_switch</td><td>Tab切换</td><td>L1</td><td>Android/iOS</td><td>点击底部「数智」Tab切换</td><td>来源Tab、目标Tab</td><td>—</td></tr>
+<tr><td>button_click</td><td>按钮点击</td><td>L1</td><td>Android/iOS</td><td>点击四入口、AI帮你看子功能、健康盒子入口、底部输入按钮</td><td>页面名称、按钮名称、按钮类型</td><td>button_name建议枚举：ai_buy/ai_look/ai_save/ai_pick/tongue/skin/face/report/health_box/voice/camera</td></tr>
+<tr><td>dialogue_send</td><td>发起AI对话</td><td>L2</td><td>Android/iOS</td><td>用户在数智页发送消息</td><td>对话ID、消息ID、消息类型、是否首条消息、帮助类型、快捷问题ID、触发类型</td><td>help_type枚举：buy/look/save/pick/other</td></tr>
+<tr><td>scan_entry</td><td>智能识别入口</td><td>L1</td><td>Android/iOS</td><td>点击看舌苔/看皮肤/看面相/报告解读或相机按钮</td><td>信息ID、入口来源、识别类型</td><td>scan_type：tongue/skin/face/report/photo_msg</td></tr>
+<tr><td>scan_complete</td><td>完成图片识别</td><td>L2</td><td>Android/iOS</td><td>识别流程终态：成功/失败/超时/取消</td><td>识别任务ID、识别类型、识别结果、结果数量、识别耗时、错误码、失败阶段</td><td>—</td></tr>
+<tr><td>recommend_view</td><td>推荐结果曝光</td><td>L2</td><td>Android/iOS</td><td>AI买/省/选结果中的商品卡片曝光</td><td>推荐批次ID、推荐来源、对话ID、推荐产品数、产品ID列表</td><td>recommend_source：dialogue_ai_buy/dialogue_ai_save/dialogue_ai_pick</td></tr>
+<tr><td>purchase_link_click</td><td>点击查看商品</td><td>L3</td><td>Android/iOS</td><td>点击商品卡片「查看」</td><td>消息ID、来源、产品ID、产品名称、购买渠道、推荐批次ID、会话ID</td><td>source：dialogue_recommend</td></tr>
+<tr><td>feedback_click</td><td>点击对话反馈</td><td>L2</td><td>Android/iOS</td><td>用户点击AI回复反馈按钮</td><td>对话ID、消息ID、反馈类型、反馈动作</td><td>—</td></tr>
+<tr><td>popup_view</td><td>弹窗曝光</td><td>L1</td><td>Android/iOS</td><td>健康盒子首次引导弹窗展示</td><td>弹窗实例ID、弹窗名称、弹窗类型、触发来源</td><td>popup_name：health_box_guide</td></tr>
+<tr><td>popup_close</td><td>弹窗关闭</td><td>L1</td><td>Android/iOS</td><td>健康盒子引导弹窗关闭</td><td>弹窗实例ID、弹窗名称、关闭方式、停留时长、用户选择</td><td>—</td></tr>
+</tbody>
+</table>
+
+<h3>5.1.2 新增字段确认</h3>
+<p>以下字段已纳入本期埋点设计，需与数据/研发同步落表：</p>
+<ul>
+  <li>page_name新增枚举值：lvyun_ai_chat（数智首页/一级页）、lvyun_health_box（健康盒子首页）、lvyun_add_item（新增物品页）、lvyun_add_plan（添加使用计划页）、lvyun_health_task（健康任务页）。</li>
+  <li>help_type新增枚举值：buy/look/save/pick/other。</li>
+  <li>scan_type新增枚举值：tongue/skin/face/report/photo_msg。</li>
+  <li>recommend_source新增枚举值：dialogue_ai_buy/dialogue_ai_save/dialogue_ai_pick。</li>
+</ul>
+
+<h3>5.2 非功能性需求</h3>
+<h4>5.2.1 性能需求</h4>
+<table>
+<thead>
+<tr><th>指标</th><th>要求</th></tr>
+</thead>
+<tbody>
+<tr><td>数智页首屏加载</td><td>≤1.5s（正常网络）</td></tr>
+<tr><td>AI首条回复</td><td>≤3s（文字输入，正常网络）</td></tr>
+<tr><td>图片识别响应</td><td>≤5s（不含上传时间）</td></tr>
+<tr><td>商品卡片加载</td><td>≤1s</td></tr>
+</tbody>
+</table>
+
+<h4>5.2.2 安全与隐私</h4>
+<ul>
+  <li>用户上传的体检报告、舌苔/皮肤/面相图片需加密传输与存储。</li>
+  <li>健康档案与识别结果仅对本人可见。</li>
+  <li>AI生成的健康建议需标注「仅供参考，不构成医疗诊断」。</li>
+</ul>
+
+<h4>5.2.3 兼容性</h4>
+<ul>
+  <li>支持Android 8.0及以上、iOS 12及以上。</li>
+  <li>适配全面屏、刘海屏、底部安全区。</li>
+</ul>
+
+<h2 id="s6">六、验收标准</h2>
+<h3>6.1 功能验收标准</h3>
+<table>
+<thead>
+<tr><th>验收项</th><th>验收标准</th><th>验收方式</th></tr>
+</thead>
+<tbody>
+<tr><td>数智Tab入口</td><td>登录用户点击底部「数智」Tab，正常进入数智首页（一级页）；未登录用户跳转登录页</td><td>功能测试</td></tr>
+<tr><td>四入口对话触发</td><td>点击AI帮你买/看/省/选，对话流中自动发送对应预设消息并进入正确分支</td><td>功能测试</td></tr>
+<tr><td>AI帮你买</td><td>输入商品需求后，返回商品卡片；无匹配时返回兜底话术</td><td>功能测试</td></tr>
+<tr><td>AI帮你省</td><td>返回折扣最大、价格最低、近7天降价商品三类数据，卡片可点击跳转详情</td><td>功能测试</td></tr>
+<tr><td>AI帮你选</td><td>返回猜你喜欢Top3商品，并附AI推荐理由</td><td>功能测试</td></tr>
+<tr><td>AI帮你看</td><td>看舌苔/皮肤/面相/报告解读子流程可正常上传图片并返回识别结果</td><td>功能测试</td></tr>
+<tr><td>健康盒子</td><td>首次进入展示引导弹窗（按用户ID去重）；物品管理与使用计划可正常新增、编辑、删除</td><td>功能测试</td></tr>
+<tr><td>记录使用</td><td>点击健康盒子「记录使用」入口，正确跳转健康任务页</td><td>功能测试</td></tr>
+<tr><td>语音输入</td><td>按住说话松手后，识别文字写入输入框，用户点击发送后进入工作流</td><td>功能测试</td></tr>
+<tr><td>相机拍照</td><td>拍照后作为图片消息发送，工作流自动识别图片类型</td><td>功能测试</td></tr>
+<tr><td>埋点上报</td><td>本期清单中所有事件按规范触发，参数完整准确</td><td>埋点测试</td></tr>
+</tbody>
+</table>
+
+<h3>6.2 性能验收标准</h3>
+<table>
+<thead>
+<tr><th>指标</th><th>标准</th><th>验收方式</th></tr>
+</thead>
+<tbody>
+<tr><td>数智页首屏加载</td><td>正常网络≤1.5s，弱网≤3s</td><td>性能测试</td></tr>
+<tr><td>AI首条文字回复</td><td>正常网络≤3s</td><td>性能测试</td></tr>
+<tr><td>图片识别响应</td><td>不含上传≤5s</td><td>性能测试</td></tr>
+</tbody>
+</table>
+
+<h3>6.3 兼容性验收标准</h3>
+<table>
+<thead>
+<tr><th>验收项</th><th>标准</th><th>验收方式</th></tr>
+</thead>
+<tbody>
+<tr><td>Android</td><td>Android 8.0及以上机型正常展示与交互</td><td>兼容性测试</td></tr>
+<tr><td>iOS</td><td>iOS 12及以上机型正常展示与交互</td><td>兼容性测试</td></tr>
+<tr><td>全面屏适配</td><td>刘海屏、底部安全区、异形屏无遮挡</td><td>UI走查</td></tr>
+</tbody>
+</table>
+
+<h2 id="s7">七、关键边界设计检查清单</h2>
+<h3>7.1 登录态边界</h3>
+<table>
+<thead>
+<tr><th>场景</th><th>边界处理</th></tr>
+</thead>
+<tbody>
+<tr><td>未登录点击数智Tab</td><td>跳转登录页，登录成功后返回数智页</td></tr>
+<tr><td>登录态失效</td><td>在数智页内调用接口时失效，统一走App登录态失效处理（如刷新token或跳转登录）</td></tr>
+</tbody>
+</table>
+
+<h3>7.2 网络边界</h3>
+<table>
+<thead>
+<tr><th>场景</th><th>边界处理</th></tr>
+</thead>
+<tbody>
+<tr><td>网络断开</td><td>展示缺省页或Toast：网络异常，请检查网络后重试</td></tr>
+<tr><td>弱网</td><td>接口超时时间合理设置，展示loading与重试按钮</td></tr>
+<tr><td>上传大图片</td><td>压缩后上传，单张≤5MB；超限时提示用户</td></tr>
+</tbody>
+</table>
+
+<h3>7.3 数据边界</h3>
+<table>
+<thead>
+<tr><th>场景</th><th>边界处理</th></tr>
+</thead>
+<tbody>
+<tr><td>商品接口无数据</td><td>返回兜底话术，不展示空白卡片</td></tr>
+<tr><td>用户无近7天行为数据（省/选）</td><td>「省」仅返回全站折扣最大与价格最低；「选」返回热门商品兜底</td></tr>
+<tr><td>识别图片模糊</td><td>提示重新拍摄，不返回无意义结果</td></tr>
+<tr><td>健康盒子无物品</td><td>展示空态并引导新增</td></tr>
+</tbody>
+</table>
+
+<h3>7.4 AI兜底边界</h3>
+<table>
+<thead>
+<tr><th>场景</th><th>边界处理</th></tr>
+</thead>
+<tbody>
+<tr><td>意图识别失败</td><td>进入兜底分支，友好回复并引导用户描述需求</td></tr>
+<tr><td>大模型生成超时</td><td>展示重试按钮，不卡死页面</td></tr>
+<tr><td>健康建议输出</td><td>必须标注「仅供参考，不构成医疗诊断」</td></tr>
+</tbody>
+</table>
+
+<h2 id="s8">八、文档维护与变更规范</h2>
+<h3>8.1 变更流程</h3>
+<p>本PRD进入开发后，任何对功能范围、接口定义、数据口径、埋点字段的变更，须经产品负责人确认并更新修订记录。涉及本期范围外的新增功能，须单独立项评审。</p>
+<h3>8.2 版本管理</h3>
+<p>文档版本号采用 Vx.y 格式：x 为重大版本（对应里程碑迭代），y 为修订次数。每次变更须同步更新「一、修订记录」。</p>
+<h3>8.3 审批人与分发范围</h3>
+<table>
+<thead>
+<tr><th>角色</th><th>职责</th></tr>
+</thead>
+<tbody>
+<tr><td>产品负责人</td><td>需求确认、范围把控、PRD定稿</td></tr>
+<tr><td>研发负责人</td><td>技术方案评审、接口设计</td></tr>
+<tr><td>数据/埋点负责人</td><td>埋点事件与属性确认</td></tr>
+<tr><td>测试负责人</td><td>验收标准评审、用例设计</td></tr>
+</tbody>
+</table>
+<h3>8.4 附录</h3>
+<h4>8.4.1 四入口预设发送消息</h4>
+<table>
+<thead>
+<tr><th>入口</th><th>预设消息</th></tr>
+</thead>
+<tbody>
+<tr><td>AI帮你买</td><td>我想买，帮我推荐一下</td></tr>
+<tr><td>AI帮你看（主入口）</td><td>不发送预设问题，直接展开子功能区</td></tr>
+<tr><td>AI帮你看-看舌苔</td><td>帮我看看舌苔</td></tr>
+<tr><td>AI帮你看-看皮肤</td><td>帮我看看皮肤</td></tr>
+<tr><td>AI帮你看-看面相</td><td>帮我看看面相</td></tr>
+<tr><td>AI帮你看-报告解读</td><td>帮我解读这份报告</td></tr>
+<tr><td>AI帮你省</td><td>帮我看看今天有什么划算的商品</td></tr>
+<tr><td>AI帮你选</td><td>帮我选几款适合我的商品</td></tr>
+</tbody>
+</table>
+
+<h4>8.4.2 意图编码对照表</h4>
+<table>
+<thead>
+<tr><th>意图编码</th><th>含义</th><th>触发条件</th></tr>
+</thead>
+<tbody>
+<tr><td>1001</td><td>AI帮你买</td><td>用户表达购买意向、点击AI帮你买入口</td></tr>
+<tr><td>1002</td><td>AI帮你看</td><td>用户点击看舌苔/皮肤/面相/报告解读、发送图片请求识别</td></tr>
+<tr><td>1003</td><td>AI帮你省</td><td>用户表达省钱/划算/降价意向、点击AI帮你省入口</td></tr>
+<tr><td>1004</td><td>AI帮你选</td><td>用户表达推荐/选择意向、点击AI帮你选入口</td></tr>
+<tr><td>9999</td><td>兜底问答</td><td>未命中以上意图</td></tr>
+</tbody>
+</table>
+
+<h4>8.4.3 图片类型编码对照表</h4>
+<table>
+<thead>
+<tr><th>图片类型编码</th><th>含义</th><th>后续处理</th></tr>
+</thead>
+<tbody>
+<tr><td>1111</td><td>舌头/舌象</td><td>进入看舌苔子工作流</td></tr>
+<tr><td>2222</td><td>皮肤</td><td>进入看皮肤子工作流</td></tr>
+<tr><td>3333</td><td>面部/面相</td><td>进入看面相子工作流</td></tr>
+<tr><td>4444</td><td>其他/OCR</td><td>先OCR提取文字，再进入报告解读或兜底处理</td></tr>
+</tbody>
+</table>
+
+<h3>8.5 参考文档</h3>
+<ul>
+  <li>泰小虎埋点规范 v2.3：<a href="https://ddyuan-spec.github.io/taixiaohu/taixiaohu-tracking-spec.html">在线查阅</a></li>
+  <li>泰小虎Coze主工作流示例：C:\Users\13364\WorkBuddy\绿韵家app\_zip_tmp\Chatflow-txh_app_conversation_center-draft-9856</li>
+  <li>泰小虎Coze图片识别优化子工作流：C:\Users\13364\WorkBuddy\绿韵家app\_zip_tmp2\Workflow-txh_center_optimize-draft-5110</li>
+  <li>绿韵家首页PRD（猜你喜欢）：C:\Users\13364\WorkBuddy\绿韵家app\lvyunjia-home-prd.html</li>
+  <li>绿韵家数商服务PRD：C:\Users\13364\WorkBuddy\绿韵家app\lvyunjia-shushang-prd.html</li>
+</ul>
+
+<h2 id="s9">九、待确认项汇总</h2>
+<h3>9.1 待确认项</h3>
+<table>
+<thead>
+<tr><th>序号</th><th>待确认内容</th><th>影响范围</th><th>建议负责人</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>绿韵家商品详情H5跳转参数（product_id、sku_id、来源等）</td><td>商品卡片点击</td><td>研发</td></tr>
+<tr><td>2</td><td>泰小虎图像识别子工作流与绿韵家主工作流的接入授权及调用方式（是否需要跨空间/跨账号）</td><td>AI帮你看实现</td><td>研发/商务</td></tr>
+<tr><td>3</td><td>健康任务页是否复用泰小虎现有页面，还是绿韵家自建；若复用，接口字段如何映射</td><td>记录使用入口</td><td>产品/研发</td></tr>
+</tbody>
+</table>
+
+<h3>9.2 风险</h3>
+<table>
+<thead>
+<tr><th>风险</th><th>等级</th><th>应对措施</th></tr>
+</thead>
+<tbody>
+<tr><td>泰小虎工作流与绿韵家接口字段不一致，导致复用成本高于预期</td><td>中</td><td>前期做字段映射表，优先改造买/省/选分支，看分支复用子工作流</td></tr>
+<tr><td>绿韵家商品数据不足，AI买/选推荐效果差</td><td>中</td><td>上线前补充产品知识库，设置兜底话术与热门商品兜底</td></tr>
+<tr><td>健康盒子与绿韵家已有健康任务/计划模块重复</td><td>低</td><td>明确健康盒子定位：家庭健康用品资产管理；与已有模块做入口互通</td></tr>
+</tbody>
+</table>
+
+</body>
+</html>
