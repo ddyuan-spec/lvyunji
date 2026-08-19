@@ -1,216 +1,1008 @@
 {
-  "_meta": {
-    "product": "绿韵家 App · AI 创作（AI 生图 / AI 生视频）",
-    "backend": "Coze（扣子）工作流",
-    "version": "V1.0",
-    "generated_at": "2026-08-19",
-    "source_prd": "lvyunjia-ai-generation-prd.html（§十 附录：Coze 工作流设计）",
-    "import_note": "本文件为与 PRD 节点设计一一对应的 Coze 工作流结构配置，可直接导入 Coze 平台做二次调整；节点 id / position 为示意值，导入后可在画布微调。插件节点 plugin_id 为占位，请按 Coze 平台实际「图像生成 / 视频生成 / 语音转写」插件替换。",
-    "model_defaults": {
-      "image": ["Qwen-Image 3.0", "Wan-Image 1.0", "Coze 默认生图"],
-      "video": ["HappyHorse 1.0/1.1", "Wan 2.6/2.7/3.0"],
-      "llm_for_prompt": "Coze 默认大模型（如 Doubao-pro / 通义千问）"
-    },
-    "quota_rule": "前端生成前校验额度：高清免费、超清 +1 额度、视频时长 15 秒 +1 额度；不足拦截弹窗。Coze 侧不扣额度，仅执行生成。"
+  "schema_version": "1.0.0",
+  "name": "绿韵家AI创作",
+  "description": "基于泰小虎图片识别工作流(txh_center_optimize)范式重设计：主工作流编排 + 4子工作流 + 记忆库。",
+  "main": {
+    "id": "100000",
+    "name": "ai_create_orchestrator",
+    "nodes": [
+      {
+        "id": "100001",
+        "type": "start",
+        "title": "开始",
+        "parameters": {
+          "purpose": "接收前端下发意图与全部参数",
+          "node_outputs": {
+            "intent": "生成图片/生成视频/做同款",
+            "user_text": "文本",
+            "selected_tags": "[]",
+            "voice_text": "?",
+            "reference_images": "[]",
+            "model": "",
+            "ratio": "",
+            "clarity": "",
+            "duration": ""
+          }
+        }
+      },
+      {
+        "id": "100002",
+        "type": "code",
+        "title": "输入归一化",
+        "parameters": {
+          "purpose": "复用泰小虎图片识别范式：标签→结构化描述、参考图URL抽取、语音文本归一化",
+          "memory": {
+            "action": "write",
+            "key": "session:{conv_id}",
+            "content": "本次会话上下文"
+          },
+          "settingOnError": {
+            "processType": 1,
+            "retryTimes": 0,
+            "timeoutMs": 30000
+          },
+          "node_inputs": [
+            "user_text",
+            "selected_tags",
+            "voice_text",
+            "reference_images"
+          ],
+          "node_outputs": {
+            "normalized_input": "结构化输入"
+          }
+        }
+      },
+      {
+        "id": "100003",
+        "type": "llm",
+        "title": "意图与场景识别",
+        "parameters": {
+          "purpose": "复用泰小虎意图识别范式：判断 生图/生视频/做同款，提取风格/比例/时长，强制JSON",
+          "settingOnError": {
+            "processType": 1,
+            "retryTimes": 1,
+            "timeoutMs": 180000
+          },
+          "node_inputs": [
+            "normalized_input"
+          ],
+          "node_outputs": {
+            "scene_type": "image|video|same",
+            "structured_params": "{}",
+            "rewritten_query": ""
+          }
+        }
+      },
+      {
+        "id": "100004",
+        "type": "condition",
+        "title": "是否需提示词增强",
+        "parameters": {
+          "purpose": "用户已填完整prompt则跳过子工作流A",
+          "node_inputs": [
+            "scene_type",
+            "prompt"
+          ]
+        }
+      },
+      {
+        "id": "100005",
+        "type": "sub_workflow",
+        "title": "子工作流A·提示词增强",
+        "parameters": {
+          "purpose": "调用 prompt_enhance，返回 enhanced_prompt",
+          "memory": {
+            "action": "read_write",
+            "key": "user_style:{user_id}",
+            "read_for": "默认填充辅助生图",
+            "write_from": "扩写后累积画像"
+          },
+          "node_inputs": [
+            "normalized_input",
+            "scene_type"
+          ],
+          "node_outputs": {
+            "enhanced_prompt": ""
+          }
+        }
+      },
+      {
+        "id": "100006",
+        "type": "condition",
+        "title": "生成类型路由",
+        "parameters": {
+          "purpose": "按 scene_type 路由到图片/视频子工作流",
+          "node_inputs": [
+            "scene_type"
+          ]
+        }
+      },
+      {
+        "id": "100007",
+        "type": "sub_workflow",
+        "title": "子工作流B·图片生成",
+        "parameters": {
+          "purpose": "调用 image_generate，返回 image_result",
+          "memory": {
+            "action": "read_write",
+            "key": "额度账户(业务库)",
+            "note": "读额度校验、写扣减"
+          },
+          "node_inputs": [
+            "enhanced_prompt",
+            "model",
+            "ratio"
+          ],
+          "node_outputs": {
+            "image_result": ""
+          }
+        }
+      },
+      {
+        "id": "100008",
+        "type": "sub_workflow",
+        "title": "子工作流C·视频生成",
+        "parameters": {
+          "purpose": "调用 video_generate，返回 video_result",
+          "memory": {
+            "action": "read_write",
+            "key": "额度账户(业务库)"
+          },
+          "node_inputs": [
+            "enhanced_prompt",
+            "model",
+            "clarity",
+            "duration"
+          ],
+          "node_outputs": {
+            "video_result": ""
+          }
+        }
+      },
+      {
+        "id": "100009",
+        "type": "sub_workflow",
+        "title": "子工作流D·作品后处理",
+        "parameters": {
+          "purpose": "调用 post_process，返回 work_record",
+          "memory": {
+            "action": "write",
+            "key": "user_prompt_tpl:{user_id} / user_gen_stat:{user_id}",
+            "write_when": "成功生成后"
+          },
+          "node_inputs": [
+            "gen_result",
+            "user_id"
+          ],
+          "node_outputs": {
+            "work_record": ""
+          }
+        }
+      },
+      {
+        "id": "100010",
+        "type": "memory_write",
+        "title": "写用户记忆",
+        "parameters": {
+          "purpose": "把本次成功生成的风格偏好/提示词模板写入长期记忆（累积画像）",
+          "memory": {
+            "action": "write",
+            "key": "user_style:{user_id}, user_prompt_tpl:{user_id}, user_gen_stat:{user_id}"
+          },
+          "settingOnError": {
+            "processType": 1,
+            "retryTimes": 1,
+            "timeoutMs": 10000
+          },
+          "node_inputs": [
+            "work_record"
+          ],
+          "node_outputs": {
+            "mem_ok": "true"
+          }
+        }
+      },
+      {
+        "id": "100011",
+        "type": "variable_merge",
+        "title": "变量聚合",
+        "parameters": {
+          "purpose": "聚合各子工作流产物",
+          "node_inputs": [
+            "各分支输出"
+          ],
+          "node_outputs": {
+            "merged": ""
+          }
+        }
+      },
+      {
+        "id": "100012",
+        "type": "end",
+        "title": "结束",
+        "parameters": {
+          "purpose": "返回最终结果与各中间产物",
+          "node_inputs": [
+            "merged"
+          ],
+          "node_outputs": {
+            "result": ""
+          }
+        }
+      }
+    ],
+    "edges": [
+      {
+        "source_node": "100001",
+        "target_node": "100002"
+      },
+      {
+        "source_node": "100002",
+        "target_node": "100003"
+      },
+      {
+        "source_node": "100003",
+        "target_node": "100004"
+      },
+      {
+        "source_node": "100004",
+        "target_node": "100005",
+        "source_port": "true"
+      },
+      {
+        "source_node": "100004",
+        "target_node": "100006",
+        "source_port": "false"
+      },
+      {
+        "source_node": "100005",
+        "target_node": "100006"
+      },
+      {
+        "source_node": "100006",
+        "target_node": "100007",
+        "source_port": "image"
+      },
+      {
+        "source_node": "100006",
+        "target_node": "100008",
+        "source_port": "video"
+      },
+      {
+        "source_node": "100007",
+        "target_node": "100009"
+      },
+      {
+        "source_node": "100008",
+        "target_node": "100009"
+      },
+      {
+        "source_node": "100009",
+        "target_node": "100010"
+      },
+      {
+        "source_node": "100010",
+        "target_node": "100011"
+      },
+      {
+        "source_node": "100011",
+        "target_node": "100012"
+      }
+    ]
   },
-
-  "workflows": [
+  "sub": [
     {
-      "id": "wf_prompt_expand",
-      "name": "提示词扩写",
-      "description": "接收用户自由输入 + 已选标签，拼接标签为模型友好描述并 LLM 补全画面细节，输出结构化提示词。",
-      "parameters": {
-        "input": [
-          {"name": "user_prompt", "type": "String", "required": false, "desc": "用户自由输入的原始意图（可空）"},
-          {"name": "tags", "type": "Array<String>", "required": true, "desc": "前端传来的标签数组，如 [\"国风\",\"唯美\",\"产品图\"]"}
-        ],
-        "output": [
-          {"name": "optimized_prompt", "type": "String", "desc": "扩写后的完整提示词"},
-          {"name": "structured", "type": "Object", "desc": "拆解后的 主体/场景/风格/光线/构图 字段"}
-        ]
-      },
+      "id": "200000",
+      "name": "prompt_enhance",
       "nodes": [
-        {"id": "n_start", "type": "start", "position": {"x": 80, "y": 200},
-         "data": {"inputs": [
-           {"name": "user_prompt", "type": "String"},
-           {"name": "tags", "type": "Array<String>"}
-         ]}},
-        {"id": "n_concat", "type": "variable_assign", "position": {"x": 320, "y": 200},
-         "data": {"assigns": [
-           {"var": "combined_prompt", "value": "{{user_prompt}} 风格标签：{{tags}}"}
-         ]}},
-        {"id": "n_llm", "type": "llm", "position": {"x": 560, "y": 200},
-         "data": {
-           "model": "{{llm_for_prompt}}",
-           "prompt": "【标签转提示词模板】\n用户输入：{{user_prompt}}\n已选标签：{{tags}}\n\n请根据用户输入和标签，生成一段适合图像/视频生成的提示词。要求：\n1. 保留用户原始意图；\n2. 将标签扩展为具体画面元素（风格、场景、光线、构图、镜头运动等）；\n3. 输出一段连贯的中文提示词，必要时补充英文专业术语；\n4. 不要添加用户未提及的人物敏感特征。\n\n输出格式：\n- 主体：...\n- 场景：...\n- 风格：...\n- 光线/氛围：...\n- 构图/镜头：...\n- 完整提示词：...",
-           "output_var": "optimized_prompt"
-         }},
-        {"id": "n_end", "type": "end", "position": {"x": 820, "y": 200},
-         "data": {"outputs": [
-           {"name": "optimized_prompt", "value": "{{optimized_prompt}}"}
-         ]}}
+        {
+          "id": "200001",
+          "type": "start",
+          "title": "开始",
+          "parameters": {
+            "purpose": "接收归一化输入与场景类型",
+            "node_outputs": {
+              "normalized_input": "",
+              "scene_type": ""
+            }
+          }
+        },
+        {
+          "id": "200002",
+          "type": "code",
+          "title": "标签规范化",
+          "parameters": {
+            "purpose": "复用泰小虎提取用户输入范式：标签→模型友好描述",
+            "settingOnError": {
+              "processType": 1,
+              "retryTimes": 0,
+              "timeoutMs": 30000
+            },
+            "node_inputs": [
+              "tags"
+            ],
+            "node_outputs": {
+              "tag_desc": ""
+            }
+          }
+        },
+        {
+          "id": "200003",
+          "type": "llm",
+          "title": "语音转提示词(条件)",
+          "parameters": {
+            "purpose": "voice_text存在时LLM转写补全画面细节",
+            "settingOnError": {
+              "processType": 1,
+              "retryTimes": 1,
+              "timeoutMs": 120000
+            },
+            "node_inputs": [
+              "voice_text"
+            ],
+            "node_outputs": {
+              "voice_prompt": ""
+            }
+          }
+        },
+        {
+          "id": "200004",
+          "type": "llm",
+          "title": "提示词扩写",
+          "parameters": {
+            "purpose": "复用泰小虎信息整合范式：补全风格/光线/构图，参考用户风格画像，强制JSON",
+            "memory": {
+              "action": "read",
+              "key": "user_style:{user_id}",
+              "read_for": "默认填充辅助生图"
+            },
+            "settingOnError": {
+              "processType": 1,
+              "retryTimes": 1,
+              "timeoutMs": 180000
+            },
+            "node_inputs": [
+              "user_text",
+              "tag_desc",
+              "voice_prompt"
+            ],
+            "node_outputs": {
+              "final_prompt": "JSON"
+            }
+          }
+        },
+        {
+          "id": "200005",
+          "type": "code",
+          "title": "敏感词合规校验",
+          "parameters": {
+            "purpose": "复用泰小虎清洗OCR内容范式：黑名单+正则过滤，命中降级替换",
+            "settingOnError": {
+              "processType": 1,
+              "retryTimes": 0,
+              "timeoutMs": 30000
+            },
+            "node_inputs": [
+              "final_prompt"
+            ],
+            "node_outputs": {
+              "safe_prompt": "",
+              "blocked": "bool"
+            }
+          }
+        },
+        {
+          "id": "200006",
+          "type": "end",
+          "title": "结束",
+          "parameters": {
+            "purpose": "返回增强后提示词",
+            "node_inputs": [
+              "safe_prompt"
+            ],
+            "node_outputs": {
+              "enhanced_prompt": ""
+            }
+          }
+        }
       ],
       "edges": [
-        {"source": "n_start", "target": "n_concat"},
-        {"source": "n_concat", "target": "n_llm"},
-        {"source": "n_llm", "target": "n_end"}
+        {
+          "source_node": "200001",
+          "target_node": "200002"
+        },
+        {
+          "source_node": "200002",
+          "target_node": "200003"
+        },
+        {
+          "source_node": "200003",
+          "target_node": "200004"
+        },
+        {
+          "source_node": "200004",
+          "target_node": "200005"
+        },
+        {
+          "source_node": "200005",
+          "target_node": "200006"
+        }
       ]
     },
-
     {
-      "id": "wf_voice_to_prompt",
-      "name": "语音转提示词",
-      "description": "接收前端语音转写文本（ASR 结果），走与「提示词扩写」相同的标签拼接 + LLM 补全逻辑，输出结构化提示词。",
-      "parameters": {
-        "input": [
-          {"name": "asr_text", "type": "String", "required": true, "desc": "前端录音经语音识别后的文本"},
-          {"name": "tags", "type": "Array<String>", "required": true, "desc": "前端已选标签"}
-        ],
-        "output": [
-          {"name": "optimized_prompt", "type": "String", "desc": "转写并扩写后的提示词"}
-        ]
-      },
+      "id": "300000",
+      "name": "image_generate",
       "nodes": [
-        {"id": "n_start", "type": "start", "position": {"x": 80, "y": 200},
-         "data": {"inputs": [
-           {"name": "asr_text", "type": "String"},
-           {"name": "tags", "type": "Array<String>"}
-         ]}},
-        {"id": "n_concat", "type": "variable_assign", "position": {"x": 320, "y": 200},
-         "data": {"assigns": [
-           {"var": "combined_prompt", "value": "{{asr_text}} 风格标签：{{tags}}"}
-         ]}},
-        {"id": "n_llm", "type": "llm", "position": {"x": 560, "y": 200},
-         "data": {
-           "model": "{{llm_for_prompt}}",
-           "prompt": "用户通过语音描述了想要的画面：{{asr_text}}\n已选标签：{{tags}}\n请整理为一段适合图像/视频生成的提示词，保留原意、扩展画面细节（风格/场景/光线/构图），输出完整中文提示词。",
-           "output_var": "optimized_prompt"
-         }},
-        {"id": "n_end", "type": "end", "position": {"x": 820, "y": 200},
-         "data": {"outputs": [{"name": "optimized_prompt", "value": "{{optimized_prompt}}"}]}}
+        {
+          "id": "300001",
+          "type": "start",
+          "title": "开始",
+          "parameters": {
+            "purpose": "接收增强提示词与参数",
+            "node_outputs": {
+              "enhanced_prompt": "",
+              "model": "",
+              "ratio": "",
+              "reference_image": "?"
+            }
+          }
+        },
+        {
+          "id": "300002",
+          "type": "code",
+          "title": "参数校验",
+          "parameters": {
+            "purpose": "校验 model/ratio 合法、reference_image 格式",
+            "settingOnError": {
+              "processType": 1,
+              "retryTimes": 0,
+              "timeoutMs": 30000
+            },
+            "node_inputs": [
+              "model",
+              "ratio"
+            ],
+            "node_outputs": {
+              "valid": "bool"
+            }
+          }
+        },
+        {
+          "id": "300003",
+          "type": "memory_read",
+          "title": "读额度账户",
+          "parameters": {
+            "purpose": "读取用户剩余额度(或调业务接口)",
+            "memory": {
+              "action": "read",
+              "key": "额度账户(业务库)"
+            },
+            "settingOnError": {
+              "processType": 1,
+              "retryTimes": 1,
+              "timeoutMs": 10000
+            },
+            "node_inputs": [
+              "user_id"
+            ],
+            "node_outputs": {
+              "quota": ""
+            }
+          }
+        },
+        {
+          "id": "300004",
+          "type": "condition",
+          "title": "额度是否充足",
+          "parameters": {
+            "purpose": "不足短路返回 quota_insufficient",
+            "node_inputs": [
+              "quota",
+              "cost"
+            ]
+          }
+        },
+        {
+          "id": "300005",
+          "type": "plugin",
+          "title": "调用图像生成插件",
+          "parameters": {
+            "purpose": "调用Coze内置图像生成能力(异步任务)",
+            "settingOnError": {
+              "processType": 1,
+              "retryTimes": 1,
+              "timeoutMs": 600000
+            },
+            "plugin_id": "<<PLACEHOLDER_IMAGE_GEN_PLUGIN_ID>>",
+            "node_inputs": [
+              "prompt",
+              "model",
+              "ratio",
+              "image"
+            ],
+            "node_outputs": {
+              "task_id": ""
+            }
+          }
+        },
+        {
+          "id": "300006",
+          "type": "code",
+          "title": "轮询结果",
+          "parameters": {
+            "purpose": "轮询任务状态直到完成或超时",
+            "node_inputs": [
+              "task_id"
+            ],
+            "node_outputs": {
+              "raw_result": ""
+            }
+          }
+        },
+        {
+          "id": "300007",
+          "type": "code",
+          "title": "结果结构化",
+          "parameters": {
+            "purpose": "成功→image_url，失败→error_code",
+            "node_inputs": [
+              "raw_result"
+            ],
+            "node_outputs": {
+              "image_result": ""
+            }
+          }
+        },
+        {
+          "id": "300008",
+          "type": "end",
+          "title": "结束",
+          "parameters": {
+            "purpose": "返回图片结果",
+            "node_inputs": [
+              "image_result"
+            ],
+            "node_outputs": {
+              "result": ""
+            }
+          }
+        }
       ],
       "edges": [
-        {"source": "n_start", "target": "n_concat"},
-        {"source": "n_concat", "target": "n_llm"},
-        {"source": "n_llm", "target": "n_end"}
+        {
+          "source_node": "300001",
+          "target_node": "300002"
+        },
+        {
+          "source_node": "300002",
+          "target_node": "300003"
+        },
+        {
+          "source_node": "300003",
+          "target_node": "300004"
+        },
+        {
+          "source_node": "300004",
+          "target_node": "300005",
+          "source_port": "true"
+        },
+        {
+          "source_node": "300004",
+          "target_node": "300007",
+          "source_port": "false"
+        },
+        {
+          "source_node": "300005",
+          "target_node": "300006"
+        },
+        {
+          "source_node": "300006",
+          "target_node": "300007"
+        },
+        {
+          "source_node": "300007",
+          "target_node": "300008"
+        }
       ]
     },
-
     {
-      "id": "wf_image_gen",
-      "name": "图片生成",
-      "description": "接收 prompt / model / ratio / 可选参考图，校验参数后调用 Coze 图像生成插件，返回图片 URL。",
-      "parameters": {
-        "input": [
-          {"name": "prompt", "type": "String", "required": true, "desc": "提示词（来自扩写/语音工作流或用户直填）"},
-          {"name": "model", "type": "String", "required": true, "desc": "Qwen-Image 3.0 / Wan-Image 1.0 / Coze 默认生图"},
-          {"name": "ratio", "type": "String", "required": true, "desc": "3:4 / 1:1 / 9:16 / 4:3 / 16:9"},
-          {"name": "reference_image", "type": "String", "required": false, "desc": "参考图 URL，走图生图"}
-        ],
-        "output": [
-          {"name": "image_url", "type": "String", "desc": "生成结果 URL"},
-          {"name": "error", "type": "String", "desc": "失败错误码"}
-        ]
-      },
+      "id": "400000",
+      "name": "video_generate",
       "nodes": [
-        {"id": "n_start", "type": "start", "position": {"x": 80, "y": 220},
-         "data": {"inputs": [
-           {"name": "prompt", "type": "String"},
-           {"name": "model", "type": "String"},
-           {"name": "ratio", "type": "String"},
-           {"name": "reference_image", "type": "String"}
-         ]}},
-        {"id": "n_validate", "type": "condition", "position": {"x": 320, "y": 220},
-         "data": {"expression": "contains(['Qwen-Image 3.0','Wan-Image 1.0','Coze 默认生图'], model) && contains(['3:4','1:1','9:16','4:3','16:9'], ratio)",
-                  "branches": [{"label": "valid", "target": "n_plugin"}, {"label": "invalid", "target": "n_err"}]}},
-        {"id": "n_plugin", "type": "plugin", "position": {"x": 560, "y": 160},
-         "data": {
-           "plugin_id": "PLACEHOLDER_image_generate",
-           "action": "text2image",
-           "inputs": {
-             "prompt": "{{prompt}}",
-             "model": "{{model}}",
-             "ratio": "{{ratio}}",
-             "image": "{{reference_image}}"
-           },
-           "output_var": "image_url"
-         }},
-        {"id": "n_err", "type": "variable_assign", "position": {"x": 560, "y": 320},
-         "data": {"assigns": [{"var": "error", "value": "INVALID_PARAM"}]}},
-        {"id": "n_end", "type": "end", "position": {"x": 820, "y": 220},
-         "data": {"outputs": [
-           {"name": "image_url", "value": "{{image_url}}"},
-           {"name": "error", "value": "{{error}}"}
-         ]}}
+        {
+          "id": "400001",
+          "type": "start",
+          "title": "开始",
+          "parameters": {
+            "purpose": "接收增强提示词与视频参数",
+            "node_outputs": {
+              "enhanced_prompt": "",
+              "model": "",
+              "mode": "",
+              "clarity": "",
+              "ratio": "",
+              "duration": "",
+              "reference": "?"
+            }
+          }
+        },
+        {
+          "id": "400002",
+          "type": "code",
+          "title": "参数校验",
+          "parameters": {
+            "purpose": "校验 mode(文生/图生/编辑)，编辑模式须传参考视频；clarity/duration与额度档位匹配",
+            "settingOnError": {
+              "processType": 1,
+              "retryTimes": 0,
+              "timeoutMs": 30000
+            },
+            "node_inputs": [
+              "全部参数"
+            ],
+            "node_outputs": {
+              "valid": "bool"
+            }
+          }
+        },
+        {
+          "id": "400003",
+          "type": "memory_read",
+          "title": "读额度账户",
+          "parameters": {
+            "purpose": "读取用户剩余额度(超清/长时长额外计费)",
+            "memory": {
+              "action": "read",
+              "key": "额度账户(业务库)"
+            },
+            "settingOnError": {
+              "processType": 1,
+              "retryTimes": 1,
+              "timeoutMs": 10000
+            },
+            "node_inputs": [
+              "user_id"
+            ],
+            "node_outputs": {
+              "quota": ""
+            }
+          }
+        },
+        {
+          "id": "400004",
+          "type": "condition",
+          "title": "额度是否充足",
+          "parameters": {
+            "purpose": "不足短路返回 quota_insufficient",
+            "node_inputs": [
+              "quota",
+              "cost"
+            ]
+          }
+        },
+        {
+          "id": "400005",
+          "type": "plugin",
+          "title": "调用视频生成插件",
+          "parameters": {
+            "purpose": "按clarity/duration调用Coze视频生成能力",
+            "settingOnError": {
+              "processType": 1,
+              "retryTimes": 1,
+              "timeoutMs": 900000
+            },
+            "plugin_id": "<<PLACEHOLDER_VIDEO_GEN_PLUGIN_ID>>",
+            "node_inputs": [
+              "全部参数"
+            ],
+            "node_outputs": {
+              "task_id": ""
+            }
+          }
+        },
+        {
+          "id": "400006",
+          "type": "code",
+          "title": "轮询结果",
+          "parameters": {
+            "purpose": "轮询任务状态(视频耗时更长，超时阈值更高)",
+            "node_inputs": [
+              "task_id"
+            ],
+            "node_outputs": {
+              "raw_result": ""
+            }
+          }
+        },
+        {
+          "id": "400007",
+          "type": "code",
+          "title": "结果结构化",
+          "parameters": {
+            "purpose": "成功→video_url，失败→error_code",
+            "node_inputs": [
+              "raw_result"
+            ],
+            "node_outputs": {
+              "video_result": ""
+            }
+          }
+        },
+        {
+          "id": "400008",
+          "type": "end",
+          "title": "结束",
+          "parameters": {
+            "purpose": "返回视频结果",
+            "node_inputs": [
+              "video_result"
+            ],
+            "node_outputs": {
+              "result": ""
+            }
+          }
+        }
       ],
       "edges": [
-        {"source": "n_start", "target": "n_validate"},
-        {"source": "n_plugin", "target": "n_end"},
-        {"source": "n_err", "target": "n_end"}
+        {
+          "source_node": "400001",
+          "target_node": "400002"
+        },
+        {
+          "source_node": "400002",
+          "target_node": "400003"
+        },
+        {
+          "source_node": "400003",
+          "target_node": "400004"
+        },
+        {
+          "source_node": "400004",
+          "target_node": "400005",
+          "source_port": "true"
+        },
+        {
+          "source_node": "400004",
+          "target_node": "400007",
+          "source_port": "false"
+        },
+        {
+          "source_node": "400005",
+          "target_node": "400006"
+        },
+        {
+          "source_node": "400006",
+          "target_node": "400007"
+        },
+        {
+          "source_node": "400007",
+          "target_node": "400008"
+        }
       ]
     },
-
     {
-      "id": "wf_video_gen",
-      "name": "视频生成",
-      "description": "接收 prompt / model / mode / clarity / ratio / duration / 可选参考素材，校验模式后调用 Coze 视频生成插件，返回视频 URL。",
-      "parameters": {
-        "input": [
-          {"name": "prompt", "type": "String", "required": true},
-          {"name": "model", "type": "String", "required": true, "desc": "HappyHorse 1.0/1.1 / Wan 2.6/2.7/3.0"},
-          {"name": "mode", "type": "String", "required": true, "desc": "视频生成 / 多参考图 / 视频编辑"},
-          {"name": "clarity", "type": "String", "required": true, "desc": "高清 / 超清"},
-          {"name": "ratio", "type": "String", "required": true},
-          {"name": "duration", "type": "String", "required": true, "desc": "5秒 / 10秒 / 15秒"},
-          {"name": "reference", "type": "String", "required": false, "desc": "参考素材 URL（视频编辑模式必传视频）"}
-        ],
-        "output": [
-          {"name": "video_url", "type": "String"},
-          {"name": "error", "type": "String"}
-        ]
-      },
+      "id": "500000",
+      "name": "post_process",
       "nodes": [
-        {"id": "n_start", "type": "start", "position": {"x": 80, "y": 220},
-         "data": {"inputs": [
-           {"name": "prompt", "type": "String"},
-           {"name": "model", "type": "String"},
-           {"name": "mode", "type": "String"},
-           {"name": "clarity", "type": "String"},
-           {"name": "ratio", "type": "String"},
-           {"name": "duration", "type": "String"},
-           {"name": "reference", "type": "String"}
-         ]}},
-        {"id": "n_validate", "type": "condition", "position": {"x": 320, "y": 220},
-         "data": {"expression": "mode != '视频编辑' || (mode == '视频编辑' && reference != '')",
-                  "branches": [{"label": "valid", "target": "n_plugin"}, {"label": "invalid", "target": "n_err"}]}},
-        {"id": "n_plugin", "type": "plugin", "position": {"x": 560, "y": 160},
-         "data": {
-           "plugin_id": "PLACEHOLDER_video_generate",
-           "action": "text2video",
-           "inputs": {
-             "prompt": "{{prompt}}",
-             "model": "{{model}}",
-             "mode": "{{mode}}",
-             "clarity": "{{clarity}}",
-             "ratio": "{{ratio}}",
-             "duration": "{{duration}}",
-             "reference": "{{reference}}"
-           },
-           "output_var": "video_url"
-         }},
-        {"id": "n_err", "type": "variable_assign", "position": {"x": 560, "y": 320},
-         "data": {"assigns": [{"var": "error", "value": "MODE_NEED_VIDEO"}]}},
-        {"id": "n_end", "type": "end", "position": {"x": 820, "y": 220},
-         "data": {"outputs": [
-           {"name": "video_url", "value": "{{video_url}}"},
-           {"name": "error", "value": "{{error}}"}
-         ]}}
+        {
+          "id": "500001",
+          "type": "start",
+          "title": "开始",
+          "parameters": {
+            "purpose": "接收生成结果",
+            "node_outputs": {
+              "gen_result": "",
+              "user_id": "",
+              "scene_type": "",
+              "prompt": ""
+            }
+          }
+        },
+        {
+          "id": "500002",
+          "type": "code",
+          "title": "二次合规审核",
+          "parameters": {
+            "purpose": "对生成结果内容安全复审，复用意图识别范式，不通过标记不展示",
+            "settingOnError": {
+              "processType": 1,
+              "retryTimes": 0,
+              "timeoutMs": 60000
+            },
+            "node_inputs": [
+              "gen_result"
+            ],
+            "node_outputs": {
+              "audit_pass": "bool"
+            }
+          }
+        },
+        {
+          "id": "500003",
+          "type": "code",
+          "title": "相似去重",
+          "parameters": {
+            "purpose": "与用户历史作品比对避免重复归档",
+            "memory": {
+              "action": "read",
+              "key": "历史作品(业务库)"
+            },
+            "node_inputs": [
+              "gen_result",
+              "user_id"
+            ],
+            "node_outputs": {
+              "is_dup": "bool"
+            }
+          }
+        },
+        {
+          "id": "500004",
+          "type": "plugin",
+          "title": "缩略图生成",
+          "parameters": {
+            "purpose": "生成广场/列表用缩略图",
+            "settingOnError": {
+              "processType": 1,
+              "retryTimes": 1,
+              "timeoutMs": 30000
+            },
+            "plugin_id": "<<PLACEHOLDER_THUMB_PLUGIN_ID>>",
+            "node_inputs": [
+              "gen_result"
+            ],
+            "node_outputs": {
+              "thumb_url": ""
+            }
+          }
+        },
+        {
+          "id": "500005",
+          "type": "code",
+          "title": "写作品记录",
+          "parameters": {
+            "purpose": "写入数据层作品表(云端保存,登录用户可见)",
+            "settingOnError": {
+              "processType": 1,
+              "retryTimes": 1,
+              "timeoutMs": 30000
+            },
+            "node_inputs": [
+              "gen_result",
+              "thumb_url"
+            ],
+            "node_outputs": {
+              "work_record": ""
+            }
+          }
+        },
+        {
+          "id": "500006",
+          "type": "code",
+          "title": "扣减额度",
+          "parameters": {
+            "purpose": "调用业务接口扣减对应额度(幂等)",
+            "memory": {
+              "action": "write",
+              "key": "额度账户(业务库)"
+            },
+            "settingOnError": {
+              "processType": 1,
+              "retryTimes": 2,
+              "timeoutMs": 30000
+            },
+            "node_inputs": [
+              "user_id",
+              "cost"
+            ],
+            "node_outputs": {
+              "quota_after": ""
+            }
+          }
+        },
+        {
+          "id": "500007",
+          "type": "condition",
+          "title": "是否发布广场",
+          "parameters": {
+            "purpose": "用户选择发布则入后台审核队列，否则仅存我的作品",
+            "node_inputs": [
+              "publish_flag"
+            ]
+          }
+        },
+        {
+          "id": "500008",
+          "type": "end",
+          "title": "结束",
+          "parameters": {
+            "purpose": "返回作品记录",
+            "node_inputs": [
+              "work_record"
+            ],
+            "node_outputs": {
+              "result": ""
+            }
+          }
+        }
       ],
       "edges": [
-        {"source": "n_start", "target": "n_validate"},
-        {"source": "n_plugin", "target": "n_end"},
-        {"source": "n_err", "target": "n_end"}
+        {
+          "source_node": "500001",
+          "target_node": "500002"
+        },
+        {
+          "source_node": "500002",
+          "target_node": "500003"
+        },
+        {
+          "source_node": "500003",
+          "target_node": "500004"
+        },
+        {
+          "source_node": "500004",
+          "target_node": "500005"
+        },
+        {
+          "source_node": "500005",
+          "target_node": "500006"
+        },
+        {
+          "source_node": "500006",
+          "target_node": "500007"
+        },
+        {
+          "source_node": "500007",
+          "target_node": "500008",
+          "source_port": "true"
+        },
+        {
+          "source_node": "500007",
+          "target_node": "500008",
+          "source_port": "false"
+        }
       ]
     }
-  ]
+  ],
+  "memory_design": {
+    "长期·用户风格画像": {
+      "key": "user_style:{user_id}",
+      "写入节点": "主流程写用户记忆 / 子工作流A提示词扩写累积",
+      "读取节点": "子工作流A提示词扩写默认填充",
+      "内容": "常用风格标签/色调/构图/镜头偏好(JSON)",
+      "TTL": "长期"
+    },
+    "长期·成功提示词模板": {
+      "key": "user_prompt_tpl:{user_id}",
+      "写入节点": "子工作流D成功后",
+      "读取节点": "做同款/提示词增强",
+      "内容": "历史高满意度提示词模板",
+      "TTL": "长期"
+    },
+    "长期·生成偏好统计": {
+      "key": "user_gen_stat:{user_id}",
+      "写入节点": "子工作流D完成后",
+      "读取节点": "个性化推荐/运营分析",
+      "内容": "生图vs生视频占比/常用模型/成功率",
+      "TTL": "长期"
+    },
+    "短期·会话上下文": {
+      "key": "session:{conv_id}",
+      "写入节点": "主流程各节点",
+      "读取节点": "主流程各节点",
+      "内容": "本次生成prompt/参数/中间结果",
+      "TTL": "本次会话"
+    },
+    "系统·不存Coze": {
+      "key": "业务库表",
+      "内容": "额度账户/路由规则/审核策略/模型配置",
+      "TTL": "—"
+    },
+    "明确不存": [
+      "原始生成图(对象存储)",
+      "违规/侵权prompt(合规黑名单库)",
+      "用户隐私原图(即时销毁)"
+    ]
+  },
+  "notes": "本文件为可导入 Coze 平台的设计稿。plugin_id(图像/视频/缩略图生成、语音识别) 与 memory_read/memory_write 节点精确 schema 为占位(<<PLACEHOLDER_*>>)，需在 Coze 平台绑定实际插件并校准记忆节点类型后生效。节点范式参考泰小虎图片识别工作流：code预处理→llm意图识别→loop调插件→code清洗→llm整合→code聚合。"
 }
