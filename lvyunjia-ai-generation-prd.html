@@ -467,48 +467,128 @@
 <h2>九、待确认项汇总</h2>
 <table><thead><tr><th>#</th><th>事项</th><th>干系人</th><th>状态</th></tr></thead><tbody><tr><td>1</td><td>KPI 具体目标值（入口点击率、人均生成次数、购买转化率）</td><td>@运营</td><td>待确认</td></tr><tr><td>2</td><td>运营后台能力范围与表结构设计</td><td>@研发</td><td>待确认</td></tr><tr><td>3</td><td>提示词最大字数、上传素材大小与格式限制</td><td>@研发</td><td>待确认</td></tr><tr><td>4</td><td>生成任务最长等待时间与轮询策略</td><td>@研发</td><td>待确认</td></tr><tr><td>5</td><td>广场分页条数、审核流程与状态字段</td><td>@运营 / @研发</td><td>待确认</td></tr><tr><td>6</td><td>历史记录删除策略（逻辑删除/物理删除/不支持删除）</td><td>@产品 / @研发</td><td>待确认</td></tr><tr><td>7</td><td>埋点规范正式文档建立</td><td>@数据 / @研发</td><td>待确认</td></tr></tbody></table>
 
-<h2>十、附录：Coze 工作流设计</h2>
-<h3>10.1 工作流总览</h3>
-<p>AI 创作后端通过 Coze 工作流实现「提示词处理」与「生成任务调用」两层能力：</p>
-<ol>
-  <li><b>提示词扩写工作流</b>：接收用户原始输入 + 已选标签，输出结构化、模型友好的英文/中文提示词；</li>
-  <li><b>语音转提示词工作流</b>：接收语音转文本结果，补全画面细节，输出结构化提示词；</li>
-  <li><b>图片生成工作流</b>：接收提示词、模型、比例、参考图，调用 Coze 图像生成插件，返回图片 URL；</li>
-  <li><b>视频生成工作流</b>：接收提示词、模型、模式、清晰度、比例、时长、参考素材，调用 Coze 视频生成插件，返回视频 URL。</li>
-</ol>
+<h2>十、附录：Coze 工作流设计</h2><h2>十、附录：Coze 工作流设计</h2>
 
-<h3>10.2 提示词扩写工作流节点</h3>
-<table><thead><tr><th>节点</th><th>输入</th><th>输出</th><th>说明</th></tr></thead><tbody><tr><td>开始</td><td>user_prompt, tags[]</td><td>-</td><td>接收用户输入和标签</td></tr><tr><td>标签拼接</td><td>user_prompt, tags</td><td>combined_prompt</td><td>将标签翻译成模型友好描述并拼接到提示词</td></tr><tr><td>提示词优化</td><td>combined_prompt</td><td>optimized_prompt</td><td>用 LLM 补全画面细节、风格、光线、构图</td></tr><tr><td>输出</td><td>optimized_prompt</td><td>最终提示词</td><td>返回给前端或下游生成节点</td></tr></tbody></table>
+<p>ℹ️ 本工作流设计以泰小虎「图片识别工作流」（<code>txh_center_optimize</code>，节点范式：<b>code 输入预处理 → llm 意图/类型识别 → loop 调识别插件 → code 清洗 → llm 信息整合 → code 聚合</b>）为骨架重设计。该骨架已验证可用，但原版为<strong>单工作流平铺、且未使用记忆库节点</strong>（知识库参数 <code>knowledgeFCParam:{}</code> 为空、全部业务知识硬编码在提示词中）。本期在此基础上补齐两项能力：<b>① 子工作流拆分</b>（主工作流编排 + 4 个子工作流）；<b>② 记忆库设计</b>（长期用户记忆 / 短期会话记忆 / 系统记忆分离，详见 §10.7）。</p>
 
-<h3>10.3 图片生成工作流节点</h3>
-<table><thead><tr><th>节点</th><th>输入</th><th>输出</th><th>说明</th></tr></thead><tbody><tr><td>开始</td><td>prompt, model, ratio, reference_image?</td><td>-</td><td>接收前端传入的生成参数，触发工作流</td></tr><tr><td>参数校验</td><td>model, ratio</td><td>valid?</td><td>校验模型与参数合法性</td></tr><tr><td>调用图像生成插件</td><td>prompt, model, ratio, image?</td><td>image_url / error</td><td>调用 Coze 平台内置图像生成能力</td></tr><tr><td>结果处理</td><td>image_url / error</td><td>result</td><td>成功返回 URL，失败返回错误码</td></tr></tbody></table>
+<h3>10.1 工作流总览（主工作流 + 子工作流）</h3>
+<table><thead><tr><th>层级</th><th>工作流</th><th>职责</th><th>关键节点类型</th></tr></thead><tbody>
+<tr><td>主</td><td><b>AI 创作编排</b><br/>ai_create_orchestrator</td><td>接收前端意图与参数，做输入归一化、意图/场景识别、路由到对应子工作流，聚合结果并写记忆库</td><td>start / code / llm / condition / sub_workflow / memory_write / variable_merge / end</td></tr>
+<tr><td>子 A</td><td><b>提示词增强</b><br/>prompt_enhance</td><td>把「用户文本 + 标签 + 语音 + 参考图」转化为模型友好的结构化提示词，含敏感词合规校验</td><td>start / code / llm / code / end</td></tr>
+<tr><td>子 B</td><td><b>图片生成</b><br/>image_generate</td><td>参数校验 → 额度校验 → 调用图像生成插件 → 轮询 → 结果结构化</td><td>start / code / memory_read / condition / plugin / code / end</td></tr>
+<tr><td>子 C</td><td><b>视频生成</b><br/>video_generate</td><td>同图片生成，额外处理清晰度 / 时长 / 编辑模式参数，调用视频生成插件</td><td>start / code / memory_read / condition / plugin / code / end</td></tr>
+<tr><td>子 D</td><td><b>作品后处理</b><br/>post_process</td><td>二次合规审核 → 相似去重 → 缩略图 → 写作品记录 → 扣额度 →（发布）入审核队列</td><td>start / code / plugin / condition / end</td></tr>
+</tbody></table>
 
-<h3>10.4 视频生成工作流节点</h3>
-<table><thead><tr><th>节点</th><th>输入</th><th>输出</th><th>说明</th></tr></thead><tbody><tr><td>开始</td><td>prompt, model, mode, clarity, ratio, duration, reference?</td><td>-</td><td>接收前端传入的视频生成参数，触发工作流</td></tr><tr><td>模式校验</td><td>mode, reference</td><td>valid?</td><td>视频编辑模式必须传视频</td></tr><tr><td>调用视频生成插件</td><td>全部参数</td><td>video_url / error</td><td>调用 Coze 平台内置视频生成能力</td></tr><tr><td>结果处理</td><td>video_url / error</td><td>result</td><td>成功返回 URL，失败返回错误码</td></tr></tbody></table>
+<h3>10.2 主工作流「AI 创作编排」节点说明</h3>
+<table><thead><tr><th>#</th><th>节点</th><th>类型</th><th>职责</th><th>输入 → 输出</th><th>记忆库</th><th>失败重试</th></tr></thead><tbody>
+<tr><td>1</td><td>开始</td><td>start</td><td>接收前端下发意图与全部参数</td><td>intent, user_text, selected_tags[], voice_text?, reference_images[], model, ratio, clarity, duration → —</td><td>无</td><td>—</td></tr>
+<tr><td>2</td><td>输入归一化</td><td>code</td><td>复用泰小虎「提取用户输入的文案和图片信息」范式：标签翻译为结构化描述、参考图 URL 抽取（正则解析 markdown/URL）、语音文本归一化</td><td>user_text, tags, voice_text, images → normalized_input</td><td>读：session 会话上下文写入</td><td>timeout 30s，retry 0</td></tr>
+<tr><td>3</td><td>意图与场景识别</td><td>llm</td><td>复用泰小虎「意图识别」范式：系统提示词判断 生图/生视频/做同款，提取风格、比例、时长、主体等结构化参数并改写查询；强制 JSON 输出</td><td>normalized_input → {scene_type, structured_params, rewritten_query}</td><td>无（纯推理）</td><td>timeout 180s，retry 1</td></tr>
+<tr><td>4</td><td>是否需提示词增强</td><td>condition</td><td>若用户已填完整 prompt 则跳过子工作流 A，直接进生成</td><td>scene_type, prompt → 路由</td><td>无</td><td>—</td></tr>
+<tr><td>5</td><td>子工作流A：提示词增强</td><td>sub_workflow</td><td>调用 prompt_enhance，返回 enhanced_prompt</td><td>normalized_input, scene_type → enhanced_prompt</td><td>读写：user_style（见 §10.7）</td><td>继承子流程</td></tr>
+<tr><td>6</td><td>生成类型路由</td><td>condition</td><td>按 scene_type 路由到图片 / 视频子工作流</td><td>scene_type → 路由</td><td>无</td><td>—</td></tr>
+<tr><td>7</td><td>子工作流B：图片生成</td><td>sub_workflow</td><td>调用 image_generate，返回 image_result</td><td>enhanced_prompt, model, ratio → image_result</td><td>读写：额度账户（业务）</td><td>继承子流程</td></tr>
+<tr><td>8</td><td>子工作流C：视频生成</td><td>sub_workflow</td><td>调用 video_generate，返回 video_result</td><td>enhanced_prompt, model, clarity, duration → video_result</td><td>读写：额度账户（业务）</td><td>继承子流程</td></tr>
+<tr><td>9</td><td>子工作流D：作品后处理</td><td>sub_workflow</td><td>调用 post_process，返回 work_record</td><td>gen_result, user_id → work_record</td><td>写：user_prompt_tpl / user_gen_stat</td><td>继承子流程</td></tr>
+<tr><td>10</td><td>写用户记忆</td><td>memory_write</td><td>把本次成功生成的风格偏好、提示词模板写入长期记忆（累积画像）</td><td>work_record → 记忆写入确认</td><td>写：user_style / user_prompt_tpl / user_gen_stat</td><td>timeout 10s，retry 1（失败不影响主结果）</td></tr>
+<tr><td>11</td><td>变量聚合</td><td>variable_merge</td><td>聚合各子工作流产物</td><td>各分支输出 → merged</td><td>无</td><td>—</td></tr>
+<tr><td>12</td><td>结束</td><td>end</td><td>返回最终结果与各中间产物</td><td>merged → result</td><td>无</td><td>—</td></tr>
+</tbody></table>
 
-<h3>10.5 提示词模板示例</h3>
+<h3>10.3 子工作流A「提示词增强」节点说明</h3>
+<table><thead><tr><th>#</th><th>节点</th><th>类型</th><th>职责</th><th>输入 → 输出</th><th>记忆库</th><th>失败重试</th></tr></thead><tbody>
+<tr><td>1</td><td>开始</td><td>start</td><td>接收归一化输入与场景类型</td><td>normalized_input, scene_type → —</td><td>无</td><td>—</td></tr>
+<tr><td>2</td><td>标签规范化</td><td>code</td><td>复用泰小虎「提取用户输入」范式：把 selected_tags 翻译为模型友好描述（如「国风」→「中国水墨风格, 留白构图」）</td><td>tags → tag_desc</td><td>无</td><td>timeout 30s</td></tr>
+<tr><td>3</td><td>语音转提示词（条件）</td><td>llm</td><td>若 voice_text 存在，LLM 将口语化语音转写为画面细节描述，补全主体/场景/动作</td><td>voice_text → voice_prompt</td><td>无</td><td>timeout 120s，retry 1</td></tr>
+<tr><td>4</td><td>提示词扩写</td><td>llm</td><td>复用泰小虎「信息整合」范式：系统提示词补全风格/光线/构图/镜头运动，强制 JSON 输出最终提示词；参考用户长期风格画像做个性化</td><td>user_text+tag_desc+voice_prompt → final_prompt(JSON)</td><td>读：user_style 默认填充</td><td>timeout 180s，retry 1</td></tr>
+<tr><td>5</td><td>敏感词合规校验</td><td>code</td><td>复用泰小虎「清洗 OCR 内容」范式：黑名单 + 正则过滤违规/侵权词，命中则降级替换并返回 flag</td><td>final_prompt → {safe_prompt, blocked}</td><td>无（命中写合规日志到业务库）</td><td>timeout 30s</td></tr>
+<tr><td>6</td><td>结束</td><td>end</td><td>返回增强后提示词</td><td>safe_prompt → enhanced_prompt</td><td>无</td><td>—</td></tr>
+</tbody></table>
+
+<h3>10.4 子工作流B「图片生成」节点说明</h3>
+<table><thead><tr><th>#</th><th>节点</th><th>类型</th><th>职责</th><th>输入 → 输出</th><th>记忆库</th><th>失败重试</th></tr></thead><tbody>
+<tr><td>1</td><td>开始</td><td>start</td><td>接收增强提示词与参数</td><td>enhanced_prompt, model, ratio, reference_image? → —</td><td>无</td><td>—</td></tr>
+<tr><td>2</td><td>参数校验</td><td>code</td><td>校验 model / ratio 合法，reference_image 格式</td><td>model, ratio → valid?</td><td>无</td><td>timeout 30s</td></tr>
+<tr><td>3</td><td>读额度账户</td><td>memory_read</td><td>读取用户剩余额度（或调用业务接口）</td><td>user_id → quota</td><td>读：额度账户（业务库/记忆）</td><td>timeout 10s，retry 1</td></tr>
+<tr><td>4</td><td>额度是否充足</td><td>condition</td><td>不足则短路返回 quota_insufficient，前端弹额度引导</td><td>quota, cost → 路由</td><td>无</td><td>—</td></tr>
+<tr><td>5</td><td>调用图像生成插件</td><td>plugin</td><td>调用 Coze 平台内置图像生成能力（异步任务），复用泰小虎 loop 调插件的批处理范式</td><td>prompt, model, ratio, image? → task_id</td><td>无</td><td>timeout 长，retry 1</td></tr>
+<tr><td>6</td><td>轮询结果</td><td>code</td><td>轮询任务状态直到完成或超时（超时策略见待确认项）</td><td>task_id → raw_result</td><td>无</td><td>轮询内置重试</td></tr>
+<tr><td>7</td><td>结果结构化</td><td>code</td><td>成功 → image_url，失败 → error_code</td><td>raw_result → image_result</td><td>无</td><td>timeout 30s</td></tr>
+<tr><td>8</td><td>结束</td><td>end</td><td>返回图片结果</td><td>image_result → result</td><td>无</td><td>—</td></tr>
+</tbody></table>
+
+<h3>10.5 子工作流C「视频生成」节点说明</h3>
+<table><thead><tr><th>#</th><th>节点</th><th>类型</th><th>职责</th><th>输入 → 输出</th><th>记忆库</th><th>失败重试</th></tr></thead><tbody>
+<tr><td>1</td><td>开始</td><td>start</td><td>接收增强提示词与视频参数</td><td>enhanced_prompt, model, mode, clarity, ratio, duration, reference? → —</td><td>无</td><td>—</td></tr>
+<tr><td>2</td><td>参数校验</td><td>code</td><td>校验 mode（文生视频 / 图生视频 / 视频编辑），编辑模式必须传参考视频；校验 clarity/duration 与额度档位匹配</td><td>全部参数 → valid?</td><td>无</td><td>timeout 30s</td></tr>
+<tr><td>3</td><td>读额度账户</td><td>memory_read</td><td>读取用户剩余额度（超清/高阶/长时长额外计费）</td><td>user_id → quota</td><td>读：额度账户</td><td>timeout 10s，retry 1</td></tr>
+<tr><td>4</td><td>额度是否充足</td><td>condition</td><td>不足短路返回 quota_insufficient</td><td>quota, cost → 路由</td><td>无</td><td>—</td></tr>
+<tr><td>5</td><td>调用视频生成插件</td><td>plugin</td><td>按 clarity/duration 调用 Coze 视频生成能力</td><td>全部参数 → task_id</td><td>无</td><td>timeout 长，retry 1</td></tr>
+<tr><td>6</td><td>轮询结果</td><td>code</td><td>轮询任务状态（视频耗时更长，超时阈值更高）</td><td>task_id → raw_result</td><td>无</td><td>轮询内置重试</td></tr>
+<tr><td>7</td><td>结果结构化</td><td>code</td><td>成功 → video_url，失败 → error_code</td><td>raw_result → video_result</td><td>无</td><td>timeout 30s</td></tr>
+<tr><td>8</td><td>结束</td><td>end</td><td>返回视频结果</td><td>video_result → result</td><td>无</td><td>—</td></tr>
+</tbody></table>
+
+<h3>10.6 子工作流D「作品后处理」节点说明</h3>
+<table><thead><tr><th>#</th><th>节点</th><th>类型</th><th>职责</th><th>输入 → 输出</th><th>记忆库</th><th>失败重试</th></tr></thead><tbody>
+<tr><td>1</td><td>开始</td><td>start</td><td>接收生成结果</td><td>gen_result, user_id, scene_type, prompt → —</td><td>无</td><td>—</td></tr>
+<tr><td>2</td><td>二次合规审核</td><td>code / llm</td><td>对生成结果做内容安全复审（复用意图识别范式），不通过则标记不展示</td><td>gen_result → audit_pass?</td><td>无（命中写合规库）</td><td>timeout 60s</td></tr>
+<tr><td>3</td><td>相似去重</td><td>code</td><td>与用户历史作品比对，避免重复归档</td><td>gen_result, user_id → is_dup?</td><td>读：历史作品（业务库）</td><td>timeout 30s</td></tr>
+<tr><td>4</td><td>缩略图生成</td><td>plugin</td><td>生成广场/列表用缩略图</td><td>gen_result → thumb_url</td><td>无</td><td>timeout 30s，retry 1</td></tr>
+<tr><td>5</td><td>写作品记录</td><td>code</td><td>写入数据层作品表（云端保存，登录用户可见）</td><td>gen_result, thumb_url → work_record</td><td>无</td><td>timeout 30s，retry 1</td></tr>
+<tr><td>6</td><td>扣减额度</td><td>code</td><td>调用业务接口扣减对应额度</td><td>user_id, cost → quota_after</td><td>写：额度账户（业务库）</td><td>timeout 30s，retry 2（幂等）</td></tr>
+<tr><td>7</td><td>是否发布广场</td><td>condition</td><td>用户选择发布则入后台审核队列，否则仅存入「我的作品」</td><td>publish_flag → 路由</td><td>无</td><td>—</td></tr>
+<tr><td>8</td><td>结束</td><td>end</td><td>返回作品记录</td><td>work_record → result</td><td>无</td><td>—</td></tr>
+</tbody></table>
+
+<h3>10.7 记忆库设计（核心新增）</h3>
+<p>基于「长期用户记忆 / 短期会话记忆 / 系统记忆」三层分离。Coze 记忆节点类型以 <code>memory_read</code> / <code>memory_write</code> 表示（具体 schema 以 Coze 平台为准，导入时按平台节点校准）。</p>
+<table><thead><tr><th>记忆类型</th><th>Key 设计</th><th>写入节点</th><th>读取节点</th><th>存储内容</th><th>TTL</th></tr></thead><tbody>
+<tr><td>长期·用户风格画像</td><td><code>user_style:{user_id}</code></td><td>主流程「写用户记忆」(10.2-10)；子工作流A「提示词扩写」累积</td><td>子工作流A「提示词扩写」默认填充辅助生图</td><td>常用风格标签、色调、构图、镜头偏好（结构化 JSON）</td><td>长期</td></tr>
+<tr><td>长期·成功提示词模板</td><td><code>user_prompt_tpl:{user_id}</code></td><td>子工作流D「写作品记录/扣减额度」成功后</td><td>做同款 / 子工作流A 提示词增强</td><td>历史高满意度的提示词模板（用于「做同款」复用与默认推荐）</td><td>长期</td></tr>
+<tr><td>长期·生成偏好统计</td><td><code>user_gen_stat:{user_id}</code></td><td>子工作流D 完成后</td><td>个性化推荐 / 运营分析</td><td>生图 vs 生视频占比、常用模型、成功率</td><td>长期</td></tr>
+<tr><td>短期·会话上下文</td><td><code>session:{conv_id}</code></td><td>主流程各节点</td><td>主流程各节点</td><td>本次生成的 prompt / 参数 / 中间结果</td><td>本次会话</td></tr>
+<tr><td>系统·（不存 Coze 记忆）</td><td>业务库表</td><td>—</td><td>—</td><td>额度账户、路由规则、审核策略、模型配置</td><td>—</td></tr>
+</tbody></table>
+<p>⚠️ 明确<b>不写入</b>记忆库的内容：原始生成图（存对象存储）、违规/侵权 prompt（存合规黑名单库）、用户隐私原图（即时销毁，不落库）。</p>
+
+<h3>10.8 关键提示词模板示例</h3>
+<p><b>① 意图与场景识别（主流程节点3，复用泰小虎「意图识别」范式）</b></p>
 <pre>
-【标签转提示词模板】
-用户输入：{user_prompt}
-已选标签：{tags}
+# 角色
+你是绿韵家 AI 创作的「意图与场景识别节点」。结合用户输入、所选标签、参考图，
+判断本次是 生图 / 生视频 / 做同款，并提取结构化生成参数。
 
-请根据用户输入和标签，生成一段适合 {model} 模型的图像/视频提示词。要求：
+## 输出格式（强制 JSON，不要解释）
+{
+  "scene_type": "image|video|same",
+  "structured_params": {"style":"","ratio":"","clarity":"","duration":""},
+  "rewritten_query": "改写后的生成诉求"
+}
+</pre>
+<p><b>② 提示词扩写（子工作流A 节点4，复用泰小虎「信息整合」范式）</b></p>
+<pre>
+【用户输入】{user_text}
+【已选标签】{tag_desc}
+【语音转写】{voice_prompt}
+【用户历史风格画像】{user_style}   # 来自记忆库 user_style:{user_id}
+
+请生成一段适合 {model} 的提示词：
 1. 保留用户原始意图；
-2. 将标签扩展为具体画面元素（风格、场景、光线、构图、镜头运动等）；
-3. 输出一段连贯的中文提示词，必要时补充英文专业术语；
-4. 不要添加用户未提及的人物敏感特征。
-
-输出格式：
-- 主体：...
-- 场景：...
-- 风格：...
-- 光线/氛围：...
-- 构图/镜头：...
-- 完整提示词：...
+2. 将标签与语音扩展为具体画面元素（风格/场景/光线/构图/镜头运动）；
+3. 参考用户历史风格画像做个性化，但不过度偏离本次诉求；
+4. 输出连贯中文提示词，必要时补英文术语；
+5. 不添加用户未提及的敏感人物特征。
+输出 JSON：{"final_prompt":"...", "style":"...", "blocked":false}
+</pre>
+<p><b>③ 敏感词合规校验（子工作流A 节点5，复用泰小虎「清洗 OCR 内容」范式）</b></p>
+<pre>
+# 黑名单 + 正则过滤违规/侵权词；命中则降级替换并返回 blocked=true
+# 命中记录写合规日志到业务库（不写记忆库）
 </pre>
 
-<h3>10.6 Coze 工作流导出文件</h3>
-<p>工作流配置文件见同目录 <code>lvyunjia-ai-coze-workflow.json</code>，可直接导入 Coze 平台做二次调整。</p>
-
-</body>
+<h3>10.9 Coze 工作流导出文件</h3>
+<p>工作流配置文件见同目录 <code>lvyunjia-ai-coze-workflow.json</code>，含主工作流 + 4 子工作流的节点与连线定义，可直接导入 Coze 平台做二次调整。<b>注意</b>：plugin_id（图像/视频生成、语音识别、缩略图插件）与 memory 节点精确 schema 为占位，需在 Coze 平台绑定实际插件并校准记忆节点类型后生效。</p>
+</body></body>
 </html>
