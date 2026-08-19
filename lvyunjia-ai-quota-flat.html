@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>绿韵家 · AI 创作 — 购买额度 / 额度明细（平铺设计稿，墨刀用）</title>
+<style>
+
+    :root {
+      --primary: #4CAF50;
+      --primary-light: #E8F5E9;
+      --primary-dark: #388E3C;
+      --blue: #2196F3;
+      --blue-light: #E3F2FD;
+      --orange: #FF9800;
+      --orange-light: #FFF3E0;
+      --purple: #9C27B0;
+      --purple-light: #F3E5F5;
+      --red: #F44336;
+      --red-light: #FFEBEE;
+      --text: #1a1a1a;
+      --text-secondary: #666666;
+      --text-tertiary: #999999;
+      --border: #eeeeee;
+      --border-light: #f0f0f0;
+      --card-bg: #ffffff;
+      --bg: #f7f8fa;
+      --mask: rgba(0,0,0,0.5);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; background: #e5e5e5; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+    .phone { width: 375px; min-height: 812px; background: var(--bg); position: relative; overflow: hidden; border-radius: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); margin: 20px 0; }
+
+    /* 页面容器 */
+    .page { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: none; overflow: hidden; background: var(--bg); }
+    .page.active { display: block; }
+    .scroll-view { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+    .has-nav .scroll-view { top: 44px; }
+    .has-bottom .scroll-view { bottom: 72px; }
+    .has-nav.has-bottom .scroll-view { top: 44px; bottom: 72px; }
+
+    /* 导航栏 */
+    .nav-bar { height: 44px; background: #fff; display: flex; align-items: center; justify-content: center; position: absolute; top: 0; left: 0; right: 0; z-index: 99; font-size: 17px; font-weight: 600; color: var(--text); border-bottom: 1px solid var(--border); }
+    .nav-bar .back { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--text); cursor: pointer; position: absolute; left: 0; }
+    .nav-bar .right { position: absolute; right: 12px; font-size: 14px; color: var(--text-secondary); cursor: pointer; }
+
+    /* Toast */
+    #toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.75); color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 14px; display: none; z-index: 999; white-space: nowrap; }
+    #toast.active { display: block; }
+
+    /* 通用组件 */
+    .card { background: var(--card-bg); border-radius: 16px; margin: 0 12px 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    .section-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+    .section-title .more { font-size: 13px; color: var(--text-tertiary); font-weight: 400; cursor: pointer; }
+
+    .option-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .option { padding: 8px 14px; border-radius: 8px; background: #f5f5f5; color: var(--text-secondary); font-size: 14px; cursor: pointer; border: 1px solid transparent; }
+    .option.active { background: var(--primary-light); color: var(--primary); border-color: var(--primary); font-weight: 600; }
+    .option.pay { position: relative; }
+    .option.pay::after { content: '付费'; position: absolute; top: -6px; right: -6px; background: var(--red); color: #fff; font-size: 9px; padding: 1px 4px; border-radius: 6px; }
+
+    .ratio-options { display: flex; gap: 14px; flex-wrap: wrap; }
+    .ratio { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
+    .ratio-box { width: 46px; height: 62px; border: 2px solid #e0e0e0; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: #fff; }
+    .ratio-box.sq { width: 46px; height: 46px; }
+    .ratio-box.land { width: 62px; height: 46px; }
+    .ratio.active .ratio-box { border-color: var(--primary); background: var(--primary-light); }
+    .ratio .r-label { font-size: 12px; color: var(--text-secondary); }
+    .ratio.active .r-label { color: var(--primary); font-weight: 600; }
+
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag { padding: 6px 12px; border-radius: 16px; background: #f5f5f5; color: var(--text-secondary); font-size: 13px; cursor: pointer; }
+    .tag.active { background: var(--primary-light); color: var(--primary); }
+
+    .input-area { background: #fff; border-radius: 16px; padding: 12px; margin: 0 12px 12px; border: 1px solid var(--border); }
+    .input-hint { font-size: 13px; color: var(--text-tertiary); margin-bottom: 10px; }
+    .input-row { display: flex; align-items: center; gap: 8px; }
+    .model-select { display: flex; align-items: center; gap: 4px; padding: 6px 10px; background: #f5f5f5; border-radius: 14px; font-size: 13px; color: var(--text); cursor: pointer; }
+    .model-select .arrow { font-size: 10px; color: var(--text-tertiary); }
+    .mode-select { display: flex; align-items: center; gap: 4px; padding: 6px 10px; background: #f5f5f5; border-radius: 14px; font-size: 13px; color: var(--text); cursor: pointer; }
+    .voice-btn { width: 32px; height: 32px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .prompt-input { flex: 1; border: none; outline: none; font-size: 14px; color: var(--text); background: transparent; }
+    .prompt-input::placeholder { color: var(--text-tertiary); }
+
+    .quota-hint { text-align: center; font-size: 12px; color: var(--text-tertiary); margin: 8px 0 14px; }
+    .quota-hint .link { color: var(--blue); cursor: pointer; }
+
+    .btn-primary { width: calc(100% - 24px); height: 48px; margin: 0 12px 16px; background: var(--primary); color: #fff; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; cursor: pointer; }
+    .btn-primary:disabled { background: #c8e6c9; }
+    .btn-primary .icon { margin-right: 6px; }
+
+    /* 上传区 */
+    .upload-zone { width: 180px; height: 240px; margin: 16px auto; border: 1px dashed #ddd; border-radius: 16px; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
+    .upload-zone .plus { font-size: 40px; color: var(--text-tertiary); }
+    .upload-zone .tip { font-size: 13px; color: var(--text-tertiary); }
+    .upload-zone.preview { border-style: solid; border-color: var(--border); }
+    .upload-zone.preview .preview-img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; }
+
+    /* AI 首页 */
+    .ai-header { padding: 16px; display: flex; align-items: center; justify-content: space-between; }
+    .ai-header .title { font-size: 22px; font-weight: 700; color: var(--text); }
+    .ai-header .quota { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); background: #fff; padding: 6px 12px; border-radius: 16px; }
+    .ai-tabs { display: flex; gap: 10px; padding: 0 12px 12px; }
+    .ai-tab { flex: 1; height: 90px; background: var(--card-bg); border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    .ai-tab .t-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+    .ai-tab .t-name { font-size: 14px; font-weight: 600; color: var(--text); }
+
+    /* 作品卡片 */
+    .work-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 12px 12px; }
+    .work-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; cursor: pointer; }
+    .work-card .w-thumb { width: 100%; aspect-ratio: 3/4; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 40px; position: relative; }
+    .work-card .w-thumb .used { position: absolute; bottom: 6px; left: 6px; background: rgba(0,0,0,0.5); color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 8px; }
+    .work-card .w-info { padding: 10px; }
+    .work-card .w-title { font-size: 13px; color: var(--text); line-height: 1.4; height: 36px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .work-card .w-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; font-size: 12px; color: var(--text-tertiary); }
+
+    /* 广场页 Tab */
+    .square-tabs { display: flex; gap: 16px; padding: 0 16px; border-bottom: 1px solid var(--border); background: #fff; }
+    .square-tab { height: 44px; display: flex; align-items: center; font-size: 14px; color: var(--text-secondary); cursor: pointer; position: relative; }
+    .square-tab.active { color: var(--text); font-weight: 600; }
+    .square-tab.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 20px; height: 3px; background: var(--primary); border-radius: 2px; }
+
+    /* 底部操作栏 */
+    .bottom-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 72px; background: #fff; border-top: 1px solid var(--border); padding: 10px 12px; z-index: 98; display: flex; align-items: center; }
+    .bottom-bar .cost { flex: 1; font-size: 13px; color: var(--text-secondary); }
+    .bottom-bar .cost b { color: var(--text); font-weight: 600; }
+    .bottom-bar .gen-btn { width: 120px; height: 44px; background: var(--primary); color: #fff; border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; cursor: pointer; }
+
+    /* 弹窗 */
+    .modal { position: fixed; inset: 0; background: var(--mask); z-index: 500; display: none; align-items: flex-end; }
+    .modal.active { display: flex; }
+    .modal-panel { width: 100%; background: #fff; border-radius: 20px 20px 0 0; padding: 16px; max-height: 80%; overflow-y: auto; }
+    .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .modal-title { font-size: 17px; font-weight: 700; color: var(--text); }
+    .modal-close { font-size: 24px; color: var(--text-tertiary); cursor: pointer; }
+    .model-item { display: flex; gap: 12px; padding: 14px; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px; cursor: pointer; }
+    .model-item.active { border-color: var(--primary); background: var(--primary-light); }
+    .model-item .m-name { font-size: 15px; font-weight: 600; color: var(--text); }
+    .model-item .m-desc { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+    .model-item .m-tag { font-size: 10px; color: var(--red); background: var(--red-light); padding: 2px 6px; border-radius: 8px; margin-left: 6px; }
+    .modal-backdrop { position: absolute; inset: 0; }
+
+    /* 结果页 */
+    .result-area { padding: 20px; display: flex; flex-direction: column; align-items: center; }
+    .result-img { width: 220px; height: 220px; border-radius: 16px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 80px; margin-bottom: 16px; }
+    .result-video { width: 220px; height: 390px; border-radius: 16px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 80px; margin-bottom: 16px; }
+    .result-actions { display: flex; gap: 12px; }
+    .result-actions .act { padding: 8px 18px; border-radius: 18px; background: #f5f5f5; color: var(--text); font-size: 14px; cursor: pointer; }
+
+    /* 历史记录 */
+    .history-list { padding: 0 12px; }
+    .history-item { display: flex; gap: 12px; background: #fff; border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+    .history-item .h-thumb { width: 70px; height: 70px; border-radius: 10px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 30px; flex-shrink: 0; }
+    .history-item .h-info { flex: 1; }
+    .history-item .h-prompt { font-size: 13px; color: var(--text); line-height: 1.4; margin-bottom: 6px; }
+    .history-item .h-meta { font-size: 11px; color: var(--text-tertiary); }
+
+    /* 标签输入 */
+    .tag-group { margin-bottom: 14px; }
+    .tag-group-title { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
+
+    /* 快速体验 */
+    .quick-card { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; background: #fff; padding: 6px 12px; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; z-index: 10; }
+    .quick-card img { width: 28px; height: 28px; border-radius: 50%; background: #f0f0f0; }
+    .quick-card span { font-size: 13px; color: var(--text); }
+
+    /* 生成中 */
+    .generating { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; }
+    .generating.active { display: flex; }
+    .spinner { width: 48px; height: 48px; border: 4px solid var(--primary-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .generating .g-text { margin-top: 16px; font-size: 14px; color: var(--text-secondary); }
+
+    /* 详情页 */
+    .detail-thumb { width: 100%; aspect-ratio: 3/4; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 80px; }
+    .detail-info { padding: 16px; }
+    .detail-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .detail-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; }
+    .detail-btns { display: flex; gap: 12px; }
+    .detail-btns .db { flex: 1; height: 44px; border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 15px; cursor: pointer; }
+    .detail-btns .db.primary { background: var(--primary); color: #fff; }
+    .detail-btns .db.secondary { background: #f5f5f5; color: var(--text); }
+  
+
+/* ===== 平铺修复 ===== */
+*{box-sizing:border-box;}
+body{display:block !important;width:100%;min-height:100vh;background:#eef0f4;}
+.copy-bar{position:sticky;top:0;left:0;z-index:100;background:#1a1a2e;color:#fff;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(0,0,0,.25);width:100%;}
+.copy-bar .t{font-size:15px;font-weight:700;}
+.copy-bar .i{font-size:12px;color:#a6adc8;margin-top:2px;}
+.copy-btn{padding:9px 22px;border:none;border-radius:22px;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;font-size:14px;font-weight:700;cursor:pointer;flex-shrink:0;}
+.copy-btn.copied{background:linear-gradient(135deg,#059669,#047857);}
+.pf-board{display:flex;gap:40px;flex-wrap:nowrap;overflow-x:auto;padding:40px 30px 100px;align-items:flex-start;background:#eef0f4;}
+.pf-col{display:flex;flex-direction:column;align-items:center;flex:0 0 auto;}
+.pf-label{font-size:14px;font-weight:600;color:#333;background:#fff;padding:6px 16px;border-radius:20px;box-shadow:0 2px 6px rgba(0,0,0,.1);margin-bottom:14px;white-space:nowrap;}
+.pf-desc{font-size:11px;color:#999;margin:-8px 0 14px;white-space:nowrap;}
+.pf-phone{flex:0 0 375px;width:375px;height:auto;min-height:812px;background:#f7f8fa;border-radius:40px;box-shadow:0 25px 50px -12px rgba(0,0,0,.25);overflow:hidden;position:relative;display:flex;flex-direction:column;}
+.pf-statusbar{height:44px;background:#fff;color:#1a1a1a;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font-size:13px;flex-shrink:0;border-bottom:1px solid #f0f0f0;}
+.pf-content{position:relative;flex:1;min-height:768px;height:auto;overflow:visible;}
+.pf-content .page{position:relative !important;inset:auto !important;top:auto !important;left:auto !important;right:auto !important;bottom:auto !important;display:block !important;height:auto !important;min-height:0 !important;width:100% !important;overflow:visible !important;}
+.pf-content .scroll-view{position:static !important;top:auto !important;bottom:auto !important;overflow:visible !important;height:auto !important;}
+.pf-content .nav-bar{position:static !important;}
+.pf-content .bottom-bar{position:static !important;width:100% !important;}
+.pf-content .square-tabs{position:static !important;}
+.pf-content #toast{display:none !important;}
+.copy-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.25);opacity:0;transition:opacity .3s;pointer-events:none;z-index:200;}
+.copy-toast.show{opacity:1;}
+
+</style>
+</head>
+<body>
+<div class="copy-bar">
+  <div>
+    <div class="t">📋 绿韵家 · AI 创作 — 购买额度 / 额度明细（平铺设计稿，墨刀用）</div>
+    <div class="i">共 2 个状态 · 横向平铺 · ⚠️ 无交互静态展示 · 一键复制源码粘墨刀</div>
+  </div>
+  <button class="copy-btn" id="copyBtn" onclick="doCopy()" title="点击复制完整 HTML 源码，粘贴到墨刀">一键复制源码</button>
+</div>
+<div class="copy-toast" id="copyToast">已复制干净源码，可直接粘贴到墨刀</div>
+<div class="pf-board" id="board">
+<div class="pf-col"><div class="pf-label">购买额度</div><div class="pf-desc">当前剩余 + 4 档套餐 + 立即购买</div><div class="pf-phone"><div class="pf-statusbar"><span>9:41</span><span>📶 🔋</span></div><div class="pf-content"><div class="page has-nav has-bottom" id="pageQuotaBuy">
+<div class="nav-bar">
+<div class="back" onclick="goBack()">‹</div>
+<div>购买额度</div>
+</div>
+<div class="scroll-view">
+<div class="card" style="text-align:center;background:linear-gradient(135deg,#E8F5E9,#fff);">
+<div style="font-size:13px;color:var(--text-tertiary);">当前剩余额度</div>
+<div style="font-size:40px;font-weight:700;color:var(--primary);margin:4px 0;">12</div>
+<div style="font-size:12px;color:var(--text-tertiary);">本月已用 36 · 累计充值 88</div>
+</div>
+<div class="card">
+<div class="section-title">选择套餐</div>
+<div id="quotaPackList"><div class="model-item active"><div style="flex:1;"><div class="m-name">1 次</div><div class="m-desc">单价 ¥1.00/次</div></div><div style="font-size:18px;font-weight:700;color:var(--text);">¥1</div></div><div class="model-item"><div style="flex:1;"><div class="m-name">10 次<span class="m-tag" style="margin-left:6px;">9折</span></div><div class="m-desc">单价 ¥0.90/次<span style="font-size:12px;color:var(--red);margin-left:6px;">省¥1</span></div></div><div style="font-size:18px;font-weight:700;color:var(--text);">¥9</div></div><div class="model-item"><div style="flex:1;"><div class="m-name">30 次<span class="m-tag" style="margin-left:6px;">8折</span></div><div class="m-desc">单价 ¥0.80/次<span style="font-size:12px;color:var(--red);margin-left:6px;">省¥6</span></div></div><div style="font-size:18px;font-weight:700;color:var(--text);">¥24</div></div><div class="model-item"><div style="flex:1;"><div class="m-name">100 次<span class="m-tag" style="margin-left:6px;">5折</span></div><div class="m-desc">单价 ¥0.50/次<span style="font-size:12px;color:var(--red);margin-left:6px;">省¥50</span></div></div><div style="font-size:18px;font-weight:700;color:var(--text);">¥50</div></div></div>
+<div style="font-size:11px;color:var(--text-tertiary);margin-top:10px;line-height:1.5;">
+          额度=生成次数，1 次 = ¥1；购买后走绿韵家现有下单流程（微信/支付宝/储值钱包支付）。
+        </div>
+</div>
+</div>
+<div class="bottom-bar">
+<div class="cost">合计 <b id="quotaBuyPrice">¥1</b></div>
+<div class="gen-btn" onclick="buyQuota()">立即购买</div>
+</div>
+</div></div></div></div>
+<div class="pf-col"><div class="pf-label">额度明细</div><div class="pf-desc">余额汇总 + Tab(全部/消耗/充值/赠送) + 流水</div><div class="pf-phone"><div class="pf-statusbar"><span>9:41</span><span>📶 🔋</span></div><div class="pf-content"><div class="page has-nav" id="pageQuotaDetail">
+<div class="nav-bar">
+<div class="back" onclick="goBack()">‹</div>
+<div>额度明细</div>
+<div class="right" onclick="go('pageQuotaBuy')">充值</div>
+</div>
+<div class="scroll-view" style="top:44px;">
+<div class="card" style="margin-top:12px;">
+<div class="section-title">额度账户</div>
+<div style="display:flex;justify-content:space-around;text-align:center;">
+<div>
+<div style="font-size:24px;font-weight:700;color:var(--primary);">12</div>
+<div style="font-size:12px;color:var(--text-tertiary);">剩余额度</div>
+</div>
+<div>
+<div style="font-size:24px;font-weight:700;color:var(--text);">36</div>
+<div style="font-size:12px;color:var(--text-tertiary);">本月已用</div>
+</div>
+<div>
+<div style="font-size:24px;font-weight:700;color:var(--blue);">88</div>
+<div style="font-size:12px;color:var(--text-tertiary);">累计充值</div>
+</div>
+</div>
+</div>
+<div class="square-tabs" style="position:sticky;top:0;">
+<div class="square-tab active" data-qtab="all" onclick="switchQuotaTab(this,'all')">全部</div>
+<div class="square-tab" data-qtab="consume" onclick="switchQuotaTab(this,'consume')">消耗</div>
+<div class="square-tab" data-qtab="recharge" onclick="switchQuotaTab(this,'recharge')">充值</div>
+<div class="square-tab" data-qtab="gift" onclick="switchQuotaTab(this,'gift')">赠送</div>
+</div>
+<div class="history-list" id="quotaDetailList" style="margin-top:8px;">
+<div class="history-item" data-type="consume">
+<div class="h-thumb" style="background:#FFEBEE;">🎨</div>
+<div class="h-info">
+<div class="h-prompt">生成图片 · 消耗 1 额度</div>
+<div class="h-meta">2026-08-18 14:32 · 操作后余额 11</div>
+</div>
+<div style="font-size:15px;font-weight:700;color:var(--red);align-self:center;">-1</div>
+</div>
+<div class="history-item" data-type="consume">
+<div class="h-thumb" style="background:#FFEBEE;">▶️</div>
+<div class="h-info">
+<div class="h-prompt">生成视频 · 消耗 1 额度</div>
+<div class="h-meta">2026-08-18 12:10 · 操作后余额 10</div>
+</div>
+<div style="font-size:15px;font-weight:700;color:var(--red);align-self:center;">-1</div>
+</div>
+<div class="history-item" data-type="recharge">
+<div class="h-thumb" style="background:#E8F5E9;">💰</div>
+<div class="h-info">
+<div class="h-prompt">购买 30 次套餐 · 充值 30 额度</div>
+<div class="h-meta">2026-08-17 10:00 · 操作后余额 60</div>
+</div>
+<div style="font-size:15px;font-weight:700;color:var(--primary);align-self:center;">+30</div>
+</div>
+<div class="history-item" data-type="gift">
+<div class="h-thumb" style="background:#FFF3E0;">🎁</div>
+<div class="h-info">
+<div class="h-prompt">新用户赠送 · 到账 3 额度</div>
+<div class="h-meta">2026-08-15 09:00 · 操作后余额 13</div>
+</div>
+<div style="font-size:15px;font-weight:700;color:var(--orange);align-self:center;">+3</div>
+</div>
+<div class="history-item" data-type="consume">
+<div class="h-thumb" style="background:#FFEBEE;">🎨</div>
+<div class="h-info">
+<div class="h-prompt">生成图片 · 消耗 1 额度</div>
+<div class="h-meta">2026-08-10 16:20 · 操作后余额 10</div>
+</div>
+<div style="font-size:15px;font-weight:700;color:var(--red);align-self:center;">-1</div>
+</div>
+<div class="history-item" data-type="recharge">
+<div class="h-thumb" style="background:#E8F5E9;">💰</div>
+<div class="h-info">
+<div class="h-prompt">购买 10 次套餐 · 充值 10 额度</div>
+<div class="h-meta">2026-08-08 20:15 · 操作后余额 11</div>
+</div>
+<div style="font-size:15px;font-weight:700;color:var(--primary);align-self:center;">+10</div>
+</div>
+</div>
+<div style="text-align:center;font-size:12px;color:var(--text-tertiary);padding:20px 0 30px;">— 已显示全部记录 —</div>
+</div>
+</div></div></div></div>
+</div>
+
+<script>
+function showCopyToast(msg){var t=document.getElementById('copyToast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},1800);}
+function doCopy(){
+  var css=document.querySelector('style').textContent;
+  var board=document.getElementById('board').outerHTML;
+  var src='<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><style>'+css+'</style></head><body>'+board+'</body></html>';
+  navigator.clipboard.writeText(src).then(function(){
+    var b=document.getElementById('copyBtn');b.textContent='✓ 已复制';b.classList.add('copied');
+    showCopyToast('已复制干净源码（无交互），可直接粘贴到墨刀');
+    setTimeout(function(){b.textContent='一键复制源码';b.classList.remove('copied');},1800);
+  }).catch(function(){alert('复制失败，请手动选择复制');});
+}
+</script>
+
+</body>
+</html>
