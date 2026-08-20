@@ -47,7 +47,6 @@
     <li><a href="#s7">七、关键边界设计检查清单</a></li>
     <li><a href="#s8">八、文档维护与变更规范</a></li>
     <li><a href="#s9">九、待确认项汇总</a></li>
-    <li><a href="#s10">十、附录：PRD内嵌截图清单</a></li>
   </ol>
 </div>
 
@@ -58,7 +57,7 @@
 </thead>
 <tbody>
   <tr><td>项目名称</td><td>绿韵家App首页改版（本期范围：Banner轮播广告改造 + 分类导航改造 + 营销专区专题管理 + 猜你喜欢算法 + 后台配置）</td></tr>
-  <tr><td>文档版本</td><td>V1.18</td></tr>
+  <tr><td>文档版本</td><td>V1.19</td></tr>
   <tr><td>创建日期</td><td>2026-08-14</td></tr>
   <tr><td>文档状态</td><td>草稿 / 待评审</td></tr>
   <tr><td>产品负责人</td><td>⚠️ 待确认 @产品负责人</td></tr>
@@ -92,7 +91,7 @@
   <tr><td>V1.16</td><td>2026-08-17</td><td>PM</td><td>专题结构与字段澄清（评审反问闭环）：① 营销专区三个固定板块各取对应专题类型的<strong>唯一专题</strong>（同类型仅允许存在 1 个，新建需先删旧）；专题卡片展示"专题名称 + 专题标签（≤5字，<strong>必填</strong>）"替换原"副标题（可选）"；② 统一打分模型"下单"加分口径确认为<strong>提交订单即计入（含未支付）</strong>。同步更新 4.1.4~4.1.6、4.1.7.4、4.2.3、4.2.4、待确认项 #23/#24/#25 收敛为已确认</td><td>草稿</td></tr>
   <tr><td>V1.17</td><td>2026-08-17</td><td>PM</td><td>专题标签"必填"范围收窄：仅专题类型=超级品牌/超级爆款/限时特惠时必填（≤5字），常规专题可选填；同步更新 4.1.4 统一数据规则、4.1.4~4.1.6 字段表、4.2.3.1/4.2.3.2、待确认项 #8/#24</td><td>草稿</td></tr>
   <tr><td>V1.18</td><td>2026-08-17</td><td>PM</td><td>营销专区商品展示数量澄清（评审反问闭环）：原"每专题取 1 个最新商品"改为按板块区分——超级品牌取该专题关联商品按商品排序降序的<strong>第 1 个</strong>（单个大图卡），超级爆款/限时特惠各取<strong>前 2 个</strong>（2 列小卡）；同步更新营销专区统一数据规则（4.1.4）、4.1.4~4.1.6 详细规则/商品展示/展示数量/列表字段表/数据来源，并修正残留的"最新加入商品/前几个商品"旧描述</td><td>草稿</td></tr>
-<tr><td>V1.19</td><td>2026-08-20</td><td>PM</td><td>猜你喜欢统一打分模型行为加分的<strong>同行为多次计次规则</strong>明文化：所有行为加分项（加购 / 下单 / 收藏 / 三天内浏览）均为<strong>二元命中、同一行为多次命中不累加、封顶 1 倍权重</strong>——同一商品多次下单/收藏/浏览均按"是否命中窗口期"判定，命中即 +权重，未命中即 0；不同行为之间可叠加（如加购 +30 + 收藏 +25 = +55）。同步更新 4.1.7.4 行为加分判定段、4.1.7.5 排序伪代码注释，并新增待确认项 #26「同行为多次命中是否改成累计加分（封顶 N 次）以反映复购深度」</td><td>草稿</td></tr>
+<tr><td>V1.19</td><td>2026-08-20</td><td>PM</td><td>① 猜你喜欢统一打分模型行为加分的<strong>同行为多次计次规则</strong>明文化：所有行为加分项（加购 / 下单 / 收藏 / 三天内浏览）均为<strong>二元命中、同一行为多次命中不累加、封顶 1 倍权重</strong>——同一商品多次下单/收藏/浏览均按"是否命中窗口期"判定，命中即 +权重，未命中即 0；不同行为之间可叠加（如加购 +30 + 收藏 +25 = +55）。同步更新 4.1.7.4 行为加分判定段、4.1.7.5 排序伪代码注释，并新增待确认项 #26。② 修正顶部文档版本号仍为 V1.18 的残留、删除遗留的"十、附录：PRD内嵌截图清单"（钉钉端截图因相对路径无法加载），确保 PRD 内嵌图片使用线上绝对 URL。</td><td>草稿</td></tr>
 </tbody>
 </table>
 
@@ -1205,42 +1204,6 @@ total_score = base_score + behavior_score
   <tr><td>21</td><td>首页运营后台：轮播广告配置复用现有"首页投放 → 广告管理"菜单（新增"轮播广告"类型）；专题管理复用现有"商品中心 → 专题管理"菜单（新增"专题类型"字段）；在现有后台中新增"首页运营配置"子菜单（猜你喜欢策略配置），非独立新建系统</td><td>@产品负责人 / @研发负责人</td><td>部分确认</td></tr>
 </tbody>
 </table>
-
-<h2 id="s10">十、附录：PRD内嵌截图清单</h2>
-
-<table>
-<thead>
-  <tr><th>截图文件名</th><th>用途</th><th>说明</th></tr>
-</thead>
-<tbody>
-  <tr><td>prd-assets/home-full.png</td><td>首页完整原型</td><td>覆盖搜索框、购物车、Banner（本期改造）、分类导航、营销专区、猜你喜欢</td></tr>
-  <tr><td>prd-assets/home-banner-new.png</td><td>首页Banner轮播区需求标注</td><td>用于 4.1.2 原型示意；说明后台广告管理新增"轮播广告"类型、限制图片大小、只能上传一张、按排序从小到大展示</td></tr>
-  <tr><td>prd-assets/category-nav.png</td><td>分类导航区</td><td>用于 4.1.3 原型示意；本期分类导航写死展示，仅补全跳转逻辑说明</td></tr>
-  <tr><td>prd-assets/marketing-zones.png</td><td>超级品牌/超级爆款/限时特惠区</td><td>用于 4.1.4~4.1.6 原型示意</td></tr>
-  <tr><td>prd-assets/guess-you-like.png</td><td>猜你喜欢区</td><td>用于 4.1.7 原型示意</td></tr>
-  <tr><td>prd-assets/nav-xinpinshangshi.jpg</td><td>新品上市落地页</td><td>用于 4.1.3.4 落地页结构说明</td></tr>
-  <tr><td>prd-assets/nav-jiankangshenghuo.jpg</td><td>健康生活落地页</td><td>用于 4.1.3.4 落地页结构说明</td></tr>
-  <tr><td>prd-assets/nav-ziyingzhuanqu.jpg</td><td>自营专区落地页</td><td>用于 4.1.3.4 落地页结构说明</td></tr>
-  <tr><td>prd-assets/nav-weishengtaizhuanqu.jpg</td><td>微生态专区落地页</td><td>用于 4.1.3.4 落地页结构说明</td></tr>
-  <tr><td>prd-assets/nav-more.png</td><td>更多落地页</td><td>用于 4.1.3.4 落地页结构说明</td></tr>
-  <tr><td>prd-assets/nav-meirihuodong.jpg</td><td>每日活动落地页</td><td>用于 4.1.3.4 落地页结构说明</td></tr>
-  <tr><td>prd-assets/nav-jingpintuijian.jpg</td><td>精品推荐落地页</td><td>用于 4.1.3.4 落地页结构说明</td></tr>
-  <tr><td>prd-assets/nav-huiminbutie.jpg</td><td>惠民补贴落地页</td><td>用于 4.1.3.4 落地页结构说明</td></tr>
-  <tr><td>prd-assets/more-category-note.png</td><td>更多页分类 tab 说明</td><td>用于 4.1.3.4 更多落地页结构说明，明确 tab 沿用现有分栏（写死）</td></tr>
-  <tr><td>prd-assets/admin-ad-reference.png</td><td>后台广告管理页面参考</td><td>用于 4.2.0 后台页面参考原型，明确新增配置模块的列表/筛选/操作交互形态</td></tr>
-  <tr><td>prd-assets/admin-ad-edit.png</td><td>后台广告编辑页参考</td><td>用于 4.2.0 / 4.2.1，说明轮播广告配置复用现有"编辑广告"页面（新增"轮播广告"类型）</td></tr>
-  <tr><td>prd-assets/app-special-zones.png</td><td>前端三大板块需求标注</td><td>用于 4.1.4 / 4.1.5 / 4.1.6，说明后台专题管理新增专题类型、点击跳转该专题商品列表页展示该专题里面的商品</td></tr>
-  <tr><td>prd-assets/admin-topic-list.png</td><td>后台专题管理列表页</td><td>用于 4.2.3.0，说明专题管理列表字段与交互形态</td></tr>
-  <tr><td>prd-assets/admin-topic-create.png</td><td>后台新增专题弹窗</td><td>用于 4.2.3.0 / 4.2.3.2，说明新增专题表单字段及本期新增的"专题类型"字段</td></tr>
-  <tr><td>prd-assets/guess-you-like-algorithm.png</td><td>猜你喜欢算法需求标注</td><td>用于 4.1.7.1，说明三类用户推荐策略需求</td></tr>
-  <tr><td>prd-assets/admin-product-fields.png</td><td>后台商品字段截图</td><td>用于 4.1.7.3 / 4.1.7.9，说明本期推荐算法复用的现有商品字段（运营类型、商品排序、商品标签、修改时间等）</td></tr>
-  <tr><td>prd-assets/topic-superbrand-list.png</td><td>超级品牌商品列表页</td><td>用于 4.1.4.6，说明点击超级品牌卡片后跳转的商品列表页样式</td></tr>
-  <tr><td>prd-assets/topic-superhit-list.png</td><td>超级爆款商品列表页</td><td>用于 4.1.5.6，说明点击超级爆款卡片后跳转的商品列表页样式</td></tr>
-  <tr><td>prd-assets/topic-limited-list.png</td><td>限时特惠商品列表页</td><td>用于 4.1.6.6，说明点击限时特惠卡片后跳转的商品列表页样式</td></tr>
-</tbody>
-</table>
-
-<p class="note"><strong>截图复用说明</strong>：home-full.png 作为首页完整设计稿，在 4.1.1 等小节中被引用以示意整体布局；home-banner-new.png 在 4.1.2 中被引用；marketing-zones.png 与 app-special-zones.png 在 4.1.4、4.1.5、4.1.6 中被引用；category-nav.png 在 4.1.3 中被引用；guess-you-like.png、guess-you-like-algorithm.png 与 admin-product-fields.png 在 4.1.7 中被引用。8 张分类导航落地页截图在 4.1.3.4 中被引用。more-category-note.png 在 4.1.3.4 中被引用；admin-ad-reference.png、admin-ad-edit.png 在 4.2.0 / 4.2.1 中被引用；admin-topic-list.png、admin-topic-create.png 在 4.2.3 中被引用。topic-superbrand-list.png、topic-superhit-list.png、topic-limited-list.png 分别在 4.1.4.6、4.1.5.6、4.1.6.6 中被引用。以上为同一张图片文件的合理复用，非视图缺失或重复截图。</p>
 
 </body>
 </html>
