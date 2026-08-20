@@ -484,7 +484,7 @@
 <h5>4.1.8.5 数据来源（字段级）</h5>
 <table><thead><tr><th>字段名称</th><th>取值逻辑说明</th></tr></thead><tbody>
 <tr><td>剩余额度 / 本月已用 / 累计充值</td><td>同 4.1.7.5，调「额度账户接口」</td></tr>
-<tr><td>流水列表</td><td>调「额度流水接口」GET /quota/ledger?type={tab}&page=1&size=20</td></tr>
+<tr><td>流水列表</td><td>调「额度流水接口」GET /quota/ledger?type=[tab]&page=1&size=20</td></tr>
 <tr><td>类型分布</td><td>前端按 data-type 过滤：consume / recharge / gift</td></tr>
 </tbody></table>
 
@@ -566,9 +566,9 @@
 
 <h3>10.2 主工作流「AI 创作编排」节点说明</h3>
 <table><thead><tr><th>#</th><th>节点</th><th>类型</th><th>职责</th><th>输入 → 输出</th><th>记忆库</th><th>失败重试</th></tr></thead><tbody>
-<tr><td>1</td><td>开始</td><td>start</td><td>接收前端下发意图与全部参数</td><td>intent, user_text, selected_tags[], voice_text?, reference_images[], model, ratio, clarity, duration → —</td><td>无</td><td>—</td></tr>
+<tr><td>1</td><td>开始</td><td>start</td><td>接收前端下发意图与全部参数</td><td>intent, user_text, selected_tags（数组）, voice_text（可选）, reference_images（数组）, model, ratio, clarity, duration → —</td><td>无</td><td>—</td></tr>
 <tr><td>2</td><td>输入归一化</td><td>code</td><td>复用泰小虎「提取用户输入的文案和图片信息」范式：标签翻译为结构化描述、参考图 URL 抽取（正则解析 markdown/URL）、语音文本归一化</td><td>user_text, tags, voice_text, images → normalized_input</td><td>读：session 会话上下文写入</td><td>timeout 30s，retry 0</td></tr>
-<tr><td>3</td><td>意图与场景识别</td><td>llm</td><td>复用泰小虎「意图识别」范式：系统提示词判断 生图/生视频/做同款，提取风格、比例、时长、主体等结构化参数并改写查询；强制 JSON 输出</td><td>normalized_input → {scene_type, structured_params, rewritten_query}</td><td>无（纯推理）</td><td>timeout 180s，retry 1</td></tr>
+<tr><td>3</td><td>意图与场景识别</td><td>llm</td><td>复用泰小虎「意图识别」范式：系统提示词判断 生图/生视频/做同款，提取风格、比例、时长、主体等结构化参数并改写查询；强制 JSON 输出</td><td>normalized_input → （scene_type, structured_params, rewritten_query）</td><td>无（纯推理）</td><td>timeout 180s，retry 1</td></tr>
 <tr><td>4</td><td>是否需提示词增强</td><td>condition</td><td>若用户已填完整 prompt 则跳过子工作流 A，直接进生成</td><td>scene_type, prompt → 路由</td><td>无</td><td>—</td></tr>
 <tr><td>5</td><td>子工作流A：提示词增强</td><td>sub_workflow</td><td>调用 prompt_enhance，返回 enhanced_prompt</td><td>normalized_input, scene_type → enhanced_prompt</td><td>读写：user_style（见 §10.7）</td><td>继承子流程</td></tr>
 <tr><td>6</td><td>生成类型路由</td><td>condition</td><td>按 scene_type 路由到图片 / 视频子工作流</td><td>scene_type → 路由</td><td>无</td><td>—</td></tr>
@@ -586,7 +586,7 @@
 <tr><td>2</td><td>标签规范化</td><td>code</td><td>复用泰小虎「提取用户输入」范式：把 selected_tags 翻译为模型友好描述（如「国风」→「中国水墨风格, 留白构图」）</td><td>tags → tag_desc</td><td>无</td><td>timeout 30s</td></tr>
 <tr><td>3</td><td>语音转提示词（条件）</td><td>llm</td><td>若 voice_text 存在，LLM 将口语化语音转写为画面细节描述，补全主体/场景/动作</td><td>voice_text → voice_prompt</td><td>无</td><td>timeout 120s，retry 1</td></tr>
 <tr><td>4</td><td>提示词扩写</td><td>llm</td><td>复用泰小虎「信息整合」范式：系统提示词补全风格/光线/构图/镜头运动，强制 JSON 输出最终提示词；参考用户长期风格画像做个性化</td><td>user_text+tag_desc+voice_prompt → final_prompt(JSON)</td><td>读：user_style 默认填充</td><td>timeout 180s，retry 1</td></tr>
-<tr><td>5</td><td>敏感词合规校验</td><td>code</td><td>复用泰小虎「清洗 OCR 内容」范式：黑名单 + 正则过滤违规/侵权词，命中则降级替换并返回 flag</td><td>final_prompt → {safe_prompt, blocked}</td><td>无（命中写合规日志到业务库）</td><td>timeout 30s</td></tr>
+<tr><td>5</td><td>敏感词合规校验</td><td>code</td><td>复用泰小虎「清洗 OCR 内容」范式：黑名单 + 正则过滤违规/侵权词，命中则降级替换并返回 flag</td><td>final_prompt → （safe_prompt, blocked）</td><td>无（命中写合规日志到业务库）</td><td>timeout 30s</td></tr>
 <tr><td>6</td><td>结束</td><td>end</td><td>返回增强后提示词</td><td>safe_prompt → enhanced_prompt</td><td>无</td><td>—</td></tr>
 </tbody></table>
 
