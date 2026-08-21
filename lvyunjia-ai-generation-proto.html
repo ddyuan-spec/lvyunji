@@ -186,74 +186,6 @@
   <div id="toast"></div>
 
   <!-- ================== AI 创作首页 ================== -->
-  <div class="page active" id="pageAIGateway">
-    <div class="scroll-view">
-      <div class="ai-header">
-        <div class="title">AI 创作</div>
-        <div class="quota" onclick="go('pageHistory')">
-          <span>⚡</span>
-          <span>剩余额度 12</span>
-        </div>
-      </div>
-
-      <div class="ai-tabs">
-        <div class="ai-tab" onclick="go('pageImageGen')">
-          <div class="t-icon" style="background:#FFF3E0;color:#FF9800;">🖼️</div>
-          <div class="t-name">AI 生图</div>
-        </div>
-        <div class="ai-tab" onclick="go('pageVideoGen')">
-          <div class="t-icon" style="background:#E3F2FD;color:#2196F3;">▶️</div>
-          <div class="t-name">AI 生视频</div>
-        </div>
-      </div>
-
-      <div class="ai-tabs">
-        <div class="ai-tab" onclick="go('pageSquare')">
-          <div class="t-icon" style="background:#F3E5F5;color:#9C27B0;">🌟</div>
-          <div class="t-name">广场 / 做同款</div>
-        </div>
-        <div class="ai-tab" onclick="go('pageHistory')">
-          <div class="t-icon" style="background:#E8F5E9;color:#4CAF50;">📁</div>
-          <div class="t-name">我的作品</div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:8px;">
-        <div class="section-title">热门推荐 <span class="more" onclick="go('pageSquare')">更多 ›</span></div>
-        <div class="work-grid">
-          <div class="work-card" onclick="goWorkDetail('image')">
-            <div class="w-thumb">🌸<span class="used">1.6万人用过</span></div>
-            <div class="w-info">
-              <div class="w-title">AI可爱风蜡笔涂鸦</div>
-              <div class="w-meta"><span>🎨 生图</span><span>❤️ 692</span></div>
-            </div>
-          </div>
-          <div class="work-card" onclick="goWorkDetail('video')">
-            <div class="w-thumb">🐺<span class="used">4.2万人用过</span></div>
-            <div class="w-info">
-              <div class="w-title">测一测你的守护兽</div>
-              <div class="w-meta"><span>▶️ 生视频</span><span>❤️ 884</span></div>
-            </div>
-          </div>
-          <div class="work-card" onclick="goWorkDetail('image')">
-            <div class="w-thumb">🌅<span class="used">7891人用过</span></div>
-            <div class="w-info">
-              <div class="w-title">镜头伸手照替换人物</div>
-              <div class="w-meta"><span>🎨 生图</span><span>❤️ 320</span></div>
-            </div>
-          </div>
-          <div class="work-card" onclick="goWorkDetail('image')">
-            <div class="w-thumb">💑<span class="used">2607人用过</span></div>
-            <div class="w-info">
-              <div class="w-title">可爱贴纸双人合照</div>
-              <div class="w-meta"><span>🎨 生图</span><span>❤️ 156</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- ================== AI 生图页 ================== -->
   <div class="page has-nav has-bottom" id="pageImageGen">
     <div class="nav-bar">
@@ -269,13 +201,9 @@
       <div class="input-area">
         <div class="input-hint">支持一句话改图，或输入文字生图</div>
         <div class="input-row">
-          <div class="model-select" onclick="openModelSelect('image')">
-            <span id="imgModelName">Qwen-Image 3.0</span>
-            <span class="arrow">▼</span>
-          </div>
-          <div class="mode-select" onclick="openRatioSelect('image')">
-            <span id="imgRatioName">3:4</span>
-            <span class="arrow">▼</span>
+          <div class="ratio-seg">
+            <div class="ratio-opt active" onclick="switchImgRatio(this,'9:16')">9:16</div>
+            <div class="ratio-opt" onclick="switchImgRatio(this,'16:9')">16:9</div>
           </div>
           <div class="voice-btn" onclick="startVoice('image')">🎙️</div>
         </div>
@@ -323,170 +251,11 @@
   </div>
 
   <!-- ================== AI 生视频页 ================== -->
-  <div class="page has-nav has-bottom" id="pageVideoGen">
-    <div class="nav-bar">
-      <div class="back" onclick="goBack()">‹</div>
-      <div>AI 生视频</div>
-    </div>
-    <div class="scroll-view">
-      <div class="quick-card" onclick="toast('快速体验：使用官方示例图')">
-        <img src="" alt="">
-        <span>快速体验</span>
-        <span style="color:#999;">›</span>
-      </div>
-
-      <div class="upload-zone" id="videoUploadZone" onclick="uploadVideo()" style="margin-top:60px;">
-        <div class="plus">+</div>
-        <div class="tip">导入图片 / 视频</div>
-      </div>
-
-      <div class="input-area">
-        <div class="input-hint">描述你想生成的画面</div>
-        <div class="input-row">
-          <div class="model-select" onclick="openModelSelect('video')">
-            <span id="videoModelName">HappyHorse 1.0</span>
-            <span class="arrow">▼</span>
-          </div>
-          <div class="mode-select" onclick="toast('切换模式')">
-            <span>视频生成</span>
-            <span class="arrow">▼</span>
-          </div>
-          <div class="voice-btn" onclick="startVoice('video')">🎙️</div>
-        </div>
-        <textarea class="prompt-input" id="videoPrompt" style="width:100%;min-height:70px;margin-top:10px;resize:none;border:none;outline:none;font-size:14px;" placeholder="描述你想要的画面"></textarea>
-      </div>
-
-      <div class="quota-hint">本次消耗 1 个生成额度 <span class="link" onclick="go('pageHistory')">额度管理 ›</span></div>
-
-      <div class="card">
-        <div class="section-title">视频编辑模式</div>
-        <div class="option-row">
-          <div class="option active" data-mode="gen" onclick="switchVideoMode(this)">视频生成</div>
-          <div class="option" data-mode="multi" onclick="switchVideoMode(this)">多参考图</div>
-          <div class="option" data-mode="edit" onclick="switchVideoMode(this)">视频编辑</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="section-title">清晰度</div>
-        <div class="option-row">
-          <div class="option active" data-clarity="hd" onclick="switchClarity(this)">高清</div>
-          <div class="option pay" data-clarity="uhd" onclick="switchClarity(this)">超清</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="section-title">比例</div>
-        <div class="ratio-options">
-          <div class="ratio active" data-ratio="9:16" onclick="switchRatio(this)">
-            <div class="ratio-box">📱</div>
-            <div class="r-label">9:16</div>
-          </div>
-          <div class="ratio" data-ratio="3:4" onclick="switchRatio(this)">
-            <div class="ratio-box sq">📱</div>
-            <div class="r-label">3:4</div>
-          </div>
-          <div class="ratio" data-ratio="1:1" onclick="switchRatio(this)">
-            <div class="ratio-box sq">⬜</div>
-            <div class="r-label">1:1</div>
-          </div>
-          <div class="ratio" data-ratio="4:3" onclick="switchRatio(this)">
-            <div class="ratio-box land">🖼️</div>
-            <div class="r-label">4:3</div>
-          </div>
-          <div class="ratio" data-ratio="16:9" onclick="switchRatio(this)">
-            <div class="ratio-box land">🖥️</div>
-            <div class="r-label">16:9</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="section-title">时长</div>
-        <div class="option-row">
-          <div class="option active" data-duration="5" onclick="switchDuration(this)">5 秒</div>
-          <div class="option" data-duration="10" onclick="switchDuration(this)">10 秒</div>
-          <div class="option pay" data-duration="15" onclick="switchDuration(this)">15 秒</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="section-title">辅助提示词</div>
-        <div class="tag-group">
-          <div class="tag-group-title">镜头运动</div>
-          <div class="tag-list">
-            <span class="tag" data-group="camera" onclick="toggleTag(this)">推进</span>
-            <span class="tag" data-group="camera" onclick="toggleTag(this)">环绕</span>
-            <span class="tag" data-group="camera" onclick="toggleTag(this)">平移</span>
-            <span class="tag" data-group="camera" onclick="toggleTag(this)">固定</span>
-          </div>
-        </div>
-        <div class="tag-group">
-          <div class="tag-group-title">情绪 / 节奏</div>
-          <div class="tag-list">
-            <span class="tag" data-group="mood" onclick="toggleTag(this)">温馨舒缓</span>
-            <span class="tag" data-group="mood" onclick="toggleTag(this)">动感活力</span>
-            <span class="tag" data-group="mood" onclick="toggleTag(this)">神秘梦幻</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="bottom-bar">
-      <div class="cost">预计消耗 <b id="videoCost">1</b> 额度</div>
-      <div class="gen-btn" onclick="generate('video')">立即生成</div>
-    </div>
-  </div>
-
-  <!-- ================== 广场页 ================== -->
-  <div class="page has-nav" id="pageSquare">
-    <div class="nav-bar">
-      <div class="back" onclick="goBack()">‹</div>
-      <div>创作广场</div>
-      <div class="right" onclick="go('pageHistory')">我的</div>
-    </div>
-    <div class="scroll-view" style="top:88px;">
-      <div class="square-tabs" style="position:absolute;top:44px;left:0;right:0;z-index:10;">
-        <div class="square-tab active" onclick="switchSquareTab(this, 'latest')">最新</div>
-        <div class="square-tab" onclick="switchSquareTab(this, 'discover')">发现</div>
-        <div class="square-tab" onclick="switchSquareTab(this, 'image')">图片</div>
-        <div class="square-tab" onclick="switchSquareTab(this, 'video')">视频</div>
-        <div class="square-tab" onclick="switchSquareTab(this, 'template')">模板</div>
-      </div>
-      <div class="work-grid" style="margin-top:12px;">
-        <div class="work-card" onclick="goWorkDetail('image')">
-          <div class="w-thumb">🌸<span class="used">1.6万人用过</span></div>
-          <div class="w-info">
-            <div class="w-title">AI可爱风蜡笔涂鸦</div>
-            <div class="w-meta"><span>🎨 生图</span><span>❤️ 692</span></div>
-          </div>
-        </div>
-        <div class="work-card" onclick="goWorkDetail('video')">
-          <div class="w-thumb">🐺<span class="used">4.2万人用过</span></div>
-          <div class="w-info">
-            <div class="w-title">测一测你的守护兽</div>
-            <div class="w-meta"><span>▶️ 生视频</span><span>❤️ 884</span></div>
-          </div>
-        </div>
-        <div class="work-card" onclick="goWorkDetail('image')">
-          <div class="w-thumb">🌅<span class="used">7891人用过</span></div>
-          <div class="w-info">
-            <div class="w-title">镜头伸手照替换人物</div>
-            <div class="w-meta"><span>🎨 生图</span><span>❤️ 320</span></div>
-          </div>
-        </div>
-        <div class="work-card" onclick="goWorkDetail('image')">
-          <div class="w-thumb">💑<span class="used">2607人用过</span></div>
-          <div class="w-info">
-            <div class="w-title">可爱贴纸双人合照</div>
-            <div class="w-meta"><span>🎨 生图</span><span>❤️ 156</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- 已删除：AI 生视频页（评审精简：仅保留我的作品 + AI 生图） -->
+  <!-- 已删除：创作广场页（评审精简） -->
 
   <!-- ================== 作品详情 / 做同款 ================== -->
-  <div class="page has-nav has-bottom" id="pageWorkDetail">
+  <div class="page has-nav" id="pageWorkDetail">
     <div class="nav-bar">
       <div class="back" onclick="goBack()">‹</div>
       <div>作品详情</div>
@@ -502,24 +271,37 @@
           <span class="tag">校园</span>
         </div>
         <div class="detail-btns">
-          <div class="db secondary" onclick="toast('收藏成功')">❤️ 收藏</div>
-          <div class="db secondary" onclick="toast('已分享给好友')">↗️ 分享</div>
+          <div class="db secondary" onclick="toast('已保存到相册')">⬇️ 保存到相册</div>
+          <div class="db secondary" onclick="openShare()">↗️ 分享</div>
         </div>
       </div>
-    </div>
-    <div class="bottom-bar">
-      <div class="cost">做同款预计消耗 <b>1</b> 额度</div>
-      <div class="gen-btn" onclick="doSame()">做同款</div>
     </div>
   </div>
 
   <!-- ================== 历史记录 / 我的作品 ================== -->
-  <div class="page has-nav" id="pageHistory">
+  <div class="page has-nav active" id="pageHistory">
     <div class="nav-bar">
       <div class="back" onclick="goBack()">‹</div>
       <div>我的作品</div>
+      <div class="right" onclick="go('pageImageGen')">创作</div>
     </div>
     <div class="scroll-view">
+      <div class="create-cta" onclick="go('pageImageGen')">
+        <div class="cc-icon">✨</div>
+        <div class="cc-text">
+          <div class="cc-title">开始你的 AI 创作</div>
+          <div class="cc-sub">一句话 / 一张图，生成专属 AI 作品</div>
+        </div>
+        <div class="cc-btn">立即创作</div>
+      </div>
+
+      <div class="empty-state" id="historyEmpty" style="display:none;text-align:center;padding:44px 0;color:#999;">
+        <div style="font-size:52px;margin-bottom:12px;">🖼️</div>
+        <div style="font-size:15px;color:#666;margin-bottom:6px;">还没有作品</div>
+        <div style="font-size:13px;margin-bottom:18px;">点击「立即创作」生成你的第一幅 AI 作品吧</div>
+        <div class="gen-btn" style="display:inline-flex;padding:0 28px;" onclick="go('pageImageGen')">立即创作</div>
+      </div>
+
       <div class="card">
         <div class="section-title">额度账户</div>
         <div style="display:flex;justify-content:space-around;text-align:center;">
@@ -542,21 +324,14 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card" id="historyCard">
         <div class="section-title">生成记录</div>
-        <div class="history-list">
+        <div class="history-list" id="historyList">
           <div class="history-item" onclick="goWorkDetail('image')">
             <div class="h-thumb">🌸</div>
             <div class="h-info">
               <div class="h-prompt">AI可爱风蜡笔涂鸦，校服女孩，糖果贴纸</div>
-              <div class="h-meta">🎨 生图 · 3:4 · 2026-08-18 14:32</div>
-            </div>
-          </div>
-          <div class="history-item" onclick="goWorkDetail('video')">
-            <div class="h-thumb">🐺</div>
-            <div class="h-info">
-              <div class="h-prompt">守护兽主题视频，白虎与狼对望，闪电背景</div>
-              <div class="h-meta">▶️ 生视频 · 9:16 · 2026-08-18 12:10</div>
+              <div class="h-meta">🎨 生图 · 9:16 · 2026-08-18 14:32</div>
             </div>
           </div>
           <div class="history-item" onclick="goWorkDetail('image')">
@@ -564,6 +339,13 @@
             <div class="h-info">
               <div class="h-prompt">日落街道，男生伸手，电影感逆光</div>
               <div class="h-meta">🎨 生图 · 9:16 · 2026-08-17 09:45</div>
+            </div>
+          </div>
+          <div class="history-item" onclick="goWorkDetail('image')">
+            <div class="h-thumb">🐱</div>
+            <div class="h-info">
+              <div class="h-prompt">治愈系猫咪，窗台晒太阳，柔光</div>
+              <div class="h-meta">🎨 生图 · 16:9 · 2026-08-16 20:10</div>
             </div>
           </div>
         </div>
@@ -686,17 +468,7 @@
     </div>
   </div>
 
-  <!-- ================== 模型选择弹窗 ================== -->
-  <div class="modal" id="modalModelSelect">
-    <div class="modal-backdrop" data-modal="modalModelSelect"></div>
-    <div class="modal-panel">
-      <div class="modal-head">
-        <div class="modal-title">选择模型</div>
-        <div class="modal-close" data-modal="modalModelSelect">×</div>
-      </div>
-      <div id="modelList"></div>
-    </div>
-  </div>
+  <!-- 已删除：模型选择弹窗（评审精简：AI 生图不再选模型） -->
 
   <!-- ================== 结果弹窗 ================== -->
   <div class="modal" id="modalResult">
@@ -715,9 +487,8 @@
           <div class="result-img" id="resultImg">🖼️</div>
           <div class="result-video" id="resultVideo">▶️</div>
           <div class="result-actions">
-            <div class="act" onclick="toast('已下载')">⬇️ 下载</div>
-            <div class="act" onclick="toast('已发布到广场，审核后展示')">🌟 发布广场</div>
-            <div class="act" onclick="toast('已重新生成')">🔄 重新生成</div>
+            <div class="act" onclick="toast('已保存到相册')">⬇️ 保存到相册</div>
+            <div class="act" onclick="openShare()">↗️ 分享</div>
           </div>
         </div>
       </div>
@@ -741,9 +512,12 @@
   <script>
     const state = {
       quota: 12,
-      image: { model: 'Qwen-Image 3.0', ratio: '3:4', prompt: '', uploaded: false },
-      video: { model: 'HappyHorse 1.0', mode: 'gen', clarity: 'hd', ratio: '9:16', duration: '5', prompt: '', uploaded: false },
-      history: [],
+      image: { ratio: '9:16', prompt: '', uploaded: false },
+      history: [
+        { id: 1, thumb: '🌸', prompt: 'AI可爱风蜡笔涂鸦，校服女孩，糖果贴纸', type: '生图', ratio: '9:16', time: '2026-08-18 14:32' },
+        { id: 2, thumb: '🌅', prompt: '日落街道，男生伸手，电影感逆光', type: '生图', ratio: '9:16', time: '2026-08-17 09:45' },
+        { id: 3, thumb: '🐱', prompt: '治愈系猫咪，窗台晒太阳，柔光', type: '生图', ratio: '16:9', time: '2026-08-16 20:10' }
+      ],
       quotaPack: 'p1'
     };
 
@@ -754,22 +528,7 @@
       { id: 'p100',times: 100, price: 50, unit: 0.50, save: 50, tag: '5折' }
     ];
 
-    const models = {
-      image: [
-        { name: 'Qwen-Image 3.0', desc: '通义万相，文字理解强，适合创意插画', tag: '' },
-        { name: 'Wan-Image 1.0', desc: '阿里最强图像模型，细节丰富', tag: '公测' },
-        { name: 'Coze 默认生图', desc: '通用平衡模型，出图稳定快速', tag: '' }
-      ],
-      video: [
-        { name: 'HappyHorse 1.0', desc: '自然稳定，镜头更有戏', tag: '' },
-        { name: 'HappyHorse 1.1', desc: '一致性更强，质感好', tag: '' },
-        { name: 'Wan 2.7', desc: '视频编辑灵活，支持首尾帧', tag: '' },
-        { name: 'Wan 2.6', desc: '15秒多镜头，超强叙事', tag: '' },
-        { name: 'Wan 3.0', desc: '阿里最强模型，超高性价比', tag: '公测' }
-      ]
-    };
-
-    let pageStack = ['pageAIGateway'];
+    let pageStack = ['pageHistory'];
 
     function go(pageId) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -802,25 +561,12 @@
       toast('图片已导入');
     }
 
-    function uploadVideo() {
-      state.video.uploaded = true;
-      const z = document.getElementById('videoUploadZone');
-      z.innerHTML = '<div style="font-size:48px;">🎬</div><div class="tip">点击更换素材</div>';
-      z.classList.add('preview');
-      toast('素材已导入');
-    }
-
     function startVoice(type) {
       toast('🎙️ 正在录音，请描述你想要的画面');
       setTimeout(() => {
         const prompt = '一位穿着校服的可爱女孩，站在洒满阳光的走廊里，周围有彩色糖果和星星贴纸';
-        if (type === 'image') {
-          document.getElementById('imgPrompt').value = prompt;
-          state.image.prompt = prompt;
-        } else {
-          document.getElementById('videoPrompt').value = prompt;
-          state.video.prompt = prompt;
-        }
+        document.getElementById('imgPrompt').value = prompt;
+        state.image.prompt = prompt;
         toast('语音已转成提示词');
       }, 1500);
     }
@@ -833,85 +579,23 @@
     }
 
     function updatePromptFromTags() {
-      const activeTags = [...document.querySelectorAll('.tag.active')].map(t => t.textContent);
+      const activeTags = [...document.querySelectorAll('.tag.active')'].map(t => t.textContent);
       if (activeTags.length === 0) return;
       const base = activeTags.join('，');
       const imgInput = document.getElementById('imgPrompt');
-      const videoInput = document.getElementById('videoPrompt');
       if (document.querySelector('#pageImageGen.active')) {
         if (!imgInput.value) imgInput.value = base;
       }
-      if (document.querySelector('#pageVideoGen.active')) {
-        if (!videoInput.value) videoInput.value = base;
-      }
     }
 
-    function switchVideoMode(el) {
-      document.querySelectorAll('#pageVideoGen .option[data-mode]').forEach(o => o.classList.remove('active'));
+    function switchImgRatio(el, ratio) {
+      document.querySelectorAll('#pageImageGen .ratio-opt').forEach(r => r.classList.remove('active'));
       el.classList.add('active');
-      state.video.mode = el.dataset.mode;
+      state.image.ratio = ratio;
     }
 
-    function switchClarity(el) {
-      document.querySelectorAll('#pageVideoGen .option[data-clarity]').forEach(o => o.classList.remove('active'));
-      el.classList.add('active');
-      state.video.clarity = el.dataset.clarity;
-      calcVideoCost();
-    }
-
-    function switchRatio(el) {
-      document.querySelectorAll('#pageVideoGen .ratio').forEach(r => r.classList.remove('active'));
-      el.classList.add('active');
-      state.video.ratio = el.dataset.ratio;
-    }
-
-    function switchDuration(el) {
-      document.querySelectorAll('#pageVideoGen .option[data-duration]').forEach(o => o.classList.remove('active'));
-      el.classList.add('active');
-      state.video.duration = el.dataset.duration;
-      calcVideoCost();
-    }
-
-    function calcVideoCost() {
-      let cost = 1;
-      if (state.video.clarity === 'uhd') cost += 1;
-      if (state.video.duration === '10') cost += 0;
-      if (state.video.duration === '15') cost += 1;
-      document.getElementById('videoCost').textContent = cost;
-    }
-
-    function openModelSelect(type) {
-      const list = document.getElementById('modelList');
-      list.innerHTML = '';
-      models[type].forEach(m => {
-        const current = type === 'image' ? state.image.model : state.video.model;
-        const active = m.name === current ? 'active' : '';
-        const tag = m.tag ? `<span class="m-tag">${m.tag}</span>` : '';
-        list.innerHTML += `
-          <div class="model-item ${active}" onclick="selectModel('${type}', '${m.name}')">
-            <div>
-              <div class="m-name">${m.name}${tag}</div>
-              <div class="m-desc">${m.desc}</div>
-            </div>
-          </div>
-        `;
-      });
-      document.getElementById('modalModelSelect').classList.add('active');
-    }
-
-    function openRatioSelect(type) {
-      toast('比例选择器（可在模型选择后细化）');
-    }
-
-    function selectModel(type, name) {
-      if (type === 'image') {
-        state.image.model = name;
-        document.getElementById('imgModelName').textContent = name;
-      } else {
-        state.video.model = name;
-        document.getElementById('videoModelName').textContent = name;
-      }
-      closeModal();
+    function openShare() {
+      toast('调起分享：复用现有分享弹窗（海报=本作品图，带 invite_code 邀请关系）');
     }
 
     function closeModal(e) {
@@ -929,7 +613,7 @@
     }
 
     function generate(type) {
-      const cost = type === 'image' ? 1 : parseInt(document.getElementById('videoCost').textContent, 10);
+      const cost = 1;
       if (state.quota < cost) {
         document.getElementById('modalQuota').classList.add('active');
         return;
@@ -942,42 +626,47 @@
         document.getElementById('generatingBox').classList.remove('active');
         const content = document.getElementById('resultContent');
         content.style.display = 'flex';
-        const isImg = type === 'image';
-        document.getElementById('resultImg').style.display = isImg ? 'flex' : 'none';
-        document.getElementById('resultVideo').style.display = isImg ? 'none' : 'flex';
+        document.getElementById('resultImg').style.display = 'flex';
+        document.getElementById('resultVideo').style.display = 'none';
+        // 写入我的作品
+        state.history.unshift({ id: Date.now(), thumb: '🖼️', prompt: state.image.prompt || '我的 AI 作品', type: '生图', ratio: state.image.ratio, time: '刚刚' });
+        renderHistory();
         toast(`生成成功，已消耗 ${cost} 个额度`);
       }, 2500);
     }
 
-    function goWorkDetail(kind) {
-      const title = kind === 'image' ? 'AI可爱风蜡笔涂鸦' : '测一测你的守护兽';
-      const desc = kind === 'image'
-        ? '一位穿着校服的可爱女孩站在走廊里，周围环绕着彩色糖果、爱心和星星贴纸，画面采用蜡笔涂鸦风格，色彩柔和温馨。'
-        : '守护兽主题短视频，白虎与狼在闪电背景下对望，画面神秘梦幻，镜头缓慢推进。';
-      document.getElementById('workDetailTitle').textContent = title;
-      document.getElementById('workDetailDesc').textContent = desc;
-      document.getElementById('workDetailThumb').textContent = kind === 'image' ? '🌸' : '🐺';
+    function goWorkDetail() {
       go('pageWorkDetail');
     }
 
-    function doSame() {
-      const prompt = document.getElementById('workDetailDesc').textContent;
-      if (document.getElementById('workDetailThumb').textContent === '🌸') {
-        state.image.prompt = prompt;
-        document.getElementById('imgPrompt').value = prompt;
-        go('pageImageGen');
-      } else {
-        state.video.prompt = prompt;
-        document.getElementById('videoPrompt').value = prompt;
-        go('pageVideoGen');
-      }
-      toast('已带入同款参数');
+    function openShare() {
+      toast('调起分享：复用现有分享弹窗（海报=本作品图，带 invite_code 邀请关系）');
     }
 
-    function switchSquareTab(el, tab) {
-      document.querySelectorAll('.square-tab').forEach(t => t.classList.remove('active'));
-      el.classList.add('active');
-      toast(`切换至${el.textContent}`);
+    function renderHistory() {
+      const list = document.getElementById('historyList');
+      const card = document.getElementById('historyCard');
+      const empty = document.getElementById('historyEmpty');
+      if (!state.history.length) {
+        if (list) list.style.display = 'none';
+        if (card) card.style.display = 'none';
+        if (empty) empty.style.display = 'block';
+        return;
+      }
+      if (card) card.style.display = '';
+      if (empty) empty.style.display = 'none';
+      if (!list) return;
+      list.innerHTML = '';
+      state.history.forEach(h => {
+        list.innerHTML += `
+          <div class="history-item" onclick="goWorkDetail('image')">
+            <div class="h-thumb">${h.thumb}</div>
+            <div class="h-info">
+              <div class="h-prompt">${h.prompt}</div>
+              <div class="h-meta">🎨 生图 · ${h.ratio} · ${h.time}</div>
+            </div>
+          </div>`;
+      });
     }
 
     function renderQuotaPacks() {
@@ -1021,10 +710,10 @@
 
     // 监听输入
     document.getElementById('imgPrompt').addEventListener('input', e => state.image.prompt = e.target.value);
-    document.getElementById('videoPrompt').addEventListener('input', e => state.video.prompt = e.target.value);
 
     bindModalEvents();
     renderQuotaPacks();
+    renderHistory();
   </script>
 </div>
 </body>
