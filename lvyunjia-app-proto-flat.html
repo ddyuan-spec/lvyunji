@@ -508,25 +508,24 @@
         <div class="stat-row">
           <div class="stat-card" onclick="goCustomerListTab(0)">
             <div class="label">总客户数量</div>
-            <div class="value" id="statTotal">0人</div>
-            <div class="change up">↗ 环比 +81.5%</div>
+            <div class="value" id="statTotal">11人</div>
+            <div class="change up">↗ 环比 +83.3%</div>
           </div>
           <div class="stat-card" onclick="goCustomerListTab(1)">
             <div class="label">今日活跃</div>
-            <div class="value" id="statActive">0人</div>
+            <div class="value" id="statActive">5人</div>
             <div class="change down">↘ 环比 -81.5%</div>
           </div>
         </div>
         <div class="stat-row">
           <div class="stat-card" onclick="goCustomerListTab(2)">
             <div class="label">沉寂预警</div>
-            <div class="value" style="color:var(--red);" id="statInactive">0人</div>
-            <div class="warn"><span>需立即唤醒</span><span class="warn-btn">一键查看 ›</span></div>
+            <div class="value" style="color:var(--red);" id="statInactive">5人</div>
           </div>
           <div class="stat-card" onclick="goCustomerListTab(3)">
             <div class="label">高价值核心客户</div>
-            <div class="value" id="statHigh">0人</div>
-            <div class="change down">↘ 环比 -81.5%</div>
+            <div class="value" id="statHigh">8人</div>
+            <div class="change down">↘ 环比 -81.4%</div>
           </div>
         </div>
       </div>
@@ -568,7 +567,6 @@
     </div>
     <div class="scroll-view" style="top:90px;">
       <div id="customerListWrap"></div>
-      <div class="float-wake" onclick="wakeInactiveCustomers()">一键唤醒</div>
       <div style="height:16px;"></div>
     </div>
   </div>
@@ -823,11 +821,6 @@
     tabs.forEach(t => t.classList.remove('active'));
     if (tabs[type]) tabs[type].classList.add('active');
     renderCustomerList(type);
-  }
-  // 一键唤醒：针对用户状态 ≠ 今日活跃 的用户，通过 App Push 触达
-  function wakeInactiveCustomers() {
-    const targets = CUSTOMERS.filter(c => c.status !== 'active');
-    toast('已发送 App Push 唤醒 ' + targets.length + ' 位非活跃用户');
   }
   function renderCustomerList(type) {
     const wrap = document.getElementById('customerListWrap');
