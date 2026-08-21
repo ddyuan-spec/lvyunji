@@ -66,18 +66,20 @@
   <tr><td>V0.3.1</td><td>2026-08-18</td><td>袁中天</td><td>重绘 §3.1 业务流程图：修正箭头方向与前后端数据流，明确「请求→后端处理→返回指标/列表/详情」及「一键唤醒→引导复购/活跃」的正向流程</td><td>评审中</td></tr>
   <tr><td>V0.4</td><td>2026-08-18</td><td>袁中天</td><td>按截图补充功能说明：① 高价值核心客户口径改为「会员等级≥高级会员」；② 沉寂预警口径改为「7天内无浏览商品详情的用户」；③ 累计消费口径改为「下单实付金额，退单扣除」；④ 四 Tab 排序规则细化；⑤ 客户详情新增联系记录时间轴（仅新增不可修改）</td><td>评审中</td></tr>
   <tr><td>V0.5</td><td>2026-08-19</td><td>袁中天</td><td>活跃口径统一为「浏览商品详情」：① §4.3.3 今日活跃改为「当前自然日有浏览过商品详情的用户」，数据源改《商品浏览日志表》；② §4.3.3 补充「本周活跃」口径定义（过去 7 天内含今日有浏览过详情，可与今日活跃同时显示）；③ §4.4「上次活跃」改名为「上次浏览商品详情时间」+ 数据源改《商品浏览日志表》；④ §4.4 全部客户/今日活跃 Tab 排序口径同步对齐；⑤ §4.3.4 活跃走势图 Y 轴口径同步，移除/更新原「登录/任意活跃」待确认项；⑥ §九 待确认 #2 标记已闭环；三端同步（本地 / GitHub Pages / 钉钉文档）</td><td>评审中</td></tr>
+  <tr><td>V0.6</td><td>2026-08-21</td><td>袁中天</td><td>按评审反馈调整：① §4.3.3 总客户数量口径改为「仅本人的直推客户数量」，删除所有「间推」相关描述；② §4.3.3 增加"环比"列：今日 vs 昨日，公式 =(今-昨)/昨×100%，昨日为 0 且今日 > 0 显示"新增"，双 0 显示"—"；仅总客户/今日活跃/高价值核心客户三张卡片显示环比，沉寂预警不显示（语义为状态量非流量）；③ 一键唤醒本期不做，全部移除：§3.1 流程图节点、§3.2 信息架构、§4.3.2 备注「一键查看」、§4.4.2 业务行、§5.3 埋点行、§六 验收用例 2 行、§七 边界检查行、§九 待确认 #1；④ §4.3.2「沉寂预警」指标卡片移除"需立即唤醒 一键查看›"；⑤ §4.4.2 客户列表页底移除"一键唤醒"按钮及对应埋点/文案。原型同步收敛（lvyunjia-app-proto-flat.html）。</td><td>评审中</td></tr>
 </table>
 
 <!-- ================= 二、项目背景与目标 ================= -->
 <h2>二、项目背景与目标</h2>
 <h3>业务背景（痛点分析）</h3>
-<p>绿韵家为会员制电商（含惠民套餐/水卡/健康专区 + 水机 IoT + 直播 + 团购 + 积分优惠券）。在原有「推广/分销」能力基础上，本期将相关能力重构为统一的<strong>数商服务模块</strong>，让店主/推广员在 App 内一站式查看自己所发展的客户关系、客户分层与经营数据，并通过「一键唤醒」将非活跃用户引导至复购/活跃。</p>
+<p>绿韵家为会员制电商（含惠民套餐/水卡/健康专区 + 水机 IoT + 直播 + 团购 + 积分优惠券）。在原有「推广/分销」能力基础上，本期将相关能力重构为统一的<strong>数商服务模块</strong>，让店主/推广员在 App 内一站式查看自己发展的直推客户、客户分层与经营数据，识别可优先跟进的高价值/沉寂用户。</p>
 <p class="meta">核心痛点：① 客户关系分散、无统一视图；② 高价值客户识别依赖人工经验，缺乏按会员等级的客观分层；③ 客户经营数据（活跃/沉寂/高价值）未闭环呈现。</p>
 
 <h3>项目目标</h3>
 <ul>
   <li><strong>业务目标</strong>：沉淀私域客户资产，提升店主/推广员的客户经营效率与转化。</li>
-  <li><strong>用户目标</strong>：让一线经营者快速识别「今日活跃 / 沉寂 / 高价值」客户，并便捷触达。</li>
+  <li><strong>用户目标</strong>：让一线经营者快速识别「今日活跃 / 沉寂 / 高价值」三类客户并按优先级跟进。</li>
+  <li><strong>本期不做</strong>：一键唤醒（App Push 触达）延期至二期再议，本期全部移除。</li>
 </ul>
 
 <h3>衡量指标（KPI）/ 埋点数据</h3>
@@ -85,7 +87,6 @@
   <tr><th style="width:34%">指标</th><th>口径说明</th><th>备注</th></tr>
   <tr><td>数商服务页访问 UV/PV</td><td>进入数商服务页的去重/累计访问</td><td>⚠️ 待确认 @数据</td></tr>
   <tr><td>客户详情访问率</td><td>从客户列表点击进入详情的客户占比</td><td>⚠️ 待确认 @数据</td></tr>
-  <tr><td>一键唤醒触达率</td><td>点击一键唤醒后成功发出 App Push 的占比</td><td>⚠️ 待确认 @数据</td></tr>
   <tr><td>高价值客户查看率</td><td>高价值 Tab 客户被查看的覆盖度</td><td>⚠️ 待确认 @数据</td></tr>
 </table>
 
@@ -122,8 +123,8 @@
   <rect x="30" y="60" width="90" height="40" rx="6" fill="#fff" stroke="#2196f3" stroke-width="1.5"></rect>
   <text x="75" y="84" text-anchor="middle" fill="#333">店主 / 推广员</text>
 
-  <rect x="30" y="340" width="90" height="40" rx="6" fill="#fff" stroke="#ff6b35" stroke-width="1.5"></rect>
-  <text x="75" y="364" text-anchor="middle" fill="#ff6b35">引导复购 / 活跃</text>
+  <rect x="30" y="340" width="90" height="40" rx="6" fill="#fff" stroke="#2196f3" stroke-width="1.5"></rect>
+  <text x="75" y="364" text-anchor="middle" fill="#2196f3">沉淀私域客户</text>
 
   <!-- 前端页面流 -->
   <rect x="220" y="60" width="220" height="40" rx="6" fill="#fff" stroke="#333"></rect>
@@ -137,9 +138,6 @@
 
   <rect x="240" y="270" width="180" height="40" rx="6" fill="#fff" stroke="#333"></rect>
   <text x="330" y="294" text-anchor="middle" fill="#333">客户详情页</text>
-
-  <rect x="240" y="340" width="180" height="40" rx="6" fill="#fff" stroke="#ff6b35" stroke-width="1.5"></rect>
-  <text x="330" y="364" text-anchor="middle" fill="#ff6b35">一键唤醒 / App Push</text>
 
   <!-- 后端数据层 -->
   <rect x="510" y="130" width="220" height="40" rx="6" fill="#fff" stroke="#333"></rect>
@@ -156,8 +154,8 @@
   <line x1="330" y1="100" x2="330" y2="130" stroke="#333" marker-end="url(#arr)"></line>
   <line x1="330" y1="170" x2="330" y2="200" stroke="#333" marker-end="url(#arr)"></line>
   <line x1="330" y1="240" x2="330" y2="270" stroke="#333" marker-end="url(#arr)"></line>
-  <line x1="330" y1="310" x2="330" y2="340" stroke="#ff6b35" marker-end="url(#arro)"></line>
-  <line x1="240" y1="360" x2="120" y2="360" stroke="#ff6b35" marker-end="url(#arro)"></line>
+  <line x1="330" y1="310" x2="330" y2="340" stroke="#333" marker-end="url(#arr)"></line>
+  <line x1="240" y1="360" x2="120" y2="360" stroke="#2196f3" marker-end="url(#arrb)"></line>
 
   <!-- 前后端数据流箭头（蓝色） -->
   <line x1="420" y1="145" x2="510" y2="145" stroke="#2196f3" marker-end="url(#arrb)"></line>
@@ -179,9 +177,9 @@
 <h3>3.2 信息架构</h3>
 <table>
   <tr><th style="width:22%">层级</th><th>映射关系</th></tr>
-  <tr><td>前端展示层</td><td>我的（数商服务入口 + 我的服务 8 入口）→ 数商服务（AI工具 / 其他工具 / 客户管理 / 活跃走势图）→ 客户列表（全部 / 今日活跃 / 沉寂 / 高价值）→ 客户详情 → 一键唤醒</td></tr>
-  <tr><td>后端配置层</td><td>会员等级配置、客户分层规则（活跃度/等级阈值）、App Push 触达通道 ⚠️ 待确认 @后端</td></tr>
-  <tr><td>数据层</td><td>用户表、会员等级表、订单表（多 SKU）、客户关系（直推/间推）表 ⚠️ 待确认 @后端 具体表名</td></tr>
+  <tr><td>前端展示层</td><td>我的（数商服务入口 + 我的服务 8 入口）→ 数商服务（AI工具 / 其他工具 / 客户管理 / 活跃走势图）→ 客户列表（全部 / 今日活跃 / 沉寂 / 高价值）→ 客户详情</td></tr>
+  <tr><td>后端配置层</td><td>会员等级配置、客户分层规则（活跃度/等级阈值）⚠️ 待确认 @后端</td></tr>
+  <tr><td>数据层</td><td>用户表、会员等级表、订单表（多 SKU）、客户关系表（仅直推，按推广码一级关系过滤） ⚠️ 待确认 @后端 具体表名</td></tr>
 </table>
 
 <h3>3.3 状态机与状态流转规则</h3>
@@ -268,29 +266,43 @@
 <h5>业务逻辑与边界条件</h5>
 <table>
   <tr><th style="width:26%">功能</th><th>说明</th><th>备注</th></tr>
-  <tr><td>客户管理指标点击</td><td>点击任意指标卡片，跳转客户列表并自动选中对应 Tab（总客户→全部；今日活跃→今日活跃；沉寂预警→沉寂；高价值→高价值）</td><td>整卡可点击，「一键查看」为同一跳转</td></tr>
+  <tr><td>客户管理指标点击</td><td>点击任意指标卡片，跳转客户列表并自动选中对应 Tab（总客户→全部；今日活跃→今日活跃；沉寂预警→沉寂；高价值→高价值）</td><td>整卡可点击</td></tr>
   <tr><td>活跃走势图 Tab 切换</td><td>点击「近7天/近15天/近30天」切换时间范围，曲线图重绘</td><td>纯前端视图切换，不埋点</td></tr>
 </table>
 
 <h5>4.3.3 客户管理四指标口径</h5>
 <table>
-  <tr><th style="width:22%">指标名称</th><th>口径定义</th><th>数据来源</th><th>跳转目标</th></tr>
-  <tr><td>总客户数量</td><td>全部客户数量（不区分直推/间推）</td><td>《客户关系表》/《用户表》</td><td>客户列表「全部客户」Tab</td></tr>
-  <tr><td>今日活跃</td><td>当前自然日有浏览过商品详情的用户</td><td>《商品浏览日志表》</td><td>客户列表「今日活跃」Tab</td></tr>
+  <tr><th style="width:16%">指标名称</th><th style="width:26%">口径定义</th><th style="width:14%">数据来源</th><th style="width:14%">跳转目标</th><th style="width:30%">环比规则</th></tr>
+  <tr>
+    <td>总客户数量</td>
+    <td>当前经营者的<strong>直推</strong>客户数量（仅本人直接发展的客户，不含间推）</td>
+    <td>《客户关系表》filter:relation_type=直推 / 《用户表》</td>
+    <td>客户列表「全部客户」Tab</td>
+    <td rowspan="3">今日 vs 昨日：环比 = (今日值 − 昨日值) / 昨日值 × 100%，保留 1 位小数。规则：① 昨日 &gt; 0 时按公式计算并显示；② 昨日 = 0 且今日 &gt; 0 显示「新增」；③ 昨日 = 0 且今日 = 0 显示「—」；④ 上行箭头 ↗ 表示上涨、下行箭头 ↘ 表示下跌，颜色按涨绿/跌红示例展示，今日值与昨日值均由后端聚合接口返回。</td>
+  </tr>
+  <tr>
+    <td>今日活跃</td>
+    <td>当前自然日有浏览过商品详情的直推用户</td>
+    <td>《商品浏览日志表》</td>
+    <td>客户列表「今日活跃」Tab</td>
+  </tr>
   <tr>
     <td>沉寂预警</td>
-    <td>7 天内无浏览商品详情的用户<br><img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/inactive-def.png" alt="沉寂客户定义：7天内无浏览商品详情的用户" style="max-width:240px;margin-top:8px;"></td>
+    <td>当前经营者的直推客户中，过去 7 天内无浏览商品详情的用户<br><img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/inactive-def.png" alt="沉寂客户定义：过去 7 天内无浏览商品详情的直推用户" style="max-width:240px;margin-top:8px;"></td>
     <td>《商品浏览日志表》</td>
     <td>客户列表「沉寂客户」Tab</td>
+    <td>— / 不显示（语义为状态量，非流量指标）</td>
   </tr>
   <tr>
     <td>高价值核心客户</td>
-    <td>会员等级 ≥ 高级会员<br><img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/high-value-def.png" alt="高价值客户定义：会员等级≥高级会员" style="max-width:240px;margin-top:8px;"></td>
+    <td>当前经营者的直推客户中，会员等级 ≥ 高级会员的用户<br><img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/high-value-def.png" alt="高价值客户定义：本人直推且会员等级≥高级会员" style="max-width:240px;margin-top:8px;"></td>
     <td>《会员等级表》</td>
     <td>客户列表「高价值客户」Tab</td>
+    <td>同上行规则（今日 vs 昨日）</td>
   </tr>
 </table>
 <div class="note">口径补充（V0.5 新增）：「本周活跃」= 过去 7 天内（含今日）有浏览过商品详情的用户，与「今日活跃」可同时显示（满足即同时点亮两个标签）。用于 §4.5 客户详情顶部状态标签。本期不在数商服务页客户管理四指标卡片中独立呈现，避免与今日活跃/沉寂预警重叠。</div>
+<div class="note">V0.6 调整：四指标范围统一收敛至「本人的直推客户」（客户关系表按 relation_type=直推 / 推广码一级过滤），不再含间推。沉寂预警卡片下方的「需立即唤醒 一键查看」按 V0.6 删除（一键唤醒本期不做）。</div>
 
 <h5>4.3.4 活跃走势图规格</h5>
 <table>
@@ -307,7 +319,7 @@
 <h3>4.4 客户列表（全部 / 今日活跃 / 沉寂 / 高价值）</h3>
 <span class="tag tag-new">本期新增</span>
 <h4>4.4.1 页面原型与交互示意</h4>
-<img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/customer-list.png" alt="客户列表页原型（四Tab：全部/今日活跃/沉寂/高价值 + 一键唤醒）">
+<img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/customer-list.png" alt="客户列表页原型（四Tab：全部/今日活跃/沉寂/高价值）">
 <h4>4.4.2 详细逻辑规则</h4>
 <h5>界面与展示规则 —— 客户列表字段表</h5>
 <table>
@@ -333,11 +345,10 @@
 <table>
   <tr><th style="width:26%">功能</th><th>说明</th><th>备注</th></tr>
   <tr><td>客户条目点击</td><td>跳转客户详情（4.5）</td><td>权限：经营身份可见</td></tr>
-  <tr><td>一键唤醒</td><td>页内按钮（非浮层），点击后对「用户状态 ≠ 今日活跃」的全部客户发起 App Push 触达</td><td>触达通道与文案 ⚠️ 待确认 @运营</td></tr>
   <tr><td>高价值排序</td><td>累计消费金额降序 + 同金额最近下单时间倒序</td><td>消费金额以「下单实付金额 - 退单金额」为准</td></tr>
   <tr><td>沉寂排序</td><td>进入沉寂时间升序</td><td>进入沉寂时间 = 最近浏览商品详情时间 + 7 天后的首个自然日</td></tr>
 </table>
-<div class="toconfirm">⚠️ 待确认 @运营：一键唤醒的 App Push 文案模板与发送频率限制。</div>
+<div class="note">V0.6 调整：原 §4.4.2「一键唤醒」按钮与对应 App Push 触达本期不做，相关 App Push 文案、频率限制一并移除，详见 §九 闭环说明。</div>
 
 <!-- 4.5 客户详情 -->
 <h3>4.5 客户详情</h3>
@@ -391,7 +402,6 @@
   <tr><th style="width:16%">事件英文名</th><th style="width:14%">事件显示名</th><th style="width:10%">所属层</th><th style="width:10%">平台</th><th style="width:18%">触发时机</th><th style="width:18%">必含上报参数(友盟中文名)</th><th>备注</th></tr>
   <tr><td>⚠️ 待确认</td><td>进入数商服务页</td><td>页面层</td><td>App</td><td>打开数商服务页</td><td>页面名称、入口来源</td><td>候选 page_enter</td></tr>
   <tr><td>⚠️ 待确认</td><td>查看客户详情</td><td>行为层</td><td>App</td><td>点击客户条目进入详情</td><td>客户ID、会员等级</td><td>候选 item_click</td></tr>
-  <tr><td>⚠️ 待确认</td><td>点击一键唤醒</td><td>行为层</td><td>App</td><td>点击唤醒按钮</td><td>客户ID、触发位置</td><td>候选 button_click</td></tr>
   <tr><td>⚠️ 待确认</td><td>切换活跃走势图时间范围</td><td>行为层</td><td>App</td><td>点击近7/15/30天</td><td>时间范围</td><td>候选 button_click</td></tr>
 </table>
 <p class="sub">说明：纯交互（Tab 切换/折叠/滚动）无业务分析价值，不埋点；结果类数据后端业务表已落库可直接统计，不重复埋。</p>
@@ -406,8 +416,8 @@
   <tr><td>多 SKU 订单金额</td><td><strong>Given</strong> 客户某订单含 3 个 SKU，<strong>When</strong> 查看订单/详情，<strong>Then</strong> 订单金额 = 各 SKU 小计之和</td></tr>
   <tr><td>累计消费口径</td><td><strong>Given</strong> 客户详情页，<strong>When</strong> 查看累计消费，<strong>Then</strong> 金额 = 下单实付金额 - 退单金额</td></tr>
   <tr><td>联系记录仅新增</td><td><strong>Given</strong> 客户详情页联系记录区，<strong>When</strong> 点击添加记录并输入备注保存，<strong>Then</strong> 时间轴新增一条记录，且不支持修改/删除历史记录</td></tr>
-  <tr><td>一键唤醒在页内</td><td><strong>Given</strong> 客户列表页，<strong>When</strong> 下滑到底部，<strong>Then</strong> 出现页内「一键唤醒」按钮（非浮层）</td></tr>
-  <tr><td>一键唤醒范围</td><td><strong>Given</strong> 客户列表页，<strong>When</strong> 点击一键唤醒，<strong>Then</strong> 仅对「非今日活跃」用户发起 App Push 触达</td></tr>
+  <tr><td>客户管理总客户口径</td><td><strong>Given</strong> 数商服务页客户管理，<strong>When</strong> 查看总客户数量，<strong>Then</strong> 数值 = 当前经营者的直推客户总数（不含间推），数据源《客户关系表》filter:relation_type=直推</td></tr>
+  <tr><td>客户管理环比（今日 vs 昨日）</td><td><strong>Given</strong> 数商服务页客户管理，<strong>When</strong> 查看总客户/今日活跃/高价值三张指标卡，<strong>Then</strong> 卡片下方显示 ↗/↘ + 百分比，公式 =(今日值 − 昨日值) / 昨日值 × 100%；昨日 = 0 且今日 &gt; 0 显示「新增」；昨日 = 0 且今日 = 0 显示「—」；沉寂预警卡片不显示环比</td></tr>
   <tr><td>我的服务入口</td><td><strong>Given</strong> 我的页，<strong>When</strong> 查看我的服务，<strong>Then</strong> 展示 8 个入口且含「数商服务」、无「排行榜/直播广场/签到打卡/推广」</td></tr>
   <tr><td>数商服务指标跳转</td><td><strong>Given</strong> 数商服务页，<strong>When</strong> 点击客户管理四指标卡片，<strong>Then</strong> 跳转客户列表并自动选中对应 Tab</td></tr>
   <tr><td>活跃走势图</td><td><strong>Given</strong> 数商服务页，<strong>When</strong> 查看活跃走势图，<strong>Then</strong> X 轴为日期、Y 轴为客户数量、图表为曲线图、支持近 7/15/30 天切换</td></tr>
@@ -423,7 +433,6 @@
   <tr><td>极限值与空状态</td><td>客户列表为空、订单为空、会员等级未达成均需有缺省图与文案</td></tr>
   <tr><td>版本兼容性</td><td>Vue2→Vue3 过渡期双端表现一致 ⚠️ 待确认 @技术</td></tr>
   <tr><td>逆向流（退款/取消）</td><td>订单退款后「最高订单金额」口径是否回滚 ⚠️ 待确认 @后端</td></tr>
-  <tr><td>高并发与防重</td><td>一键唤醒防重复点击，避免重复发送 App Push</td></tr>
 </table>
 
 <!-- ================= 八、文档维护与变更规范 ================= -->
@@ -441,15 +450,15 @@
     <tr><th style="width:6%">#</th><th style="width:20%">待确认事项</th><th style="width:14%">责任方</th><th>当前占位 / 备注</th></tr>
   </thead>
   <tbody>
-    <tr><td>1</td><td>一键唤醒 App Push 文案模板与频率限制</td><td>@运营</td><td>文案、发送时段、单用户日上限待定</td></tr>
-    <tr><td>2</td><td>活跃走势图「活跃」口径（登录/任意活跃行为）</td><td>@数据</td><td>已闭环 V0.5：统一为「浏览商品详情」口径，见 §4.3.3 / §4.3.4</td></tr>
-    <tr><td>3</td><td>客户手机号脱敏规则</td><td>@安全</td><td>中间四位/后四位掩码待定</td></tr>
-    <tr><td>4</td><td>数商服务入口权限（哪些身份可见）</td><td>@产品</td><td>店主/推广员可见，普通会员隐藏？</td></tr>
-    <tr><td>5</td><td>客户列表分页条数</td><td>@前端</td><td>每页条数待定</td></tr>
-    <tr><td>6</td><td>埋点事件英文名对齐 v2.3 目录</td><td>@数据</td><td>候选事件须对齐既有目录，走埋点评审</td></tr>
-    <tr><td>7</td><td>分类 / AI / 消息 Tab 页面设计</td><td>@产品</td><td>本期按沿用旧版占位处理</td></tr>
-    <tr><td>8</td><td>技术 Owner / 测试负责人</td><td>@技术负责人</td><td>文档基本信息待补全</td></tr>
-  </tbody>
+<tr><td>1</td><td>活跃走势图「活跃」口径（登录/任意活跃行为）</td><td>@数据</td><td>已闭环 V0.5：统一为「浏览商品详情」口径，见 §4.3.3 / §4.3.4</td></tr>
+  <tr><td>2</td><td>客户手机号脱敏规则</td><td>@安全</td><td>中间四位/后四位掩码待定</td></tr>
+  <tr><td>3</td><td>数商服务入口权限（哪些身份可见）</td><td>@产品</td><td>店主/推广员可见，普通会员隐藏？</td></tr>
+  <tr><td>4</td><td>客户列表分页条数</td><td>@前端</td><td>每页条数待定</td></tr>
+  <tr><td>5</td><td>埋点事件英文名对齐 v2.3 目录</td><td>@数据</td><td>候选事件须对齐既有目录，走埋点评审</td></tr>
+  <tr><td>6</td><td>分类 / AI / 消息 Tab 页面设计</td><td>@产品</td><td>本期按沿用旧版占位处理</td></tr>
+  <tr><td>7</td><td>技术 Owner / 测试负责人</td><td>@技术负责人</td><td>文档基本信息待补全</td></tr>
+  <tr><td>8</td><td>「一键唤醒」延期评估（二期）</td><td>@产品</td><td>V0.6 移除本期范围，App Push 文案与频率限制留待二期重新评估；接口与埋点暂不预留。</td></tr>
+</tbody>
 </table>
 <p class="sub">以上待确认项需在评审会逐条澄清后回填，回填完成方可定稿。</p>
 
