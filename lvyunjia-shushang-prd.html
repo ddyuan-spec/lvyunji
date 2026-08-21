@@ -67,6 +67,7 @@
   <tr><td>V0.4</td><td>2026-08-18</td><td>袁中天</td><td>按截图补充功能说明：① 高价值核心客户口径改为「会员等级≥高级会员」；② 沉寂预警口径改为「7天内无浏览商品详情的用户」；③ 累计消费口径改为「下单实付金额，退单扣除」；④ 四 Tab 排序规则细化；⑤ 客户详情新增联系记录时间轴（仅新增不可修改）</td><td>评审中</td></tr>
   <tr><td>V0.5</td><td>2026-08-19</td><td>袁中天</td><td>活跃口径统一为「浏览商品详情」：① §4.3.3 今日活跃改为「当前自然日有浏览过商品详情的用户」，数据源改《商品浏览日志表》；② §4.3.3 补充「本周活跃」口径定义（过去 7 天内含今日有浏览过详情，可与今日活跃同时显示）；③ §4.4「上次活跃」改名为「上次浏览商品详情时间」+ 数据源改《商品浏览日志表》；④ §4.4 全部客户/今日活跃 Tab 排序口径同步对齐；⑤ §4.3.4 活跃走势图 Y 轴口径同步，移除/更新原「登录/任意活跃」待确认项；⑥ §九 待确认 #2 标记已闭环；三端同步（本地 / GitHub Pages / 钉钉文档）</td><td>评审中</td></tr>
   <tr><td>V0.6</td><td>2026-08-21</td><td>袁中天</td><td>按评审反馈调整：① §4.3.3 总客户数量口径改为「仅本人的直推客户数量」，删除所有「间推」相关描述；② §4.3.3 增加"环比"列：今日 vs 昨日，公式 =(今-昨)/昨×100%，昨日为 0 且今日 > 0 显示"新增"，双 0 显示"—"；仅总客户/今日活跃/高价值核心客户三张卡片显示环比，沉寂预警不显示（语义为状态量非流量）；③ 一键唤醒本期不做，全部移除：§3.1 流程图节点、§3.2 信息架构、§4.3.2 备注「一键查看」、§4.4.2 业务行、§5.3 埋点行、§六 验收用例 2 行、§七 边界检查行、§九 待确认 #1；④ §4.3.2「沉寂预警」指标卡片移除"需立即唤醒 一键查看›"；⑤ §4.4.2 客户列表页底移除"一键唤醒"按钮及对应埋点/文案。原型同步收敛（lvyunjia-app-proto-flat.html）。</td><td>评审中</td></tr>
+  <tr><td>V0.6.1</td><td>2026-08-21</td><td>袁中天</td><td>累计消费口径补充澄清：显式明确"部分退单时仅扣除实际退单金额，未退部分仍计入累计消费"，消除"整单作废"歧义（§4.4.1 字段表 / §4.4.2 高价值排序备注 / §4.5 累计消费定义 / §6 验收用例同步更新）</td><td>评审中</td></tr>
 </table>
 
 <!-- ================= 二、项目背景与目标 ================= -->
@@ -330,7 +331,7 @@
   <tr><td>会员等级</td><td>显示客户会员等级</td><td>取《会员等级表》.level_name</td></tr>
   <tr><td>关系标识</td><td>直推 / 间推标记</td><td>取《客户关系表》.relation_type</td></tr>
   <tr><td>上次浏览商品详情时间</td><td>展示最近一次浏览商品详情的时间（全部/今日活跃/沉寂 Tab）</td><td>取《商品浏览日志表》.last_browse_time（口径同 §4.3.3）</td></tr>
-  <tr><td>累计消费</td><td>高价值 Tab 展示客户累计消费金额（下单实付 - 退单）</td><td>取《订单表》聚合</td></tr>
+  <tr><td>累计消费</td><td>高价值 Tab 展示客户累计消费金额（下单实付 - 实际退单，部分退单未退部分仍计入）</td><td>取《订单表》聚合</td></tr>
   <tr><td>最近下单</td><td>高价值 Tab 展示最近一次下单时间</td><td>取《订单表》.order_time</td></tr>
 </table>
 <h5>四 Tab 筛选与排序规则</h5>
@@ -345,7 +346,7 @@
 <table>
   <tr><th style="width:26%">功能</th><th>说明</th><th>备注</th></tr>
   <tr><td>客户条目点击</td><td>跳转客户详情（4.5）</td><td>权限：经营身份可见</td></tr>
-  <tr><td>高价值排序</td><td>累计消费金额降序 + 同金额最近下单时间倒序</td><td>消费金额以「下单实付金额 - 退单金额」为准</td></tr>
+  <tr><td>高价值排序</td><td>累计消费金额降序 + 同金额最近下单时间倒序</td><td>消费金额以「下单实付金额 - 退单金额」为准；部分退单时仅扣实际退单金额，未退部分仍计入</td></tr>
   <tr><td>沉寂排序</td><td>进入沉寂时间升序</td><td>进入沉寂时间 = 最近浏览商品详情时间 + 7 天后的首个自然日</td></tr>
 </table>
 <div class="note">V0.6 调整：原 §4.4.2「一键唤醒」按钮与对应 App Push 触达本期不做，相关 App Push 文案、频率限制一并移除，详见 §九 闭环说明。</div>
@@ -363,7 +364,7 @@
   <tr><td>关系</td><td>直推 / 间推</td><td>取《客户关系表》</td></tr>
   <tr>
     <td>累计消费</td>
-    <td>客户累计消费金额 = 下单实付金额 - 退单金额<br><img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/consume-def.png" alt="累计消费：下单实付金额，退单扣除" style="max-width:260px;margin-top:8px;"></td>
+    <td>客户累计消费金额 = 下单实付金额 - 退单金额。<br>部分退单时仅扣除实际退单金额，未退部分仍计入累计消费。<br><img class="prd-shot" src="https://ddyuan-spec.github.io/lvyunji/prd-assets/shushang/consume-def.png" alt="累计消费：下单实付金额，退单扣除" style="max-width:260px;margin-top:8px;"></td>
     <td>取《订单表》聚合</td>
   </tr>
   <tr><td>订单列表</td><td>该客户订单，含多 SKU 商品、金额、状态</td><td>同一订单多 SKU 时金额为 SKU 合计</td></tr>
@@ -414,7 +415,7 @@
   <tr><td>客户列表全部/今日活跃排序</td><td><strong>Given</strong> 客户列表全部或今日活跃 Tab，<strong>When</strong> 加载数据，<strong>Then</strong> 按最近浏览商品详情时间倒序，最近浏览的排最前面</td></tr>
   <tr><td>客户列表沉寂排序</td><td><strong>Given</strong> 客户列表沉寂 Tab，<strong>When</strong> 加载数据，<strong>Then</strong> 按进入沉寂时间升序，越早进入沉寂的排越前面</td></tr>
   <tr><td>多 SKU 订单金额</td><td><strong>Given</strong> 客户某订单含 3 个 SKU，<strong>When</strong> 查看订单/详情，<strong>Then</strong> 订单金额 = 各 SKU 小计之和</td></tr>
-  <tr><td>累计消费口径</td><td><strong>Given</strong> 客户详情页，<strong>When</strong> 查看累计消费，<strong>Then</strong> 金额 = 下单实付金额 - 退单金额</td></tr>
+  <tr><td>累计消费口径</td><td><strong>Given</strong> 客户详情页，<strong>When</strong> 查看累计消费，<strong>Then</strong> 金额 = 下单实付金额 - 实际退单金额（部分退单时未退部分仍计入）</td></tr>
   <tr><td>联系记录仅新增</td><td><strong>Given</strong> 客户详情页联系记录区，<strong>When</strong> 点击添加记录并输入备注保存，<strong>Then</strong> 时间轴新增一条记录，且不支持修改/删除历史记录</td></tr>
   <tr><td>客户管理总客户口径</td><td><strong>Given</strong> 数商服务页客户管理，<strong>When</strong> 查看总客户数量，<strong>Then</strong> 数值 = 当前经营者的直推客户总数（不含间推），数据源《客户关系表》filter:relation_type=直推</td></tr>
   <tr><td>客户管理环比（今日 vs 昨日）</td><td><strong>Given</strong> 数商服务页客户管理，<strong>When</strong> 查看总客户/今日活跃/高价值三张指标卡，<strong>Then</strong> 卡片下方显示 ↗/↘ + 百分比，公式 =(今日值 − 昨日值) / 昨日值 × 100%；昨日 = 0 且今日 &gt; 0 显示「新增」；昨日 = 0 且今日 = 0 显示「—」；沉寂预警卡片不显示环比</td></tr>
