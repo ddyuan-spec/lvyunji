@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>商学院 - 绿韵家</title>
+  <style>
+    :root {
+      --primary: #07C160;
+      --primary-dark: #06AD56;
+      --bg: #F5F7FA;
+      --card-bg: #FFFFFF;
+      --text-main: #111111;
+      --text-sub: #666666;
+      --text-hint: #999999;
+      --border: #EEEEEE;
+      --tab-active: #07C160;
+      --tab-inactive: #666666;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: #E5E5E5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; }
+    .phone { width: 100%; max-width: 414px; min-height: 100vh; margin: 0 auto; background: var(--bg); position: relative; overflow: hidden; }
+    .page { display: none; min-height: 100vh; padding-bottom: 80px; }
+    .page.active { display: block; }
+
+    /* 顶部标题 */
+    .header { background: var(--card-bg); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
+    .header-title { font-size: 18px; font-weight: 600; color: var(--text-main); }
+    .header-back { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--text-main); cursor: pointer; }
+    .header-placeholder { width: 24px; }
+
+    /* Banner */
+    .banner { margin: 12px 16px; border-radius: 12px; overflow: hidden; height: 130px; background: linear-gradient(135deg, #07C160 0%, #00B578 100%); position: relative; }
+    .banner-content { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: 0 20px; color: #fff; }
+    .banner-tag { font-size: 12px; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px; display: inline-block; width: fit-content; margin-bottom: 6px; }
+    .banner-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .banner-sub { font-size: 13px; opacity: 0.95; }
+
+    /* 分类Tab */
+    .category-tabs { background: var(--card-bg); padding: 0 16px; display: flex; border-bottom: 1px solid var(--border); }
+    .tab-item { padding: 14px 0; margin-right: 24px; font-size: 15px; color: var(--tab-inactive); position: relative; cursor: pointer; }
+    .tab-item.active { color: var(--tab-active); font-weight: 600; }
+    .tab-item.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--tab-active); border-radius: 2px 2px 0 0; }
+
+    /* 视频列表 */
+    .video-list { padding: 12px 16px; }
+    .video-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); cursor: pointer; }
+    .video-cover-wrap { position: relative; width: 100%; aspect-ratio: 16/9; background: #222; overflow: hidden; }
+    .video-cover { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .video-duration { position: absolute; right: 10px; bottom: 10px; background: rgba(0,0,0,0.65); color: #fff; font-size: 12px; padding: 2px 6px; border-radius: 4px; }
+    .video-play { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 44px; height: 44px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .video-play::after { content: ''; width: 0; height: 0; border-left: 14px solid #fff; border-top: 9px solid transparent; border-bottom: 9px solid transparent; margin-left: 3px; }
+    .video-info { padding: 12px; }
+    .video-title { font-size: 15px; color: var(--text-main); line-height: 1.4; font-weight: 500; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .video-meta { font-size: 12px; color: var(--text-hint); }
+
+    /* 空态 */
+    .empty-state { text-align: center; padding: 60px 16px; color: var(--text-hint); font-size: 14px; }
+
+    /* 加载更多 */
+    .load-more { text-align: center; padding: 16px; color: var(--text-hint); font-size: 13px; }
+
+    /* 底部导航 */
+    .bottom-tabbar { position: fixed; bottom: 0; left: 0; right: 0; max-width: 414px; margin: 0 auto; background: var(--card-bg); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 8px 0 12px; z-index: 20; }
+    .bottom-item { flex: 1; text-align: center; color: var(--text-hint); font-size: 11px; cursor: pointer; }
+    .bottom-item.active { color: var(--tab-active); }
+    .bottom-icon { width: 24px; height: 24px; margin: 0 auto 3px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+
+    /* 播放页 */
+    .player-wrap { width: 100%; aspect-ratio: 16/9; background: #000; position: relative; display: flex; align-items: center; justify-content: center; }
+    .player-placeholder { color: #fff; text-align: center; }
+    .player-placeholder .big-play { width: 56px; height: 56px; border: 2px solid rgba(255,255,255,0.8); border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; }
+    .player-placeholder .big-play::after { content: ''; width: 0; height: 0; border-left: 20px solid #fff; border-top: 12px solid transparent; border-bottom: 12px solid transparent; margin-left: 5px; }
+    .player-controls { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); padding: 12px; color: #fff; }
+    .progress-bar { height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px; margin-bottom: 10px; position: relative; }
+    .progress-fill { position: absolute; left: 0; top: 0; height: 100%; width: 35%; background: var(--primary); border-radius: 2px; }
+    .control-row { display: flex; align-items: center; justify-content: space-between; font-size: 12px; }
+    .control-left { display: flex; align-items: center; gap: 12px; }
+    .control-btn { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .control-btn.pause::after { content: ''; width: 10px; height: 10px; border-left: 3px solid #fff; border-right: 3px solid #fff; }
+    .speed-btn { border: 1px solid rgba(255,255,255,0.6); padding: 2px 6px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+
+    .video-detail { padding: 16px; background: var(--card-bg); }
+    .detail-title { font-size: 17px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; line-height: 1.4; }
+    .detail-meta { font-size: 13px; color: var(--text-sub); display: flex; gap: 16px; }
+
+    /* Toast */
+    #toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); background: rgba(0,0,0,0.75); color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 100; white-space: nowrap; }
+    #toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <!-- 商学院首页 -->
+    <div id="pageHome" class="page active">
+      <div class="header" style="justify-content:center;">
+        <div class="header-title">商学院</div>
+      </div>
+      <div class="banner">
+        <div class="banner-content">
+          <span class="banner-tag">商学院</span>
+          <div class="banner-title">学知识 赢未来</div>
+          <div class="banner-sub">精选课程视频 助你成长</div>
+        </div>
+      </div>
+      <div class="category-tabs" id="categoryTabs">
+        <div class="tab-item active" data-idx="0">商学院</div>
+        <div class="tab-item" data-idx="1">健康讲堂</div>
+        <div class="tab-item" data-idx="2">营销技能</div>
+      </div>
+      <div class="video-list" id="videoList">
+        <!-- JS填充 -->
+      </div>
+      <div class="load-more" id="loadMore">上拉加载更多</div>
+    </div>
+
+    <!-- 视频播放页 -->
+    <div id="pagePlayer" class="page">
+      <div class="header">
+        <div class="header-back" onclick="go('pageHome')">‹</div>
+        <div class="header-title">视频详情</div>
+        <div class="header-placeholder"></div>
+      </div>
+      <div class="player-wrap" onclick="togglePlay()">
+        <div class="player-placeholder">
+          <div class="big-play"></div>
+          <div style="font-size:13px;opacity:0.9;">点击播放</div>
+        </div>
+        <div class="player-controls">
+          <div class="progress-bar"><div class="progress-fill"></div></div>
+          <div class="control-row">
+            <div class="control-left">
+              <div class="control-btn pause" id="playBtn"></div>
+              <span>02:15 / 06:30</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <span class="speed-btn" id="speedBtn">1.0x</span>
+              <span style="font-size:12px;cursor:pointer;">全屏</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="video-detail">
+        <div class="detail-title" id="detailTitle">商学院第一课：产品介绍</div>
+        <div class="detail-meta">
+          <span id="detailDuration">06:30</span>
+          <span id="detailViews">1.2万次播放</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="bottom-tabbar">
+      <div class="bottom-item" onclick="toast('跳转首页')">
+        <div class="bottom-icon">🏠</div>
+        <div>首页</div>
+      </div>
+      <div class="bottom-item active" onclick="go('pageHome')">
+        <div class="bottom-icon">🎓</div>
+        <div>商学院</div>
+      </div>
+      <div class="bottom-item" onclick="toast('跳转分类')">
+        <div class="bottom-icon">≡</div>
+        <div>分类</div>
+      </div>
+      <div class="bottom-item" onclick="toast('跳转购物车')">
+        <div class="bottom-icon">🛒</div>
+        <div>购物车</div>
+      </div>
+      <div class="bottom-item" onclick="toast('跳转我的')">
+        <div class="bottom-icon">👤</div>
+        <div>我的</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    const categories = ['商学院', '健康讲堂', '营销技能'];
+    const sampleData = {
+      0: [
+        { id: 1, title: '商学院第一课：品牌文化与理念', duration: '06:30', views: '1.2万', cover: 'https://picsum.photos/seed/bs1/400/225' },
+        { id: 2, title: '商学院第二课：产品体系全解析', duration: '08:45', views: '9,834', cover: 'https://picsum.photos/seed/bs2/400/225' },
+        { id: 3, title: '商学院第三课：会员权益说明', duration: '05:20', views: '7,521', cover: 'https://picsum.photos/seed/bs3/400/225' }
+      ],
+      1: [
+        { id: 4, title: '健康知识：日常养生指南', duration: '10:15', views: '2.1万', cover: 'https://picsum.photos/seed/hl1/400/225' },
+        { id: 5, title: '健康讲堂：营养搭配入门', duration: '07:30', views: '8,102', cover: 'https://picsum.photos/seed/hl2/400/225' }
+      ],
+      2: [
+        { id: 6, title: '营销技能：社群运营实战', duration: '12:00', views: '1.5万', cover: 'https://picsum.photos/seed/mk1/400/225' },
+        { id: 7, title: '营销技能：客户沟通技巧', duration: '09:10', views: '6,430', cover: 'https://picsum.photos/seed/mk2/400/225' }
+      ]
+    };
+    let currentCat = 0;
+
+    function go(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+      const isJsdom = typeof navigator !== 'undefined' && /jsdom|Node\.js/i.test(navigator.userAgent);
+      if (!isJsdom && typeof window !== 'undefined' && window.scrollTo) { window.scrollTo(0, 0); }
+    }
+
+    function toast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 1800);
+    }
+
+    function renderList(catIdx) {
+      currentCat = catIdx;
+      const list = document.getElementById('videoList');
+      list.innerHTML = '';
+      const items = sampleData[catIdx] || [];
+      if (items.length === 0) {
+        list.innerHTML = '<div class="empty-state">-暂无更多数据-</div>';
+        document.getElementById('loadMore').style.display = 'none';
+        return;
+      }
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'video-card';
+        card.onclick = () => openPlayer(item);
+        card.innerHTML = `
+          <div class="video-cover-wrap">
+            <img class="video-cover" src="${item.cover}" alt="">
+            <div class="video-play"></div>
+            <div class="video-duration">${item.duration}</div>
+          </div>
+          <div class="video-info">
+            <div class="video-title">${item.title}</div>
+            <div class="video-meta">${item.views}次播放</div>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+      document.getElementById('loadMore').style.display = 'block';
+    }
+
+    function openPlayer(item) {
+      document.getElementById('detailTitle').textContent = item.title;
+      document.getElementById('detailDuration').textContent = item.duration;
+      document.getElementById('detailViews').textContent = item.views + '次播放';
+      go('pagePlayer');
+    }
+
+    function switchTab(idx) {
+      document.querySelectorAll('#categoryTabs .tab-item').forEach((el, i) => {
+        el.classList.toggle('active', i === idx);
+      });
+      renderList(idx);
+    }
+
+    document.querySelectorAll('#categoryTabs .tab-item').forEach((el, idx) => {
+      el.onclick = () => switchTab(idx);
+    });
+    document.getElementById('speedBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      changeSpeed();
+    });
+
+    let playing = false;
+    function togglePlay() {
+      playing = !playing;
+      const btn = document.getElementById('playBtn');
+      if (playing) {
+        btn.classList.remove('pause');
+        btn.innerHTML = '<div style="width:10px;height:10px;background:#fff;"></div>';
+      } else {
+        btn.classList.add('pause');
+        btn.innerHTML = '';
+      }
+    }
+
+    const speeds = ['1.0x', '1.25x', '1.5x', '2.0x'];
+    let speedIdx = 0;
+    function changeSpeed() {
+      speedIdx = (speedIdx + 1) % speeds.length;
+      document.getElementById('speedBtn').textContent = speeds[speedIdx];
+    }
+
+    renderList(0);
+  </script>
+</body>
+</html>
