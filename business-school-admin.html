@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>商学院视频管理 - 绿韵家管理系统</title>
+  <style>
+    :root {
+      --primary: #FF4D4F;
+      --primary-hover: #FF7875;
+      --bg: #F0F2F5;
+      --sidebar-bg: #001529;
+      --sidebar-active: #FF4D4F;
+      --text-main: #333333;
+      --text-sub: #666666;
+      --text-hint: #999999;
+      --border: #E8E8E8;
+      --header-bg: #FFFFFF;
+      --main-bg: #F0F2F5;
+      --table-header-bg: #FAFAFA;
+      --tag-green: #52C41A;
+      --tag-red: #FF4D4F;
+      --link-blue: #1890FF;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; color: var(--text-main); background: var(--bg); }
+    .layout { display: flex; min-height: 100vh; }
+
+    /* 侧栏 */
+    .sidebar { width: 180px; background: var(--sidebar-bg); color: #fff; flex-shrink: 0; min-height: 100vh; }
+    .sidebar-header { height: 50px; display: flex; align-items: center; padding: 0 16px; font-size: 16px; font-weight: 500; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .menu { padding: 8px 0; }
+    .menu-group { margin-bottom: 4px; }
+    .group-title { padding: 10px 16px; color: rgba(255,255,255,0.65); font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+    .group-title:hover { color: #fff; }
+    .group-arrow { font-size: 10px; transition: transform 0.2s; }
+    .group-arrow.open { transform: rotate(90deg); }
+    .submenu { display: none; }
+    .submenu.open { display: block; }
+    .menu-item { padding: 10px 16px 10px 32px; font-size: 13px; color: rgba(255,255,255,0.65); cursor: pointer; display: flex; align-items: center; gap: 8px; }
+    .menu-item:hover { color: #fff; }
+    .menu-item.active { background: var(--sidebar-active); color: #fff; }
+    .menu-icon { width: 16px; text-align: center; }
+
+    /* 主内容区 */
+    .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .topbar { height: 50px; background: var(--header-bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+    .topnav { display: flex; gap: 24px; font-size: 14px; }
+    .topnav-item { color: var(--text-sub); cursor: pointer; }
+    .topnav-item.active { color: var(--primary); font-weight: 500; }
+    .topuser { color: var(--text-sub); font-size: 14px; }
+
+    .content { padding: 16px 24px; flex: 1; }
+    .breadcrumb { font-size: 13px; color: var(--text-sub); margin-bottom: 16px; }
+    .breadcrumb span { margin-right: 8px; }
+    .breadcrumb span.divider { color: var(--text-hint); }
+    .breadcrumb span.current { color: var(--text-main); font-weight: 500; }
+
+    /* 页面容器 */
+    .view-page { display: none; }
+    .view-page.active { display: block; }
+
+    /* 卡片 */
+    .card { background: #fff; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+    .card-header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .card-title { font-size: 16px; font-weight: 600; color: var(--text-main); }
+    .card-body { padding: 24px; }
+
+    /* 搜索区 */
+    .search-form { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; margin-bottom: 24px; }
+    .form-item { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 13px; color: var(--text-sub); }
+    .form-input, .form-select { height: 32px; border: 1px solid var(--border); border-radius: 4px; padding: 0 12px; font-size: 13px; min-width: 180px; outline: none; }
+    .form-input:focus, .form-select:focus { border-color: var(--primary); }
+    .btn { height: 32px; padding: 0 16px; border-radius: 4px; font-size: 13px; cursor: pointer; border: none; outline: none; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-default { background: #fff; color: var(--text-main); border: 1px solid var(--border); }
+    .btn-default:hover { border-color: var(--primary); color: var(--primary); }
+    .btn-link { background: transparent; color: var(--link-blue); padding: 0; height: auto; }
+    .btn-link:hover { text-decoration: underline; }
+    .btn-danger { background: transparent; color: var(--primary); padding: 0; height: auto; }
+    .btn-danger:hover { text-decoration: underline; }
+
+    /* 表格 */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: var(--table-header-bg); color: var(--text-sub); font-weight: 500; }
+    tr:hover td { background: #FAFAFA; }
+    .cover-thumb { width: 80px; height: 45px; object-fit: cover; border-radius: 4px; background: #eee; }
+    .status-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+    .status-on { background: #F6FFED; color: var(--tag-green); border: 1px solid #B7EB8F; }
+    .status-off { background: #FFF1F0; color: var(--tag-red); border: 1px solid #FFA39E; }
+    .op-btns { display: flex; gap: 12px; }
+
+    /* 分页 */
+    .pagination-bar { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 16px 0; font-size: 13px; color: var(--text-sub); }
+    .page-btn { min-width: 28px; height: 28px; border: 1px solid var(--border); background: #fff; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .page-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .page-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .page-btn.disabled { color: var(--text-hint); cursor: not-allowed; border-color: var(--border); }
+    .page-size { height: 28px; border: 1px solid var(--border); border-radius: 4px; padding: 0 8px; font-size: 13px; }
+    .page-jump { display: flex; align-items: center; gap: 6px; }
+    .page-jump input { width: 40px; height: 28px; border: 1px solid var(--border); border-radius: 4px; text-align: center; }
+
+    /* 表单页 */
+    .form-page .form-row { display: flex; gap: 24px; margin-bottom: 20px; }
+    .form-page .form-col { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .form-page .form-col.full { width: 100%; flex: none; }
+    .form-page .form-input, .form-page .form-select, .form-page textarea { width: 100%; }
+    .form-page textarea { min-height: 120px; padding: 12px; resize: vertical; }
+    .required::before { content: '* '; color: var(--primary); }
+    .form-tips { font-size: 12px; color: var(--text-hint); margin-top: 4px; }
+    .cover-uploader { width: 160px; height: 90px; border: 1px dashed var(--border); border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-hint); font-size: 13px; cursor: pointer; }
+    .cover-uploader:hover { border-color: var(--primary); color: var(--primary); }
+    .form-actions { margin-top: 32px; display: flex; gap: 12px; }
+
+    /* Toast */
+    #toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) scale(0.95); background: rgba(0,0,0,0.75); color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 1000; }
+    #toast.show { opacity: 1; transform: translateX(-50%) scale(1); }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <!-- 侧栏 -->
+    <div class="sidebar">
+      <div class="sidebar-header">绿韵家管理系统</div>
+      <div class="menu">
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)">
+            <span>签到打卡</span>
+            <span class="group-arrow">▶</span>
+          </div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)">
+            <span>优惠券管理</span>
+            <span class="group-arrow">▶</span>
+          </div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)">
+            <span>平台直播</span>
+            <span class="group-arrow">▶</span>
+          </div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)">
+            <span>排行榜</span>
+            <span class="group-arrow">▶</span>
+          </div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)">
+            <span>商品换购</span>
+            <span class="group-arrow">▶</span>
+          </div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)">
+            <span>热搜管理</span>
+            <span class="group-arrow">▶</span>
+          </div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)">
+            <span>会员标签</span>
+            <span class="group-arrow">▶</span>
+          </div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)">
+            <span>直播管理</span>
+            <span class="group-arrow">▶</span>
+          </div>
+          <div class="submenu">
+            <div class="menu-item"><span class="menu-icon">▣</span>直播商品</div>
+            <div class="menu-item"><span class="menu-icon">▣</span>直播间管理</div>
+            <div class="menu-item"><span class="menu-icon">▣</span>直播间商品匹配</div>
+            <div class="menu-item"><span class="menu-icon">▣</span>直播会员订单</div>
+            <div class="menu-item"><span class="menu-icon">▣</span>直播数据统计</div>
+            <div class="menu-item"><span class="menu-icon">▣</span>观看时长设置</div>
+          </div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)">
+            <span>商学院管理</span>
+            <span class="group-arrow open">▶</span>
+          </div>
+          <div class="submenu open">
+            <div class="menu-item active" onclick="go('list')"><span class="menu-icon">▣</span>视频管理</div>
+            <div class="menu-item" onclick="go('category')"><span class="menu-icon">▣</span>栏目管理</div>
+          </div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)">
+            <span>享创</span>
+            <span class="group-arrow">▶</span>
+          </div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)">
+            <span>水机权益</span>
+            <span class="group-arrow">▶</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 主内容 -->
+    <main class="main">
+      <div class="topbar">
+        <div class="topnav">
+          <span class="topnav-item">店铺</span>
+          <span class="topnav-item active">营销中心</span>
+          <span class="topnav-item">结算中心</span>
+        </div>
+        <div class="topuser">袁</div>
+      </div>
+
+      <div class="content">
+        <!-- 视频列表页 -->
+        <div id="viewList" class="view-page active">
+          <div class="breadcrumb">
+            <span>首页报表</span><span class="divider">></span>
+            <span>商学院</span><span class="divider">></span>
+            <span class="current">视频管理</span>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">视频管理</span>
+              <div style="display:flex;gap:12px;align-items:center;">
+                <button class="btn btn-primary" onclick="go('category')">栏目管理</button>
+                <button class="btn btn-primary" onclick="go('create')">添加视频</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="search-form">
+                <div class="form-item">
+                  <label class="form-label">视频名称</label>
+                  <input class="form-input" type="text" placeholder="请输入视频名称" id="qName">
+                </div>
+                <div class="form-item">
+                  <label class="form-label">视频状态</label>
+                  <select class="form-select" id="qStatus">
+                    <option value="">全部</option>
+                    <option value="1">已上架</option>
+                    <option value="0">已下架</option>
+                  </select>
+                </div>
+                <div class="form-item">
+                  <button class="btn btn-primary" onclick="searchList()">搜索</button>
+                </div>
+                <div class="form-item">
+                  <button class="btn btn-default" onclick="resetSearch()">重置</button>
+                </div>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>视频ID</th>
+                      <th>视频名称</th>
+                      <th>视频封面</th>
+                      <th>视频栏目</th>
+                      <th>状态</th>
+                      <th>视频时长</th>
+                      <th>上传时间</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="listBody">
+                    <!-- JS填充 -->
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="pagination-bar">
+                <span>共 3 条</span>
+                <select class="page-size"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>
+                <button class="page-btn disabled">&lt;</button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn disabled">&gt;</button>
+                <span>前往</span>
+                <input type="text" value="1">
+                <span>页</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 栏目管理页 -->
+        <div id="viewCategory" class="view-page">
+          <div class="breadcrumb">
+            <span>首页报表</span><span class="divider">></span>
+            <span>商学院</span><span class="divider">></span>
+            <span class="current">栏目管理</span>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">栏目管理</span>
+              <div style="display:flex;gap:12px;">
+                <button class="btn btn-default" onclick="go('list')">返回</button>
+                <button class="btn btn-primary" onclick="toast('新增栏目')">新增栏目</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr><th>栏目ID</th><th>栏目名称</th><th>排序</th><th>状态</th><th>操作</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>1</td><td>商学院</td><td>1</td><td><span class="status-tag status-on">启用</span></td><td class="op-btns"><button class="btn btn-link">编辑</button><button class="btn btn-danger">删除</button></td></tr>
+                    <tr><td>2</td><td>健康讲堂</td><td>2</td><td><span class="status-tag status-on">启用</span></td><td class="op-btns"><button class="btn btn-link">编辑</button><button class="btn btn-danger">删除</button></td></tr>
+                    <tr><td>3</td><td>营销技能</td><td>3</td><td><span class="status-tag status-on">启用</span></td><td class="op-btns"><button class="btn btn-link">编辑</button><button class="btn btn-danger">删除</button></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 新增/编辑视频页 -->
+        <div id="viewCreate" class="view-page form-page">
+          <div class="breadcrumb">
+            <span>首页报表</span><span class="divider">></span>
+            <span>商学院</span><span class="divider">></span>
+            <span>视频管理</span><span class="divider">></span>
+            <span class="current">添加视频</span>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">添加视频</span>
+            </div>
+            <div class="card-body">
+              <div class="form-row">
+                <div class="form-col" style="flex:2;">
+                  <label class="form-label required">视频名称</label>
+                  <input class="form-input" type="text" placeholder="请输入视频名称">
+                </div>
+                <div class="form-col" style="flex:1;">
+                  <label class="form-label required">所属栏目</label>
+                  <select class="form-select">
+                    <option>商学院</option>
+                    <option>健康讲堂</option>
+                    <option>营销技能</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-col">
+                  <label class="form-label required">视频文件</label>
+                  <input class="form-input" type="text" placeholder="请输入视频文件地址或上传">
+                  <div class="form-tips">支持 mp4 / mov 格式，单个文件不超过 500MB</div>
+                </div>
+                <div class="form-col">
+                  <label class="form-label required">视频时长</label>
+                  <input class="form-input" type="text" placeholder="如 06:30">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-col">
+                  <label class="form-label">视频封面</label>
+                  <div class="cover-uploader" onclick="toast('上传封面')">
+                    <div style="font-size:18px;">+</div>
+                    <div>上传封面</div>
+                  </div>
+                  <div class="form-tips">建议尺寸 16:9，不超过 2MB</div>
+                </div>
+                <div class="form-col">
+                  <label class="form-label">状态</label>
+                  <select class="form-select">
+                    <option>上架</option>
+                    <option>下架</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-col full">
+                  <label class="form-label">视频简介</label>
+                  <textarea placeholder="请输入视频简介"></textarea>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button class="btn btn-primary" onclick="toast('保存成功');go('list')">保存</button>
+                <button class="btn btn-default" onclick="go('list')">取消</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    const sampleList = [
+      { id: 1001, name: '商学院第一课：品牌文化与理念', category: '商学院', duration: '06:30', status: 1, time: '2026-08-20 10:30', cover: 'https://picsum.photos/seed/bsadm1/160/90' },
+      { id: 1002, name: '健康知识：日常养生指南', category: '健康讲堂', duration: '10:15', status: 0, time: '2026-08-19 14:20', cover: 'https://picsum.photos/seed/bsadm2/160/90' },
+      { id: 1003, name: '营销技能：社群运营实战', category: '营销技能', duration: '12:00', status: 1, time: '2026-08-18 09:10', cover: 'https://picsum.photos/seed/bsadm3/160/90' }
+    ];
+
+    function go(pk) {
+      const viewId = 'view' + pk.charAt(0).toUpperCase() + pk.slice(1);
+      document.querySelectorAll('.view-page').forEach(v => v.classList.remove('active'));
+      const el = document.getElementById(viewId);
+      if (el) el.classList.add('active');
+    }
+
+    function toast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 1800);
+    }
+
+    function toggleMenu(el) {
+      const arrow = el.querySelector('.group-arrow');
+      const submenu = el.nextElementSibling;
+      if (!submenu || !submenu.classList.contains('submenu')) return;
+      submenu.classList.toggle('open');
+      arrow.classList.toggle('open');
+    }
+
+    function renderList(data) {
+      const body = document.getElementById('listBody');
+      body.innerHTML = '';
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        const statusTag = row.status === 1
+          ? '<span class="status-tag status-on">已上架</span>'
+          : '<span class="status-tag status-off">已下架</span>';
+        const opText = row.status === 1 ? '下架' : '上架';
+        tr.innerHTML = `
+          <td>${row.id}</td>
+          <td>${row.name}</td>
+          <td><img class="cover-thumb" src="${row.cover}" alt=""></td>
+          <td>${row.category}</td>
+          <td>${statusTag}</td>
+          <td>${row.duration}</td>
+          <td>${row.time}</td>
+          <td class="op-btns">
+            <button class="btn btn-link" onclick="go('create')">编辑</button>
+            <button class="btn btn-link" onclick="toast('已${opText}')">${opText}</button>
+            <button class="btn btn-danger" onclick="toast('已删除')">删除</button>
+          </td>
+        `;
+        body.appendChild(tr);
+      });
+    }
+
+    function searchList() {
+      const name = document.getElementById('qName').value.trim();
+      const status = document.getElementById('qStatus').value;
+      let filtered = sampleList;
+      if (name) filtered = filtered.filter(r => r.name.includes(name));
+      if (status !== '') filtered = filtered.filter(r => String(r.status) === status);
+      renderList(filtered);
+      document.querySelector('.pagination-bar span').textContent = '共 ' + filtered.length + ' 条';
+    }
+
+    function resetSearch() {
+      document.getElementById('qName').value = '';
+      document.getElementById('qStatus').value = '';
+      renderList(sampleList);
+      document.querySelector('.pagination-bar span').textContent = '共 3 条';
+    }
+
+    renderList(sampleList);
+  </script>
+</body>
+</html>
