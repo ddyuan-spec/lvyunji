@@ -85,14 +85,14 @@
     /* 表格 */
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
     th { background: var(--table-header-bg); color: var(--text-sub); font-weight: 500; }
     tr:hover td { background: #FAFAFA; }
     .cover-thumb { width: 80px; height: 45px; object-fit: cover; border-radius: 4px; background: #eee; }
     .status-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
     .status-on { background: #F6FFED; color: var(--tag-green); border: 1px solid #B7EB8F; }
     .status-off { background: #FFF1F0; color: var(--tag-red); border: 1px solid #FFA39E; }
-    .op-btns { display: flex; gap: 12px; }
+    .op-btns { display: flex; gap: 12px; flex-wrap: nowrap; }
 
     /* 分页 */
     .pagination-bar { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 16px 0; font-size: 13px; color: var(--text-sub); }
@@ -303,7 +303,7 @@
               <span class="card-title">栏目管理</span>
               <div style="display:flex;gap:12px;">
                 <button class="btn btn-default" onclick="go('list')">返回</button>
-                <button class="btn btn-primary" onclick="toast('新增栏目')">新增栏目</button>
+                <button class="btn btn-primary" onclick="go('categoryCreate')">新增栏目</button>
               </div>
             </div>
             <div class="card-body">
@@ -313,11 +313,95 @@
                     <tr><th>栏目ID</th><th>栏目名称</th><th>排序</th><th>状态</th><th>操作</th></tr>
                   </thead>
                   <tbody>
-                    <tr><td>1</td><td>商学院</td><td>1</td><td><span class="status-tag status-on">启用</span></td><td class="op-btns"><button class="btn btn-link">编辑</button><button class="btn btn-danger">删除</button></td></tr>
-                    <tr><td>2</td><td>健康讲堂</td><td>2</td><td><span class="status-tag status-on">启用</span></td><td class="op-btns"><button class="btn btn-link">编辑</button><button class="btn btn-danger">删除</button></td></tr>
-                    <tr><td>3</td><td>营销技能</td><td>3</td><td><span class="status-tag status-on">启用</span></td><td class="op-btns"><button class="btn btn-link">编辑</button><button class="btn btn-danger">删除</button></td></tr>
+                    <tr><td>1</td><td>商学院</td><td>1</td><td><span class="status-tag status-on">启用</span></td><td><div class="op-btns"><button class="btn btn-link" onclick="go('categoryEdit')">编辑</button><button class="btn btn-danger">删除</button></div></td></tr>
+                    <tr><td>2</td><td>健康讲堂</td><td>2</td><td><span class="status-tag status-on">启用</span></td><td><div class="op-btns"><button class="btn btn-link" onclick="go('categoryEdit')">编辑</button><button class="btn btn-danger">删除</button></div></td></tr>
+                    <tr><td>3</td><td>营销技能</td><td>3</td><td><span class="status-tag status-on">启用</span></td><td><div class="op-btns"><button class="btn btn-link" onclick="go('categoryEdit')">编辑</button><button class="btn btn-danger">删除</button></div></td></tr>
                   </tbody>
                 </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 新增栏目页 -->
+        <div id="viewCategoryCreate" class="view-page form-page">
+          <div class="breadcrumb">
+            <span>首页报表</span><span class="divider">></span>
+            <span>商学院</span><span class="divider">></span>
+            <span>栏目管理</span><span class="divider">></span>
+            <span class="current">新增栏目</span>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">新增栏目</span>
+              <button class="btn btn-default" onclick="go('category')">返回</button>
+            </div>
+            <div class="card-body">
+              <div class="form-row">
+                <div class="form-col" style="flex:2;">
+                  <label class="form-label required">栏目名称</label>
+                  <input class="form-input" type="text" placeholder="请输入栏目名称">
+                </div>
+                <div class="form-col" style="flex:1;">
+                  <label class="form-label required">排序</label>
+                  <input class="form-input" type="text" placeholder="数字越小越靠前">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-col" style="flex:1;">
+                  <label class="form-label required">状态</label>
+                  <select class="form-select">
+                    <option>启用</option>
+                    <option>禁用</option>
+                  </select>
+                </div>
+                <div class="form-col" style="flex:2;"></div>
+              </div>
+              <div class="form-actions">
+                <button class="btn btn-primary" onclick="toast('保存成功');go('category')">保存</button>
+                <button class="btn btn-default" onclick="go('category')">取消</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 编辑栏目页 -->
+        <div id="viewCategoryEdit" class="view-page form-page">
+          <div class="breadcrumb">
+            <span>首页报表</span><span class="divider">></span>
+            <span>商学院</span><span class="divider">></span>
+            <span>栏目管理</span><span class="divider">></span>
+            <span class="current">编辑栏目</span>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">编辑栏目</span>
+              <button class="btn btn-default" onclick="go('category')">返回</button>
+            </div>
+            <div class="card-body">
+              <div class="form-row">
+                <div class="form-col" style="flex:2;">
+                  <label class="form-label required">栏目名称</label>
+                  <input class="form-input" type="text" value="商学院">
+                </div>
+                <div class="form-col" style="flex:1;">
+                  <label class="form-label required">排序</label>
+                  <input class="form-input" type="text" value="1">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-col" style="flex:1;">
+                  <label class="form-label required">状态</label>
+                  <select class="form-select">
+                    <option selected>启用</option>
+                    <option>禁用</option>
+                  </select>
+                </div>
+                <div class="form-col" style="flex:2;"></div>
+              </div>
+              <div class="form-actions">
+                <button class="btn btn-primary" onclick="toast('保存成功');go('category')">保存</button>
+                <button class="btn btn-default" onclick="go('category')">取消</button>
               </div>
             </div>
           </div>
@@ -443,10 +527,12 @@
           <td>${statusTag}</td>
           <td>${row.duration}</td>
           <td>${row.time}</td>
-          <td class="op-btns">
-            <button class="btn btn-link" onclick="go('create')">编辑</button>
-            <button class="btn btn-link" onclick="toast('已${opText}')">${opText}</button>
-            <button class="btn btn-danger" onclick="toast('已删除')">删除</button>
+          <td>
+            <div class="op-btns">
+              <button class="btn btn-link" onclick="go('create')">编辑</button>
+              <button class="btn btn-link" onclick="toast('已${opText}')">${opText}</button>
+              <button class="btn btn-danger" onclick="toast('已删除')">删除</button>
+            </div>
           </td>
         `;
         body.appendChild(tr);
