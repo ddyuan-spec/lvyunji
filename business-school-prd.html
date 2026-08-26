@@ -119,9 +119,7 @@
   <h4>4.1.1 页面原型与交互示意</h4>
   <p><strong>商学院首页</strong></p>
   <img src="https://ddyuan-spec.github.io/lvyunji/business-school-client-home.png" alt="C端商学院首页">
-  <p><strong>入口链路：我的 → 数商服务 → 商学院</strong></p>
-  <img src="https://ddyuan-spec.github.io/lvyunji/business-school-client-mine.png" alt="C端我的页面">
-  <img src="https://ddyuan-spec.github.io/lvyunji/business-school-client-shushang.png" alt="C端数商服务页面">
+  <p class="note">入口：C端用户从「我的」→「数商服务」→「商学院」进入首页（非底部Tab，进入后底部Tab高亮「我的」）。「我的」与「数商服务」为已有页面，本期不展开描述。</p>
 
   <h4>4.1.2 界面与展示规则</h4>
   <ul>
@@ -136,7 +134,6 @@
 
   <h4>4.1.3 业务逻辑与边界条件</h4>
   <ul>
-    <li>入口：用户从「我的」页面进入「数商服务」，在数商工具列表点击「商学院」进入首页。商学院不属于底部Tab，进入商学院页面后底部Tab保持高亮「我的」。</li>
     <li>Tab切换：点击Tab后立即切换分类并重新加载对应视频列表，当前列表滚动位置重置。</li>
     <li>点击卡片：进入视频播放页，携带视频ID。</li>
     <li>未登录：可浏览列表，播放时按现有登录态拦截逻辑处理。</li>
