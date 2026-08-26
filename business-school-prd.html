@@ -61,7 +61,7 @@
   <table>
     <thead><tr><th>端口</th><th>模块</th><th>本期动作</th><th>备注</th></tr></thead>
     <tbody>
-      <tr><td>C端App</td><td>商学院</td><td>新增</td><td>首页底部Tab新增「商学院」入口（或替换现有Tab）</td></tr>
+      <tr><td>C端App</td><td>商学院</td><td>新增</td><td>我的 → 数商服务 → 商学院</td></tr>
       <tr><td>C端小程序/H5</td><td>商学院</td><td>新增</td><td>与App同构，适配移动端浏览器</td></tr>
       <tr><td>绿韵家后台</td><td>商学院管理</td><td>新增</td><td>在左侧导航新增「商学院管理」分组，含视频管理、栏目管理</td></tr>
     </tbody>
@@ -117,7 +117,11 @@
   <p><strong>需求影响范围</strong>：C端App、小程序、H5。<strong>涉及终端明细</strong>：绿韵家C端全端。</p>
 
   <h4>4.1.1 页面原型与交互示意</h4>
+  <p><strong>商学院首页</strong></p>
   <img src="https://ddyuan-spec.github.io/lvyunji/business-school-client-home.png" alt="C端商学院首页">
+  <p><strong>入口链路：我的 → 数商服务 → 商学院</strong></p>
+  <img src="https://ddyuan-spec.github.io/lvyunji/business-school-client-mine.png" alt="C端我的页面">
+  <img src="https://ddyuan-spec.github.io/lvyunji/business-school-client-shushang.png" alt="C端数商服务页面">
 
   <h4>4.1.2 界面与展示规则</h4>
   <ul>
@@ -132,7 +136,7 @@
 
   <h4>4.1.3 业务逻辑与边界条件</h4>
   <ul>
-    <li>入口：用户从底部Tab「商学院」进入首页。</li>
+    <li>入口：用户从「我的」页面进入「数商服务」，在数商工具列表点击「商学院」进入首页。商学院不属于底部Tab，进入商学院页面后底部Tab保持高亮「我的」。</li>
     <li>Tab切换：点击Tab后立即切换分类并重新加载对应视频列表，当前列表滚动位置重置。</li>
     <li>点击卡片：进入视频播放页，携带视频ID。</li>
     <li>未登录：可浏览列表，播放时按现有登录态拦截逻辑处理。</li>
@@ -352,7 +356,7 @@
   <table>
     <thead><tr><th>#</th><th>事项</th><th>干系人</th><th>状态</th></tr></thead>
     <tbody>
-      <tr><td>1</td><td>商学院C端入口是替换现有底部Tab「直播」还是新增入口？</td><td>@产品/业务</td><td>待确认</td></tr>
+      <tr><td>1</td><td>商学院C端入口位于我的 → 数商服务，已确认。</td><td>@产品/业务</td><td>已确认</td></tr>
       <tr><td>2</td><td>视频播放量统计口径：是否按用户去重、去重时间窗多长？</td><td>@产品/数据</td><td>待确认（当前按5分钟去重占位）</td></tr>
       <tr><td>3</td><td>视频文件存储方案：复用现有直播回放存储还是独立视频存储服务？</td><td>@后端</td><td>待确认</td></tr>
       <tr><td>4</td><td>是否需要视频转码/多清晰度适配？</td><td>@后端</td><td>待确认（当前按单文件直出）</td></tr>
