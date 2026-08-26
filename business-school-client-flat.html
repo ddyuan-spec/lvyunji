@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>绿韵家·商学院 C端 — 平铺设计稿（墨刀用）</title>
+<style>
+  :root {
+    --primary: #07C160;
+    --primary-dark: #06AD56;
+    --bg: #F5F7FA;
+    --card-bg: #FFFFFF;
+    --text-main: #111111;
+    --text-sub: #666666;
+    --text-hint: #999999;
+    --border: #EEEEEE;
+    --tab-active: #07C160;
+    --tab-inactive: #666666;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; }
+
+  /* ===== 平铺修复：所有屏幕在独立手机框里全部展开、无交互 ===== */
+  body { display: block !important; width: 100%; background: #eef0f4; }
+  .page { display: block !important; min-height: 0; }
+
+  /* 顶部复制工具栏 */
+  .copy-bar { position: sticky; top: 0; left: 0; z-index: 100; background: #1a1a2e; color: #fff; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 12px rgba(0,0,0,.25); width: 100%; box-sizing: border-box; }
+  .copy-bar .t { font-size: 15px; font-weight: 700; }
+  .copy-bar .i { font-size: 12px; color: #a6adc8; margin-top: 2px; }
+  .copy-btn { padding: 9px 22px; border: none; border-radius: 22px; background: linear-gradient(135deg,#2563eb,#7c3aed); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; flex-shrink: 0; transition: transform .1s, box-shadow .2s; }
+  .copy-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(124,58,237,.35); }
+  .copy-btn.copied { background: linear-gradient(135deg,#059669,#047857); }
+
+  /* 平铺画板 */
+  .pf-board { display: flex; gap: 40px; flex-wrap: nowrap; overflow-x: auto; padding: 40px 30px 100px; align-items: flex-start; background: #eef0f4; }
+  .pf-col { display: flex; flex-direction: column; align-items: center; flex: 0 0 auto; }
+  .pf-label { font-size: 14px; font-weight: 600; color: #333; background: #fff; padding: 6px 16px; border-radius: 20px; box-shadow: 0 2px 6px rgba(0,0,0,.1); margin-bottom: 14px; white-space: nowrap; }
+
+  /* 手机框：固定 375px 宽 */
+  .pf-phone { flex: 0 0 375px; width: 375px; height: auto; min-height: 760px; background: #f5f5f5; border-radius: 40px; box-shadow: 0 25px 50px -12px rgba(0,0,0,.25); overflow: hidden; position: relative; display: flex; flex-direction: column; }
+  .pf-statusbar { height: 44px; background: #1a1a2e; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; font-size: 13px; flex-shrink: 0; }
+  .pf-content { position: relative; flex: 1; min-height: 716px; height: auto; overflow: visible; }
+
+  /* ===== 以下为交互原型视觉样式（1:1 复用） ===== */
+  .phone { width: 100%; max-width: 414px; min-height: 100vh; margin: 0 auto; background: var(--bg); position: relative; overflow: hidden; }
+  .header { background: var(--card-bg); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: static; z-index: 10; }
+  .header-title { font-size: 18px; font-weight: 600; color: var(--text-main); }
+  .header-back { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--text-main); }
+  .header-placeholder { width: 24px; }
+
+  .banner { margin: 12px 16px; border-radius: 12px; overflow: hidden; height: 130px; background: linear-gradient(135deg, #07C160 0%, #00B578 100%); position: relative; }
+  .banner-content { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: 0 20px; color: #fff; }
+  .banner-tag { font-size: 12px; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px; display: inline-block; width: fit-content; margin-bottom: 6px; }
+  .banner-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .banner-sub { font-size: 13px; opacity: 0.95; }
+
+  .category-tabs { background: var(--card-bg); padding: 0 16px; display: flex; border-bottom: 1px solid var(--border); }
+  .tab-item { padding: 14px 0; margin-right: 24px; font-size: 15px; color: var(--tab-inactive); position: relative; }
+  .tab-item.active { color: var(--tab-active); font-weight: 600; }
+  .tab-item.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--tab-active); border-radius: 2px 2px 0 0; }
+
+  .video-list { padding: 12px 16px; }
+  .video-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .video-cover-wrap { position: relative; width: 100%; aspect-ratio: 16/9; background: #222; overflow: hidden; }
+  .video-cover { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .video-duration { position: absolute; right: 10px; bottom: 10px; background: rgba(0,0,0,0.65); color: #fff; font-size: 12px; padding: 2px 6px; border-radius: 4px; }
+  .video-play { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 44px; height: 44px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .video-play::after { content: ''; width: 0; height: 0; border-left: 14px solid #fff; border-top: 9px solid transparent; border-bottom: 9px solid transparent; margin-left: 3px; }
+  .video-info { padding: 12px; }
+  .video-title { font-size: 15px; color: var(--text-main); line-height: 1.4; font-weight: 500; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .video-meta { font-size: 12px; color: var(--text-hint); }
+
+  .load-more { text-align: center; padding: 16px; color: var(--text-hint); font-size: 13px; }
+
+  .player-wrap { width: 100%; aspect-ratio: 16/9; background: #000; position: relative; display: flex; align-items: center; justify-content: center; }
+  .player-placeholder { color: #fff; text-align: center; }
+  .player-placeholder .big-play { width: 56px; height: 56px; border: 2px solid rgba(255,255,255,0.8); border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; }
+  .player-placeholder .big-play::after { content: ''; width: 0; height: 0; border-left: 20px solid #fff; border-top: 12px solid transparent; border-bottom: 12px solid transparent; margin-left: 5px; }
+  .player-controls { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); padding: 12px; color: #fff; }
+  .progress-bar { height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px; margin-bottom: 10px; position: relative; }
+  .progress-fill { position: absolute; left: 0; top: 0; height: 100%; width: 35%; background: var(--primary); border-radius: 2px; }
+  .control-row { display: flex; align-items: center; justify-content: space-between; font-size: 12px; }
+  .control-left { display: flex; align-items: center; gap: 12px; }
+  .control-btn { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
+  .control-btn.pause::after { content: ''; width: 10px; height: 10px; border-left: 3px solid #fff; border-right: 3px solid #fff; }
+  .speed-btn { border: 1px solid rgba(255,255,255,0.6); padding: 2px 6px; border-radius: 4px; font-size: 11px; }
+
+  .video-detail { padding: 16px; background: var(--card-bg); }
+  .detail-title { font-size: 17px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; line-height: 1.4; }
+  .detail-meta { font-size: 13px; color: var(--text-sub); display: flex; gap: 16px; }
+
+  .mine-top { background: linear-gradient(180deg, #E8F9EF 0%, #F5F7FA 100%); padding: 24px 16px 16px; }
+  .mine-user { display: flex; align-items: center; gap: 12px; }
+  .mine-avatar { width: 56px; height: 56px; border-radius: 50%; background: #ddd; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+  .mine-name { font-size: 18px; font-weight: 600; color: var(--text-main); }
+  .mine-tags { display: flex; gap: 8px; margin-top: 6px; }
+  .mine-tag { font-size: 11px; color: #D48806; background: #FFFBE6; border: 1px solid #FFE58F; padding: 2px 8px; border-radius: 10px; }
+  .menu-list { margin-top: 12px; background: var(--card-bg); }
+  .menu-item-row { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 1px solid var(--border); }
+  .menu-item-left { display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--text-main); }
+  .menu-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .menu-arrow { color: var(--text-hint); font-size: 14px; }
+
+  .tools-section { background: var(--card-bg); padding: 20px 16px; }
+  .tools-title { font-size: 16px; font-weight: 600; color: var(--text-main); margin-bottom: 16px; }
+  .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 8px; }
+  .tool-cell { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .tool-icon { width: 48px; height: 48px; border-radius: 12px; background: #F5F7FA; display: flex; align-items: center; justify-content: center; font-size: 22px; position: relative; }
+  .tool-icon.active { background: #E8F9EF; }
+  .tool-name { font-size: 13px; color: var(--text-main); }
+
+  .bottom-tabbar { position: static !important; width: 100%; background: var(--card-bg); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 8px 0 12px; z-index: 20; }
+  .bottom-item { flex: 1; text-align: center; color: var(--text-hint); font-size: 11px; }
+  .bottom-item.active { color: var(--tab-active); }
+  .bottom-icon { width: 24px; height: 24px; margin: 0 auto 3px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+
+  /* 复制成功提示 toast */
+  .copy-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1a1a2e; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 13px; box-shadow: 0 4px 16px rgba(0,0,0,.25); opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 200; }
+  .copy-toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+  <div class="copy-bar">
+    <div>
+      <div class="t">📋 绿韵家·商学院 C端 — 平铺设计稿（墨刀用）</div>
+      <div class="i">共 4 个屏幕 · 横向平铺 · 无交互 · 一键复制源码粘墨刀</div>
+    </div>
+    <button class="copy-btn" id="copyBtn" onclick="doCopy()" title="点击复制完整 HTML 源码，粘贴到墨刀">一键复制源码</button>
+  </div>
+  <div class="copy-toast" id="copyToast">已复制干净源码，可直接粘贴到墨刀</div>
+
+  <div class="pf-board" id="board">
+
+    <!-- 屏幕1：我的 -->
+    <div class="pf-col">
+      <div class="pf-label">我的</div>
+      <div class="pf-phone">
+        <div class="pf-statusbar"><span>9:41</span><span>📶 📡 🔋</span></div>
+        <div class="pf-content">
+          <div class="phone">
+            <div class="header" style="justify-content:center;"><div class="header-title">我的</div></div>
+            <div class="mine-top">
+              <div class="mine-user">
+                <div class="mine-avatar">👤</div>
+                <div>
+                  <div class="mine-name">大不列颠蛋黄酥</div>
+                  <div class="mine-tags">
+                    <span class="mine-tag">至尊达人</span>
+                    <span class="mine-tag">执行委</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="menu-list">
+              <div class="menu-item-row">
+                <div class="menu-item-left"><span class="menu-icon">📊</span><span>数商服务</span></div>
+                <span class="menu-arrow">›</span>
+              </div>
+              <div class="menu-item-row">
+                <div class="menu-item-left"><span class="menu-icon">📦</span><span>我的订单</span></div>
+                <span class="menu-arrow">›</span>
+              </div>
+              <div class="menu-item-row">
+                <div class="menu-item-left"><span class="menu-icon">📍</span><span>收货地址</span></div>
+                <span class="menu-arrow">›</span>
+              </div>
+              <div class="menu-item-row">
+                <div class="menu-item-left"><span class="menu-icon">⚙️</span><span>设置</span></div>
+                <span class="menu-arrow">›</span>
+              </div>
+            </div>
+            <div class="bottom-tabbar">
+              <div class="bottom-item"><div class="bottom-icon">🏠</div><div>首页</div></div>
+              <div class="bottom-item"><div class="bottom-icon">≡</div><div>分类</div></div>
+              <div class="bottom-item"><div class="bottom-icon">🛒</div><div>购物车</div></div>
+              <div class="bottom-item active"><div class="bottom-icon">👤</div><div>我的</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 屏幕2：数商服务 -->
+    <div class="pf-col">
+      <div class="pf-label">数商服务</div>
+      <div class="pf-phone">
+        <div class="pf-statusbar"><span>9:41</span><span>📶 📡 🔋</span></div>
+        <div class="pf-content">
+          <div class="phone">
+            <div class="header">
+              <div class="header-back">‹</div>
+              <div class="header-title">数商服务</div>
+              <div class="header-placeholder"></div>
+            </div>
+            <div class="tools-section">
+              <div class="tools-title">数商工具</div>
+              <div class="tools-grid">
+                <div class="tool-cell"><div class="tool-icon">📁</div><div class="tool-name">素材库</div></div>
+                <div class="tool-cell"><div class="tool-icon">🖼️</div><div class="tool-name">我的作品</div></div>
+                <div class="tool-cell"><div class="tool-icon">🎨</div><div class="tool-name">图片生成</div></div>
+                <div class="tool-cell"><div class="tool-icon">👥</div><div class="tool-name">代注册</div></div>
+                <div class="tool-cell"><div class="tool-icon">🏭</div><div class="tool-name">工业游</div></div>
+                <div class="tool-cell"><div class="tool-icon">📋</div><div class="tool-name">公司资质</div></div>
+                <div class="tool-cell"><div class="tool-icon active">🎓</div><div class="tool-name">商学院</div></div>
+              </div>
+            </div>
+            <div class="bottom-tabbar">
+              <div class="bottom-item"><div class="bottom-icon">🏠</div><div>首页</div></div>
+              <div class="bottom-item"><div class="bottom-icon">≡</div><div>分类</div></div>
+              <div class="bottom-item"><div class="bottom-icon">🛒</div><div>购物车</div></div>
+              <div class="bottom-item active"><div class="bottom-icon">👤</div><div>我的</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 屏幕3：商学院首页 -->
+    <div class="pf-col">
+      <div class="pf-label">商学院首页</div>
+      <div class="pf-phone">
+        <div class="pf-statusbar"><span>9:41</span><span>📶 📡 🔋</span></div>
+        <div class="pf-content">
+          <div class="phone">
+            <div class="header" style="justify-content:center;"><div class="header-title">商学院</div></div>
+            <div class="banner">
+              <div class="banner-content">
+                <span class="banner-tag">商学院</span>
+                <div class="banner-title">学知识 赢未来</div>
+                <div class="banner-sub">精选课程视频 助你成长</div>
+              </div>
+            </div>
+            <div class="category-tabs">
+              <div class="tab-item active">商学院</div>
+              <div class="tab-item">健康讲堂</div>
+              <div class="tab-item">营销技能</div>
+            </div>
+            <div class="video-list">
+              <div class="video-card">
+                <div class="video-cover-wrap">
+                  <img class="video-cover" src="https://picsum.photos/seed/bs1/400/225" alt="">
+                  <div class="video-play"></div>
+                  <div class="video-duration">06:30</div>
+                </div>
+                <div class="video-info">
+                  <div class="video-title">商学院第一课：品牌文化与理念</div>
+                  <div class="video-meta">1.2万次播放</div>
+                </div>
+              </div>
+              <div class="video-card">
+                <div class="video-cover-wrap">
+                  <img class="video-cover" src="https://picsum.photos/seed/bs2/400/225" alt="">
+                  <div class="video-play"></div>
+                  <div class="video-duration">08:45</div>
+                </div>
+                <div class="video-info">
+                  <div class="video-title">商学院第二课：产品体系全解析</div>
+                  <div class="video-meta">9,834次播放</div>
+                </div>
+              </div>
+              <div class="video-card">
+                <div class="video-cover-wrap">
+                  <img class="video-cover" src="https://picsum.photos/seed/bs3/400/225" alt="">
+                  <div class="video-play"></div>
+                  <div class="video-duration">05:20</div>
+                </div>
+                <div class="video-info">
+                  <div class="video-title">商学院第三课：会员权益说明</div>
+                  <div class="video-meta">7,521次播放</div>
+                </div>
+              </div>
+            </div>
+            <div class="load-more">上拉加载更多</div>
+            <div class="bottom-tabbar">
+              <div class="bottom-item"><div class="bottom-icon">🏠</div><div>首页</div></div>
+              <div class="bottom-item"><div class="bottom-icon">≡</div><div>分类</div></div>
+              <div class="bottom-item"><div class="bottom-icon">🛒</div><div>购物车</div></div>
+              <div class="bottom-item active"><div class="bottom-icon">👤</div><div>我的</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 屏幕4：视频播放页 -->
+    <div class="pf-col">
+      <div class="pf-label">视频播放页</div>
+      <div class="pf-phone">
+        <div class="pf-statusbar"><span>9:41</span><span>📶 📡 🔋</span></div>
+        <div class="pf-content">
+          <div class="phone">
+            <div class="header">
+              <div class="header-back">‹</div>
+              <div class="header-title">视频详情</div>
+              <div class="header-placeholder"></div>
+            </div>
+            <div class="player-wrap">
+              <div class="player-placeholder">
+                <div class="big-play"></div>
+                <div style="font-size:13px;opacity:0.9;">点击播放</div>
+              </div>
+              <div class="player-controls">
+                <div class="progress-bar"><div class="progress-fill"></div></div>
+                <div class="control-row">
+                  <div class="control-left">
+                    <div class="control-btn pause"></div>
+                    <span>02:15 / 06:30</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <span class="speed-btn">1.0x</span>
+                    <span style="font-size:12px;">全屏</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="video-detail">
+              <div class="detail-title">商学院第一课：品牌文化与理念</div>
+              <div class="detail-meta">
+                <span>06:30</span>
+                <span>1.2万次播放</span>
+              </div>
+            </div>
+            <div class="bottom-tabbar">
+              <div class="bottom-item"><div class="bottom-icon">🏠</div><div>首页</div></div>
+              <div class="bottom-item"><div class="bottom-icon">≡</div><div>分类</div></div>
+              <div class="bottom-item"><div class="bottom-icon">🛒</div><div>购物车</div></div>
+              <div class="bottom-item active"><div class="bottom-icon">👤</div><div>我的</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+  function showCopyToast(msg){
+    var t = document.getElementById('copyToast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 1800);
+  }
+  function doCopy(){
+    var css = document.querySelector('style').textContent;
+    var board = document.getElementById('board').outerHTML;
+    var src = '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><style>' + css + '</style></head><body>' + board + '</body></html>';
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(src).then(function(){
+        var b = document.getElementById('copyBtn');
+        b.textContent = '✓ 已复制'; b.classList.add('copied');
+        showCopyToast('已复制干净源码，可直接粘贴到墨刀');
+        setTimeout(function(){ b.textContent = '一键复制源码'; b.classList.remove('copied'); }, 1800);
+      }).catch(function(){ fallbackCopy(src); });
+    } else {
+      fallbackCopy(src);
+    }
+  }
+  function fallbackCopy(src){
+    var ta = document.createElement('textarea');
+    ta.value = src; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy');
+      var b = document.getElementById('copyBtn'); b.textContent = '✓ 已复制'; b.classList.add('copied');
+      showCopyToast('已复制干净源码，可直接粘贴到墨刀');
+      setTimeout(function(){ b.textContent = '一键复制源码'; b.classList.remove('copied'); }, 1800);
+    } catch(e){ alert('复制失败，请手动选择复制'); }
+    document.body.removeChild(ta);
+  }
+  </script>
+</body>
+</html>
