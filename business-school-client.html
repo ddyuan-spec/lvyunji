@@ -84,6 +84,29 @@
     .detail-title { font-size: 17px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; line-height: 1.4; }
     .detail-meta { font-size: 13px; color: var(--text-sub); display: flex; gap: 16px; }
 
+    /* 我的页面 */
+    .mine-top { background: linear-gradient(180deg, #E8F9EF 0%, #F5F7FA 100%); padding: 24px 16px 16px; }
+    .mine-user { display: flex; align-items: center; gap: 12px; }
+    .mine-avatar { width: 56px; height: 56px; border-radius: 50%; background: #ddd; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+    .mine-name { font-size: 18px; font-weight: 600; color: var(--text-main); }
+    .mine-tags { display: flex; gap: 8px; margin-top: 6px; }
+    .mine-tag { font-size: 11px; color: #D48806; background: #FFFBE6; border: 1px solid #FFE58F; padding: 2px 8px; border-radius: 10px; }
+    .menu-list { margin-top: 12px; background: var(--card-bg); }
+    .menu-item-row { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 1px solid var(--border); cursor: pointer; }
+    .menu-item-left { display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--text-main); }
+    .menu-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .menu-arrow { color: var(--text-hint); font-size: 14px; }
+
+    /* 数商服务页面 */
+    .tools-section { background: var(--card-bg); padding: 20px 16px; }
+    .tools-title { font-size: 16px; font-weight: 600; color: var(--text-main); margin-bottom: 16px; }
+    .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 8px; }
+    .tool-cell { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
+    .tool-icon { width: 48px; height: 48px; border-radius: 12px; background: #F5F7FA; display: flex; align-items: center; justify-content: center; font-size: 22px; position: relative; }
+    .tool-icon.active { background: #E8F9EF; }
+    .tool-name { font-size: 13px; color: var(--text-main); }
+    .tool-badge { position: absolute; top: -4px; right: -4px; min-width: 16px; height: 16px; background: #FF4D4F; color: #fff; font-size: 10px; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 0 4px; }
+
     /* Toast */
     #toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); background: rgba(0,0,0,0.75); color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 100; white-space: nowrap; }
     #toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
@@ -149,15 +172,102 @@
       </div>
     </div>
 
+    <!-- 我的页面 -->
+    <div id="pageMine" class="page">
+      <div class="header" style="justify-content:center;">
+        <div class="header-title">我的</div>
+      </div>
+      <div class="mine-top">
+        <div class="mine-user">
+          <div class="mine-avatar">👤</div>
+          <div>
+            <div class="mine-name">大不列颠蛋黄酥</div>
+            <div class="mine-tags">
+              <span class="mine-tag">至尊达人</span>
+              <span class="mine-tag">执行委</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="menu-list">
+        <div class="menu-item-row" onclick="go('pageShushang')">
+          <div class="menu-item-left">
+            <span class="menu-icon">📊</span>
+            <span>数商服务</span>
+          </div>
+          <span class="menu-arrow">›</span>
+        </div>
+        <div class="menu-item-row" onclick="toast('跳转我的订单')">
+          <div class="menu-item-left">
+            <span class="menu-icon">📦</span>
+            <span>我的订单</span>
+          </div>
+          <span class="menu-arrow">›</span>
+        </div>
+        <div class="menu-item-row" onclick="toast('跳转收货地址')">
+          <div class="menu-item-left">
+            <span class="menu-icon">📍</span>
+            <span>收货地址</span>
+          </div>
+          <span class="menu-arrow">›</span>
+        </div>
+        <div class="menu-item-row" onclick="toast('跳转设置')">
+          <div class="menu-item-left">
+            <span class="menu-icon">⚙️</span>
+            <span>设置</span>
+          </div>
+          <span class="menu-arrow">›</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 数商服务页面 -->
+    <div id="pageShushang" class="page">
+      <div class="header">
+        <div class="header-back" onclick="go('pageMine')">‹</div>
+        <div class="header-title">数商服务</div>
+        <div class="header-placeholder"></div>
+      </div>
+      <div class="tools-section">
+        <div class="tools-title">数商工具</div>
+        <div class="tools-grid">
+          <div class="tool-cell" onclick="toast('跳转素材库')">
+            <div class="tool-icon">📁</div>
+            <div class="tool-name">素材库</div>
+          </div>
+          <div class="tool-cell" onclick="toast('跳转我的作品')">
+            <div class="tool-icon">🖼️<span class="tool-badge">11</span></div>
+            <div class="tool-name">我的作品</div>
+          </div>
+          <div class="tool-cell" onclick="toast('跳转图片生成')">
+            <div class="tool-icon">🎨</div>
+            <div class="tool-name">图片生成</div>
+          </div>
+          <div class="tool-cell" onclick="toast('跳转代注册')">
+            <div class="tool-icon">👥</div>
+            <div class="tool-name">代注册</div>
+          </div>
+          <div class="tool-cell" onclick="toast('跳转工业游')">
+            <div class="tool-icon">🏭</div>
+            <div class="tool-name">工业游</div>
+          </div>
+          <div class="tool-cell" onclick="toast('跳转公司资质')">
+            <div class="tool-icon">📋</div>
+            <div class="tool-name">公司资质</div>
+          </div>
+          <div class="tool-cell" onclick="go('pageHome')">
+            <div class="tool-icon active">🎓</div>
+            <div class="tool-name">商学院</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 底部导航 -->
-    <div class="bottom-tabbar">
+    <div class="bottom-tabbar" id="bottomTabbar">
       <div class="bottom-item" onclick="toast('跳转首页')">
         <div class="bottom-icon">🏠</div>
         <div>首页</div>
-      </div>
-      <div class="bottom-item active" onclick="go('pageHome')">
-        <div class="bottom-icon">🎓</div>
-        <div>商学院</div>
       </div>
       <div class="bottom-item" onclick="toast('跳转分类')">
         <div class="bottom-icon">≡</div>
@@ -167,7 +277,7 @@
         <div class="bottom-icon">🛒</div>
         <div>购物车</div>
       </div>
-      <div class="bottom-item" onclick="toast('跳转我的')">
+      <div class="bottom-item active" id="tabMine" onclick="go('pageMine')">
         <div class="bottom-icon">👤</div>
         <div>我的</div>
       </div>
@@ -200,6 +310,15 @@
       document.getElementById(pageId).classList.add('active');
       const isJsdom = typeof navigator !== 'undefined' && /jsdom|Node\.js/i.test(navigator.userAgent);
       if (!isJsdom && typeof window !== 'undefined' && window.scrollTo) { window.scrollTo(0, 0); }
+      updateTabActive(pageId);
+    }
+
+    function updateTabActive(pageId) {
+      const minePages = ['pageHome', 'pagePlayer', 'pageShushang', 'pageMine'];
+      document.querySelectorAll('#bottomTabbar .bottom-item').forEach(el => el.classList.remove('active'));
+      if (minePages.includes(pageId)) {
+        document.getElementById('tabMine').classList.add('active');
+      }
     }
 
     function toast(msg) {
@@ -282,6 +401,7 @@
     }
 
     renderList(0);
+    updateTabActive('pageHome');
   </script>
 </body>
 </html>
