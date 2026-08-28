@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>绿韵家扫码取水功能 PRD</title>
+<style>
+    :root { --primary: #FF4D4F; --green: #52C41A; --orange: #FAAD14; --text: #333; --sub: #666; --hint: #999; --bg: #f5f5f5; --border: #e0e0e0; }
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; line-height: 1.7; color: var(--text); max-width: 1100px; margin: 0 auto; padding: 32px 24px; background: #fff; }
+    h1 { font-size: 28px; border-bottom: 2px solid var(--primary); padding-bottom: 12px; margin-bottom: 24px; }
+    h2 { font-size: 22px; margin-top: 40px; padding-left: 12px; border-left: 4px solid var(--primary); }
+    h3 { font-size: 18px; margin-top: 32px; color: #222; }
+    h4 { font-size: 16px; margin-top: 26px; color: #333; }
+    h5 { font-size: 14px; margin-top: 20px; color: #444; }
+    p { margin: 10px 0; }
+    table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; table-layout: fixed; }
+    th, td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; word-break: break-all; overflow-wrap: break-word; }
+    th { background: #fafafa; font-weight: 600; color: var(--sub); }
+    tr:nth-child(even) td { background: #fafafa; }
+    ul, ol { margin: 10px 0; padding-left: 24px; }
+    li { margin: 6px 0; }
+    code { background: #f2f2f2; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px; }
+    .tag.y { background: #FFF7E6; color: #FAAD14; border: 1px solid #FFD591; }
+    .tag.g { background: #F6FFED; color: #389E0D; border: 1px solid #B7EB8F; }
+    .tag.r { background: #FFF1F0; color: #CF1322; border: 1px solid #FFA39E; }
+    .warn { background: #FFFBE6; border: 1px solid #FFE58F; padding: 12px 16px; border-radius: 4px; margin: 14px 0; }
+    .note { background: #F6FFED; border: 1px solid #B7EB8F; padding: 12px 16px; border-radius: 4px; margin: 14px 0; }
+    .img-wrap { margin: 16px 0; }
+    .img-wrap img { max-width: 100%; max-height: 760px; border: 1px solid var(--border); border-radius: 8px; object-fit: contain; }
+    .img-cap { font-size: 13px; color: var(--sub); margin-top: 6px; }
+    .toc { background: #fafafa; border: 1px solid var(--border); padding: 16px 20px; border-radius: 6px; margin-bottom: 24px; }
+    .toc a { color: #1890FF; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .page-meta { color: var(--sub); font-size: 13px; margin: 8px 0 16px; }
+  </style>
+</head>
+<body>
+<h1 id="top">绿韵家扫码取水功能 PRD</h1>
+<div class="toc">
+<strong>目录</strong><br/>
+<a href="#s1">一、文档基本信息</a> ·
+  <a href="#s2">二、项目背景与目标</a> ·
+  <a href="#s3">三、业务流程与架构</a> ·
+  <a href="#s4">四、功能需求详情</a> ·
+  <a href="#s5">五、非功能性需求</a> ·
+  <a href="#s6">六、验收标准</a> ·
+  <a href="#s7">七、关键边界设计检查清单</a> ·
+  <a href="#s8">八、文档维护与变更规范</a> ·
+  <a href="#s9">九、待确认项汇总</a>
+</div>
+<h2 id="s1">一、文档基本信息</h2>
+<table>
+<thead><tr><th style="width:20%">项目</th><th>内容</th></tr></thead>
+<tbody><tr><td>项目名称</td><td>绿韵家扫码取水功能</td></tr><tr><td>创建时间</td><td>2026-08-28</td></tr><tr><td>负责人（PM）</td><td>袁中天</td></tr><tr><td>技术 Owner</td><td>⚠️ 待确认 @研发负责人</td></tr><tr><td>测试负责人</td><td>⚠️ 待确认 @测试负责人</td></tr><tr><td>文档状态</td><td>评审中</td></tr></tbody></table>
+<h3>历史修订记录</h3>
+<table>
+<thead><tr><th>版本</th><th>日期</th><th>修改人</th><th>修订内容简述</th><th>状态</th></tr></thead>
+<tbody><tr><td>V1.0</td><td>2026-08-28</td><td>袁中天</td><td>初版；基于最终 C 端原型截图与后台原型定稿，输出扫码取水完整流程与后台取水记录管理</td><td>评审中</td></tr></tbody></table>
+<h2 id="s2">二、项目背景与目标</h2>
+<h3>2.1 业务背景</h3>
+<p>绿韵家现有取水流程中，用户领取/购买水袋权益后，需要经过「元气先锋」中间层完成水袋划拨与水机通讯。实际运营中存在以下痛点：</p>
+<ul>
+<li>链路依赖元气先锋，偶发通讯失败导致用户到店无法取水；</li>
+<li>绿韵家侧无法直接感知水机状态，异常排查滞后；</li>
+<li>缺乏统一的取水记录与机主收益数据沉淀，月末结算需人工核对。</li>
+</ul>
+<p>本期需求将「元气先锋」中间层剥离：绿韵家后台直接与水机通讯，用户到店扫码后由绿韵家后台校验权益并调用取水接口出水，同时沉淀取水记录与机主待发收益。</p>
+<h3>2.2 项目目标</h3>
+<ul>
+<li><strong>业务目标</strong>：缩短取水链路，提升取水成功率；建立可查询、可对账的取水订单记录与机主收益记录。</li>
+<li><strong>用户目标</strong>：用户到达水机前，使用绿韵家 App/小程序扫码即可取水，实时看到取水成功或异常提示。</li>
+</ul>
+<h3>2.3 衡量指标（KPI）</h3>
+<table>
+<thead><tr><th>指标</th><th>目标值</th><th>说明</th></tr></thead>
+<tbody><tr><td>扫码取水成功率</td><td>⚠️ 待确认 @产品负责人</td><td>取水接口返回成功 / 总扫码取水请求数</td></tr><tr><td>平均取水完成时长</td><td>⚠️ 待确认 @产品负责人</td><td>从用户点击「确认取水」到收到成功响应的时长</td></tr><tr><td>设备异常投诉率</td><td>⚠️ 待确认 @产品负责人</td><td>因设备/门店异常导致的取水失败投诉 / 总取水请求</td></tr></tbody></table>
+<h2 id="s3">三、业务流程与架构</h2>
+<h3>3.1 本期范围与影响</h3>
+<table>
+<thead><tr><th>端口/模块</th><th>本期范围</th><th>对老数据影响</th></tr></thead>
+<tbody><tr><td>C 端 App / 小程序 / H5</td><td>我的权益、权益订单、扫码取水确认页、取水成功页、权益不足页、设备异常页</td><td>历史水袋权益数据沿用；新增取水记录关联</td></tr><tr><td>绿韵家管理后台</td><td>水机权益 → 取水记录（列表页、详情页）</td><td>新增取水记录表、机主收益表</td></tr><tr><td>元气先锋接口</td><td>仅调用三代机取水接口，不含划拨/预约</td><td>无</td></tr><tr><td>商家端后台</td><td>本需求不涉及商家端后台</td><td>（初始）</td></tr><tr><td>四代机 / 新一代水机</td><td>本需求暂不涉及，仅对接三代机</td><td>（初始）</td></tr></tbody></table>
+<h3>3.2 业务流程图</h3>
+<p class="note">📎 权威来源：本流程与 2026-08-28 需求梳理阶段《绿韵家取水流程梳理-流程图 (2)》一致，核心链路为「发放水袋 → 用户扫水机码 → 解析商户/设备 → 校验水袋权益 → 调用取水接口出水 → 记录取水记录 + 机主待发收益」。⚠️ 禁止在 PRD 中自行简化/重绘/修改流程图。</p>
+<div class="img-wrap">
+<svg style="width:100%;max-width:840px;border:1px solid #e0e0e0;border-radius:8px;background:#fff;" viewbox="0 0 840 520">
+<!-- 泳道背景 -->
+<rect fill="#fff" height="520" width="840" x="0" y="0"></rect>
+<rect fill="#f7f7f7" height="480" width="140" x="0" y="40"></rect>
+<rect fill="#fff" height="480" width="500" x="140" y="40"></rect>
+<rect fill="#f7f7f7" height="480" width="200" x="640" y="40"></rect>
+<line stroke="#e0e0e0" x1="140" x2="140" y1="40" y2="520"></line>
+<line stroke="#e0e0e0" x1="640" x2="640" y1="40" y2="520"></line>
+<!-- 泳道标题 -->
+<text fill="#333" font-size="14" font-weight="600" text-anchor="middle" x="70" y="28">用户端</text>
+<text fill="#333" font-size="14" font-weight="600" text-anchor="middle" x="390" y="28">绿韵家后台</text>
+<text fill="#333" font-size="14" font-weight="600" text-anchor="middle" x="740" y="28">元气三代机</text>
+<!-- 节点 -->
+<rect fill="#E6F7FF" height="38" rx="4" stroke="#1890FF" stroke-width="1.5" width="90" x="25" y="70"></rect>
+<text fill="#333" font-size="12" text-anchor="middle" x="70" y="94">获得水袋权益</text>
+<rect fill="#E6F7FF" height="38" rx="4" stroke="#1890FF" stroke-width="1.5" width="90" x="25" y="140"></rect>
+<text fill="#333" font-size="12" text-anchor="middle" x="70" y="164">扫水机二维码</text>
+<rect fill="#E6F7FF" height="38" rx="4" stroke="#1890FF" stroke-width="1.5" width="90" x="25" y="210"></rect>
+<text fill="#333" font-size="12" text-anchor="middle" x="70" y="234">确认取水</text>
+<rect fill="#E6F7FF" height="38" rx="4" stroke="#1890FF" stroke-width="1.5" width="90" x="25" y="350"></rect>
+<text fill="#333" font-size="12" text-anchor="middle" x="70" y="374">查看结果</text>
+<rect fill="#F6FFED" height="38" rx="4" stroke="#52C41A" stroke-width="1.5" width="110" x="295" y="140"></rect>
+<text fill="#333" font-size="12" text-anchor="middle" x="350" y="164">解析商户/设备</text>
+<rect fill="#F6FFED" height="38" rx="4" stroke="#52C41A" stroke-width="1.5" width="110" x="295" y="210"></rect>
+<text fill="#333" font-size="12" text-anchor="middle" x="350" y="228">校验水袋权益</text>
+<text fill="#333" font-size="12" text-anchor="middle" x="350" y="242">（本月可取&gt;0）</text>
+<rect fill="#F6FFED" height="38" rx="4" stroke="#52C41A" stroke-width="1.5" width="110" x="295" y="280"></rect>
+<text fill="#333" font-size="12" text-anchor="middle" x="350" y="298">生成订单号并</text>
+<text fill="#333" font-size="12" text-anchor="middle" x="350" y="312">调取水接口</text>
+<rect fill="#F6FFED" height="38" rx="4" stroke="#52C41A" stroke-width="1.5" width="110" x="295" y="420"></rect>
+<text fill="#333" font-size="12" text-anchor="middle" x="350" y="438">记录取水订单</text>
+<text fill="#333" font-size="12" text-anchor="middle" x="350" y="452">+ 机主收益</text>
+<rect fill="#FFF1F0" height="38" rx="4" stroke="#FF4D4F" stroke-width="1.5" width="90" x="695" y="280"></rect>
+<text fill="#333" font-size="12" text-anchor="middle" x="740" y="304">水机出水</text>
+<!-- 判断 -->
+<polygon fill="#FFFBE6" points="350,350 390,380 350,410 310,380" stroke="#FAAD14" stroke-width="1.5"></polygon>
+<text fill="#333" font-size="11" text-anchor="middle" x="350" y="376">成功？</text>
+<!-- 异常 -->
+<rect fill="#FFF1F0" height="38" rx="4" stroke="#FF4D4F" stroke-width="1.5" width="90" x="460" y="205"></rect>
+<text fill="#333" font-size="12" text-anchor="middle" x="505" y="223">返回权益不足</text>
+<text fill="#333" font-size="12" text-anchor="middle" x="505" y="237">/ 设备异常提示</text>
+<!-- 连线 -->
+<line marker-end="url(#arr)" stroke="#999" stroke-width="1.5" x1="70" x2="70" y1="108" y2="140"></line>
+<line marker-end="url(#arr)" stroke="#999" stroke-width="1.5" x1="115" x2="295" y1="159" y2="159"></line>
+<line marker-end="url(#arr)" stroke="#999" stroke-width="1.5" x1="350" x2="350" y1="178" y2="210"></line>
+<line marker-end="url(#arr)" stroke="#999" stroke-width="1.5" x1="350" x2="350" y1="248" y2="280"></line>
+<line marker-end="url(#arr)" stroke="#999" stroke-width="1.5" x1="405" x2="695" y1="299" y2="299"></line>
+<line stroke="#999" stroke-width="1.5" x1="70" x2="70" y1="248" y2="350"></line>
+<line marker-end="url(#arr)" stroke="#999" stroke-width="1.5" x1="70" x2="70" y1="210" y2="190"></line>
+<line marker-end="url(#arr)" stroke="#999" stroke-width="1.5" x1="405" x2="460" y1="229" y2="224"></line>
+<line marker-end="url(#arr)" stroke="#999" stroke-width="1.5" x1="70" x2="70" y1="388" y2="420"></line>
+<line marker-end="url(#arr)" stroke="#999" stroke-width="1.5" x1="350" x2="350" y1="318" y2="350"></line>
+<line marker-end="url(#arr)" stroke="#999" stroke-width="1.5" x1="390" x2="460" y1="380" y2="380"></line>
+<line stroke="#999" stroke-dasharray="4" stroke-width="1.5" x1="505" x2="505" y1="243" y2="380"></line>
+<line stroke="#999" stroke-dasharray="4" stroke-width="1.5" x1="505" x2="390" y1="380" y2="380"></line>
+<line marker-end="url(#arr)" stroke="#999" stroke-width="1.5" x1="350" x2="350" y1="410" y2="420"></line>
+<!-- 箭头定义 -->
+<defs>
+<marker id="arr" markerheight="8" markerwidth="8" orient="auto" refx="6" refy="4">
+<path d="M0,0 L8,4 L0,8 L2,4 Z" fill="#999"></path>
+</marker>
+</defs>
+</svg>
+<div class="img-cap">图 3-1：绿韵家扫码取水横向泳道流程图</div>
+</div>
+<h3>3.3 信息架构</h3>
+<table>
+<thead><tr><th>层级</th><th>说明</th><th>关键数据/能力</th></tr></thead>
+<tbody><tr><td>C 端展示层</td><td>我的 → 我的权益 / 网格水站 → 权益订单 → 扫码取水 → 结果页</td><td>权益编号、本月可取、设备编码、取水袋数</td></tr><tr><td>后台配置/管理</td><td>绿韵家管理后台 → 水机权益 → 取水记录（列表/详情）</td><td>取水订单查询、导出、详情查看</td></tr><tr><td>业务服务层</td><td>权益校验服务、订单服务、取水接口代理、回调处理服务</td><td>生成订单号、调用元气三代机接口、处理异步回调</td></tr><tr><td>数据层</td><td>用户水袋权益表、取水记录表、机主收益表、水站映射表、设备表</td><td>记录用户、水站、设备、袋数、时间、状态</td></tr><tr><td>第三方接口</td><td>元气先锋三代机取水接口</td><td>出水指令下发、回调通知</td></tr></tbody></table>
+<h3>3.4 状态机与状态流转</h3>
+<h4>3.4.1 取水记录状态</h4>
+<p><strong>完整状态枚举</strong>：回调中、取水成功、取水失败。其中「回调中」为中间态，等待同步响应或异步回调后流转为终态。</p>
+<table>
+<thead><tr><th>起始状态</th><th>触发动作（Action）</th><th>前置条件</th><th>目标状态</th><th>后置条件/结果</th></tr></thead>
+<tbody><tr><td>（初始）</td><td>用户确认取水</td><td>本月可取 &gt; 0；设备/门店可用</td><td>回调中</td><td>生成绿韵家订单号，调取水接口，扣减权益</td></tr><tr><td>回调中</td><td>收到取水接口同步成功响应</td><td>接口返回 errcode=0</td><td>取水成功</td><td>记录 water_no；机主收益记为「待发」</td></tr><tr><td>回调中</td><td>收到取水接口同步失败响应</td><td>接口返回 errcode≠0</td><td>取水失败</td><td>恢复用户权益（撤销扣减）；不计入机主收益</td></tr><tr><td>回调中</td><td>异步回调通知</td><td>callback_url 收到最终状态</td><td>取水成功 / 取水失败</td><td>以回调状态为准修正最终状态</td></tr></tbody></table>
+<h4>3.4.2 机主收益状态</h4>
+<p><strong>完整状态枚举</strong>：待发、已结算、作废。仅在取水记录状态 = 取水成功时生成「待发」收益；结算条件本期沿用现有规则。</p>
+<table>
+<thead><tr><th>起始状态</th><th>触发动作（Action）</th><th>前置条件</th><th>目标状态</th><th>后置条件/结果</th></tr></thead>
+<tbody><tr><td>（初始）</td><td>取水成功</td><td>取水记录状态 = 取水成功</td><td>待发</td><td>收益金额 = 取水袋数 × 0.5 元</td></tr><tr><td>待发</td><td>月末统一结算</td><td>满足现有结算条件（本期沿用，不改动）</td><td>已结算</td><td>按结算规则发放给机主</td></tr><tr><td>待发</td><td>发生退单/作废</td><td>取水记录被判定无效</td><td>作废</td><td>不计入结算</td></tr></tbody></table>
+<h2 id="s4">四、功能需求详情</h2>
+<h3>4.1 C 端</h3>
+<h4>4.1.1 我的 <span class="tag r">已有-沿用</span></h4>
+<p>沿用现有功能。</p>
+<h4>4.1.2 我的权益 <span class="tag g">本期改动</span></h4>
+<p class="page-meta"><strong>需求影响范围</strong>：用户查看自身水袋权益与取水记录的入口；本期改动点为数据口径与交互入口对齐新的扫码取水链路。<strong>涉及终端</strong>：C 端 App / 小程序 / H5。</p>
+<h5>4.1.2.1 页面原型与交互示意</h5>
+<div class="img-wrap">
+<img alt="C端-我的权益页原型" src="prd-scan-water-assets/c-my-benefit.png"/>
+<div class="img-cap">图 4-1：C 端「我的权益」页</div>
+</div>
+<p>交互说明：</p>
+<ul>
+<li>页面顶部展示权益主题图与总览文案；</li>
+<li>「直播权益包(7袋水) &gt;」点击后进入权益包详情（本期仅保留入口，详情页不在本次范围）；</li>
+<li>「我的水量」区展示总权益水量、本月可取、已取水三指标；</li>
+<li>Tab 切换「接水记录 / 发卡记录」，默认「接水记录」；</li>
+<li>「查看更多 &gt;」进入权益订单列表。</li>
+</ul>
+<h5>4.1.2.2 详细逻辑规则</h5>
+<p><strong>界面与展示规则</strong></p>
+<ul>
+<li>总权益水量：用户当前持有的全部可用水袋数量（袋）。</li>
+<li>本月可取：当前自然月内还可取水袋数量；若权益包有月度上限，按自然月重置。</li>
+<li>已取水：当前自然月内已完成取水的累计袋数。</li>
+<li>接水记录：默认展示最近 N 条（⚠️ 待确认 @产品负责人：默认条数），按取水时间倒序。</li>
+<li>空态：无接水记录时展示缺省图与文案「暂无取水记录」。</li>
+</ul>
+<p><strong>业务逻辑与边界条件</strong></p>
+<ul>
+<li>未登录拦截：游客态点击「我的权益」先引导登录，登录后回到本页。</li>
+<li>数据刷新：每次进入页面拉取最新权益数据；下拉支持刷新。</li>
+</ul>
+<h5>4.1.2.3 列表字段表（接水记录）</h5>
+<table>
+<thead><tr><th style="width:22%">字段名称</th><th>需求说明</th><th style="width:25%">备注</th></tr></thead>
+<tbody><tr><td>水站名称</td><td>用户实际取水的水站名称</td><td>取《取水记录表.水站名称》</td></tr><tr><td>取水时间</td><td>取水接口调用成功的时间</td><td>取《取水记录表.取水时间》，格式 yyyy-MM-dd HH:mm</td></tr><tr><td>取水袋数</td><td>本次取水袋数</td><td>取《取水记录表.取水袋数》</td></tr></tbody></table>
+<h5>4.1.2.4 数据来源（字段级）</h5>
+<table>
+<thead><tr><th style="width:22%">字段名称</th><th>取值逻辑说明</th></tr></thead>
+<tbody><tr><td>总权益水量</td><td>取《用户水袋权益表.剩余可用袋数》按权益编号聚合</td></tr><tr><td>本月可取</td><td>取《用户水袋权益表.本月剩余可用袋数》按权益编号聚合</td></tr><tr><td>已取水</td><td>取《取水记录表.取水袋数》按当前自然月、当前用户、状态=取水成功汇总</td></tr></tbody></table>
+<h4>4.1.3 权益订单 <span class="tag g">本期改动</span></h4>
+<p class="page-meta"><strong>需求影响范围</strong>：将原有「预约取水」入口改为「扫码取水」，并控制按钮仅在权益可用时暴露。<strong>涉及终端</strong>：C 端 App / 小程序 / H5。</p>
+<h5>4.1.3.1 页面原型与交互示意</h5>
+<div class="img-wrap">
+<img alt="C端-权益订单页原型" src="prd-scan-water-assets/c-benefit-orders.png"/>
+<div class="img-cap">图 4-2：C 端「权益订单」页</div>
+</div>
+<p>交互说明：</p>
+<ul>
+<li>按「权益编号」分卡纵向排列；</li>
+<li>每张卡展示总水量、本月可取、已领取、来源说明；</li>
+<li>本月可取 &gt; 0 时，显示「预约记录」白按钮 + 「扫码取水」绿按钮；</li>
+<li>本月可取 = 0 时，仅显示「预约记录」白按钮；</li>
+<li>点击「扫码取水」进入扫码取水确认页；点击「预约记录」进入历史预约/取水记录列表（本期仅保留入口，详细规则沿用现有）。</li>
+</ul>
+<h5>4.1.3.2 详细逻辑规则</h5>
+<p><strong>界面与展示规则</strong></p>
+<ul>
+<li>权益编号：唯一标识一笔权益，如 42394。</li>
+<li>总水量：该权益编号下的全部水袋数量。</li>
+<li>本月可取：该权益编号在当前自然月内还可取用的袋数。</li>
+<li>已领取：该权益编号下用户历史已取用的累计袋数。</li>
+<li>来源说明：权益来源描述，如「20260610下单积分水卡商品结算，订单号：605287」。</li>
+</ul>
+<p><strong>业务逻辑与边界条件</strong></p>
+<ul>
+<li>「扫码取水」按钮显示条件：当前权益编号的「本月可取」&gt; 0。</li>
+<li>无权益时：列表为空，展示空态图与文案「暂无权益订单」。</li>
+<li>点击「扫码取水」时携带当前权益编号进入扫码取水确认页。</li>
+</ul>
+<h5>4.1.3.3 列表字段表</h5>
+<table>
+<thead><tr><th style="width:18%">字段名称</th><th>需求说明</th><th style="width:25%">备注</th></tr></thead>
+<tbody><tr><td>权益编号</td><td>权益包唯一编号</td><td>取《用户水袋权益表.权益编号》</td></tr><tr><td>总水量</td><td>该权益编号总袋数</td><td>取《用户水袋权益表.总袋数》</td></tr><tr><td>本月可取</td><td>当月剩余可取袋数</td><td>取《用户水袋权益表.本月剩余袋数》；为 0 时不显示扫码取水按钮</td></tr><tr><td>已领取</td><td>历史累计已取袋数</td><td>取《取水记录表.取水袋数》按权益编号汇总</td></tr><tr><td>来源说明</td><td>权益来源文本</td><td>取《用户水袋权益表.来源说明》</td></tr></tbody></table>
+<h5>4.1.3.4 功能按钮总表</h5>
+<table>
+<thead><tr><th style="width:18%">功能名称</th><th>功能说明</th><th style="width:25%">备注</th></tr></thead>
+<tbody><tr><td>预约记录</td><td>进入该权益编号的历史预约/取水记录列表</td><td>已有-沿用入口</td></tr><tr><td>扫码取水</td><td>进入扫码取水确认页，发起扫码取水</td><td>本期新增；仅本月可取&gt;0 时显示</td></tr></tbody></table>
+<h5>4.1.3.5 【扫码取水】按钮功能</h5>
+<ul>
+<li><strong>功能说明</strong>：以当前权益编号为可用权益，进入扫码取水流程。</li>
+<li><strong>显示位置</strong>：每张权益卡右下角。</li>
+<li><strong>权限</strong>：登录用户且该权益归属当前用户。</li>
+<li><strong>前置条件</strong>：该权益编号的「本月可取」&gt; 0。</li>
+<li><strong>功能实现</strong>：点击后跳转至扫码取水确认页，并传入权益编号、本月可取数量。</li>
+</ul>
+<h5>4.1.3.6 数据来源（字段级）</h5>
+<table>
+<thead><tr><th style="width:22%">字段名称</th><th>取值逻辑说明</th></tr></thead>
+<tbody><tr><td>权益编号</td><td>取《用户水袋权益表.权益编号》</td></tr><tr><td>总水量 / 本月可取 / 来源说明</td><td>取《用户水袋权益表》相同字段</td></tr><tr><td>已领取</td><td>取《取水记录表》按权益编号、状态=取水成功汇总</td></tr></tbody></table>
+<h4>4.1.4 扫码取水确认页 <span class="tag y">本期新增</span></h4>
+<p class="page-meta"><strong>需求影响范围</strong>：新增页面，承载扫码后设备信息确认、取水数量选择与最终出水触发。<strong>涉及终端</strong>：C 端 App / 小程序 / H5。</p>
+<h5>4.1.4.1 页面原型与交互示意</h5>
+<div class="img-wrap">
+<img alt="C端-扫码取水确认页原型" src="prd-scan-water-assets/c-scan-confirm.png"/>
+<div class="img-cap">图 4-3：C 端「扫码取水确认」页</div>
+</div>
+<p>交互说明：</p>
+<ul>
+<li>页面标题「扫码取水」；</li>
+<li>设备信息区展示水站名称、设备编码、商户编号；</li>
+<li>取水袋数区默认展示全部剩余（本月可取最大值），提供「-」「+」步进器；</li>
+<li>底部固定「确认取水」大按钮；</li>
+<li>页面中间提示「当前权益编号 42394，本月可取 28 袋」。</li>
+</ul>
+<h5>4.1.4.2 详细逻辑规则</h5>
+<p><strong>界面与展示规则</strong></p>
+<ul>
+<li>水站名称：绿韵家侧水站名称，由二维码中的元气商户号 customer_id 映射得到。</li>
+<li>设备编码：直接取二维码中的 water_code。</li>
+<li>商户编号：二维码中的 customer_id 解码后的数值（如 5411）。</li>
+<li>取水袋数：默认 = 本月可取剩余袋数；最小 1，最大 = 本月可取；不可超过本月可取。</li>
+<li>当用户无扫码相机页原型时，本页视为扫码后进入的结果页；实际开发需自行实现扫码入口并截取二维码参数。</li>
+</ul>
+<p><strong>业务逻辑与边界条件</strong></p>
+<ul>
+<li>入参校验：进入本页时必须携带有效权益编号与二维码解析结果；缺失则返回权益订单页。</li>
+<li>防重：同一用户同一设备 5 分钟内重复发起取水，前端按钮 loading 并提示「您已发起取水，请勿重复操作」。</li>
+<li>确认取水：校验本月可取 ≥ 选择袋数 → 生成订单号 → 调取水接口 → 根据结果跳转成功/异常页。</li>
+</ul>
+<h5>4.1.4.3 功能按钮总表</h5>
+<table>
+<thead><tr><th style="width:18%">功能名称</th><th>功能说明</th><th style="width:25%">备注</th></tr></thead>
+<tbody><tr><td>减少袋数</td><td>将本次取水袋数减 1</td><td>最小值为 1</td></tr><tr><td>增加袋数</td><td>将本次取水袋数加 1</td><td>最大值为本月可取</td></tr><tr><td>确认取水</td><td>校验权益并调用取水接口出水</td><td>点击后进入 loading，防止重复提交</td></tr></tbody></table>
+<h5>4.1.4.4 【确认取水】按钮功能</h5>
+<ul>
+<li><strong>功能说明</strong>：校验权益并调用元气三代机取水接口，触发水机出水。</li>
+<li><strong>显示位置</strong>：页面底部固定大按钮。</li>
+<li><strong>权限</strong>：登录用户，且当前权益编号归属该用户。</li>
+<li><strong>前置条件</strong>：本月可取 ≥ 选择袋数 ≥ 1；设备/门店状态可用。</li>
+<li><strong>功能实现</strong>：
+    <ol>
+<li>前端校验选择袋数是否在 [1, 本月可取] 区间；</li>
+<li>生成绿韵家取水订单号（⚠️ 待确认 @研发/产品：订单号生成规则）；</li>
+<li>后台校验权益充足性、5 分钟防重、设备/门店映射有效性；</li>
+<li>调用元气三代机取水接口，参数：key、water_num、customer_id、balance_name="water_num"、machine_code、order_no、callback_url；</li>
+<li>接口成功：扣减权益，创建取水记录，跳转「取水成功」页；</li>
+<li>接口失败：不扣减权益，根据错误码跳转「权益不足」或「设备异常」页并展示对应文案。</li>
+</ol>
+</li>
+</ul>
+<h5>4.1.4.5 数据来源（字段级）</h5>
+<table>
+<thead><tr><th style="width:22%">字段名称</th><th>取值逻辑说明</th></tr></thead>
+<tbody><tr><td>水站名称</td><td>二维码 customer_id → 映射《水站映射表.绿韵家水站名称》</td></tr><tr><td>设备编码 machine_code</td><td>二维码 water_code 直接截取</td></tr><tr><td>商户编号 customer_id</td><td>二维码 customer_id 经 PHP serialize+base64 解码后得到</td></tr><tr><td>本月可取</td><td>取《用户水袋权益表.本月剩余袋数》</td></tr><tr><td>取水袋数</td><td>前端步进器选择，默认=本月可取，上限=本月可取</td></tr></tbody></table>
+<h4>4.1.5 取水成功页 <span class="tag y">本期新增</span></h4>
+<p class="page-meta"><strong>需求影响范围</strong>：新增结果页，向用户反馈取水已触发。<strong>涉及终端</strong>：C 端 App / 小程序 / H5。</p>
+<h5>4.1.5.1 页面原型与交互示意</h5>
+<div class="img-wrap">
+<img alt="C端-取水成功页原型" src="prd-scan-water-assets/c-scan-success.png"/>
+<div class="img-cap">图 4-4：C 端「取水成功」页</div>
+</div>
+<h5>4.1.5.2 详细逻辑规则</h5>
+<p><strong>界面与展示规则</strong></p>
+<ul>
+<li>页面顶部展示绿色大勾与「取水成功」标题；</li>
+<li>副标题「水机正在出水，请注意查收」；</li>
+<li>信息区展示：取水袋数、水站名称、取水时间（接口返回成功时间，格式 yyyy-MM-dd HH:mm）。</li>
+</ul>
+<p><strong>业务逻辑与边界条件</strong></p>
+<ul>
+<li>本页仅在取水接口同步返回成功时展示。</li>
+<li>点击「完成」返回权益订单页；此时权益订单页数据已刷新（本月可取扣减、已领取增加）。</li>
+<li>若用户离开本页后收到异步回调告知最终失败，需通过推送/消息通知用户（⚠️ 待确认 @产品负责人：异步失败通知方式）。</li>
+</ul>
+<h5>4.1.5.3 数据来源（字段级）</h5>
+<table>
+<thead><tr><th style="width:22%">字段名称</th><th>取值逻辑说明</th></tr></thead>
+<tbody><tr><td>取水袋数</td><td>取本次请求提交值</td></tr><tr><td>水站名称</td><td>取扫码确认页传入/解析值</td></tr><tr><td>取水时间</td><td>取接口返回成功时间或后台落库时间</td></tr></tbody></table>
+<h4>4.1.6 权益不足页 <span class="tag y">本期新增</span></h4>
+<p class="page-meta"><strong>需求影响范围</strong>：新增异常结果页，用于拦截无可用权益的取水请求。<strong>涉及终端</strong>：C 端 App / 小程序 / H5。</p>
+<h5>4.1.6.1 页面原型与交互示意</h5>
+<div class="img-wrap">
+<img alt="C端-权益不足页原型" src="prd-scan-water-assets/c-no-benefit.png"/>
+<div class="img-cap">图 4-5：C 端「权益不足」页</div>
+</div>
+<h5>4.1.6.2 详细逻辑规则</h5>
+<p><strong>界面与展示规则</strong></p>
+<ul>
+<li>页面顶部红色叉号与「当前权益不足」标题；</li>
+<li>说明文案「本月可取水量为 0，无法发起取水」；</li>
+<li>底部「返回权益订单」按钮。</li>
+</ul>
+<p><strong>业务逻辑与边界条件</strong></p>
+<ul>
+<li>触发条件：扫码后校验当前权益编号的「本月可取」= 0；或后台权益扣减前校验不通过。</li>
+<li>不调用取水接口，不生成取水记录。</li>
+<li>返回权益订单页后，该权益卡不再显示「扫码取水」按钮。</li>
+</ul>
+<h4>4.1.7 设备异常页 <span class="tag y">本期新增</span></h4>
+<p class="page-meta"><strong>需求影响范围</strong>：新增异常结果页，用于水机/门店不可用时向用户反馈。<strong>涉及终端</strong>：C 端 App / 小程序 / H5。</p>
+<h5>4.1.7.1 页面原型与交互示意</h5>
+<div class="img-wrap">
+<img alt="C端-设备异常页原型" src="prd-scan-water-assets/c-device-error.png"/>
+<div class="img-cap">图 4-6：C 端「设备异常」页</div>
+</div>
+<h5>4.1.7.2 详细逻辑规则</h5>
+<p><strong>界面与展示规则</strong></p>
+<ul>
+<li>页面顶部红色叉号与「当前水机不可用」标题；</li>
+<li>说明文案「设备状态异常或门店未上线，请联系水站处理」；</li>
+<li>底部「返回权益订单」按钮。</li>
+</ul>
+<p><strong>业务逻辑与边界条件</strong></p>
+<ul>
+<li>触发条件：设备编码无效、设备状态异常、门店未上线、调用设备接口报错、网络超时。</li>
+<li>不扣减权益，可提示用户联系水站或稍后重试。</li>
+<li>后台需记录失败日志，供运营排查。</li>
+</ul>
+<h3>4.2 绿韵家管理后台</h3>
+<h4>4.2.1 取水记录列表页 <span class="tag y">本期新增</span></h4>
+<p class="page-meta"><strong>需求影响范围</strong>：新增后台管理页面，供运营/客服查询用户取水记录。<strong>涉及终端</strong>：绿韵家管理后台（PC）。</p>
+<h5>4.2.1.1 页面原型与交互示意</h5>
+<div class="img-wrap">
+<img alt="后台-取水记录列表页原型" src="prd-scan-water-assets/admin-water-list.png"/>
+<div class="img-cap">图 4-7：后台「取水记录」列表页</div>
+</div>
+<p>交互说明：</p>
+<ul>
+<li>左侧导航「水机权益 → 取水记录」高亮；</li>
+<li>顶部筛选区支持按订单号、用户、水站、设备编码、取水时间、状态查询；</li>
+<li>列表展示取水记录，操作列仅「查看」；</li>
+<li>点击「查看」跳转独立详情页；点击「导出」下载当前筛选结果（⚠️ 待确认 @产品负责人：导出字段与格式）。</li>
+</ul>
+<h5>4.2.1.2 详细逻辑规则</h5>
+<p><strong>界面与展示规则</strong></p>
+<ul>
+<li>列表默认按取水时间倒序排列。</li>
+<li>状态标签：取水成功（绿）、取水失败（红）、回调中（黄）。</li>
+<li>空态：无记录时展示缺省表格「暂无数据」。</li>
+</ul>
+<p><strong>业务逻辑与边界条件</strong></p>
+<ul>
+<li>权限：仅拥有「水机权益 → 取水记录」菜单权限的角色可见。</li>
+<li>用户手机号、昵称原文展示，不脱敏。</li>
+<li>分页：默认 10 条/页，支持 10/20/50 切换。</li>
+</ul>
+<h5>4.2.1.3 列表字段表</h5>
+<table>
+<thead><tr><th style="width:16%">字段名称</th><th>需求说明</th><th style="width:28%">备注</th></tr></thead>
+<tbody><tr><td>取水订单号</td><td>绿韵家侧生成的唯一订单号</td><td>取《取水记录表.取水订单号》；支持模糊搜索</td></tr><tr><td>用户</td><td>用户昵称 + 手机号</td><td>取《用户表.昵称》《用户表.手机号》；原文展示，不脱敏</td></tr><tr><td>水站</td><td>绿韵家侧水站名称</td><td>取《取水记录表.水站名称》；支持模糊搜索</td></tr><tr><td>设备编码</td><td>三代机设备编码 machine_code</td><td>取《取水记录表.设备编码》；支持模糊搜索</td></tr><tr><td>取水袋数</td><td>本次取水袋数</td><td>取《取水记录表.取水袋数》</td></tr><tr><td>机主收益(元)</td><td>本次取水给机主带来的待发收益</td><td>计算：取水袋数 × 0.5 元</td></tr><tr><td>取水时间</td><td>接口调用成功时间</td><td>取《取水记录表.取水时间》；支持时间范围筛选</td></tr><tr><td>状态</td><td>取水记录状态</td><td>取《取水记录表.状态》：成功/失败/回调中</td></tr><tr><td>操作</td><td>查看详情入口</td><td>跳转独立详情页</td></tr></tbody></table>
+<h5>4.2.1.4 查询条件</h5>
+<table>
+<thead><tr><th style="width:22%">查询条件</th><th>查询说明</th></tr></thead>
+<tbody><tr><td>取水订单号</td><td>文本输入框，模糊匹配</td></tr><tr><td>用户（手机号/昵称）</td><td>文本输入框，模糊匹配手机号或昵称</td></tr><tr><td>水站</td><td>文本输入框，模糊匹配水站名称</td></tr><tr><td>设备编码</td><td>文本输入框，模糊匹配设备编码</td></tr><tr><td>取水时间</td><td>日期范围选择器，精确到日</td></tr><tr><td>状态</td><td>下拉选择：全部 / 取水成功 / 取水失败 / 回调中</td></tr></tbody></table>
+<h5>4.2.1.5 功能按钮总表</h5>
+<table>
+<thead><tr><th style="width:18%">功能名称</th><th>功能说明</th><th style="width:25%">备注</th></tr></thead>
+<tbody><tr><td>搜索</td><td>按筛选条件查询列表</td><td>点击后刷新列表与分页</td></tr><tr><td>重置</td><td>清空所有筛选条件并恢复默认列表</td><td>（初始）</td></tr><tr><td>导出</td><td>导出当前筛选结果</td><td>⚠️ 待确认 @产品负责人：导出字段与文件格式</td></tr><tr><td>查看</td><td>进入该条记录的独立详情页</td><td>列表操作列</td></tr></tbody></table>
+<h5>4.2.1.6 【查看】按钮功能</h5>
+<ul>
+<li><strong>功能说明</strong>：查看单条取水记录的完整信息。</li>
+<li><strong>显示位置</strong>：列表操作列。</li>
+<li><strong>权限</strong>：同「取水记录」菜单查看权限。</li>
+<li><strong>前置条件</strong>：无。</li>
+<li><strong>功能实现</strong>：点击后跳转至「取水详情」独立页面，URL 携带订单号参数。</li>
+</ul>
+<h5>4.2.1.7 数据来源（字段级）</h5>
+<table>
+<thead><tr><th style="width:22%">字段名称</th><th>取值逻辑说明</th></tr></thead>
+<tbody><tr><td>取水订单号 / 水站 / 设备编码 / 取水袋数 / 取水时间 / 状态</td><td>取《取水记录表》相同字段</td></tr><tr><td>用户昵称 / 手机号</td><td>取水记录表.user_id → 关联《用户表》</td></tr><tr><td>机主收益</td><td>计算字段：取水袋数 × 0.5 元</td></tr></tbody></table>
+<h4>4.2.2 取水记录详情页 <span class="tag y">本期新增</span></h4>
+<p class="page-meta"><strong>需求影响范围</strong>：新增独立详情页，展示单笔取水订单全量信息。<strong>涉及终端</strong>：绿韵家管理后台（PC）。</p>
+<h5>4.2.2.1 页面原型与交互示意</h5>
+<div class="img-wrap">
+<img alt="后台-取水记录详情页原型" src="prd-scan-water-assets/admin-water-detail.png"/>
+<div class="img-cap">图 4-8：后台「取水详情」页</div>
+</div>
+<p>交互说明：</p>
+<ul>
+<li>页面顶部面包屑：首页报表 &gt; 水机权益 &gt; 取水记录 &gt; 取水详情；</li>
+<li>卡片内分区块展示：取水信息、用户信息、水站·设备、机主收益、接口调用回参；</li>
+<li>点击「返回列表」回到列表页。</li>
+</ul>
+<h5>4.2.2.2 详细逻辑规则</h5>
+<p><strong>界面与展示规则</strong></p>
+<ul>
+<li>详情页按五段展示，每段标题带左侧红色竖线。</li>
+<li>订单号、设备编码、用户 ID 等使用等宽字体展示。</li>
+<li>状态字段带对应颜色标签。</li>
+</ul>
+<p><strong>业务逻辑与边界条件</strong></p>
+<ul>
+<li>若订单号不存在，返回列表页并提示「记录不存在」。</li>
+<li>仅展示，不支持编辑。</li>
+</ul>
+<h5>4.2.2.3 详情字段表</h5>
+<div><h5>取水信息</h5><table><thead><tr><th>字段名称</th><th>需求说明</th><th>备注</th></tr></thead><tbody><tr><td>取水订单号（绿韵家）</td><td>绿韵家侧唯一订单号</td><td>取《取水记录表.取水订单号》</td></tr><tr><td>元气水单号 water_no</td><td>元气接口返回的水单号</td><td>取《取水记录表.元气水单号》；失败时显示 "-"</td></tr><tr><td>状态</td><td>取水成功/失败/回调中</td><td>取《取水记录表.状态》</td></tr><tr><td>取水袋数</td><td>本次取水袋数</td><td>取《取水记录表.取水袋数》</td></tr><tr><td>取水时间</td><td>接口调用成功时间</td><td>取《取水记录表.取水时间》</td></tr><tr><td>取水水量（升）</td><td>实际出水量</td><td>计算：取水袋数 × 5 升</td></tr></tbody></table><h5>用户信息</h5><table><thead><tr><th>字段名称</th><th>需求说明</th><th>备注</th></tr></thead><tbody><tr><td>用户ID</td><td>绿韵家用户唯一 ID</td><td>取《取水记录表.用户ID》</td></tr><tr><td>昵称</td><td>用户昵称</td><td>关联《用户表.昵称》</td></tr><tr><td>手机号</td><td>用户手机号，原文展示</td><td>关联《用户表.手机号》</td></tr></tbody></table><h5>水站·设备</h5><table><thead><tr><th>字段名称</th><th>需求说明</th><th>备注</th></tr></thead><tbody><tr><td>水站名称</td><td>绿韵家侧水站名称</td><td>取《取水记录表.水站名称》</td></tr><tr><td>绿韵家水站ID</td><td>绿韵家内部水站 ID</td><td>取《取水记录表.水站ID》</td></tr><tr><td>元气商户号 customer_id</td><td>元气侧商户编号</td><td>取《取水记录表.元气商户号》</td></tr><tr><td>设备编码 machine_code</td><td>三代机设备编码</td><td>取《取水记录表.设备编码》</td></tr></tbody></table><h5>机主收益</h5><table><thead><tr><th>字段名称</th><th>需求说明</th><th>备注</th></tr></thead><tbody><tr><td>本次收益</td><td>机主本次待发收益</td><td>计算：取水袋数 × 0.5 元</td></tr><tr><td>结算状态</td><td>待发 / 不计入</td><td>取水成功=待发；失败=不计入</td></tr></tbody></table><h5>接口调用回参</h5><table><thead><tr><th>字段名称</th><th>需求说明</th><th>备注</th></tr></thead><tbody><tr><td>key</td><td>接口调用密钥</td><td>取《取水记录表.调用密钥》</td></tr><tr><td>balance_name</td><td>固定为 water_num</td><td>取《取水记录表.balance_name》</td></tr><tr><td>callback_url</td><td>回调接收地址</td><td>取《取水记录表.callback_url》</td></tr><tr><td>回调状态</td><td>已回调 / 未触发 / 回调中</td><td>取《取水记录表.回调状态》</td></tr></tbody></table></div>
+<h5>4.2.2.4 功能按钮总表</h5>
+<table>
+<thead><tr><th style="width:18%">功能名称</th><th>功能说明</th><th style="width:25%">备注</th></tr></thead>
+<tbody><tr><td>返回列表</td><td>返回取水记录列表页</td><td>独立页面顶部按钮</td></tr></tbody></table>
+<h5>4.2.2.5 数据来源（字段级）</h5>
+<table>
+<thead><tr><th style="width:22%">字段名称</th><th>取值逻辑说明</th></tr></thead>
+<tbody><tr><td>取水信息 / 水站·设备 / 接口回参字段</td><td>取《取水记录表》相同字段</td></tr><tr><td>用户信息</td><td>取水记录表.user_id → 关联《用户表》</td></tr><tr><td>取水水量 / 本次收益</td><td>计算字段</td></tr></tbody></table>
+<h2 id="s5">五、非功能性需求</h2>
+<h3>5.1 性能</h3>
+<ul>
+<li>扫码取水接口调用总耗时 ≤ ⚠️ 待确认 @产品负责人 秒（含网络往返与水机响应）。</li>
+<li>后台列表页默认加载 ≤ 1 秒（10 条/页）。</li>
+<li>权益订单页、我的权益页首屏加载 ≤ ⚠️ 待确认 @产品负责人 秒。</li>
+</ul>
+<h3>5.2 安全</h3>
+<ul>
+<li>取水接口调用密钥 key 禁止写死在前端，须由后台配置并加密存储。</li>
+<li>用户手机号、设备编码等敏感数据在传输中使用 HTTPS。</li>
+<li>后台查询接口需校验角色权限，防止越权查看他人取水记录。</li>
+</ul>
+<h3>5.3 兼容性</h3>
+<ul>
+<li>C 端页面兼容 iOS / Android App 内 WebView、微信小程序 WebView、H5 浏览器。</li>
+<li>后台管理后台兼容 Chrome / Edge / Safari 最新两个主版本。</li>
+</ul>
+<h3>5.4 埋点需求</h3>
+<p>本需求埋点事件与属性遵循《泰小虎埋点规范 v2.3》的方法论，绿韵家项目具体事件待埋点评审后确认。</p>
+<p>规范链接：<a href="https://ddyuan-spec.github.io/taixiaohu/taixiaohu-tracking-spec.html" target="_blank">泰小虎埋点规范 v2.3（在线查阅）</a></p>
+<table>
+<thead><tr><th>事件英文名</th><th>事件显示名</th><th>所属层</th><th>平台</th><th>触发时机</th><th>必含上报参数（友盟中文名）</th><th>备注</th></tr></thead>
+<tbody><tr><td>⚠️ 待确认</td><td>页面浏览-扫码取水确认页</td><td>行为</td><td>C端</td><td>进入扫码取水确认页</td><td>页面名称、权益编号</td><td>待埋点评审确定事件英文名</td></tr><tr><td>⚠️ 待确认</td><td>按钮点击-确认取水</td><td>行为</td><td>C端</td><td>点击确认取水</td><td>权益编号、取水袋数、设备编码</td><td>待埋点评审确定事件英文名</td></tr><tr><td>⚠️ 待确认</td><td>页面浏览-取水成功页</td><td>行为</td><td>C端</td><td>进入取水成功页</td><td>权益编号、取水袋数</td><td>待埋点评审确定事件英文名</td></tr><tr><td>⚠️ 待确认</td><td>页面浏览-权益不足/设备异常页</td><td>行为</td><td>C端</td><td>进入异常结果页</td><td>异常类型、权益编号</td><td>待埋点评审确定事件英文名</td></tr></tbody></table>
+<h2 id="s6">六、验收标准</h2>
+<ul>
+<li><strong>AC1</strong>：Given 用户已登录且拥有本月可取 &gt; 0 的权益，When 用户在权益订单页点击「扫码取水」，Then 进入扫码取水确认页并正确展示水站名称、设备编码、商户编号。</li>
+<li><strong>AC2</strong>：Given 用户在扫码取水确认页，When 调整取水袋数，Then 最小值为 1，最大值为当前权益编号的「本月可取」，默认值为「本月可取」剩余全部。</li>
+<li><strong>AC3</strong>：Given 用户点击「确认取水」，When 接口返回成功，Then 权益扣减、取水记录生成、跳转取水成功页；When 接口返回权益不足，Then 不扣减权益并跳转权益不足页；When 接口返回设备异常，Then 不扣减权益并跳转设备异常页。</li>
+<li><strong>AC4</strong>：Given 用户 5 分钟内对同一设备重复发起取水，When 再次点击确认取水，Then 前端拦截并提示「您已发起取水，请勿重复操作」。</li>
+<li><strong>AC5</strong>：Given 运营人员登录后台，When 进入「水机权益 → 取水记录」，Then 可按订单号/用户/水站/设备编码/时间/状态筛选，并查看每条记录的详情。</li>
+<li><strong>AC6</strong>：Given 存在取水成功记录，When 查看详情页，Then 机主收益显示为「取水袋数 × 0.5 元」且结算状态为「待发」。</li>
+</ul>
+<h2 id="s7">七、关键边界设计检查清单</h2>
+<ul>
+<li><strong>网络与异常状态</strong>：弱网/断网时「确认取水」按钮 loading 态，超时后提示「网络异常，请稍后重试」；后台接口调用失败记录日志。</li>
+<li><strong>登录与游客态</strong>：未登录用户点击「扫码取水」前必须先登录；登录成功后回到扫码取水确认页并保留已选数量。</li>
+<li><strong>极限值与空状态</strong>：本月可取为 0 时隐藏「扫码取水」按钮；权益订单列表为空时展示缺省图。</li>
+<li><strong>版本兼容性</strong>：老版本用户若未升级，扫码取水入口不可见，沿用原有预约流程（⚠️ 待确认 @产品负责人：老版本兼容策略）。</li>
+<li><strong>逆向流 / 退款</strong>：取水失败时恢复用户权益（撤销扣减）；回调失败时以异步回调最终状态为准修正记录（⚠️ 待确认 @研发：补偿机制）。</li>
+<li><strong>高并发与防重</strong>：前端按钮 loading + 后端 5 分钟防重；同一设备同一 customer_id 同一 order_no 5 分钟内不可重复提交。</li>
+</ul>
+<h2 id="s8">八、文档维护与变更规范</h2>
+<ul>
+<li>版本号规范：大迭代 V1.0/V2.0；小修改 V1.1/V1.2。</li>
+<li>历史修订记录必须写明修改人、修改时间、修改原因。</li>
+<li>定稿后变更须在文档中高亮标出，并主动 @ 对应开发、测试与运营。</li>
+<li>本需求原型短链：C端 <a href="https://ddyuan-spec.github.io/lvyunji/lvyunji-scan-water.html" target="_blank">https://ddyuan-spec.github.io/lvyunji/lvyunji-scan-water.html</a>；后台 <a href="https://ddyuan-spec.github.io/lvyunji/lvyunji-scan-water-order-admin.html" target="_blank">https://ddyuan-spec.github.io/lvyunji/lvyunji-scan-water-order-admin.html</a>。</li>
+</ul>
+<h2 id="s9">九、待确认项汇总</h2>
+<table>
+<thead><tr><th style="width:6%">#</th><th>事项</th><th style="width:18%">干系人</th><th style="width:12%">状态</th></tr></thead>
+<tbody><tr><td>1</td><td>绿韵家取水订单号生成规则</td><td>@研发 / @产品负责人</td><td>待确认</td></tr><tr><td>2</td><td>单次扫码取水袋数上限策略（当前按本月可取全部默认）</td><td>@产品负责人</td><td>待确认</td></tr><tr><td>3</td><td>扫码取水接口调用超时时间与重试策略</td><td>@研发 / @产品负责人</td><td>待确认</td></tr><tr><td>4</td><td>取水接口异步回调失败时的恢复用户权益（撤销扣减）与补偿机制</td><td>@研发 / @产品负责人</td><td>待确认</td></tr><tr><td>5</td><td>元气三代机正式环境域名与 key</td><td>@研发 / @元气对接人</td><td>待确认</td></tr><tr><td>6</td><td>机主 0.5 元/袋收益的月末结算条件与发放方式（本期沿用现有条件）</td><td>@财务 / @产品负责人</td><td>待确认</td></tr><tr><td>7</td><td>老版本 App/小程序对扫码取水入口的兼容策略</td><td>@产品负责人 / @研发</td><td>待确认</td></tr><tr><td>8</td><td>后台「导出」功能的字段范围与文件格式</td><td>@产品负责人 / @运营</td><td>待确认</td></tr><tr><td>9</td><td>埋点事件英文名与必含参数（需走埋点评审）</td><td>@数据 / @埋点负责人</td><td>待确认</td></tr><tr><td>10</td><td>取水成功后的异步失败通知方式（推送/短信/站内信）</td><td>@产品负责人 / @研发</td><td>待确认</td></tr></tbody></table>
+</body>
+</html>
