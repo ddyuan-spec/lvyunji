@@ -167,9 +167,28 @@
     /* helper icons */
     .icon { width: 24px; height: 24px; }
     .icon-arrow-left { width: 0; height: 0; border-top: 6px solid transparent; border-bottom: 6px solid transparent; border-right: 8px solid #333; }
+  /* ===== 一键复制源码工具条（skill 标准组件） ===== */
+  .copy-bar{position:sticky;top:0;left:0;z-index:200;background:#1f1f2e;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 18px;box-shadow:0 2px 10px rgba(0,0,0,.2);}
+  .copy-bar .t{font-size:13px;font-weight:600;line-height:1.3;}
+  .copy-bar .i{font-size:11px;color:#a6b0c8;margin-top:2px;}
+  .copy-btn{padding:8px 18px;border:none;border-radius:20px;background:linear-gradient(135deg,#07c160,#06ad56);color:#fff;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;transition:transform .1s,box-shadow .2s;}
+  .copy-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(7,193,96,.35);}
+  .copy-btn.copied{background:linear-gradient(135deg,#059669,#047857);}
+  .copy-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1f1f2e;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.25);opacity:0;transition:opacity .3s;pointer-events:none;z-index:300;}
+  .copy-toast.show{opacity:1;}
+
   </style>
 </head>
 <body>
+  <div class="copy-bar">
+    <div>
+      <div class="t">📋 绿韵家扫码取水原型</div>
+      <div class="i">单文件原型 · 一键复制整页 HTML 源码</div>
+    </div>
+    <button class="copy-btn" id="copyBtn" onclick="doCopy()" title="点击复制完整 HTML 源码，粘贴本地即可运行">一键复制源码</button>
+  </div>
+  <div class="copy-toast" id="copyToast"></div>
+
   <div class="phone">
     <!-- page-mine -->
     <div class="page active" id="page-mine">
@@ -496,6 +515,32 @@
       t.textContent = msg;
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 1500);
+    }
+
+    function showCopyToast(msg) {
+      var t = document.getElementById('copyToast');
+      if (!t) { t = document.createElement('div'); t.id = 'copyToast'; t.className = 'copy-toast'; document.body.appendChild(t); }
+      t.textContent = msg; t.classList.add('show');
+      setTimeout(function () { t.classList.remove('show'); }, 1800);
+    }
+
+    function doCopy() {
+      var src = '<!DOCTYPE html><html lang="zh-CN">' + document.documentElement.innerHTML + '</html>';
+      function markCopied() {
+        var b = document.getElementById('copyBtn');
+        if (b) { b.textContent = '✓ 已复制源码'; b.classList.add('copied'); }
+        showCopyToast('已复制整页原型源码，粘贴本地即可运行');
+        setTimeout(function () { if (b) { b.textContent = '一键复制源码'; b.classList.remove('copied'); } }, 1800);
+      }
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(src).then(markCopied, markCopied);
+        } else {
+          markCopied();
+        }
+      } catch (e) {
+        markCopied();
+      }
     }
 
     function switchBenefitTab(el, type) {
