@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>取水记录 - 绿韵家管理系统</title>
+  <style>
+    :root {
+      --primary: #FF4D4F;
+      --primary-hover: #FF7875;
+      --bg: #F0F2F5;
+      --sidebar-bg: #001529;
+      --sidebar-active: #FF4D4F;
+      --text-main: #333333;
+      --text-sub: #666666;
+      --text-hint: #999999;
+      --border: #E8E8E8;
+      --header-bg: #FFFFFF;
+      --main-bg: #F0F2F5;
+      --table-header-bg: #FAFAFA;
+      --tag-green: #52C41A;
+      --tag-red: #FF4D4F;
+      --tag-orange: #FAAD14;
+      --link-blue: #1890FF;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; color: var(--text-main); background: var(--bg); }
+    .layout { display: flex; min-height: 100vh; }
+
+    /* 侧栏 */
+    .sidebar { width: 180px; background: var(--sidebar-bg); color: #fff; flex-shrink: 0; min-height: 100vh; }
+    .sidebar-header { height: 50px; display: flex; align-items: center; padding: 0 16px; font-size: 16px; font-weight: 500; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .menu { padding: 8px 0; }
+    .menu-group { margin-bottom: 4px; }
+    .group-title { padding: 10px 16px; color: rgba(255,255,255,0.65); font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+    .group-title:hover { color: #fff; }
+    .group-arrow { font-size: 10px; transition: transform 0.2s; }
+    .group-arrow.open { transform: rotate(90deg); }
+    .submenu { display: none; }
+    .submenu.open { display: block; }
+    .menu-item { padding: 10px 16px 10px 32px; font-size: 13px; color: rgba(255,255,255,0.65); cursor: pointer; display: flex; align-items: center; gap: 8px; }
+    .menu-item:hover { color: #fff; }
+    .menu-item.active { background: var(--sidebar-active); color: #fff; }
+    .menu-icon { width: 16px; text-align: center; }
+
+    /* 主内容区 */
+    .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .topbar { height: 50px; background: var(--header-bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+    .topnav { display: flex; gap: 24px; font-size: 14px; }
+    .topnav-item { color: var(--text-sub); cursor: pointer; }
+    .topnav-item.active { color: var(--primary); font-weight: 500; }
+    .topuser { color: var(--text-sub); font-size: 14px; }
+
+    .content { padding: 16px 24px; flex: 1; }
+    .breadcrumb { font-size: 13px; color: var(--text-sub); margin-bottom: 16px; }
+    .breadcrumb span { margin-right: 8px; }
+    .breadcrumb span.divider { color: var(--text-hint); }
+    .breadcrumb span.current { color: var(--text-main); font-weight: 500; }
+
+    /* 页面容器 */
+    .view-page { display: none; }
+    .view-page.active { display: block; }
+
+    /* 卡片 */
+    .card { background: #fff; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+    .card-header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .card-title { font-size: 16px; font-weight: 600; color: var(--text-main); }
+    .card-body { padding: 24px; }
+
+    /* 搜索区 */
+    .search-form { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; margin-bottom: 24px; }
+    .form-item { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 13px; color: var(--text-sub); }
+    .form-input, .form-select { height: 32px; border: 1px solid var(--border); border-radius: 4px; padding: 0 12px; font-size: 13px; min-width: 160px; outline: none; }
+    .form-input:focus, .form-select:focus { border-color: var(--primary); }
+    .btn { height: 32px; padding: 0 16px; border-radius: 4px; font-size: 13px; cursor: pointer; border: none; outline: none; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-default { background: #fff; color: var(--text-main); border: 1px solid var(--border); }
+    .btn-default:hover { border-color: var(--primary); color: var(--primary); }
+    .btn-link { background: transparent; color: var(--link-blue); padding: 0; height: auto; }
+    .btn-link:hover { text-decoration: underline; }
+
+    /* 表格 */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    th { background: var(--table-header-bg); color: var(--text-sub); font-weight: 500; white-space: nowrap; }
+    tr:hover td { background: #FAFAFA; }
+    .status-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; white-space: nowrap; }
+    .status-on { background: #F6FFED; color: var(--tag-green); border: 1px solid #B7EB8F; }
+    .status-off { background: #FFF1F0; color: var(--tag-red); border: 1px solid #FFA39E; }
+    .status-pending { background: #FFFBE6; color: var(--tag-orange); border: 1px solid #FFE58F; }
+    .op-btns { display: flex; gap: 12px; flex-wrap: nowrap; }
+    .cell-sub { color: var(--text-hint); font-size: 12px; }
+
+    /* 分页 */
+    .pagination-bar { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 16px 0; font-size: 13px; color: var(--text-sub); }
+    .page-btn { min-width: 28px; height: 28px; border: 1px solid var(--border); background: #fff; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .page-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .page-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .page-btn.disabled { color: var(--text-hint); cursor: not-allowed; border-color: var(--border); }
+    .page-size { height: 28px; border: 1px solid var(--border); border-radius: 4px; padding: 0 8px; font-size: 13px; }
+    .page-jump { display: flex; align-items: center; gap: 6px; }
+    .page-jump input { width: 40px; height: 28px; border: 1px solid var(--border); border-radius: 4px; text-align: center; }
+
+    /* 详情页 */
+    .detail-section { margin-bottom: 24px; }
+    .detail-section:last-child { margin-bottom: 0; }
+    .detail-section-title { font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 16px; padding-left: 8px; border-left: 3px solid var(--primary); }
+    .detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px 24px; }
+    .detail-item { display: flex; flex-direction: column; gap: 6px; }
+    .detail-label { font-size: 13px; color: var(--text-sub); }
+    .detail-value { font-size: 14px; color: var(--text-main); word-break: break-all; }
+    .detail-value.mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; }
+    .detail-actions { margin-top: 8px; display: flex; gap: 12px; }
+
+    /* 复制源码工具条 */
+    .copy-bar { position: fixed; top: 0; left: 0; right: 0; height: 40px; background: #001529; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-size: 13px; z-index: 2000; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+    .copy-bar .copy-meta { display: flex; align-items: center; gap: 8px; opacity: 0.85; }
+    .copy-btn { background: #FF4D4F; color: #fff; border: none; height: 26px; padding: 0 14px; border-radius: 4px; font-size: 13px; cursor: pointer; }
+    .copy-btn:hover { background: #FF7875; }
+    .copy-btn.done { background: #52C41A; }
+
+    /* Toast */
+    #toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) scale(0.95); background: rgba(0,0,0,0.75); color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 3000; }
+    #toast.show { opacity: 1; transform: translateX(-50%) scale(1); }
+  </style>
+</head>
+<body>
+  <div class="copy-bar">
+    <span class="copy-meta">📋 绿韵家取水记录后台原型 · 单文件原型 · 一键复制整页 HTML 源码</span>
+    <button class="copy-btn" id="copyBtn" onclick="doCopy()">一键复制源码</button>
+  </div>
+  <div class="layout">
+    <!-- 侧栏 -->
+    <div class="sidebar">
+      <div class="sidebar-header">绿韵家管理系统</div>
+      <div class="menu">
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)"><span>签到打卡</span><span class="group-arrow">▶</span></div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)"><span>优惠券管理</span><span class="group-arrow">▶</span></div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)"><span>平台直播</span><span class="group-arrow">▶</span></div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)"><span>排行榜</span><span class="group-arrow">▶</span></div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)"><span>商品换购</span><span class="group-arrow">▶</span></div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)"><span>热搜管理</span><span class="group-arrow">▶</span></div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)"><span>会员标签</span><span class="group-arrow">▶</span></div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)"><span>直播管理</span><span class="group-arrow">▶</span></div>
+          <div class="submenu">
+            <div class="menu-item"><span class="menu-icon">▣</span>直播商品</div>
+            <div class="menu-item"><span class="menu-icon">▣</span>直播间管理</div>
+            <div class="menu-item"><span class="menu-icon">▣</span>直播间商品匹配</div>
+            <div class="menu-item"><span class="menu-icon">▣</span>直播会员订单</div>
+            <div class="menu-item"><span class="menu-icon">▣</span>直播数据统计</div>
+            <div class="menu-item"><span class="menu-icon">▣</span>观看时长设置</div>
+          </div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)"><span>商学院管理</span><span class="group-arrow">▶</span></div>
+          <div class="submenu">
+            <div class="menu-item"><span class="menu-icon">▣</span>视频管理</div>
+            <div class="menu-item"><span class="menu-icon">▣</span>栏目管理</div>
+          </div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)"><span>享创</span><span class="group-arrow">▶</span></div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)"><span>水机权益</span><span class="group-arrow open">▶</span></div>
+          <div class="submenu open">
+            <div class="menu-item active" onclick="go('list')"><span class="menu-icon">▣</span>取水记录</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 主内容 -->
+    <main class="main">
+      <div class="topbar">
+        <div class="topnav">
+          <span class="topnav-item">店铺</span>
+          <span class="topnav-item active">营销中心</span>
+          <span class="topnav-item">结算中心</span>
+        </div>
+        <div class="topuser">袁</div>
+      </div>
+
+      <div class="content">
+        <!-- 取水记录列表页 -->
+        <div id="viewList" class="view-page active">
+          <div class="breadcrumb">
+            <span>首页报表</span><span class="divider">></span>
+            <span>水机权益</span><span class="divider">></span>
+            <span class="current">取水记录</span>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">取水记录</span>
+              <button class="btn btn-primary" onclick="toast('已导出取水记录')">导出</button>
+            </div>
+            <div class="card-body">
+              <div class="search-form">
+                <div class="form-item">
+                  <label class="form-label">取水订单号</label>
+                  <input class="form-input" type="text" placeholder="请输入取水订单号" id="qOrderNo">
+                </div>
+                <div class="form-item">
+                  <label class="form-label">用户（手机号/昵称）</label>
+                  <input class="form-input" type="text" placeholder="请输入手机号或昵称" id="qUser">
+                </div>
+                <div class="form-item">
+                  <label class="form-label">水站</label>
+                  <input class="form-input" type="text" placeholder="请输入水站名称" id="qStation">
+                </div>
+                <div class="form-item">
+                  <label class="form-label">设备编码</label>
+                  <input class="form-input" type="text" placeholder="请输入设备编码" id="qMachine">
+                </div>
+                <div class="form-item">
+                  <label class="form-label">取水时间</label>
+                  <input class="form-input" type="date" id="qStart"> ~ <input class="form-input" type="date" id="qEnd" style="margin-left:6px;">
+                </div>
+                <div class="form-item">
+                  <label class="form-label">状态</label>
+                  <select class="form-select" id="qStatus">
+                    <option value="">全部</option>
+                    <option value="1">取水成功</option>
+                    <option value="0">取水失败</option>
+                    <option value="2">回调中</option>
+                  </select>
+                </div>
+                <div class="form-item">
+                  <button class="btn btn-primary" onclick="searchList()">搜索</button>
+                </div>
+                <div class="form-item">
+                  <button class="btn btn-default" onclick="resetSearch()">重置</button>
+                </div>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>取水订单号</th>
+                      <th>用户</th>
+                      <th>水站</th>
+                      <th>设备编码</th>
+                      <th>取水袋数</th>
+                      <th>机主收益(元)</th>
+                      <th>取水时间</th>
+                      <th>状态</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="listBody"></tbody>
+                </table>
+              </div>
+
+              <div class="pagination-bar">
+                <span id="totalCount">共 0 条</span>
+                <select class="page-size"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>
+                <button class="page-btn disabled">&lt;</button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn disabled">&gt;</button>
+                <span>前往</span>
+                <input type="text" value="1">
+                <span>页</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 取水记录详情页 -->
+        <div id="viewDetail" class="view-page">
+          <div class="breadcrumb">
+            <span>首页报表</span><span class="divider">></span>
+            <span>水机权益</span><span class="divider">></span>
+            <span>取水记录</span><span class="divider">></span>
+            <span class="current">取水详情</span>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">取水详情</span>
+              <button class="btn btn-default" onclick="go('list')">返回列表</button>
+            </div>
+            <div class="card-body">
+              <div class="detail-section">
+                <div class="detail-section-title">取水信息</div>
+                <div class="detail-grid">
+                  <div class="detail-item"><span class="detail-label">取水订单号（绿韵家）</span><span class="detail-value mono" id="dOrderNo">-</span></div>
+                  <div class="detail-item"><span class="detail-label">元气水单号 water_no</span><span class="detail-value mono" id="dWaterNo">-</span></div>
+                  <div class="detail-item"><span class="detail-label">状态</span><span class="detail-value" id="dStatus">-</span></div>
+                  <div class="detail-item"><span class="detail-label">取水袋数</span><span class="detail-value" id="dBags">-</span></div>
+                  <div class="detail-item"><span class="detail-label">取水时间</span><span class="detail-value" id="dTime">-</span></div>
+                  <div class="detail-item"><span class="detail-label">取水水量（升）</span><span class="detail-value" id="dLiters">-</span></div>
+                </div>
+              </div>
+
+              <div class="detail-section">
+                <div class="detail-section-title">用户信息</div>
+                <div class="detail-grid">
+                  <div class="detail-item"><span class="detail-label">用户ID</span><span class="detail-value mono" id="dUserId">-</span></div>
+                  <div class="detail-item"><span class="detail-label">昵称</span><span class="detail-value" id="dNick">-</span></div>
+                  <div class="detail-item"><span class="detail-label">手机号</span><span class="detail-value" id="dPhone">-</span></div>
+                </div>
+              </div>
+
+              <div class="detail-section">
+                <div class="detail-section-title">水站 / 设备信息</div>
+                <div class="detail-grid">
+                  <div class="detail-item"><span class="detail-label">水站名称</span><span class="detail-value" id="dStation">-</span></div>
+                  <div class="detail-item"><span class="detail-label">绿韵家水站ID</span><span class="detail-value mono" id="dStationId">-</span></div>
+                  <div class="detail-item"><span class="detail-label">元气商户号 customer_id</span><span class="detail-value mono" id="dCustomerId">-</span></div>
+                  <div class="detail-item"><span class="detail-label">设备编码 machine_code</span><span class="detail-value mono" id="dMachine">-</span></div>
+                  <div class="detail-item"><span class="detail-label">机主 / 收益归属</span><span class="detail-value" id="dOwner">-</span></div>
+                </div>
+              </div>
+
+              <div class="detail-section">
+                <div class="detail-section-title">机主收益</div>
+                <div class="detail-grid">
+                  <div class="detail-item"><span class="detail-label">本次收益（含待发）</span><span class="detail-value" id="dIncome">-</span></div>
+                  <div class="detail-item"><span class="detail-label">收益结算状态</span><span class="detail-value" id="dIncomeStatus">-</span></div>
+                </div>
+              </div>
+
+              <div class="detail-section">
+                <div class="detail-section-title">接口调用回参（开发对接）</div>
+                <div class="detail-grid">
+                  <div class="detail-item"><span class="detail-label">key（配置）</span><span class="detail-value mono" id="dKey">-</span></div>
+                  <div class="detail-item"><span class="detail-label">balance_name</span><span class="detail-value mono" id="dBalanceName">-</span></div>
+                  <div class="detail-item"><span class="detail-label">callback_url</span><span class="detail-value mono" id="dCallback">-</span></div>
+                  <div class="detail-item"><span class="detail-label">回调状态</span><span class="detail-value" id="dCallbackStatus">-</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    const sampleList = [
+      { orderNo: 'LYJ20260828U10086001', userId: 'U10086', nick: '张明', phone: '13812345678', station: '东山街道绿韵健康服务中心工作室', stationId: 'S2031', customerId: '5411', machine: '10AAU6P03709VGMS8921', bags: 2, time: '2026-08-28 09:12', status: 1, waterNo: 'SN2026082812001', key: 'QSis9DlJdXcK8mGpCf4tr5ogTh2RB3E6', balanceName: 'water_num', callback: 'https://api.lyunjia.com/cb/water', callbackStatus: '已回调' },
+      { orderNo: 'LYJ20260828U10087002', userId: 'U10087', nick: '李华', phone: '13923456789', station: '城东社区绿韵水站', stationId: 'S2045', customerId: '5411', machine: '10AAU6P03712KLTW7733', bags: 1, time: '2026-08-28 10:45', status: 1, waterNo: 'SN2026082812002', key: 'QSis9DlJdXcK8mGpCf4tr5ogTh2RB3E6', balanceName: 'water_num', callback: 'https://api.lyunjia.com/cb/water', callbackStatus: '已回调' },
+      { orderNo: 'LYJ20260827U10088003', userId: 'U10088', nick: '王芳', phone: '13734567890', station: '西园路绿韵健康小屋', stationId: 'S2077', customerId: '5411', machine: '10AAU6P03708MNBV5544', bags: 3, time: '2026-08-27 18:30', status: 0, waterNo: '-', key: 'QSis9DlJdXcK8mGpCf4tr5ogTh2RB3E6', balanceName: 'water_num', callback: 'https://api.lyunjia.com/cb/water', callbackStatus: '未触发' },
+      { orderNo: 'LYJ20260827U10089004', userId: 'U10089', nick: '赵强', phone: '13645678901', station: '东山街道绿韵健康服务中心工作室', stationId: 'S2031', customerId: '5411', machine: '10AAU6P03709VGMS8921', bags: 1, time: '2026-08-27 20:05', status: 2, waterNo: 'SN2026082720041', key: 'QSis9DlJdXcK8mGpCf4tr5ogTh2RB3E6', balanceName: 'water_num', callback: 'https://api.lyunjia.com/cb/water', callbackStatus: '回调中' },
+      { orderNo: 'LYJ20260826U10090005', userId: 'U10090', nick: '陈静', phone: '13556789012', station: '城北绿韵惠民水站', stationId: 'S2090', customerId: '5411', machine: '10AAU6P03715PQRS6688', bags: 5, time: '2026-08-26 11:20', status: 1, waterNo: 'SN2026082612005', key: 'QSis9DlJdXcK8mGpCf4tr5ogTh2RB3E6', balanceName: 'water_num', callback: 'https://api.lyunjia.com/cb/water', callbackStatus: '已回调' }
+    ];
+
+    function go(pk) {
+      const viewId = 'view' + pk.charAt(0).toUpperCase() + pk.slice(1);
+      document.querySelectorAll('.view-page').forEach(v => v.classList.remove('active'));
+      const el = document.getElementById(viewId);
+      if (el) el.classList.add('active');
+    }
+
+    function toast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 1800);
+    }
+
+    function toggleMenu(el) {
+      const arrow = el.querySelector('.group-arrow');
+      const submenu = el.nextElementSibling;
+      if (!submenu || !submenu.classList.contains('submenu')) return;
+      submenu.classList.toggle('open');
+      arrow.classList.toggle('open');
+    }
+
+    function statusTag(status) {
+      if (status === 1) return '<span class="status-tag status-on">取水成功</span>';
+      if (status === 0) return '<span class="status-tag status-off">取水失败</span>';
+      return '<span class="status-tag status-pending">回调中</span>';
+    }
+
+    function renderList(data) {
+      const body = document.getElementById('listBody');
+      body.innerHTML = '';
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="mono">${row.orderNo}</td>
+          <td>${row.nick}<div class="cell-sub">${row.phone}</div></td>
+          <td>${row.station}</td>
+          <td class="mono">${row.machine}</td>
+          <td>${row.bags} 袋</td>
+          <td>${(row.bags * 0.5).toFixed(2)}</td>
+          <td>${row.time}</td>
+          <td>${statusTag(row.status)}</td>
+          <td><div class="op-btns"><button class="btn btn-link" onclick="viewDetail('${row.orderNo}')">查看</button></div></td>
+        `;
+        body.appendChild(tr);
+      });
+      document.getElementById('totalCount').textContent = '共 ' + data.length + ' 条';
+    }
+
+    function searchList() {
+      const orderNo = document.getElementById('qOrderNo').value.trim();
+      const user = document.getElementById('qUser').value.trim();
+      const station = document.getElementById('qStation').value.trim();
+      const machine = document.getElementById('qMachine').value.trim();
+      const status = document.getElementById('qStatus').value;
+      let filtered = sampleList;
+      if (orderNo) filtered = filtered.filter(r => r.orderNo.includes(orderNo));
+      if (user) filtered = filtered.filter(r => r.nick.includes(user) || r.phone.includes(user));
+      if (station) filtered = filtered.filter(r => r.station.includes(station));
+      if (machine) filtered = filtered.filter(r => r.machine.includes(machine));
+      if (status !== '') filtered = filtered.filter(r => String(r.status) === status);
+      renderList(filtered);
+    }
+
+    function resetSearch() {
+      document.getElementById('qOrderNo').value = '';
+      document.getElementById('qUser').value = '';
+      document.getElementById('qStation').value = '';
+      document.getElementById('qMachine').value = '';
+      document.getElementById('qStart').value = '';
+      document.getElementById('qEnd').value = '';
+      document.getElementById('qStatus').value = '';
+      renderList(sampleList);
+    }
+
+    function viewDetail(orderNo) {
+      const row = sampleList.find(r => r.orderNo === orderNo);
+      if (!row) { toast('未找到该记录'); return; }
+      document.getElementById('dOrderNo').textContent = row.orderNo;
+      document.getElementById('dWaterNo').textContent = row.waterNo;
+      document.getElementById('dStatus').innerHTML = statusTag(row.status);
+      document.getElementById('dBags').textContent = row.bags + ' 袋';
+      document.getElementById('dTime').textContent = row.time;
+      document.getElementById('dLiters').textContent = (row.bags * 5) + ' 升';
+      document.getElementById('dUserId').textContent = row.userId;
+      document.getElementById('dNick').textContent = row.nick;
+      document.getElementById('dPhone').textContent = row.phone;
+      document.getElementById('dStation').textContent = row.station;
+      document.getElementById('dStationId').textContent = row.stationId;
+      document.getElementById('dCustomerId').textContent = row.customerId;
+      document.getElementById('dMachine').textContent = row.machine;
+      document.getElementById('dOwner').textContent = row.station + '（机主）';
+      document.getElementById('dIncome').textContent = '¥ ' + (row.bags * 0.5).toFixed(2);
+      document.getElementById('dIncomeStatus').innerHTML = row.status === 1
+        ? '<span class="status-tag status-pending">待发</span>'
+        : '<span class="status-tag status-off">不计入</span>';
+      document.getElementById('dKey').textContent = row.key;
+      document.getElementById('dBalanceName').textContent = row.balanceName;
+      document.getElementById('dCallback').textContent = row.callback;
+      document.getElementById('dCallbackStatus').textContent = row.callbackStatus;
+      go('detail');
+    }
+
+    function doCopy() {
+      const btn = document.getElementById('copyBtn');
+      const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const done = () => { btn.textContent = '✓ 已复制源码'; btn.classList.add('done'); setTimeout(() => { btn.textContent = '一键复制源码'; btn.classList.remove('done'); }, 1800); toast('已复制整页 HTML 源码'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(html).then(done).catch(() => fallbackCopy(html, done));
+      } else {
+        fallbackCopy(html, done);
+      }
+    }
+    function fallbackCopy(text, done) {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) { toast('复制失败，请手动复制'); }
+      document.body.removeChild(ta);
+    }
+
+    renderList(sampleList);
+  </script>
+</body>
+</html>
