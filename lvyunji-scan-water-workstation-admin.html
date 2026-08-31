@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>全部工作站 - 绿韵家管理系统</title>
+  <style>
+    :root {
+      --primary: #FF4D4F;
+      --primary-hover: #FF7875;
+      --bg: #F0F2F5;
+      --sidebar-bg: #001529;
+      --sidebar-active: #FF4D4F;
+      --text-main: #333333;
+      --text-sub: #666666;
+      --text-hint: #999999;
+      --border: #E8E8E8;
+      --header-bg: #FFFFFF;
+      --main-bg: #F0F2F5;
+      --table-header-bg: #FAFAFA;
+      --tag-green: #52C41A;
+      --tag-red: #FF4D4F;
+      --tag-orange: #FAAD14;
+      --tag-blue: #1890FF;
+      --link-blue: #1890FF;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; color: var(--text-main); background: var(--bg); }
+    .layout { display: flex; min-height: 100vh; }
+
+    /* 侧栏 */
+    .sidebar { width: 180px; background: var(--sidebar-bg); color: #fff; flex-shrink: 0; min-height: 100vh; }
+    .sidebar-header { height: 50px; display: flex; align-items: center; padding: 0 16px; font-size: 16px; font-weight: 500; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .menu { padding: 8px 0; }
+    .menu-group { margin-bottom: 4px; }
+    .group-title { padding: 10px 16px; color: rgba(255,255,255,0.65); font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+    .group-title:hover { color: #fff; }
+    .group-arrow { font-size: 10px; transition: transform 0.2s; }
+    .group-arrow.open { transform: rotate(90deg); }
+    .submenu { display: none; }
+    .submenu.open { display: block; }
+    .menu-item { padding: 10px 16px 10px 32px; font-size: 13px; color: rgba(255,255,255,0.65); cursor: pointer; display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .menu-item:hover { color: #fff; }
+    .menu-item.active { background: var(--sidebar-active); color: #fff; }
+    .menu-icon { width: 16px; text-align: center; }
+
+    /* 主内容区 */
+    .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .topbar { height: 50px; background: var(--header-bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+    .topnav { display: flex; gap: 24px; font-size: 14px; }
+    .topnav-item { color: var(--text-sub); cursor: pointer; }
+    .topnav-item.active { color: var(--primary); font-weight: 500; }
+    .topuser { color: var(--text-sub); font-size: 14px; }
+
+    .content { padding: 16px 24px; flex: 1; }
+    .breadcrumb { font-size: 13px; color: var(--text-sub); margin-bottom: 16px; }
+    .breadcrumb span { margin-right: 8px; }
+    .breadcrumb span.divider { color: var(--text-hint); }
+    .breadcrumb span.current { color: var(--text-main); font-weight: 500; }
+
+    /* 卡片 */
+    .card { background: #fff; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+    .card-header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .card-title { font-size: 16px; font-weight: 600; color: var(--text-main); }
+    .card-body { padding: 24px; }
+
+    /* 搜索区 */
+    .search-form { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; margin-bottom: 24px; }
+    .form-item { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 13px; color: var(--text-sub); }
+    .form-input, .form-select { height: 32px; border: 1px solid var(--border); border-radius: 4px; padding: 0 12px; font-size: 13px; min-width: 160px; outline: none; }
+    .form-input:focus, .form-select:focus { border-color: var(--primary); }
+    .btn { height: 32px; padding: 0 16px; border-radius: 4px; font-size: 13px; cursor: pointer; border: none; outline: none; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-default { background: #fff; color: var(--text-main); border: 1px solid var(--border); }
+    .btn-default:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* 表格 */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    th { background: var(--table-header-bg); color: var(--text-sub); font-weight: 500; white-space: nowrap; }
+    tr:hover td { background: #FAFAFA; }
+    .status-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; white-space: nowrap; }
+    .status-on { background: #F6FFED; color: var(--tag-green); border: 1px solid #B7EB8F; }
+    .status-pending { background: #FFFBE6; color: var(--tag-orange); border: 1px solid #FFE58F; }
+    .status-off { background: #FFF1F0; color: var(--tag-red); border: 1px solid #FFA39E; }
+    .op-btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .op-btns .btn-link { background: transparent; color: var(--link-blue); padding: 0; height: auto; font-size: 13px; cursor: pointer; border: none; }
+    .op-btns .btn-link:hover { text-decoration: underline; }
+    .op-btns .btn-link.danger { color: var(--tag-red); }
+    .op-btns .divider { color: var(--text-hint); font-size: 12px; }
+    .station-info { display: flex; align-items: center; gap: 8px; }
+    .station-avatar { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; background: #f5f5f5; }
+    .station-name { font-size: 13px; color: var(--text-main); }
+    .cell-sub { color: var(--text-hint); font-size: 12px; }
+
+    /* 分页 */
+    .pagination-bar { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 16px 0; font-size: 13px; color: var(--text-sub); }
+    .page-btn { min-width: 28px; height: 28px; border: 1px solid var(--border); background: #fff; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .page-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .page-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .page-btn.disabled { color: var(--text-hint); cursor: not-allowed; border-color: var(--border); }
+    .page-size { height: 28px; border: 1px solid var(--border); border-radius: 4px; padding: 0 8px; font-size: 13px; }
+    .page-jump { display: flex; align-items: center; gap: 6px; }
+    .page-jump input { width: 40px; height: 28px; border: 1px solid var(--border); border-radius: 4px; text-align: center; }
+
+    /* Toast */
+    #toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) scale(0.95); background: rgba(0,0,0,0.75); color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 3000; }
+    #toast.show { opacity: 1; transform: translateX(-50%) scale(1); }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <!-- 侧栏 -->
+    <div class="sidebar">
+      <div class="sidebar-header">绿韵家管理系统</div>
+      <div class="menu">
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)"><span>签到打卡</span><span class="group-arrow">▶</span></div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)"><span>优惠券管理</span><span class="group-arrow">▶</span></div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)"><span>平台直播</span><span class="group-arrow">▶</span></div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)"><span>排行榜</span><span class="group-arrow">▶</span></div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)"><span>商品换购</span><span class="group-arrow">▶</span></div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)"><span>热搜管理</span><span class="group-arrow">▶</span></div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)"><span>会员标签</span><span class="group-arrow">▶</span></div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)"><span>直播管理</span><span class="group-arrow">▶</span></div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)"><span>商学院管理</span><span class="group-arrow">▶</span></div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)"><span>享创</span><span class="group-arrow">▶</span></div>
+        </div>
+        <div class="menu-group">
+          <div class="group-title" onclick="toggleMenu(this)"><span>水机权益</span><span class="group-arrow open">▶</span></div>
+          <div class="submenu open">
+            <div class="menu-item active"><span class="menu-icon">▣</span>全部工作站</div>
+            <a class="menu-item" href="lvyunji-scan-water-order-admin.html"><span class="menu-icon">▣</span>取水记录</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 主内容 -->
+    <main class="main">
+      <div class="topbar">
+        <div class="topnav">
+          <span class="topnav-item">店铺</span>
+          <span class="topnav-item active">营销中心</span>
+          <span class="topnav-item">结算中心</span>
+        </div>
+        <div class="topuser">袁</div>
+      </div>
+
+      <div class="content">
+        <div class="breadcrumb">
+          <span>首页报表</span><span class="divider">></span>
+          <span>水机权益</span><span class="divider">></span>
+          <span class="current">全部工作站</span>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">全部工作站</span>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-primary" onclick="toast('已导出工作站列表')">导出</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="search-form">
+              <div class="form-item">
+                <label class="form-label">工作站名称</label>
+                <input class="form-input" type="text" placeholder="请输入工作站名称" id="qName">
+              </div>
+              <div class="form-item">
+                <label class="form-label">账号</label>
+                <input class="form-input" type="text" placeholder="请输入账号" id="qAccount">
+              </div>
+              <div class="form-item">
+                <label class="form-label">状态</label>
+                <select class="form-select" id="qStatus">
+                  <option value="">全部</option>
+                  <option value="1">已认证</option>
+                  <option value="0">待审核</option>
+                </select>
+              </div>
+              <div class="form-item">
+                <label class="form-label">联系人</label>
+                <input class="form-input" type="text" placeholder="请输入联系人" id="qContact">
+              </div>
+              <div class="form-item">
+                <label class="form-label">默认排序</label>
+                <select class="form-select" id="qSort">
+                  <option>默认排序</option>
+                  <option>创建时间倒序</option>
+                  <option>总取水量倒序</option>
+                </select>
+              </div>
+              <div class="form-item">
+                <button class="btn btn-primary" onclick="searchList()">查询</button>
+              </div>
+              <div class="form-item">
+                <button class="btn btn-default" onclick="resetSearch()">重置</button>
+              </div>
+              <div class="form-item">
+                <button class="btn btn-primary" onclick="toast('进入新增工作站流程')">新增</button>
+              </div>
+              <div class="form-item">
+                <button class="btn btn-primary" onclick="toast('已发送水样送检提醒')">水样送检提醒</button>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>编号</th>
+                    <th>账号</th>
+                    <th>联系人</th>
+                    <th>元气先锋ID</th>
+                    <th>华夏水机序号</th>
+                    <th>工作站信息</th>
+                    <th>工作站街道</th>
+                    <th>总取水量</th>
+                    <th>当日取水量</th>
+                    <th>状态</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="listBody"></tbody>
+              </table>
+            </div>
+
+            <div class="pagination-bar">
+              <span id="totalCount">共 0 条</span>
+              <select class="page-size"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>
+              <button class="page-btn disabled">&lt;</button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">3</button>
+              <button class="page-btn">4</button>
+              <button class="page-btn">5</button>
+              <button class="page-btn">6</button>
+              <button class="page-btn disabled">...</button>
+              <button class="page-btn">71</button>
+              <button class="page-btn">&gt;</button>
+              <div class="page-jump">
+                <span>前往</span>
+                <input type="text" value="1">
+                <span>页</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    const sampleList = [
+      { id: 713, account: '18307448440', contact: 'qian', yuanqiId: '11123213', huaxiaNo: '21312412', name: '万湖汇绿韵家工作室', address: '湖南省长沙市雨花区东塘街道凯德广场', avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=WQ&backgroundColor=e5e7eb', totalWater: 0, todayWater: 0, status: 1, createdAt: '2026-05-20 16:14:03', machines: ['10AAU6P03709VGMS8921'] },
+      { id: 711, account: '18307448442', contact: '宋健', yuanqiId: '1111', huaxiaNo: '1111', name: 'qian绿韵家工作室', address: '湖南省长沙市雨花区梨子山街道韶山中路489号（新建路与韶山路交汇处）', avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=SJ&backgroundColor=dbeafe', totalWater: 22, todayWater: 0, status: 1, createdAt: '2026-05-09 11:46:52', machines: ['10AAU6P03712KLTW7733', '10AAU6P03708MNBV5544'] },
+      { id: 710, account: '18566956673', contact: '小TT', yuanqiId: '8888888888', huaxiaNo: '9999999999', name: '盛瑞工作室', address: '河北省秦皇岛市山海关区西关街道山海关区拆迁办公室山海关区保障性住房管理中心', avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=SR&backgroundColor=fce7f3', totalWater: 365, todayWater: 0, status: 1, createdAt: '2026-04-03 09:05:15', machines: ['10AAU6P03715PQRS6688', '10AAU6P03716XYZW9900'] },
+      { id: 709, account: '189799', contact: '林贤', yuanqiId: '2022CP19550', huaxiaNo: '104A5KP03709SYCJZROT', name: '南宁市良庆区东洁工作室', address: '广西壮族自治区南宁市良庆区青山路鼎际', avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=LX&backgroundColor=dcfce7', totalWater: 0, todayWater: 0, status: 0, createdAt: '2026-03-23 14:30:22', machines: ['10AAU6P03718ABCD1122'] },
+      { id: 708, account: '13768392003', contact: '陈于圆', yuanqiId: '2022CP19550', huaxiaNo: '104A5KP03709YJZSQQEGQ', name: '贵港市闽洁工作室', address: '广西壮族自治区贵港市港北区荷城街道迎宾建材', avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=CY&backgroundColor=fef9c3', totalWater: 0, todayWater: 0, status: 0, createdAt: '2026-03-23 14:05:58', machines: ['10AAU6P03719EFGH3344'] }
+    ];
+
+    function toggleMenu(el) {
+      const arrow = el.querySelector('.group-arrow');
+      const submenu = el.nextElementSibling;
+      if (!submenu || !submenu.classList.contains('submenu')) return;
+      submenu.classList.toggle('open');
+      arrow.classList.toggle('open');
+    }
+
+    function toast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 1800);
+    }
+
+    function statusTag(status) {
+      if (status === 1) return '<span class="status-tag status-on">已认证</span>';
+      return '<span class="status-tag status-pending">待审核</span>';
+    }
+
+    function drawPlaceholderQR(canvas, machineCode) {
+      const ctx = canvas.getContext('2d');
+      const size = 200;
+      canvas.width = size;
+      canvas.height = size + 24;
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, size, size + 24);
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(4, 4, size - 8, size - 8);
+      // 三个定位角
+      ctx.fillStyle = '#000';
+      ctx.fillRect(16, 16, 44, 44);
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(24, 24, 28, 28);
+      ctx.fillStyle = '#000';
+      ctx.fillRect(32, 32, 12, 12);
+
+      ctx.fillStyle = '#000';
+      ctx.fillRect(size - 60, 16, 44, 44);
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(size - 52, 24, 28, 28);
+      ctx.fillStyle = '#000';
+      ctx.fillRect(size - 44, 32, 12, 12);
+
+      ctx.fillStyle = '#000';
+      ctx.fillRect(16, size - 60, 44, 44);
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(24, size - 52, 28, 28);
+      ctx.fillStyle = '#000';
+      ctx.fillRect(32, size - 44, 12, 12);
+
+      // 随机黑块模拟数据
+      let seed = 0;
+      for (let c of machineCode) seed += c.charCodeAt(0);
+      const rng = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+      for (let y = 72; y < size - 72; y += 8) {
+        for (let x = 72; x < size - 72; x += 8) {
+          if (rng() > 0.5) ctx.fillRect(x, y, 7, 7);
+        }
+      }
+      ctx.fillStyle = '#333';
+      ctx.font = '12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(machineCode, size / 2, size + 16);
+    }
+
+    function downloadQR(stationName, machines) {
+      if (!machines || machines.length === 0) {
+        toast('该工作站暂无绑定水机');
+        return;
+      }
+      machines.forEach((code, idx) => {
+        const canvas = document.createElement('canvas');
+        drawPlaceholderQR(canvas, code);
+        const filename = `${stationName}-${code}.png`;
+        canvas.toBlob(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          setTimeout(() => {
+            a.click();
+            URL.revokeObjectURL(url);
+          }, idx * 200);
+        }, 'image/png');
+      });
+      toast(`已下载 ${machines.length} 个水机二维码`);
+    }
+
+    function renderList(data) {
+      const body = document.getElementById('listBody');
+      body.innerHTML = '';
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.id}</td>
+          <td>${row.account}</td>
+          <td>${row.contact}</td>
+          <td>${row.yuanqiId}</td>
+          <td class="mono">${row.huaxiaNo}</td>
+          <td>
+            <div class="station-info">
+              <img class="station-avatar" src="${row.avatar}" alt="">
+              <span class="station-name">${row.name}</span>
+            </div>
+          </td>
+          <td>${row.address}</td>
+          <td>${row.totalWater}</td>
+          <td>${row.todayWater}</td>
+          <td>${statusTag(row.status)}</td>
+          <td>${row.createdAt}</td>
+          <td>
+            <div class="op-btns">
+              <button class="btn btn-link" onclick="toast('查看工作站 ${row.id}')">查看</button>
+              <button class="btn btn-link" onclick="toast('编辑工作站 ${row.id}')">编辑</button>
+              <button class="btn btn-link" onclick="toast('修改水机账号 ${row.id}')">修改水机账号</button>
+              <button class="btn btn-link danger" onclick="toast('拉黑工作站 ${row.id}')">拉黑</button>
+              <button class="btn btn-link danger" onclick="toast('驳回工作站 ${row.id}')">驳回</button>
+              <button class="btn btn-link" onclick="toast('水机预约记录 ${row.id}')">水机预约记录</button>
+              <button class="btn btn-link" onclick="downloadQR('${row.name}', ${JSON.stringify(row.machines).replace(/"/g, '&quot;')})">下载二维码</button>
+            </div>
+          </td>
+        `;
+        body.appendChild(tr);
+      });
+      document.getElementById('totalCount').textContent = '共 ' + data.length + ' 条';
+    }
+
+    function searchList() {
+      const name = document.getElementById('qName').value.trim();
+      const account = document.getElementById('qAccount').value.trim();
+      const contact = document.getElementById('qContact').value.trim();
+      const status = document.getElementById('qStatus').value;
+      let filtered = sampleList;
+      if (name) filtered = filtered.filter(r => r.name.includes(name));
+      if (account) filtered = filtered.filter(r => r.account.includes(account));
+      if (contact) filtered = filtered.filter(r => r.contact.includes(contact));
+      if (status !== '') filtered = filtered.filter(r => String(r.status) === status);
+      renderList(filtered);
+    }
+
+    function resetSearch() {
+      document.getElementById('qName').value = '';
+      document.getElementById('qAccount').value = '';
+      document.getElementById('qContact').value = '';
+      document.getElementById('qStatus').value = '';
+      document.getElementById('qSort').selectedIndex = 0;
+      renderList(sampleList);
+    }
+
+    renderList(sampleList);
+  </script>
+</body>
+</html>
