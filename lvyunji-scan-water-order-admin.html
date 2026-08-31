@@ -72,6 +72,9 @@
     .form-item { display: flex; flex-direction: column; gap: 6px; }
     .form-label { font-size: 13px; color: var(--text-sub); }
     .form-input, .form-select { height: 32px; border: 1px solid var(--border); border-radius: 4px; padding: 0 12px; font-size: 13px; min-width: 160px; outline: none; }
+    .date-range { display: flex; align-items: center; gap: 8px; }
+    .date-range .form-input { min-width: 130px; }
+    .date-sep { color: var(--text-sub); font-size: 13px; }
     .form-input:focus, .form-select:focus { border-color: var(--primary); }
     .btn { height: 32px; padding: 0 16px; border-radius: 4px; font-size: 13px; cursor: pointer; border: none; outline: none; display: inline-flex; align-items: center; justify-content: center; }
     .btn-primary { background: var(--primary); color: #fff; }
@@ -221,7 +224,11 @@
                 </div>
                 <div class="form-item">
                   <label class="form-label">取水时间</label>
-                  <input class="form-input" type="date" id="qStart"> ~ <input class="form-input" type="date" id="qEnd" style="margin-left:6px;">
+                  <div class="date-range">
+                    <input class="form-input" type="date" id="qStart">
+                    <span class="date-sep">~</span>
+                    <input class="form-input" type="date" id="qEnd">
+                  </div>
                 </div>
                 <div class="form-item">
                   <label class="form-label">状态</label>
@@ -265,9 +272,11 @@
                 <button class="page-btn disabled">&lt;</button>
                 <button class="page-btn active">1</button>
                 <button class="page-btn disabled">&gt;</button>
-                <span>前往</span>
-                <input type="text" value="1">
-                <span>页</span>
+                <div class="page-jump">
+                  <span>前往</span>
+                  <input type="text" value="1">
+                  <span>页</span>
+                </div>
               </div>
             </div>
           </div>
