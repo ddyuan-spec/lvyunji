@@ -256,7 +256,6 @@
                       <th>水站</th>
                       <th>设备编码</th>
                       <th>取水袋数</th>
-                      <th>机主收益(元)</th>
                       <th>取水时间</th>
                       <th>状态</th>
                       <th>操作</th>
@@ -324,15 +323,6 @@
                   <div class="detail-item"><span class="detail-label">绿韵家水站ID</span><span class="detail-value mono" id="dStationId">-</span></div>
                   <div class="detail-item"><span class="detail-label">元气商户号 customer_id</span><span class="detail-value mono" id="dCustomerId">-</span></div>
                   <div class="detail-item"><span class="detail-label">设备编码 machine_code</span><span class="detail-value mono" id="dMachine">-</span></div>
-                  <div class="detail-item"><span class="detail-label">机主 / 收益归属</span><span class="detail-value" id="dOwner">-</span></div>
-                </div>
-              </div>
-
-              <div class="detail-section">
-                <div class="detail-section-title">机主收益</div>
-                <div class="detail-grid">
-                  <div class="detail-item"><span class="detail-label">本次收益（含待发）</span><span class="detail-value" id="dIncome">-</span></div>
-                  <div class="detail-item"><span class="detail-label">收益结算状态</span><span class="detail-value" id="dIncomeStatus">-</span></div>
                 </div>
               </div>
 
@@ -402,7 +392,6 @@
           <td>${row.station}</td>
           <td class="mono">${row.machine}</td>
           <td>${row.bags} 袋</td>
-          <td>${(row.bags * 0.5).toFixed(2)}</td>
           <td>${row.time}</td>
           <td>${statusTag(row.status)}</td>
           <td><div class="op-btns"><button class="btn btn-link" onclick="viewDetail('${row.orderNo}')">查看</button></div></td>
@@ -454,11 +443,6 @@
       document.getElementById('dStationId').textContent = row.stationId;
       document.getElementById('dCustomerId').textContent = row.customerId;
       document.getElementById('dMachine').textContent = row.machine;
-      document.getElementById('dOwner').textContent = row.station + '（机主）';
-      document.getElementById('dIncome').textContent = '¥ ' + (row.bags * 0.5).toFixed(2);
-      document.getElementById('dIncomeStatus').innerHTML = row.status === 1
-        ? '<span class="status-tag status-pending">待发</span>'
-        : '<span class="status-tag status-off">不计入</span>';
       document.getElementById('dKey').textContent = row.key;
       document.getElementById('dBalanceName').textContent = row.balanceName;
       document.getElementById('dCallback').textContent = row.callback;
