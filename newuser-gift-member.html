@@ -168,6 +168,8 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 .fab-newcode{position:absolute;right:14px;bottom:74px;width:54px;height:54px;border-radius:50%;background:var(--c-primary);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px rgba(26,173,124,.4);font-size:11px;font-weight:600;line-height:1.1;z-index:10;border:none}
 .fab-newcode .em{font-size:18px;font-weight:700;margin-bottom:2px}
 .fab-newcode:active{transform:scale(.95)}
+.copy-src-btn{position:absolute;left:14px;bottom:70px;z-index:30;padding:6px 12px;border-radius:16px;background:rgba(0,0,0,.55);color:#fff;font-size:12px;line-height:1;border:none;cursor:pointer;font-family:inherit}
+.copy-src-btn:active{background:rgba(0,0,0,.78)}
 
 .toast{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s}
 .toast.active{opacity:1}
@@ -330,6 +332,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
     <div style="height:140px"></div>
 
     <button class="fab-newcode" id="fab_buy_more"><div class="em">+</div>购买激活码</button>
+    <button class="copy-src-btn" id="btn_copy_source">复制源码</button>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -436,6 +439,27 @@ document.getElementById('qty_minus').onclick = function(){ qtyChange(-1); };
 document.getElementById('qty_plus').onclick = function(){ qtyChange(1); };
 qtyChange(0);
 renderCodes();
+
+/* ========== 复制源码到墨刀 ========== */
+function copySource(){
+  var t = '';
+  try { t = document.documentElement.outerHTML; } catch(e){ t = ''; }
+  var ok = false;
+  try {
+    var ta = document.createElement('textarea');
+    ta.value = t;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-9999px';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+  } catch(e) { ok = false; }
+  toast(ok ? '源码已复制，去墨刀粘贴即可' : '复制失败，请手动复制源码');
+}
+document.getElementById('btn_copy_source').onclick = copySource;
 </script>
 </body>
 </html>
