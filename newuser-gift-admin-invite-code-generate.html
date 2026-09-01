@@ -75,8 +75,6 @@ html,body{height:100%;font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans
 
 .tag{display:inline-block;padding:2px 8px;border-radius:3px;font-size:11px;line-height:16px}
 .tag.src-system{background:#f0f2f5;color:var(--text-2);border:1px solid var(--line-strong)}
-
-.toast{position:fixed;left:50%;top:70px;transform:translateX(-50%);background:rgba(46,51,56,.92);color:#fff;padding:10px 18px;border-radius:4px;font-size:13px;z-index:99;display:none}
 </style>
 </head>
 <body>
@@ -158,8 +156,6 @@ html,body{height:100%;font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
-
 <script>
 function step(d){
   var el = document.getElementById('gen_count');
@@ -170,13 +166,8 @@ function goBack(){ history.back(); }
 function submitGen(){
   var n = parseInt(document.getElementById('gen_count').value,10) || 1;
   var remark = document.getElementById('gen_remark').value.trim();
-  // 原型演示：实际写库逻辑由后端实现，这里仅提示生成结果
-  showToast('已生成 ' + n + ' 个系统邀请码' + (remark ? '（备注：' + remark + '）' : '') + '，可在邀请码管理列表查看');
-}
-function showToast(msg){
-  var t = document.getElementById('toast');
-  t.textContent = msg; t.style.display = 'block';
-  setTimeout(function(){ t.style.display = 'none'; }, 2600);
+  // 原型演示：实际写库逻辑由后端实现；提交后直接跳转到列表页查看
+  window.location.href = 'admin-invite-codes.html?generated=' + n + (remark ? '&remark=' + encodeURI(remark) : '');
 }
 </script>
 </body>
