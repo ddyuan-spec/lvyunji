@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>绿韵家 AI 创作原型 V0.5（积分体系）</title>
+  <style>
+    :root {
+      --primary: #4CAF50;
+      --primary-light: #E8F5E9;
+      --primary-dark: #388E3C;
+      --blue: #2196F3;
+      --blue-light: #E3F2FD;
+      --orange: #FF9800;
+      --orange-light: #FFF3E0;
+      --purple: #9C27B0;
+      --purple-light: #F3E5F5;
+      --red: #F44336;
+      --red-light: #FFEBEE;
+      --text: #1a1a1a;
+      --text-secondary: #666666;
+      --text-tertiary: #999999;
+      --border: #eeeeee;
+      --border-light: #f0f0f0;
+      --card-bg: #ffffff;
+      --bg: #f7f8fa;
+      --mask: rgba(0,0,0,0.5);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; background: #e5e5e5; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+    .phone { width: 375px; min-height: 812px; background: var(--bg); position: relative; overflow: hidden; border-radius: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); margin: 20px 0; }
+
+    /* 页面容器 */
+    .page { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: none; overflow: hidden; background: var(--bg); }
+    .page.active { display: block; }
+    .scroll-view { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+    .has-nav .scroll-view { top: 44px; }
+    .has-bottom .scroll-view { bottom: 72px; }
+    .has-nav.has-bottom .scroll-view { top: 44px; bottom: 72px; }
+
+    /* 导航栏 */
+    .nav-bar { height: 44px; background: #fff; display: flex; align-items: center; justify-content: center; position: absolute; top: 0; left: 0; right: 0; z-index: 99; font-size: 17px; font-weight: 600; color: var(--text); border-bottom: 1px solid var(--border); }
+    .nav-bar .back { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--text); cursor: pointer; position: absolute; left: 0; }
+    .nav-bar .right { position: absolute; right: 12px; font-size: 14px; color: var(--text-secondary); cursor: pointer; }
+
+    /* Toast */
+    #toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.75); color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 14px; display: none; z-index: 999; white-space: nowrap; }
+    #toast.active { display: block; }
+
+    /* 通用组件 */
+    .card { background: var(--card-bg); border-radius: 16px; margin: 0 12px 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    .section-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+    .section-title .more { font-size: 13px; color: var(--text-tertiary); font-weight: 400; cursor: pointer; }
+
+    .option-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .option { padding: 8px 14px; border-radius: 8px; background: #f5f5f5; color: var(--text-secondary); font-size: 14px; cursor: pointer; border: 1px solid transparent; }
+    .option.active { background: var(--primary-light); color: var(--primary); border-color: var(--primary); font-weight: 600; }
+    .option.pay { position: relative; }
+    .option.pay::after { content: '付费'; position: absolute; top: -6px; right: -6px; background: var(--red); color: #fff; font-size: 9px; padding: 1px 4px; border-radius: 6px; }
+
+    .ratio-options { display: flex; gap: 14px; flex-wrap: wrap; }
+    .ratio { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
+    .ratio-box { width: 46px; height: 62px; border: 2px solid #e0e0e0; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: #fff; }
+    .ratio-box.sq { width: 46px; height: 46px; }
+    .ratio-box.land { width: 62px; height: 46px; }
+    .ratio.active .ratio-box { border-color: var(--primary); background: var(--primary-light); }
+    .ratio .r-label { font-size: 12px; color: var(--text-secondary); }
+    .ratio.active .r-label { color: var(--primary); font-weight: 600; }
+
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag { padding: 6px 12px; border-radius: 16px; background: #f5f5f5; color: var(--text-secondary); font-size: 13px; cursor: pointer; }
+    .tag.active { background: var(--primary-light); color: var(--primary); }
+
+    .input-area { background: #fff; border-radius: 16px; padding: 12px; margin: 0 12px 12px; border: 1px solid var(--border); }
+    .input-hint { font-size: 13px; color: var(--text-tertiary); margin-bottom: 10px; }
+    .input-row { display: flex; align-items: center; gap: 8px; }
+    .model-select { display: flex; align-items: center; gap: 4px; padding: 6px 10px; background: #f5f5f5; border-radius: 14px; font-size: 13px; color: var(--text); cursor: pointer; }
+    .model-select .arrow { font-size: 10px; color: var(--text-tertiary); }
+    .mode-select { display: flex; align-items: center; gap: 4px; padding: 6px 10px; background: #f5f5f5; border-radius: 14px; font-size: 13px; color: var(--text); cursor: pointer; }
+    .voice-btn { width: 32px; height: 32px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .prompt-input { flex: 1; border: none; outline: none; font-size: 14px; color: var(--text); background: transparent; }
+    .prompt-input::placeholder { color: var(--text-tertiary); }
+
+    .quota-hint { text-align: center; font-size: 12px; color: var(--text-tertiary); margin: 8px 0 14px; }
+    .quota-hint .link { color: var(--blue); cursor: pointer; }
+
+    .btn-primary { width: calc(100% - 24px); height: 48px; margin: 0 12px 16px; background: var(--primary); color: #fff; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; cursor: pointer; }
+    .btn-primary:disabled { background: #c8e6c9; }
+    .btn-primary .icon { margin-right: 6px; }
+
+    /* 上传区 */
+    .upload-zone { width: 180px; height: 240px; margin: 16px auto; border: 1px dashed #ddd; border-radius: 16px; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
+    .upload-zone .plus { font-size: 40px; color: var(--text-tertiary); }
+    .upload-zone .tip { font-size: 13px; color: var(--text-tertiary); }
+    .upload-zone.preview { border-style: solid; border-color: var(--border); }
+    .upload-zone.preview .preview-img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; }
+
+    /* AI 首页 */
+    .ai-header { padding: 16px; display: flex; align-items: center; justify-content: space-between; }
+    .ai-header .title { font-size: 22px; font-weight: 700; color: var(--text); }
+    .ai-header .quota { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); background: #fff; padding: 6px 12px; border-radius: 16px; }
+    .ai-tabs { display: flex; gap: 10px; padding: 0 12px 12px; }
+    .ai-tab { flex: 1; height: 90px; background: var(--card-bg); border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    .ai-tab .t-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+    .ai-tab .t-name { font-size: 14px; font-weight: 600; color: var(--text); }
+
+    /* 作品卡片 */
+    .work-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 12px 12px; }
+    .work-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; cursor: pointer; }
+    .work-card .w-thumb { width: 100%; aspect-ratio: 3/4; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 40px; position: relative; }
+    .work-card .w-thumb .used { position: absolute; bottom: 6px; left: 6px; background: rgba(0,0,0,0.5); color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 8px; }
+    .work-card .w-info { padding: 10px; }
+    .work-card .w-title { font-size: 13px; color: var(--text); line-height: 1.4; height: 36px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .work-card .w-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; font-size: 12px; color: var(--text-tertiary); }
+
+    /* 广场页 Tab */
+    .square-tabs { display: flex; gap: 16px; padding: 0 16px; border-bottom: 1px solid var(--border); background: #fff; }
+    .square-tab { height: 44px; display: flex; align-items: center; font-size: 14px; color: var(--text-secondary); cursor: pointer; position: relative; }
+    .square-tab.active { color: var(--text); font-weight: 600; }
+    .square-tab.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 20px; height: 3px; background: var(--primary); border-radius: 2px; }
+
+    /* 底部操作栏 */
+    .bottom-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 72px; background: #fff; border-top: 1px solid var(--border); padding: 10px 12px; z-index: 98; display: flex; align-items: center; }
+    .bottom-bar .cost { flex: 1; font-size: 13px; color: var(--text-secondary); }
+    .bottom-bar .cost b { color: var(--text); font-weight: 600; }
+    .bottom-bar .gen-btn { width: 120px; height: 44px; background: var(--primary); color: #fff; border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; cursor: pointer; }
+
+    /* 弹窗 */
+    .modal { position: fixed; inset: 0; background: var(--mask); z-index: 500; display: none; align-items: flex-end; }
+    .modal.active { display: flex; }
+    .modal-panel { width: 100%; background: #fff; border-radius: 20px 20px 0 0; padding: 16px; max-height: 80%; overflow-y: auto; }
+    .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .modal-title { font-size: 17px; font-weight: 700; color: var(--text); }
+    .modal-close { font-size: 24px; color: var(--text-tertiary); cursor: pointer; }
+    .model-item { display: flex; gap: 12px; padding: 14px; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px; cursor: pointer; }
+    .model-item.active { border-color: var(--primary); background: var(--primary-light); }
+    .model-item .m-name { font-size: 15px; font-weight: 600; color: var(--text); }
+    .model-item .m-desc { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+    .model-item .m-tag { font-size: 10px; color: var(--red); background: var(--red-light); padding: 2px 6px; border-radius: 8px; margin-left: 6px; }
+    .modal-backdrop { position: absolute; inset: 0; }
+
+    /* 结果页 */
+    .result-area { padding: 20px; display: flex; flex-direction: column; align-items: center; }
+    .result-img { width: 220px; height: 220px; border-radius: 16px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 80px; margin-bottom: 16px; }
+    .result-video { width: 220px; height: 390px; border-radius: 16px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 80px; margin-bottom: 16px; }
+    .result-actions { display: flex; gap: 12px; }
+    .result-actions .act { padding: 8px 18px; border-radius: 18px; background: #f5f5f5; color: var(--text); font-size: 14px; cursor: pointer; }
+
+    /* 历史记录 */
+    .history-list { padding: 0 12px; }
+    .history-item { display: flex; gap: 12px; background: #fff; border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+    .history-item .h-thumb { width: 70px; height: 70px; border-radius: 10px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 30px; flex-shrink: 0; }
+    .history-item .h-info { flex: 1; }
+    .history-item .h-prompt { font-size: 13px; color: var(--text); line-height: 1.4; margin-bottom: 6px; }
+    .history-item .h-meta { font-size: 11px; color: var(--text-tertiary); }
+
+    /* 标签输入 */
+    .tag-group { margin-bottom: 14px; }
+    .tag-group-title { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
+
+    /* 快速体验 */
+    .quick-card { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; background: #fff; padding: 6px 12px; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; z-index: 10; }
+    .quick-card img { width: 28px; height: 28px; border-radius: 50%; background: #f0f0f0; }
+    .quick-card span { font-size: 13px; color: var(--text); }
+
+    /* 生成中 */
+    .generating { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; }
+    .generating.active { display: flex; }
+    .spinner { width: 48px; height: 48px; border: 4px solid var(--primary-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .generating .g-text { margin-top: 16px; font-size: 14px; color: var(--text-secondary); }
+
+    /* 详情页 */
+    .detail-thumb { width: 100%; aspect-ratio: 3/4; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 80px; }
+    .detail-info { padding: 16px; }
+    .detail-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .detail-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; }
+    .detail-btns { display: flex; gap: 12px; }
+    .detail-btns .db { flex: 1; height: 44px; border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 15px; cursor: pointer; }
+    .detail-btns .db.primary { background: var(--primary); color: #fff; }
+    .detail-btns .db.secondary { background: #f5f5f5; color: var(--text); }
+
+    /* 创建 CTA 卡片（我的作品页顶部） */
+    .create-cta { display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg, #f8f9ff 0%, #fff5e6 100%); border-radius: 14px; padding: 16px; margin: 12px 12px 0; cursor: pointer; border: 1px solid #eee; }
+    .create-cta .cc-icon { font-size: 28px; flex-shrink: 0; }
+    .create-cta .cc-text { flex: 1; min-width: 0; }
+    .create-cta .cc-title { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.3; }
+    .create-cta .cc-sub { font-size: 12px; color: var(--text-secondary); margin-top: 3px; line-height: 1.3; }
+    .create-cta .cc-btn { background: var(--primary); color: #fff; font-size: 13px; font-weight: 600; padding: 7px 16px; border-radius: 18px; white-space: nowrap; flex-shrink: 0; }
+
+    /* 比例分段选择器 */
+    .ratio-seg { display: flex; background: #f0f0f0; border-radius: 10px; padding: 3px; flex-shrink: 0; }
+    .ratio-opt { padding: 6px 14px; border-radius: 7px; font-size: 13px; color: var(--text-secondary); cursor: pointer; text-align: center; transition: all .15s; }
+    .ratio-opt.active { background: #fff; color: var(--text); font-weight: 600; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+    /* 空状态 */
+    .empty-state { text-align: center; padding: 44px 0; color: #999; }
+  </style>
+</head>
+<body>
+<div class="phone">
+  <div id="toast"></div>
+
+  <!-- ================== AI 创作首页 ================== -->
+  <!-- ================== AI 生图页 ================== -->
+  <div class="page has-nav has-bottom" id="pageImageGen">
+    <div class="nav-bar">
+      <div class="back" onclick="goBack()">‹</div>
+      <div>AI 生图</div>
+    </div>
+    <div class="scroll-view">
+      <div class="upload-zone" id="imgUploadZone" onclick="uploadImage()">
+        <div class="plus">+</div>
+        <div class="tip">导入图片</div>
+      </div>
+
+      <div class="input-area">
+        <div class="input-hint">支持一句话改图，或输入文字生图</div>
+        <div class="input-row">
+          <textarea class="prompt-input" id="imgPrompt" style="width:100%;min-height:70px;margin-top:10px;resize:none;border:none;outline:none;font-size:14px;" placeholder="描述你想要的画面"></textarea>
+        </div>
+      </div>
+
+      <div class="quota-hint">本次生成将消耗 <b id="costPerImageHint">1</b> 个积分</div>
+
+      <div class="card">
+        <div class="section-title">辅助提示词</div>
+        <div class="tag-group">
+          <div class="tag-group-title">风格</div>
+          <div class="tag-list">
+            <span class="tag" data-group="style" onclick="toggleTag(this)">写实照片</span>
+            <span class="tag" data-group="style" onclick="toggleTag(this)">动漫插画</span>
+            <span class="tag" data-group="style" onclick="toggleTag(this)">水彩手绘</span>
+            <span class="tag" data-group="style" onclick="toggleTag(this)">蜡笔涂鸦</span>
+            <span class="tag" data-group="style" onclick="toggleTag(this)">国风山水</span>
+          </div>
+        </div>
+        <div class="tag-group">
+          <div class="tag-group-title">场景</div>
+          <div class="tag-list">
+            <span class="tag" data-group="scene" onclick="toggleTag(this)">室内居家</span>
+            <span class="tag" data-group="scene" onclick="toggleTag(this)">城市街景</span>
+            <span class="tag" data-group="scene" onclick="toggleTag(this)">自然风光</span>
+            <span class="tag" data-group="scene" onclick="toggleTag(this)">梦幻星空</span>
+          </div>
+        </div>
+        <div class="tag-group">
+          <div class="tag-group-title">光线 / 氛围</div>
+          <div class="tag-list">
+            <span class="tag" data-group="light" onclick="toggleTag(this)">柔光</span>
+            <span class="tag" data-group="light" onclick="toggleTag(this)">逆光</span>
+            <span class="tag" data-group="light" onclick="toggleTag(this)">暖色调</span>
+            <span class="tag" data-group="light" onclick="toggleTag(this)">电影感</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-bar">
+      <div class="cost">预计消耗 <b id="costPerImageBottom">1</b> 积分</div>
+      <div class="gen-btn" onclick="generate('image')">立即生成</div>
+    </div>
+  </div>
+
+  <!-- ================== AI 生视频页 ================== -->
+  <!-- 已删除：AI 生视频页（评审精简：仅保留我的作品 + AI 生图） -->
+  <!-- 已删除：创作广场页（评审精简） -->
+
+  <!-- ================== 作品详情 / 做同款 ================== -->
+  <div class="page has-nav" id="pageWorkDetail">
+    <div class="nav-bar">
+      <div class="back" onclick="goBack()">‹</div>
+      <div>作品详情</div>
+    </div>
+    <div class="scroll-view">
+      <div class="detail-thumb" id="workDetailThumb">🌸</div>
+      <div class="detail-info">
+        <div class="detail-title" id="workDetailTitle">AI可爱风蜡笔涂鸦</div>
+        <div class="detail-desc" id="workDetailDesc">一位穿着校服的可爱女孩站在走廊里，周围环绕着彩色糖果、爱心和星星贴纸，画面采用蜡笔涂鸦风格，色彩柔和温馨。</div>
+        <div class="tag-list" style="margin-bottom:16px;">
+          <span class="tag">蜡笔涂鸦</span>
+          <span class="tag">可爱女孩</span>
+          <span class="tag">校园</span>
+        </div>
+        <div class="detail-btns">
+          <div class="db secondary" onclick="toast('已保存到相册')">⬇️ 保存到相册</div>
+          <div class="db secondary" onclick="openShare()">↗️ 分享</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== 历史记录 / 我的作品 ================== -->
+  <div class="page has-nav active" id="pageHistory">
+    <div class="nav-bar">
+      <div class="back" onclick="goBack()">‹</div>
+      <div>我的作品</div>
+      <div></div>
+    </div>
+    <div class="scroll-view">
+      <div class="create-cta" onclick="go('pageImageGen')">
+        <div class="cc-icon">✨</div>
+        <div class="cc-text">
+          <div class="cc-title">开始你的 AI 创作</div>
+          <div class="cc-sub">一句话 / 一张图，生成专属 AI 作品</div>
+        </div>
+        <div class="cc-btn">立即创作</div>
+      </div>
+
+      <div class="empty-state" id="historyEmpty" style="display:none;text-align:center;padding:44px 0;color:#999;">
+        <div style="font-size:52px;margin-bottom:12px;">🖼️</div>
+        <div style="font-size:15px;color:#666;margin-bottom:6px;">还没有作品</div>
+        <div style="font-size:13px;margin-bottom:18px;">点击「立即创作」生成你的第一幅 AI 作品吧</div>
+        <div class="gen-btn" style="display:inline-flex;padding:0 28px;" onclick="go('pageImageGen')">立即创作</div>
+      </div>
+
+      <!-- 新人礼包营销入口 -->
+      <div id="newcomerGift" style="margin:14px 0;border-radius:12px;background:linear-gradient(135deg,#FFF7E6 0%,#FFE7BA 100%);padding:14px 16px;display:flex;align-items:center;gap:12px;">
+        <div style="font-size:36px;flex-shrink:0;">🎁</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:15px;font-weight:600;color:#B0780C;margin-bottom:2px;">新人首单 · 买 100 送 100</div>
+          <div style="font-size:12px;color:#A07808;line-height:1.5;">首次购买积分，实付多少送多少，仅限一次</div>
+        </div>
+        <div class="gen-btn" style="flex-shrink:0;padding:0 16px;font-size:13px;background:var(--primary);color:#fff;" onclick="go('pageQuotaBuy')">立即充值</div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">积分账户</div>
+        <div style="display:flex;justify-content:space-around;text-align:center;">
+          <div>
+            <div style="font-size:26px;font-weight:700;color:var(--text);" class="js-quota">12</div>
+            <div style="font-size:12px;color:var(--text-tertiary);">剩余积分</div>
+          </div>
+          <div>
+            <div style="font-size:26px;font-weight:700;color:var(--text);">36</div>
+            <div style="font-size:12px;color:var(--text-tertiary);">本月已用</div>
+          </div>
+          <div>
+            <div style="font-size:26px;font-weight:700;color:var(--text);">8</div>
+            <div style="font-size:12px;color:var(--text-tertiary);">我的作品</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:14px;">
+          <div class="db primary" style="flex:1;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:var(--primary);color:#fff;font-size:14px;cursor:pointer;" onclick="go('pageQuotaBuy')">购买积分</div>
+          <div class="db secondary" style="flex:1;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:#f5f5f5;color:var(--text);font-size:14px;cursor:pointer;" onclick="go('pageQuotaDetail')">积分明细</div>
+        </div>
+      </div>
+
+      <div class="card" id="historyCard">
+        <div class="section-title">生成记录</div>
+        <div class="history-list" id="historyList">
+          <div class="history-item" onclick="goWorkDetail('image')">
+            <div class="h-thumb">🌸</div>
+            <div class="h-info">
+              <div class="h-prompt">AI可爱风蜡笔涂鸦，校服女孩，糖果贴纸</div>
+              <div class="h-meta">🎨 生图 · 9:16 · 2026-08-18 14:32</div>
+            </div>
+          </div>
+          <div class="history-item" onclick="goWorkDetail('image')">
+            <div class="h-thumb">🌅</div>
+            <div class="h-info">
+              <div class="h-prompt">日落街道，男生伸手，电影感逆光</div>
+              <div class="h-meta">🎨 生图 · 9:16 · 2026-08-17 09:45</div>
+            </div>
+          </div>
+          <div class="history-item" onclick="goWorkDetail('image')">
+            <div class="h-thumb">🐱</div>
+            <div class="h-info">
+              <div class="h-prompt">治愈系猫咪，窗台晒太阳，柔光</div>
+              <div class="h-meta">🎨 生图 · 16:9 · 2026-08-16 20:10</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== 购买积分页 ================== -->
+  <div class="page has-nav has-bottom" id="pageQuotaBuy">
+    <div class="nav-bar">
+      <div class="back" onclick="goBack()">‹</div>
+      <div>购买积分</div>
+    </div>
+    <div class="scroll-view">
+      <div class="card" style="text-align:center;background:linear-gradient(135deg,#E8F5E9,#fff);">
+        <div style="font-size:13px;color:var(--text-tertiary);">当前剩余积分</div>
+        <div style="font-size:40px;font-weight:700;color:var(--primary);margin:4px 0;" class="js-quota">12</div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">选择套餐</div>
+        <div id="quotaPackList"></div>
+      </div>
+    </div>
+    <div class="bottom-bar">
+      <div class="cost">合计 <b id="quotaBuyPrice">¥29.9</b></div>
+      <div class="gen-btn" onclick="openOrder()">立即购买</div>
+    </div>
+  </div>
+
+  <!-- ================== 订单确认页 ================== -->
+  <div class="page has-nav" id="pageQuotaOrder">
+    <div class="nav-bar">
+      <div class="back" onclick="goBack()">‹</div>
+      <div>确认订单</div>
+    </div>
+    <div class="scroll-view">
+      <div class="card">
+        <div class="section-title">商品信息</div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;">
+          <span style="color:var(--text-secondary);font-size:14px;">商品</span>
+          <span style="font-size:14px;font-weight:600;" id="orderPackName">100 积分</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;">
+          <span style="color:var(--text-secondary);font-size:14px;">单价</span>
+          <span style="font-size:14px;" id="orderUnitPrice">¥0.10/积分</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;">
+          <span style="color:var(--text-secondary);font-size:14px;">数量</span>
+          <span style="font-size:14px;" id="orderQty">100 积分</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px 0 0;border-top:1px solid var(--border-light);margin-top:4px;">
+          <span style="color:var(--text-secondary);font-size:14px;">应付金额</span>
+          <span style="font-size:18px;font-weight:700;color:var(--red);" id="orderPay">¥10.0</span>
+        </div>
+      </div>
+
+      <div class="card" id="orderBonus" style="background:linear-gradient(135deg,#FFF7E6,#FFE7BA);">
+        <div style="font-size:14px;font-weight:600;color:#B0780C;margin-bottom:4px;">🎁 新人首单优惠</div>
+        <div style="font-size:13px;color:#A07808;line-height:1.5;" id="orderBonusText">额外赠送 100 积分，实到账 200 积分（仅限一次）</div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">支付方式</div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;">
+          <div style="width:18px;height:18px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;">✓</div>
+          <span style="font-size:14px;flex:1;">绿韵钱包（余额 ¥0.00）</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--text-tertiary);">
+          <div style="width:18px;height:18px;border-radius:50%;border:2px solid #ddd;"></div>
+          <span style="font-size:14px;flex:1;">微信支付</span>
+        </div>
+      </div>
+
+      <div style="margin:4px 12px 12px;font-size:12px;color:var(--red);line-height:1.5;">
+        ⚠️ 积分一经购买到账，不支持退款，请确认后提交订单。
+      </div>
+    </div>
+    <div class="bottom-bar">
+      <div class="cost">应付 <b id="orderPayBtnText">¥10.0</b></div>
+      <div class="gen-btn" onclick="completePurchase()">提交订单</div>
+    </div>
+  </div>
+
+  <!-- ================== 积分明细页 ================== -->
+  <div class="page has-nav" id="pageQuotaDetail">
+    <div class="nav-bar">
+      <div class="back" onclick="goBack()">‹</div>
+      <div>积分明细</div>
+      <div class="right" onclick="go('pageQuotaBuy')">充值</div>
+    </div>
+    <div class="scroll-view" style="top:44px;">
+      <div class="card" style="margin-top:12px;">
+        <div class="section-title">积分账户</div>
+        <div style="display:flex;justify-content:space-around;text-align:center;">
+          <div>
+            <div style="font-size:24px;font-weight:700;color:var(--primary);" class="js-quota">12</div>
+            <div style="font-size:12px;color:var(--text-tertiary);">剩余积分</div>
+          </div>
+          <div>
+            <div style="font-size:24px;font-weight:700;color:var(--text);">36</div>
+            <div style="font-size:12px;color:var(--text-tertiary);">本月已用</div>
+          </div>
+          <div>
+            <div style="font-size:24px;font-weight:700;color:var(--blue);">88</div>
+            <div style="font-size:12px;color:var(--text-tertiary);">累计充值</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="square-tabs" style="position:sticky;top:0;">
+        <div class="square-tab active" data-qtab="all" onclick="switchQuotaTab(this,'all')">全部</div>
+        <div class="square-tab" data-qtab="consume" onclick="switchQuotaTab(this,'consume')">消耗</div>
+        <div class="square-tab" data-qtab="recharge" onclick="switchQuotaTab(this,'recharge')">充值</div>
+        <div class="square-tab" data-qtab="gift" onclick="switchQuotaTab(this,'gift')">赠送</div>
+      </div>
+
+      <div class="history-list" style="margin-top:8px;" id="quotaDetailList">
+        <div class="history-item" data-type="consume">
+          <div class="h-thumb" style="background:#FFEBEE;">🎨</div>
+          <div class="h-info">
+            <div class="h-prompt">生成图片 · 消耗 1 积分</div>
+            <div class="h-meta">2026-08-18 14:32 · 操作后余额 11</div>
+          </div>
+          <div style="font-size:15px;font-weight:700;color:var(--red);align-self:center;">-1</div>
+        </div>
+        <div class="history-item" data-type="consume">
+          <div class="h-thumb" style="background:#FFEBEE;">▶️</div>
+          <div class="h-info">
+            <div class="h-prompt">生成视频 · 消耗 1 积分</div>
+            <div class="h-meta">2026-08-18 12:10 · 操作后余额 10</div>
+          </div>
+          <div style="font-size:15px;font-weight:700;color:var(--red);align-self:center;">-1</div>
+        </div>
+        <div class="history-item" data-type="recharge">
+          <div class="h-thumb" style="background:#E8F5E9;">💰</div>
+          <div class="h-info">
+            <div class="h-prompt">购买 30 次套餐 · 到账 30 积分</div>
+            <div class="h-meta">2026-08-17 10:00 · 操作后余额 60</div>
+          </div>
+          <div style="font-size:15px;font-weight:700;color:var(--primary);align-self:center;">+30</div>
+        </div>
+        <div class="history-item" data-type="gift">
+          <div class="h-thumb" style="background:#FFF3E0;">🎁</div>
+          <div class="h-info">
+            <div class="h-prompt">新用户赠送 · 到账 3 积分</div>
+            <div class="h-meta">2026-08-15 09:00 · 操作后余额 13</div>
+          </div>
+          <div style="font-size:15px;font-weight:700;color:var(--orange);align-self:center;">+3</div>
+        </div>
+        <div class="history-item" data-type="consume">
+          <div class="h-thumb" style="background:#FFEBEE;">🎨</div>
+          <div class="h-info">
+            <div class="h-prompt">生成图片 · 消耗 1 积分</div>
+            <div class="h-meta">2026-08-10 16:20 · 操作后余额 10</div>
+          </div>
+          <div style="font-size:15px;font-weight:700;color:var(--red);align-self:center;">-1</div>
+        </div>
+        <div class="history-item" data-type="recharge">
+          <div class="h-thumb" style="background:#E8F5E9;">💰</div>
+          <div class="h-info">
+            <div class="h-prompt">购买 10 次套餐 · 到账 10 积分</div>
+            <div class="h-meta">2026-08-08 20:15 · 操作后余额 11</div>
+          </div>
+          <div style="font-size:15px;font-weight:700;color:var(--primary);align-self:center;">+10</div>
+        </div>
+      </div>
+
+      <div style="text-align:center;font-size:12px;color:var(--text-tertiary);padding:20px 0 30px;">— 已显示全部记录 —</div>
+    </div>
+  </div>
+
+  <!-- 已删除：模型选择弹窗（评审精简：AI 生图不再选模型） -->
+
+  <!-- ================== 结果弹窗 ================== -->
+  <div class="modal" id="modalResult">
+    <div class="modal-backdrop" data-modal="modalResult"></div>
+    <div class="modal-panel" style="border-radius:20px;">
+      <div class="modal-head">
+        <div class="modal-title">生成结果</div>
+        <div class="modal-close" data-modal="modalResult">×</div>
+      </div>
+      <div class="result-area">
+        <div class="generating" id="generatingBox">
+          <div class="spinner"></div>
+          <div class="g-text">正在生成中，请稍候…</div>
+        </div>
+        <div id="resultContent" style="display:none;flex-direction:column;align-items:center;width:100%;">
+          <div class="result-img" id="resultImg">🖼️</div>
+          <div class="result-video" id="resultVideo">▶️</div>
+          <div class="result-actions">
+            <div class="act" onclick="toast('已保存到相册')">⬇️ 保存到相册</div>
+            <div class="act" onclick="openShare()">↗️ 分享</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== 积分不足弹窗（V0.4 原名：额度不足弹窗） ================== -->
+  <div class="modal" id="modalQuota">
+    <div class="modal-backdrop" data-modal="modalQuota"></div>
+    <div class="modal-panel" style="border-radius:20px;padding:24px;text-align:center;">
+      <div style="font-size:48px;margin-bottom:12px;">⚡</div>
+      <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;">积分不足</div>
+      <div style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;">本次生成需要 <b id="costPerImageModal">1</b> 个积分，你的剩余积分为 0</div>
+      <div style="display:flex;gap:12px;">
+        <div style="flex:1;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;background:#f5f5f5;color:var(--text);font-size:15px;cursor:pointer;" onclick="closeModal()">取消</div>
+        <div style="flex:1;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;background:var(--primary);color:#fff;font-size:15px;cursor:pointer;" onclick="closeModal();go('pageQuotaBuy')">购买积分</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      quota: 12,
+      image: { ratio: '9:16', prompt: '', uploaded: false },
+      history: [
+        { id: 1, thumb: '🌸', prompt: 'AI可爱风蜡笔涂鸦，校服女孩，糖果贴纸', type: '生图', ratio: '9:16', time: '2026-08-18 14:32' },
+        { id: 2, thumb: '🌅', prompt: '日落街道，男生伸手，电影感逆光', type: '生图', ratio: '9:16', time: '2026-08-17 09:45' },
+        { id: 3, thumb: '🐱', prompt: '治愈系猫咪，窗台晒太阳，柔光', type: '生图', ratio: '16:9', time: '2026-08-16 20:10' }
+      ],
+      quotaPack: 'p100'
+    };
+
+    // V0.5：套餐按「积分」卖，价格 = 积分 × 后台定价（price_per_credit）
+    // 套餐只定义积分数，不绑固定价格；运营改定价即全站生效
+    const PRICE_PER_CREDIT = 0.10;  // 后台「积分定价管理」配置：1 积分 = ¥0.10（可调）
+    const quotaPacks = [
+      { id: 'p30',  credits: 30,   tag: '' },
+      { id: 'p100', credits: 100,  tag: '推荐' },
+      { id: 'p300', credits: 300,  tag: '超值' },
+      { id: 'p1000',credits: 1000, tag: '特惠' }
+    ];
+
+    // 新人首单标识（真实实现由后端判断是否首次购买）
+    let isFirstPurchase = true;
+
+    // ===== V0.5：后台「生图成本配置」（§4.9）模拟 =====
+    // 真实实现由后端下发：取 ai_image_cost_config 表 valid_from <= 当前时刻 的最新一条 cost_per_image
+    const COST_PER_IMAGE = 1;   // 后台配置：每张图消耗 N 积分（运营可调，改这里即全站生效）
+
+    let pageStack = ['pageHistory'];
+
+    function go(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+      pageStack.push(pageId);
+    }
+
+    function goBack() {
+      if (pageStack.length > 1) {
+        pageStack.pop();
+        const prev = pageStack[pageStack.length - 1];
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(prev).classList.add('active');
+      }
+    }
+
+    function toast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('active');
+      setTimeout(() => t.classList.remove('active'), 2000);
+    }
+
+    function uploadImage() {
+      state.image.uploaded = true;
+      const z = document.getElementById('imgUploadZone');
+      const shadowColor = 'rgba' + '(0,0,0,0.5)';
+      z.innerHTML = '<img class="preview-img" src="" alt=""><div class="tip" style="position:absolute;color:#fff;text-shadow:0 1px 3px ' + shadowColor + ';">点击更换</div>';
+      z.classList.add('preview');
+      toast('图片已导入');
+    }
+
+    function startVoice(type) {
+      toast('🎙️ 正在录音，请描述你想要的画面');
+      setTimeout(() => {
+        const prompt = '一位穿着校服的可爱女孩，站在洒满阳光的走廊里，周围有彩色糖果和星星贴纸';
+        document.getElementById('imgPrompt').value = prompt;
+        state.image.prompt = prompt;
+        toast('语音已转成提示词');
+      }, 1500);
+    }
+
+    function toggleTag(el) {
+      const group = el.dataset.group;
+      document.querySelectorAll(`.tag[data-group="${group}"]`).forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      updatePromptFromTags();
+    }
+
+    function updatePromptFromTags() {
+      const activeTags = [...document.querySelectorAll('.tag.active')].map(t => t.textContent);
+      if (activeTags.length === 0) return;
+      const base = activeTags.join('，');
+      const imgInput = document.getElementById('imgPrompt');
+      if (document.querySelector('#pageImageGen.active')) {
+        if (!imgInput.value) imgInput.value = base;
+      }
+    }
+
+    function switchImgRatio(el, ratio) {
+      document.querySelectorAll('#pageImageGen .ratio-opt').forEach(r => r.classList.remove('active'));
+      el.classList.add('active');
+      state.image.ratio = ratio;
+    }
+
+    function openShare() {
+      toast('已调起分享');
+    }
+
+    function closeModal(e) {
+      if (e && e.target && !e.target.closest('.modal-panel') && !e.target.classList.contains('modal-close') && !e.target.classList.contains('modal-backdrop')) return;
+      document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+    }
+
+    function bindModalEvents() {
+      document.querySelectorAll('.modal-backdrop, .modal-close').forEach(el => {
+        el.addEventListener('click', () => {
+          const id = el.dataset.modal;
+          if (id) document.getElementById(id).classList.remove('active');
+        });
+      });
+    }
+
+    function generate(type) {
+      const cost = COST_PER_IMAGE;   // 改为读取后台生图成本配置
+      if (state.quota < cost) {
+        document.getElementById('modalQuota').classList.add('active');
+        return;
+      }
+      document.getElementById('modalResult').classList.add('active');
+      document.getElementById('generatingBox').classList.add('active');
+      document.getElementById('resultContent').style.display = 'none';
+      setTimeout(() => {
+        state.quota -= cost;
+        document.getElementById('generatingBox').classList.remove('active');
+        const content = document.getElementById('resultContent');
+        content.style.display = 'flex';
+        document.getElementById('resultImg').style.display = 'flex';
+        document.getElementById('resultVideo').style.display = 'none';
+        // 写入我的作品
+        state.history.unshift({ id: Date.now(), thumb: '🖼️', prompt: state.image.prompt || '我的 AI 作品', type: '生图', ratio: state.image.ratio, time: '刚刚' });
+        renderHistory();
+        toast(`生成成功，已消耗 ${cost} 个积分`);
+      }, 2500);
+    }
+
+    function goWorkDetail() {
+      go('pageWorkDetail');
+    }
+
+    function renderHistory() {
+      const list = document.getElementById('historyList');
+      const card = document.getElementById('historyCard');
+      const empty = document.getElementById('historyEmpty');
+      if (!state.history.length) {
+        if (list) list.style.display = 'none';
+        if (card) card.style.display = 'none';
+        if (empty) empty.style.display = 'block';
+        return;
+      }
+      if (card) card.style.display = '';
+      if (empty) empty.style.display = 'none';
+      if (!list) return;
+      list.innerHTML = '';
+      state.history.forEach(h => {
+        list.innerHTML += `
+          <div class="history-item" onclick="goWorkDetail('image')">
+            <div class="h-thumb">${h.thumb}</div>
+            <div class="h-info">
+              <div class="h-prompt">${h.prompt}</div>
+              <div class="h-meta">🎨 生图 · ${h.ratio} · ${h.time}</div>
+            </div>
+          </div>`;
+      });
+    }
+
+    function renderQuotaPacks() {
+      const list = document.getElementById('quotaPackList');
+      list.innerHTML = '';
+      quotaPacks.forEach(p => {
+        const active = p.id === state.quotaPack ? 'active' : '';
+        const price = (p.credits * PRICE_PER_CREDIT).toFixed(1);
+        const tagHtml = p.tag ? `<span class="m-tag" style="margin-left:6px;">${p.tag}</span>` : '';
+        const bonusHtml = isFirstPurchase ? `<div style="font-size:11px;color:var(--primary);margin-top:2px;">首单再送 ${p.credits} 积分</div>` : '';
+        list.innerHTML += `
+          <div class="model-item ${active}" onclick="selectQuotaPack(this,'${p.id}')">
+            <div style="flex:1;">
+              <div class="m-name">${p.credits} 积分${tagHtml}</div>
+              <div class="m-desc">¥${PRICE_PER_CREDIT.toFixed(2)}/积分</div>
+              ${bonusHtml}
+            </div>
+            <div style="font-size:18px;font-weight:700;color:var(--text);">¥${price}</div>
+          </div>`;
+      });
+    }
+
+    function selectQuotaPack(el, id) {
+      state.quotaPack = id;
+      document.querySelectorAll('#quotaPackList .model-item').forEach(m => m.classList.remove('active'));
+      const pack = quotaPacks.find(p => p.id === id);
+      const price = (pack.credits * PRICE_PER_CREDIT).toFixed(1);
+      document.getElementById('quotaBuyPrice').textContent = '¥' + price;
+      el.classList.add('active');
+    }
+
+    // 进入订单确认页（动态填充所选套餐的订单信息）
+    function openOrder() {
+      const pack = quotaPacks.find(p => p.id === state.quotaPack);
+      const price = (pack.credits * PRICE_PER_CREDIT).toFixed(1);
+      document.getElementById('orderPackName').textContent = pack.credits + ' 积分';
+      document.getElementById('orderUnitPrice').textContent = '¥' + PRICE_PER_CREDIT.toFixed(2) + '/积分';
+      document.getElementById('orderQty').textContent = pack.credits + ' 积分';
+      document.getElementById('orderPay').textContent = '¥' + price;
+      document.getElementById('orderPayBtnText').textContent = '¥' + price;
+      const bonusBox = document.getElementById('orderBonus');
+      if (isFirstPurchase) {
+        bonusBox.style.display = '';
+        document.getElementById('orderBonusText').textContent =
+          '额外赠送 ' + pack.credits + ' 积分，实到账 ' + (pack.credits * 2) + ' 积分（仅限一次）';
+      } else {
+        bonusBox.style.display = 'none';
+      }
+      go('pageQuotaOrder');
+    }
+
+    // 提交订单：i. 累加积分（含首单赠送） ii. 标记首单已用 iii. 刷新余额并返回
+    function completePurchase() {
+      const pack = quotaPacks.find(p => p.id === state.quotaPack);
+      const bonus = isFirstPurchase ? pack.credits : 0;
+      state.quota += pack.credits + bonus;
+      isFirstPurchase = false;
+      const gift = document.getElementById('newcomerGift');
+      if (gift) gift.style.display = 'none';
+      refreshQuotaDisplay();
+      toast('购买成功，积分已到账');
+      go('pageHistory');
+    }
+
+    // 同步所有「剩余积分」展示
+    function refreshQuotaDisplay() {
+      document.querySelectorAll('.js-quota').forEach(el => el.textContent = state.quota);
+    }
+
+    function switchQuotaTab(el, tab) {
+      document.querySelectorAll('.square-tab[data-qtab]').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      document.querySelectorAll('#quotaDetailList .history-item').forEach(item => {
+        item.style.display = (tab === 'all' || item.dataset.type === tab) ? 'flex' : 'none';
+      });
+    }
+
+    // 监听输入
+    document.getElementById('imgPrompt').addEventListener('input', e => state.image.prompt = e.target.value);
+
+    // 把后台生图成本配置写入 AI 生图页三处提示（顶部 hint / 底部栏 / 积分不足弹窗）
+    (function renderCostHints() {
+      const hint = document.getElementById('costPerImageHint');
+      const bottom = document.getElementById('costPerImageBottom');
+      const modal = document.getElementById('costPerImageModal');
+      if (hint) hint.textContent = COST_PER_IMAGE;
+      if (bottom) bottom.textContent = COST_PER_IMAGE;
+      if (modal) modal.textContent = COST_PER_IMAGE;
+    })();
+
+    bindModalEvents();
+    renderQuotaPacks();
+    renderHistory();
+    refreshQuotaDisplay();
+  </script>
+</div>
+</body>
+</html>
