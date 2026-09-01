@@ -107,10 +107,6 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
 .pager .jump{display:flex;align-items:center;gap:4px;color:var(--text-2);font-size:12px}
 .pager .jump .input{height:24px;width:50px}
 
-.summary{padding:12px 16px;background:#fff7e6;color:#8a5500;font-size:12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px}
-.summary .item{display:flex;gap:4px;align-items:center}
-.summary .num{font-weight:600;font-size:14px;color:#f56c6c}
-
 .icon{width:14px;height:14px;display:inline-block;background:rgba(255,255,255,.15);border-radius:2px;flex-shrink:0}
 </style>
 </head>
@@ -184,16 +180,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
         </div>
       </div>
 
-      <!-- 数据概览（无激活状态，按下单 / 生成途径统计） -->
-      <div class="summary">
-        <div class="item">共 <span class="num">8</span> 条</div>
-        <div class="item">已下单 <span class="num">5</span> 条</div>
-        <div class="item">未下单 <span class="num">3</span> 条</div>
-        <div class="item">购买生成 <span class="num">6</span> 条</div>
-        <div class="item">系统生成 <span class="num">2</span> 条</div>
-      </div>
-
-      <!-- 主筛选 -->
+      <!-- 主筛选（数据概览已移除：状态分类通过二级筛选查看） -->
       <div class="filters">
         <div class="filter-row">
           <div class="item">
