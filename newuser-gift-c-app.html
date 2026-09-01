@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>新人激活码礼包 · C 端用户原型 v2</title>
+<style>
+:root{
+  --c-primary:#1AAD7C;
+  --c-primary-2:#0F8E63;
+  --c-orange:#FF7800;
+  --c-red:#E04D4D;
+  --c-red-2:#FF5757;
+  --c-text:#222;
+  --c-text-2:#666;
+  --c-text-3:#999;
+  --c-line:#EEE;
+  --c-line-2:#F0F0F0;
+  --c-bg:#F5F6F8;
+  --c-card:#FFF;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--c-text);font-size:13px}
+.phone{
+  position:relative;width:375px;height:812px;margin:20px auto;background:#fff;border-radius:32px;
+  box-shadow:0 12px 40px rgba(0,0,0,.15);overflow:hidden;
+}
+.page{position:absolute;inset:0;overflow-y:auto;background:#fff;display:none}
+.page.active{display:block;-webkit-animation:fade .25s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+.nav{position:sticky;top:0;left:0;right:0;height:44px;display:flex;align-items:center;justify-content:center;background:#fff;border-bottom:1px solid var(--c-line);z-index:5;font-size:15px;font-weight:600}
+.nav .back{position:absolute;left:12px;top:0;height:44px;display:flex;align-items:center;color:var(--c-text);font-size:22px}
+.btn-primary{display:block;width:100%;height:44px;border-radius:22px;background:var(--c-primary);color:#fff;font-size:15px;font-weight:600;border:none;cursor:pointer;line-height:44px;text-align:center}
+.btn-primary:active{background:var(--c-primary-2)}
+.btn-red{display:block;width:100%;height:44px;border-radius:22px;background:var(--c-red);color:#fff;font-size:15px;font-weight:600;border:none;cursor:pointer;line-height:44px;text-align:center}
+.btn-outline{display:inline-block;height:28px;line-height:26px;padding:0 12px;border:1px solid var(--c-primary);border-radius:14px;color:var(--c-primary);background:#fff;font-size:12px;cursor:pointer}
+.btn-outline-orange{display:inline-block;height:28px;line-height:26px;padding:0 12px;border:1px solid var(--c-orange);border-radius:14px;color:var(--c-orange);background:#fff;font-size:12px;cursor:pointer}
+.btn-outline-grey{display:inline-block;height:28px;line-height:26px;padding:0 12px;border:1px solid var(--c-line-2);border-radius:14px;color:var(--c-text-2);background:#fff;font-size:12px;cursor:pointer}
+
+/* ===== 首页 ===== */
+.searchbar{padding:8px 12px;display:flex;align-items:center;gap:8px;background:#fff;border-bottom:1px solid var(--c-line)}
+.searchbar .brand{font-size:16px;font-weight:700;color:var(--c-text)}
+.searchbar .mall{font-size:12px;color:var(--c-text-3)}
+.searchbar .box{flex:1;height:32px;background:#F2F3F5;border-radius:16px;display:flex;align-items:center;padding:0 12px;color:var(--c-text-3);font-size:12px;gap:6px}
+.searchbar .box .ico{width:14px;height:14px;background:#bbb;border-radius:50%;display:inline-block}
+.searchbar .cart{position:relative;width:28px;height:28px;display:flex;align-items:center;justify-content:center}
+.searchbar .cart .badge{position:absolute;top:-4px;right:-6px;min-width:16px;height:16px;border-radius:8px;background:var(--c-red);color:#fff;font-size:10px;line-height:16px;text-align:center;padding:0 4px}
+.searchbar .go{height:32px;padding:0 14px;background:var(--c-primary);color:#fff;border-radius:16px;font-size:12px;line-height:32px}
+
+.tabs{display:flex;align-items:center;background:#fff;padding:0 4px;border-bottom:1px solid var(--c-line);overflow-x:auto}
+.tabs::-webkit-scrollbar{display:none}
+.tabs .t{position:relative;flex-shrink:0;padding:10px 10px;font-size:13px;color:var(--c-text-2)}
+.tabs .t.on{color:var(--c-text);font-weight:600}
+.tabs .t.on::after{content:"";position:absolute;left:50%;bottom:0;width:18px;height:2px;background:var(--c-primary);transform:translateX(-50%);border-radius:1px}
+
+.grids{display:grid;grid-template-columns:repeat(4,1fr);padding:16px 4px;background:#fff}
+.grids .g{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:var(--c-text)}
+.grids .g .icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:700}
+.grids .g .icon.new{background:#5BC89A}
+.grids .g .icon.health{background:#4FB7E1}
+.grids .g .icon.self{background:#F0935A}
+.grids .g .icon.vc{background:#9DA1A8}
+
+.banner{padding:12px;background:#fff}
+.banner .bn{height:96px;border-radius:10px;display:flex;align-items:center;padding:14px;color:#fff;font-weight:600;position:relative;overflow:hidden;margin-bottom:8px}
+.banner .bn.green{background:linear-gradient(135deg,#3CC893,#1AAD7C)}
+.banner .bn.orange{background:linear-gradient(135deg,#FF9466,#FF6A3D)}
+.banner .bn .ttl{font-size:14px}
+.banner .bn .sub{font-size:11px;opacity:.85;margin-top:4px}
+.banner .bn .pill{display:inline-block;margin-top:8px;padding:3px 10px;border:1px solid #fff;border-radius:12px;font-size:11px}
+
+.promo-big{margin:0 12px 12px;background:linear-gradient(135deg,#FFD5DA,#FFA8B4);border-radius:10px;padding:14px 16px;color:#fff;position:relative}
+.promo-big .ttl{font-size:18px;font-weight:700;color:#fff}
+.promo-big .sub{font-size:12px;margin-top:4px;color:#fff}
+.promo-big .num{font-size:28px;font-weight:800;color:#FF5757;margin-top:8px}
+.promo-big .num small{font-size:14px;color:#FF5757;font-weight:600}
+
+.tabbar{position:sticky;bottom:0;left:0;right:0;height:50px;background:#fff;border-top:1px solid var(--c-line);display:flex;z-index:5}
+.tabbar .tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--c-text-3);font-size:11px;gap:2px}
+.tabbar .tb.on{color:var(--c-primary)}
+.tabbar .tb .ic{width:22px;height:22px;border-radius:6px;background:#DDD}
+.tabbar .tb.on .ic{background:var(--c-primary)}
+
+.fab{position:absolute;right:14px;bottom:74px;width:54px;height:54px;border-radius:50%;background:var(--c-primary);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px rgba(26,173,124,.4);font-size:11px;font-weight:600;line-height:1.1;z-index:10;border:none}
+.fab .em{font-size:18px;font-weight:700;margin-bottom:2px}
+.fab:active{transform:scale(.95)}
+.fab.hidden{display:none}
+.fab-share{position:absolute;right:14px;bottom:138px;width:48px;height:48px;border-radius:50%;background:#fff;color:var(--c-primary);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.1);font-size:20px;z-index:10;border:1px solid var(--c-line)}
+
+/* ===== 激活页 ===== */
+.activate{padding-bottom:24px}
+.activate .hero{padding:24px 16px 16px;background:linear-gradient(135deg,#E9F8F1,#D4F1E2);text-align:center}
+.activate .hero .bag-icon{width:64px;height:64px;border-radius:50%;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:10px;box-shadow:0 4px 12px rgba(26,173,124,.15)}
+.activate .hero .ttl{font-size:18px;font-weight:700;color:var(--c-text)}
+.activate .hero .sub{font-size:12px;color:var(--c-text-2);margin-top:4px}
+
+.activate .card{margin:-8px 14px 14px;background:#fff;border-radius:12px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.activate .card .hd{font-size:13px;font-weight:600;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.activate .card .hd .price{color:var(--c-red);font-size:15px}
+.activate .item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--c-line)}
+.activate .item:last-child{border-bottom:none}
+.activate .item .thumb{width:48px;height:48px;border-radius:8px;background:#F5F6F8;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.activate .item .meta{flex:1}
+.activate .item .name{font-size:13px;color:var(--c-text)}
+.activate .item .desc{font-size:11px;color:var(--c-text-3);margin-top:2px}
+.activate .item .qty{font-size:12px;color:var(--c-text-3)}
+
+.activate .form{margin:0 14px;background:#fff;border-radius:12px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.activate .form .row{margin-bottom:6px}
+.activate .form .label{font-size:13px;color:var(--c-text);font-weight:600;margin-bottom:6px}
+.activate .form .input{width:100%;height:42px;border:1px solid var(--c-line);border-radius:8px;padding:0 12px;font-size:14px;color:var(--c-text);background:#FAFAFB;outline:none;font-family:monospace}
+.activate .form .input:focus{border-color:var(--c-primary);background:#fff}
+.activate .form .hint{font-size:11px;color:var(--c-orange);margin-top:6px}
+.activate .submit-wrap{padding:16px 14px}
+.activate .foot-tip{padding:0 14px 20px;font-size:11px;color:var(--c-text-3);text-align:center}
+
+/* ===== 地址页 ===== */
+.address{padding-bottom:80px}
+.address .list{padding:10px 12px}
+.address .item{background:#fff;border-radius:10px;padding:12px;margin-bottom:10px;display:flex;gap:10px;align-items:flex-start;border:1px solid var(--c-line)}
+.address .item.on{border-color:var(--c-primary)}
+.address .item .dot{flex-shrink:0;width:18px;height:18px;border-radius:50%;border:1.5px solid #C8C8C8;margin-top:2px;display:flex;align-items:center;justify-content:center}
+.address .item.on .dot{border-color:var(--c-primary);background:var(--c-primary)}
+.address .item.on .dot::after{content:"";width:8px;height:8px;border-radius:50%;background:#fff}
+.address .item .body{flex:1;min-width:0}
+.address .item .name{font-size:14px;font-weight:600;color:var(--c-text)}
+.address .item .name .tag{display:inline-block;background:#FFF1E6;color:var(--c-orange);font-size:10px;padding:1px 5px;border-radius:3px;margin-left:6px;font-weight:400}
+.address .item .addr{font-size:12px;color:var(--c-text-2);margin-top:4px;line-height:1.5}
+.address .empty{padding:60px 20px;text-align:center;color:var(--c-text-3);font-size:13px}
+.address .empty .ico{font-size:40px;margin-bottom:10px;opacity:.4}
+.address .add-btn{margin:14px;background:#fff;border:1px dashed #C8C8C8;border-radius:10px;padding:14px;text-align:center;color:var(--c-text-2);font-size:13px;cursor:pointer}
+.address .footer{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;background:#fff;border-top:1px solid var(--c-line)}
+
+/* ===== 地址编辑 ===== */
+.addr-edit .form{margin:14px;background:#fff;border-radius:10px;padding:6px 14px}
+.addr-edit .form .row{padding:12px 0;border-bottom:1px solid var(--c-line)}
+.addr-edit .form .row:last-child{border-bottom:none}
+.addr-edit .form .label{font-size:12px;color:var(--c-text-2);margin-bottom:4px}
+.addr-edit .form .input{width:100%;border:none;outline:none;font-size:14px;color:var(--c-text);background:transparent;padding:0}
+.addr-edit .submit-wrap{padding:14px}
+
+/* ===== 确认订单页（1:1 套 image#1） ===== */
+.confirm{padding-bottom:80px;background:var(--c-bg)}
+.confirm .addr-bar{margin:10px 12px;background:#fff;border-radius:10px;padding:14px;display:flex;align-items:center;gap:10px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.confirm .addr-bar .ico{width:32px;height:32px;border-radius:50%;background:#FFF1E6;color:var(--c-orange);display:flex;align-items:center;justify-content:center;font-size:16px}
+.confirm .addr-bar .body{flex:1}
+.confirm .addr-bar .name{font-size:14px;color:var(--c-text);font-weight:600}
+.confirm .addr-bar .name .phone{margin-left:10px;font-weight:400;color:var(--c-text-2)}
+.confirm .addr-bar .addr{font-size:12px;color:var(--c-text-2);margin-top:4px}
+.confirm .addr-bar.empty{justify-content:center;color:var(--c-text-2);font-size:13px}
+.confirm .addr-bar.empty .ico{background:#FFF1E6;color:var(--c-orange)}
+.confirm .addr-bar .arr{color:#C8C8C8;font-size:18px}
+
+.confirm .pkg{margin:0 12px 10px;background:#fff;border-radius:10px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.confirm .pkg .gtitle{font-size:14px;font-weight:600;color:var(--c-text);margin-bottom:8px}
+.confirm .pkg .gdesc{font-size:11px;color:var(--c-text-3);margin-bottom:10px;line-height:1.5}
+.confirm .pkg .row{display:flex;gap:10px;align-items:center;padding:6px 0}
+.confirm .pkg .row .thumb{width:48px;height:48px;border-radius:6px;background:var(--c-bg);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.confirm .pkg .row .info{flex:1;min-width:0}
+.confirm .pkg .row .name{font-size:13px;color:var(--c-text)}
+.confirm .pkg .row .spec{font-size:11px;color:var(--c-text-3);margin-top:2px}
+.confirm .pkg .row .qty{font-size:13px;color:var(--c-text-3);text-align:right}
+.confirm .pkg .rightory{display:flex;justify-content:space-between;font-size:12px;color:var(--c-text-2);padding-top:10px;border-top:1px dashed var(--c-line);margin-top:8px}
+.confirm .pkg .rightory .num{color:var(--c-orange);font-weight:600}
+.confirm .pkg .price-row{display:flex;justify-content:space-between;font-size:12px;color:var(--c-text-2);padding-top:4px}
+.confirm .pkg .price-row .v{color:var(--c-text)}
+
+.confirm .price-card{margin:0 12px 10px;background:#fff;border-radius:10px;padding:12px 14px;font-size:12px;color:var(--c-text-2);box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.confirm .price-card .line{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
+.confirm .price-card .line .v{color:var(--c-text)}
+.confirm .price-card .line .v.red{color:var(--c-red-2);font-size:15px;font-weight:600}
+.confirm .price-card .line.muted{color:var(--c-text-3);font-size:11px}
+
+.confirm .remark{margin:0 12px 10px;background:#fff;border-radius:10px;padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.confirm .remark .label{font-size:12px;color:var(--c-text-2);margin-bottom:6px}
+.confirm .remark .input{width:100%;border:none;outline:none;font-size:13px;color:var(--c-text);background:transparent;padding:0}
+
+.confirm .footer{position:absolute;left:0;right:0;bottom:0;height:60px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-top:1px solid var(--c-line)}
+.confirm .footer .left{font-size:12px;color:var(--c-text-2)}
+.confirm .footer .left .amt{font-size:18px;font-weight:700;color:var(--c-red-2);margin:0 4px}
+.confirm .footer .left .qty{font-size:11px;color:var(--c-text-3)}
+.confirm .footer .btn-confirm{height:40px;padding:0 28px;background:var(--c-red);color:#fff;border-radius:20px;border:none;font-size:14px;font-weight:600;cursor:pointer}
+
+/* ===== 订单详情页 ===== */
+.order .tabs2{display:flex;background:#fff;padding:0 4px;border-bottom:1px solid var(--c-line);overflow-x:auto;position:sticky;top:44px;z-index:4}
+.order .tabs2::-webkit-scrollbar{display:none}
+.order .tabs2 .t{flex-shrink:0;padding:10px 10px;font-size:12px;color:var(--c-text-2)}
+.order .tabs2 .t.on{color:var(--c-text);font-weight:600;position:relative}
+.order .tabs2 .t.on::after{content:"";position:absolute;left:50%;bottom:0;width:14px;height:2px;background:var(--c-primary);transform:translateX(-50%);border-radius:1px}
+.order .ord-card{margin:10px 12px;background:#fff;border-radius:10px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.order .ord-card .head{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--c-text-2);margin-bottom:10px}
+.order .ord-card .head .status{color:var(--c-orange);font-size:12px;font-weight:600}
+.order .ord-card .goods{display:flex;gap:10px;padding:8px 0;border-bottom:1px dashed var(--c-line)}
+.order .ord-card .goods .thumb{width:72px;height:72px;border-radius:6px;background:var(--c-bg);display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0}
+.order .ord-card .goods .info{flex:1;min-width:0}
+.order .ord-card .goods .gtitle{font-size:13px;color:var(--c-text);line-height:1.4}
+.order .ord-card .goods .spec{margin-top:6px;font-size:11px;color:var(--c-text-3);display:inline-block;border:1px solid var(--c-line);padding:1px 6px;border-radius:3px}
+.order .ord-card .goods .price{color:var(--c-red);font-size:14px;font-weight:600;text-align:right}
+.order .ord-card .goods .xqty{font-size:11px;color:var(--c-text-3);text-align:right;margin-top:4px}
+.order .ord-card .payinfo{display:flex;justify-content:space-between;align-items:center;padding-top:10px;font-size:12px;color:var(--c-text-2)}
+.order .ord-card .payinfo .pay{color:var(--c-red);font-size:15px;font-weight:600}
+.order .ord-card .btns{display:flex;justify-content:flex-end;gap:8px;padding-top:10px;border-top:1px solid var(--c-line);margin-top:10px}
+.order .ord-card .btns .btn-cancel{display:none}
+.order .ord-card .btns .btn-aftersale{display:none}
+.order .footer-bar{height:60px}
+
+/* toast */
+.toast{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.active{opacity:1}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- ===== p_home 首页 ===== -->
+  <div class="page active" id="p_home">
+    <div class="searchbar">
+      <div>
+        <div class="brand">绿韵家</div>
+        <div class="mall">积分商城</div>
+      </div>
+      <div class="box" onclick=""><span class="ico"></span>搜索商品</div>
+      <div class="cart"><div style="width:20px;height:20px;background:#999;border-radius:4px"></div><div class="badge">2</div></div>
+      <div class="go">搜索</div>
+    </div>
+
+    <div class="tabs">
+      <div class="t on">推荐</div>
+      <div class="t">图书</div>
+      <div class="t">厨具</div>
+      <div class="t">个人护理</div>
+      <div class="t">膳食营养补充食品</div>
+      <div class="t">美妆</div>
+    </div>
+
+    <div class="grids">
+      <div class="g"><div class="icon new">NEW</div>新品上市</div>
+      <div class="g"><div class="icon health">+</div>健康专区</div>
+      <div class="g"><div class="icon self">店</div>自营专区</div>
+      <div class="g"><div class="icon vc">vC</div>vConsole</div>
+    </div>
+
+    <div class="banner">
+      <div class="bn green">
+        <div><div class="ttl">惠民补贴专区</div><div class="sub">下单送积分，享千元好礼</div><div class="pill">去看看 ▶</div></div>
+      </div>
+      <div class="bn orange">
+        <div><div class="ttl">每日活动专区</div><div class="sub">买赠好礼，精彩拿实惠</div><div class="pill">去看看 ▶</div></div>
+      </div>
+    </div>
+
+    <div class="promo-big">
+      <div class="ttl">520 健康节</div>
+      <div class="sub">把爱藏在健康里</div>
+      <div class="num">1314<small>个</small></div>
+      <div class="sub">活动名额 送完即止</div>
+    </div>
+
+    <div style="height:80px"></div>
+    <div class="tabbar">
+      <div class="tb on"><div class="ic"></div>首页</div>
+      <div class="tb"><div class="ic"></div>数智</div>
+      <div class="tb"><div class="ic"></div>消息</div>
+      <div class="tb"><div class="ic"></div>我的</div>
+    </div>
+
+    <button class="fab-share" onclick="toast('分享功能')">分</button>
+    <button class="fab" id="fab_gift"><div class="em">礼</div>新人礼包</button>
+  </div>
+
+  <!-- ===== p_activate 激活页 ===== -->
+  <div class="page activate" id="p_activate">
+    <div class="nav">
+      <div class="back" onclick="go('p_home')">‹</div>
+      新人礼包激活
+    </div>
+
+    <div class="hero">
+      <div class="bag-icon">🎁</div>
+      <div class="ttl">新人激活码大礼包</div>
+      <div class="sub">输入会员朋友分享的激活码即可领取</div>
+    </div>
+
+    <div class="card">
+      <div class="hd">
+        <div>礼包内容</div>
+        <div class="price">¥39.9<small style="font-size:11px;color:var(--c-text-3);text-decoration:line-through;margin-left:4px">实付¥0</small></div>
+      </div>
+      <div class="item">
+        <div class="thumb">🪥</div>
+        <div class="meta"><div class="name">益齿健牙膏</div><div class="desc">120g · 快递配送</div></div>
+        <div class="qty">×1</div>
+      </div>
+      <div class="item">
+        <div class="thumb">💊</div>
+        <div class="meta"><div class="name">辅酶 Q10 体验装</div><div class="desc">10 粒装 · 快递配送</div></div>
+        <div class="qty">×1</div>
+      </div>
+      <div class="item">
+        <div class="thumb">💧</div>
+        <div class="meta"><div class="name">5L 饮用水</div><div class="desc">需自备水袋 · 到店自提</div></div>
+        <div class="qty">×7 袋</div>
+      </div>
+    </div>
+
+    <div class="form">
+      <div class="row">
+        <div class="label">激活码</div>
+        <input id="input_code" class="input" type="text" placeholder="请输入激活码" maxlength="20">
+        <div class="hint">每个账号仅可使用一次激活码</div>
+      </div>
+    </div>
+
+    <div class="submit-wrap">
+      <button class="btn-primary" id="btn_activate">立即激活</button>
+    </div>
+    <div class="foot-tip">激活即视为同意礼包配送安排</div>
+  </div>
+
+  <!-- ===== p_address 收货地址 ===== -->
+  <div class="page address" id="p_address">
+    <div class="nav">
+      <div class="back" onclick="goBackFromAddress()">‹</div>
+      选择收货地址
+    </div>
+
+    <div class="list" id="addr_list">
+      <!-- 由 JS 渲染 -->
+    </div>
+
+    <div class="add-btn" onclick="go('p_address_edit')">+ 新增收货地址</div>
+
+    <div class="footer">
+      <button class="btn-primary" id="btn_addr_use">使用此地址</button>
+    </div>
+  </div>
+
+  <!-- ===== p_address_edit 新增/编辑地址 ===== -->
+  <div class="page addr-edit" id="p_address_edit">
+    <div class="nav">
+      <div class="back" onclick="go('p_address')">‹</div>
+      新增收货地址
+    </div>
+    <div class="form">
+      <div class="row"><div class="label">收件人</div><input class="input" id="ae_name" placeholder="请输入收件人姓名"></div>
+      <div class="row"><div class="label">手机号</div><input class="input" id="ae_phone" placeholder="请输入手机号" maxlength="11"></div>
+      <div class="row"><div class="label">省 / 市 / 区</div><input class="input" id="ae_region" placeholder="如：北京市 朝阳区"></div>
+      <div class="row"><div class="label">详细地址</div><input class="input" id="ae_addr" placeholder="街道、楼栋、门牌号"></div>
+      <div class="row"><div class="label">设为默认</div><div style="text-align:right;color:var(--c-primary);font-size:13px">默认地址</div></div>
+    </div>
+    <div class="submit-wrap"><button class="btn-primary" id="btn_addr_save">保存并使用</button></div>
+  </div>
+
+  <!-- ===== p_confirm 确认订单 ===== -->
+  <div class="page confirm" id="p_confirm">
+    <div class="nav">
+      <div class="back" onclick="go('p_activate')">‹</div>
+      确认订单
+    </div>
+
+    <div class="addr-bar empty" id="confirm_addr" onclick="go('p_address')">
+      <div class="ico">+</div>
+      <div>添加收货地址</div>
+    </div>
+
+    <div class="pkg">
+      <div class="gtitle">新人礼包 - 益齿健牙膏套装</div>
+      <div class="gdesc">益齿健牙膏(120g)*1 · 辅酶 Q10 体验装(10 粒)*1 · 5L 饮用水*7 袋(到店自提)</div>
+
+      <div class="row">
+        <div class="thumb">🪥</div>
+        <div class="info"><div class="name">益齿健牙膏</div><div class="spec">1 支（120g/支）</div></div>
+        <div class="qty">×1</div>
+      </div>
+      <div class="row">
+        <div class="thumb">💊</div>
+        <div class="info"><div class="name">辅酶 Q10 体验装</div><div class="spec">1 瓶（10 粒/瓶）</div></div>
+        <div class="qty">×1</div>
+      </div>
+      <div class="row">
+        <div class="thumb">💧</div>
+        <div class="info"><div class="name">5L 饮用水</div><div class="spec">到店自提 · 需自备水袋</div></div>
+        <div class="qty">×7 袋</div>
+      </div>
+
+      <div class="rightory"><span>权益：赠水袋</span><span class="num">×7 个</span></div>
+      <div class="price-row"><span>运费</span><span class="v">¥0</span></div>
+    </div>
+
+    <div class="price-card">
+      <div class="line"><span>商品总价</span><span class="v">¥39.9</span></div>
+      <div class="line"><span>运费</span><span class="v">¥0</span></div>
+      <div class="line"><span>激活码抵扣</span><span class="v">- ¥39.9</span></div>
+      <div class="line"><span>实付金额</span><span class="v red">¥0.00</span></div>
+      <div class="line muted" style="margin-top:4px">激活后无需再支付，订单由会员分享激活码赠送</div>
+    </div>
+
+    <div class="remark">
+      <div class="label">订单备注</div>
+      <input class="input" placeholder="请填写您的备注信息（可不填）">
+    </div>
+
+    <div class="footer">
+      <div class="left">合计：<span class="amt">¥0.00</span><span class="qty">共 9 件</span></div>
+      <button class="btn-confirm" id="btn_confirm">确认购买</button>
+    </div>
+  </div>
+
+  <!-- ===== p_order 订单详情 ===== -->
+  <div class="page order" id="p_order">
+    <div class="nav">
+      <div class="back" onclick="go('p_home')">‹</div>
+      我的订单
+    </div>
+
+    <div class="tabs2">
+      <div class="t">全部</div>
+      <div class="t">代付订单</div>
+      <div class="t">待付款</div>
+      <div class="t on">待发货/待核销</div>
+      <div class="t">待收货</div>
+      <div class="t">已完成</div>
+    </div>
+
+    <div class="ord-card">
+      <div class="head">
+        <div>订单号：<span id="order_no">待生成</span></div>
+        <div class="status">待发货</div>
+      </div>
+
+      <div class="goods">
+        <div class="thumb">🪥</div>
+        <div class="info"><div class="gtitle">益齿健牙膏</div><div class="spec">1 支（120g/支）</div></div>
+        <div><div class="price">¥19.9</div><div class="xqty">×1</div></div>
+      </div>
+
+      <div class="goods">
+        <div class="thumb">💊</div>
+        <div class="info"><div class="gtitle">辅酶 Q10 体验装</div><div class="spec">1 瓶（10 粒/瓶）</div></div>
+        <div><div class="price">¥2.0</div><div class="xqty">×1</div></div>
+      </div>
+
+      <div class="goods">
+        <div class="thumb">💧</div>
+        <div class="info"><div class="gtitle">5L 饮用水</div><div class="spec">到店自提 · 需自备水袋</div></div>
+        <div><div class="price">¥18.0</div><div class="xqty">×7 袋</div></div>
+      </div>
+
+      <div class="payinfo">
+        <div>支付时间：<span id="pay_time">2026-09-01 14:17</span></div>
+        <div>共 9 件，实付款：<span class="pay" id="pay_amt">¥0.00</span></div>
+      </div>
+
+      <div class="code-display" style="background:#F5F6F8;border-radius:8px;padding:10px;margin-top:10px;font-size:11px;color:var(--c-text-2)">
+        <div><span style="display:inline-block;width:70px;color:var(--c-text-3)">激活码</span><span style="color:var(--c-text);font-family:monospace" id="show_code">-</span></div>
+      </div>
+
+      <div class="btns">
+        <div class="btn-outline" onclick="toast('正在跳转客服...')">联系客服</div>
+        <div class="btn-outline-orange" id="btn_remind">提醒发货</div>
+      </div>
+    </div>
+
+    <div class="footer-bar"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ========== 状态 ========== */
+window._activated = false;       // 是否已激活（隐藏 FAB）
+window._orderSeq = 605832;       // 订单号累加器
+window._address = null;           // 当前选中地址
+var _codesCache = [               // 演示地址数据：首激活用户通常为空，需新增
+  // { id: 'a1', name: '王小明', phone: '138****8888', region: '北京市 朝阳区', addr: '建国路 88 号 SOHO 现代城 A 座 1808 室', default: true }
+];
+
+/* ========== 导航 ========== */
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  var t=document.getElementById(id);
+  if(t){t.classList.add('active');t.scrollTop=0;}
+  if(id === 'p_address') renderAddressList();
+  if(id === 'p_confirm') renderConfirmAddr();
+  if(id === 'p_home') updateFab();
+}
+function goBackFromAddress(){
+  // 没有地址则回首页；有则回确认订单
+  go(window._address ? 'p_confirm' : 'p_activate');
+}
+
+/* ========== FAB 可见性 ========== */
+function updateFab(){
+  var fab = document.getElementById('fab_gift');
+  if(fab) fab.classList.toggle('hidden', !!window._activated);
+}
+
+/* ========== 地址列表渲染 ========== */
+function renderAddressList(){
+  var list = document.getElementById('addr_list');
+  if(!list) return;
+  if(!_codesCache.length){
+    list.innerHTML = '<div class="empty"><div class="ico">📭</div>暂无收货地址<br>请添加后再选择</div>';
+    document.getElementById('btn_addr_use').classList.add('btn-outline-grey');
+    document.getElementById('btn_addr_use').classList.remove('btn-primary');
+    document.getElementById('btn_addr_use').disabled = true;
+    document.getElementById('btn_addr_use').style.opacity = '0.4';
+    return;
+  }
+  list.innerHTML = _codesCache.map(function(a){
+    var on = (window._address && window._address.id === a.id) ? 'on' : '';
+    return '<div class="item '+on+'" data-id="'+a.id+'" onclick="pickAddress(\''+a.id+'\')">'
+      +'<div class="dot"></div>'
+      +'<div class="body"><div class="name">'+a.name+'<span class="phone">'+a.phone+'</span>'
+      +(a.default?'<span class="tag">默认</span>':'')
+      +'</div><div class="addr">'+a.region+' '+a.addr+'</div></div></div>';
+  }).join('');
+  document.getElementById('btn_addr_use').classList.remove('btn-outline-grey');
+  document.getElementById('btn_addr_use').classList.add('btn-primary');
+  document.getElementById('btn_addr_use').disabled = false;
+  document.getElementById('btn_addr_use').style.opacity = '1';
+}
+function pickAddress(id){
+  window._address = _codesCache.find(function(a){return a.id===id;}) || null;
+  renderAddressList();
+}
+
+/* ========== 确认订单页地址栏 ========== */
+function renderConfirmAddr(){
+  var bar = document.getElementById('confirm_addr');
+  if(!bar) return;
+  if(window._address){
+    bar.classList.remove('empty');
+    bar.innerHTML = '<div class="ico">📍</div><div class="body"><div class="name">'+window._address.name+'<span class="phone">'+window._address.phone+'</span></div><div class="addr">'+window._address.region+' '+window._address.addr+'</div></div><div class="arr">›</div>';
+  } else {
+    bar.classList.add('empty');
+    bar.innerHTML = '<div class="ico">+</div><div>添加收货地址</div>';
+  }
+}
+
+/* ========== Toast ========== */
+function toast(msg){
+  var el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('active');
+  clearTimeout(window._toastT);
+  window._toastT=setTimeout(function(){el.classList.remove('active');},1800);
+}
+
+/* ========== 激活 ========== */
+function doActivate(){
+  var k = document.getElementById('input_code').value.trim();
+  if(!k){toast('请输入激活码');return;}
+  if(!/[a-z]/.test(k) || !/[A-Z]/.test(k) || !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(k)){
+    toast('激活码需包含大小写字母与特殊符号');return;
+  }
+  if(k.length < 8){toast('激活码至少 8 位');return;}
+  // 激活成功：进入收货地址
+  go('p_address');
+}
+
+/* ========== 地址保存 ========== */
+function doSaveAddress(){
+  var name = document.getElementById('ae_name').value.trim();
+  var phone = document.getElementById('ae_phone').value.trim();
+  var region = document.getElementById('ae_region').value.trim();
+  var addr = document.getElementById('ae_addr').value.trim();
+  if(!name){toast('请输入收件人');return;}
+  if(!/^\d{11}$/.test(phone)){toast('请输入 11 位手机号');return;}
+  if(!region){toast('请输入省/市/区');return;}
+  if(!addr){toast('请输入详细地址');return;}
+  var id = 'a' + Date.now();
+  _codesCache.push({ id: id, name: name, phone: phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2'), region: region, addr: addr, default: true });
+  window._address = _codesCache[_codesCache.length-1];
+  toast('地址已保存');
+  setTimeout(function(){go('p_confirm');},400);
+}
+
+/* ========== 使用此地址 ========== */
+function useAddress(){
+  if(!window._address){toast('请先选择一个地址');return;}
+  go('p_confirm');
+}
+
+/* ========== 确认购买 ========== */
+function doConfirm(){
+  if(!window._address){toast('请先添加收货地址');return;}
+  // 生成订单
+  document.getElementById('show_code').textContent = document.getElementById('input_code').value.trim() || '-';
+  document.getElementById('order_no').textContent = genOrderNo();
+  var d = new Date();
+  var pad = function(n){return n<10?'0'+n:n;};
+  document.getElementById('pay_time').textContent = d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes());
+  window._activated = true;
+  toast('订单已生成');
+  setTimeout(function(){go('p_order');},500);
+}
+function genOrderNo(){
+  window._orderSeq += 1; return window._orderSeq;
+}
+
+/* ========== 提醒发货 ========== */
+function doRemind(){
+  var btn=document.getElementById('btn_remind');
+  if(!btn||btn.dataset.done==='1')return;
+  btn.dataset.done='1';
+  btn.textContent='已提醒';
+  btn.style.color='#999';
+  btn.style.borderColor='#DDD';
+  toast('已提醒商家发货');
+}
+
+/* ========== 事件绑定 ========== */
+document.getElementById('fab_gift').onclick = function(){ go('p_activate'); };
+document.getElementById('btn_activate').onclick = doActivate;
+document.getElementById('btn_addr_save').onclick = doSaveAddress;
+document.getElementById('btn_addr_use').onclick = useAddress;
+document.getElementById('btn_confirm').onclick = doConfirm;
+document.getElementById('btn_remind').onclick = doRemind;
+
+// 初始 FAB 可见性
+updateFab();
+</script>
+</body>
+</html>
