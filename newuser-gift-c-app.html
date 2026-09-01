@@ -86,6 +86,8 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 .fab:active{transform:scale(.95)}
 .fab.hidden{display:none}
 .fab-share{position:absolute;right:14px;bottom:138px;width:48px;height:48px;border-radius:50%;background:#fff;color:var(--c-primary);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.1);font-size:20px;z-index:10;border:1px solid var(--c-line)}
+.copy-src-btn{position:absolute;left:14px;bottom:70px;z-index:30;padding:6px 12px;border-radius:16px;background:rgba(0,0,0,.55);color:#fff;font-size:12px;line-height:1;border:none;cursor:pointer;font-family:inherit}
+.copy-src-btn:active{background:rgba(0,0,0,.78)}
 
 /* ===== 激活页 ===== */
 .activate{padding-bottom:24px}
@@ -266,6 +268,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 
     <button class="fab-share" onclick="toast('分享功能')">分</button>
     <button class="fab" id="fab_gift"><div class="em">礼</div>新人礼包</button>
+    <button class="copy-src-btn" id="btn_copy_source">复制源码</button>
   </div>
 
   <!-- ===== p_activate 激活页 ===== -->
@@ -620,6 +623,27 @@ document.getElementById('btn_remind').onclick = doRemind;
 
 // 初始 FAB 可见性
 updateFab();
+
+/* ========== 复制源码到墨刀 ========== */
+function copySource(){
+  var t = '';
+  try { t = document.documentElement.outerHTML; } catch(e){ t = ''; }
+  var ok = false;
+  try {
+    var ta = document.createElement('textarea');
+    ta.value = t;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-9999px';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+  } catch(e) { ok = false; }
+  toast(ok ? '源码已复制，去墨刀粘贴即可' : '复制失败，请手动复制源码');
+}
+document.getElementById('btn_copy_source').onclick = copySource;
 </script>
 </body>
 </html>
