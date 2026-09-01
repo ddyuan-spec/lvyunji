@@ -278,11 +278,11 @@
 
   <script>
     const sampleList = [
-      { id: 713, account: '18307448440', contact: 'qian', yuanqiId: '11123213', huaxiaNo: '21312412', name: '万湖汇绿韵家工作室', address: '湖南省长沙市雨花区东塘街道凯德广场', avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=WQ&backgroundColor=e5e7eb', totalWater: 0, todayWater: 0, status: 1, createdAt: '2026-05-20 16:14:03', machines: ['10AAU6P03709VGMS8921'] },
-      { id: 711, account: '18307448442', contact: '宋健', yuanqiId: '1111', huaxiaNo: '1111', name: 'qian绿韵家工作室', address: '湖南省长沙市雨花区梨子山街道韶山中路489号（新建路与韶山路交汇处）', avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=SJ&backgroundColor=dbeafe', totalWater: 22, todayWater: 0, status: 1, createdAt: '2026-05-09 11:46:52', machines: ['10AAU6P03712KLTW7733', '10AAU6P03708MNBV5544'] },
-      { id: 710, account: '18566956673', contact: '小TT', yuanqiId: '8888888888', huaxiaNo: '9999999999', name: '盛瑞工作室', address: '河北省秦皇岛市山海关区西关街道山海关区拆迁办公室山海关区保障性住房管理中心', avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=SR&backgroundColor=fce7f3', totalWater: 365, todayWater: 0, status: 1, createdAt: '2026-04-03 09:05:15', machines: ['10AAU6P03715PQRS6688', '10AAU6P03716XYZW9900'] },
-      { id: 709, account: '189799', contact: '林贤', yuanqiId: '2022CP19550', huaxiaNo: '104A5KP03709SYCJZROT', name: '南宁市良庆区东洁工作室', address: '广西壮族自治区南宁市良庆区青山路鼎际', avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=LX&backgroundColor=dcfce7', totalWater: 0, todayWater: 0, status: 0, createdAt: '2026-03-23 14:30:22', machines: ['10AAU6P03718ABCD1122'] },
-      { id: 708, account: '13768392003', contact: '陈于圆', yuanqiId: '2022CP19550', huaxiaNo: '104A5KP03709YJZSQQEGQ', name: '贵港市闽洁工作室', address: '广西壮族自治区贵港市港北区荷城街道迎宾建材', avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=CY&backgroundColor=fef9c3', totalWater: 0, todayWater: 0, status: 0, createdAt: '2026-03-23 14:05:58', machines: ['10AAU6P03719EFGH3344'] }
+      { id: 713, account: '18307448440', contact: 'qian', yuanqiId: '11123213', huaxiaNo: '21312412', name: '万湖汇绿韵家工作室', address: '湖南省长沙市雨花区东塘街道凯德广场', avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=WQ&backgroundColor=e5e7eb', totalWater: 0, todayWater: 0, status: 1, createdAt: '2026-05-20 16:14:03' },
+      { id: 711, account: '18307448442', contact: '宋健', yuanqiId: '1111', huaxiaNo: '1111', name: 'qian绿韵家工作室', address: '湖南省长沙市雨花区梨子山街道韶山中路489号（新建路与韶山路交汇处）', avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=SJ&backgroundColor=dbeafe', totalWater: 22, todayWater: 0, status: 1, createdAt: '2026-05-09 11:46:52' },
+      { id: 710, account: '18566956673', contact: '小TT', yuanqiId: '8888888888', huaxiaNo: '9999999999', name: '盛瑞工作室', address: '河北省秦皇岛市山海关区西关街道山海关区拆迁办公室山海关区保障性住房管理中心', avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=SR&backgroundColor=fce7f3', totalWater: 365, todayWater: 0, status: 1, createdAt: '2026-04-03 09:05:15' },
+      { id: 709, account: '189799', contact: '林贤', yuanqiId: '2022CP19550', huaxiaNo: '104A5KP03709SYCJZROT', name: '南宁市良庆区东洁工作室', address: '广西壮族自治区南宁市良庆区青山路鼎际', avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=LX&backgroundColor=dcfce7', totalWater: 0, todayWater: 0, status: 0, createdAt: '2026-03-23 14:30:22' },
+      { id: 708, account: '13768392003', contact: '陈于圆', yuanqiId: '2022CP19550', huaxiaNo: '104A5KP03709YJZSQQEGQ', name: '贵港市闽洁工作室', address: '广西壮族自治区贵港市港北区荷城街道迎宾建材', avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=CY&backgroundColor=fef9c3', totalWater: 0, todayWater: 0, status: 0, createdAt: '2026-03-23 14:05:58' }
     ];
 
     function toggleMenu(el) {
@@ -303,76 +303,6 @@
     function statusTag(status) {
       if (status === 1) return '<span class="status-tag status-on">已认证</span>';
       return '<span class="status-tag status-pending">待审核</span>';
-    }
-
-    function drawPlaceholderQR(canvas, machineCode) {
-      const ctx = canvas.getContext('2d');
-      const size = 200;
-      canvas.width = size;
-      canvas.height = size + 24;
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(0, 0, size, size + 24);
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(4, 4, size - 8, size - 8);
-      // 三个定位角
-      ctx.fillStyle = '#000';
-      ctx.fillRect(16, 16, 44, 44);
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(24, 24, 28, 28);
-      ctx.fillStyle = '#000';
-      ctx.fillRect(32, 32, 12, 12);
-
-      ctx.fillStyle = '#000';
-      ctx.fillRect(size - 60, 16, 44, 44);
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(size - 52, 24, 28, 28);
-      ctx.fillStyle = '#000';
-      ctx.fillRect(size - 44, 32, 12, 12);
-
-      ctx.fillStyle = '#000';
-      ctx.fillRect(16, size - 60, 44, 44);
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(24, size - 52, 28, 28);
-      ctx.fillStyle = '#000';
-      ctx.fillRect(32, size - 44, 12, 12);
-
-      // 随机黑块模拟数据
-      let seed = 0;
-      for (let c of machineCode) seed += c.charCodeAt(0);
-      const rng = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
-      for (let y = 72; y < size - 72; y += 8) {
-        for (let x = 72; x < size - 72; x += 8) {
-          if (rng() > 0.5) ctx.fillRect(x, y, 7, 7);
-        }
-      }
-      ctx.fillStyle = '#333';
-      ctx.font = '12px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(machineCode, size / 2, size + 16);
-    }
-
-    function downloadQR(stationName, machines) {
-      if (!machines || machines.length === 0) {
-        toast('该工作站暂无绑定水机');
-        return;
-      }
-      machines.forEach((code, idx) => {
-        const canvas = document.createElement('canvas');
-        drawPlaceholderQR(canvas, code);
-        const filename = `${stationName}-${code}.png`;
-        canvas.toBlob(blob => {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = filename;
-          setTimeout(() => {
-            a.click();
-            URL.revokeObjectURL(url);
-          }, idx * 200);
-        }, 'image/png');
-      });
-      toast(`已下载 ${machines.length} 个水机二维码`);
     }
 
     function renderList(data) {
@@ -405,7 +335,6 @@
               <button class="btn btn-link danger" onclick="toast('拉黑工作站 ${row.id}')">拉黑</button>
               <button class="btn btn-link danger" onclick="toast('驳回工作站 ${row.id}')">驳回</button>
               <button class="btn btn-link" onclick="toast('水机预约记录 ${row.id}')">水机预约记录</button>
-              <button class="btn btn-link" onclick="downloadQR('${row.name}', ${JSON.stringify(row.machines).replace(/"/g, '&quot;')})">下载二维码</button>
             </div>
           </td>
         `;
