@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>绿韵家App「数智-健康档案」需求文档（PRD）</title>
+  <style>
+    :root { color-scheme: light; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; line-height: 1.7; color: #1f2329; max-width: 980px; margin: 40px auto; padding: 0 24px; background: #fff; }
+    h1 { font-size: 28px; border-bottom: 2px solid #166cff; padding-bottom: 12px; }
+    h2 { font-size: 22px; margin-top: 40px; border-left: 4px solid #166cff; padding-left: 12px; }
+    h3 { font-size: 18px; margin-top: 32px; color: #0d47a1; }
+    h4 { font-size: 16px; margin-top: 26px; color: #1a237e; }
+    h5 { font-size: 14px; margin-top: 20px; color: #37474f; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; table-layout: fixed; font-size: 14px; }
+    th, td { border: 1px solid #d0d7de; padding: 10px 12px; vertical-align: top; word-break: break-all; overflow-wrap: break-word; }
+    th { background: #f6f8fa; font-weight: 600; text-align: left; }
+    ul, ol { margin: 10px 0; padding-left: 22px; }
+    li { margin: 6px 0; }
+    img { max-width: 100%; max-height: 800px; border: 1px solid #e0e0e0; border-radius: 8px; object-fit: contain; display: block; margin: 12px 0; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px; font-weight: 600; }
+    .tag.r { background: #ffebee; color: #c62828; }
+    .tag.y { background: #fff8e1; color: #f57f17; }
+    .tag.g { background: #e8f5e9; color: #2e7d32; }
+    .tag.b { background: #e3f2fd; color: #1565c0; }
+    .warn { background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px 16px; margin: 16px 0; border-radius: 0 8px 8px 0; }
+    .note { background: #e3f2fd; border-left: 4px solid #2196f3; padding: 12px 16px; margin: 16px 0; border-radius: 0 8px 8px 0; }
+    code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-family: Consolas, monospace; font-size: 13px; }
+    .toc { background: #f8f9fa; padding: 16px 20px; border-radius: 8px; margin-bottom: 32px; }
+    .toc a { color: #166cff; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .scope-tag { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; vertical-align: middle; }
+    .scope-existing { background: #e8f5e9; color: #2e7d32; }
+    .scope-new { background: #ffebee; color: #c62828; }
+    .scope-modified { background: #fff8e1; color: #f57f17; }
+  </style>
+</head>
+<body>
+
+<h1>绿韵家App「数智-健康档案」需求文档（PRD）</h1>
+
+<div class="toc">
+  <strong>目录</strong>
+  <ol>
+    <li><a href="#s1">一、文档基本信息</a></li>
+    <li><a href="#s2">二、项目背景与目标</a></li>
+    <li><a href="#s3">三、业务流程与架构</a></li>
+    <li><a href="#s4">四、功能需求详情</a></li>
+    <li><a href="#s5">五、非功能性需求</a></li>
+    <li><a href="#s6">六、验收标准</a></li>
+    <li><a href="#s7">七、关键边界设计检查清单</a></li>
+    <li><a href="#s8">八、文档维护与变更规范</a></li>
+    <li><a href="#s9">九、待确认项汇总</a></li>
+  </ol>
+</div>
+
+<!-- ==================== 一、文档基本信息 ==================== -->
+<h2 id="s1">一、文档基本信息</h2>
+<table>
+<thead>
+  <tr><th>项目</th><th>内容</th></tr>
+</thead>
+<tbody>
+  <tr><td>项目名称</td><td>绿韵家App「数智-健康档案」功能需求</td></tr>
+  <tr><td>文档版本</td><td>V1.0</td></tr>
+  <tr><td>创建日期</td><td>2026-09-01</td></tr>
+  <tr><td>文档状态</td><td>草稿 / 待评审</td></tr>
+  <tr><td>产品负责人</td><td>⚠️ 待确认 @产品负责人</td></tr>
+  <tr><td>技术Owner</td><td>⚠️ 待确认 @研发负责人</td></tr>
+  <tr><td>测试负责人</td><td>⚠️ 待确认 @测试负责人</td></tr>
+</tbody>
+</table>
+
+<h3>历史修订记录</h3>
+<table>
+<thead>
+  <tr><th>版本号</th><th>修订日期</th><th>修订人</th><th>修订内容简述</th><th>状态</th></tr>
+</thead>
+<tbody>
+  <tr><td>V1.0</td><td>2026-09-01</td><td>PM</td><td>初版：基于16张「数智」原型截图，聚焦健康档案模块（数智入口、健康档案详情、日/周/月/年视图、记录身体数据、基础信息完善）补全交互规则与PRD。</td><td>草稿</td></tr>
+  <tr><td>V1.1</td><td>2026-09-01</td><td>PM</td><td>修订：① 全量身体数据精度统一至小数点后1位；② 各指标输入范围给定常见人类占位区间（体重2.0~300.0kg/身高30.0~250.0cm/体脂率2.0~75.0%/腰围30.0~200.0cm）；③ 记录弹窗修改身高同步更新基础信息；④ KPI基线给定占位（日活≥15%、完善率≥60%）；⑤ 新增§5.4埋点需求（本期事件清单）；⑥ 改为「一天一条记录、修改覆盖、删除物理删除」模型。</td><td>草稿</td></tr>
+</tbody>
+</table>
+
+<div class="note">
+<strong>本期范围声明</strong>：本期仅覆盖「数智」Tab 下的<strong>健康档案</strong>功能链路，包括：① 数智首页/对话页作为入口；② 健康档案详情页（日/周/月/年视图、记录列表、身体趋势图）；③ 记录身体数据弹窗；④ 完善基础信息弹窗/页面。<strong>不在本期范围</strong>：AI帮你买/省/选/看的具体对话逻辑、健康盒子（百宝箱）物品管理与使用计划、AI拍照识别、设备同步连接。
+</div>
+
+<!-- ==================== 二、项目背景与目标 ==================== -->
+<h2 id="s2">二、项目背景与目标</h2>
+
+<h3>2.1 业务背景</h3>
+<p>绿韵家App正在将原有小程序「数智」能力升级为以AI健康助手为核心的健康档案中心。当前原型已画出首页入口、健康档案详情、记录弹窗等界面，但缺少具体的交互规则与边界条件，尤其是：</p>
+<ol>
+  <li><strong>当天无记录的空状态</strong>未明确页面如何展示、用户如何被引导去记录；</li>
+  <li><strong>日/周/月/年切换</strong>的统计口径与下方展示规则（列表 vs 趋势图）未定义；</li>
+  <li><strong>记录操作</strong>（删除、编辑、来源）未定义；</li>
+  <li><strong>基础信息</strong>的触发条件与必填规则未明确。</li>
+</ol>
+
+<h3>2.2 项目目标</h3>
+<table>
+<thead>
+  <tr><th>目标维度</th><th>具体指标/描述</th><th>优先级</th></tr>
+</thead>
+<tbody>
+  <tr><td>记录闭环</td><td>用户在健康档案任何时间维度下都能清晰看到当天是否有记录，并一键补录</td><td>P0</td></tr>
+  <tr><td>数据可读</td><td>日/周/月/年切换后，顶部关键指标与下方趋势/列表展示口径一致、无歧义</td><td>P0</td></tr>
+  <tr><td>体验简洁</td><td>记录操作路径短，删除后可直接重新录入，不强制编辑旧记录</td><td>P1</td></tr>
+</tbody>
+</table>
+
+<h3>2.3 衡量指标（KPI）</h3>
+<table>
+<thead>
+  <tr><th>指标</th><th>说明</th><th>目标</th></tr>
+</thead>
+<tbody>
+  <tr><td>健康档案日活跃率</td><td>进入健康档案的用户中，当日产生至少一条记录的占比</td><td>≥ 15%（占位基线，待产品负责人确认）</td></tr>
+  <tr><td>记录完成率</td><td>点击「去记录」后成功保存记录的比例</td><td>≥ 95%</td></tr>
+  <tr><td>基础信息完善率</td><td>查看BMI/体脂率的用户中，已完善性别/生日/身高的占比</td><td>≥ 60%（占位基线，待产品负责人确认）</td></tr>
+</tbody>
+</table>
+
+<!-- ==================== 三、业务流程与架构 ==================== -->
+<h2 id="s3">三、业务流程与架构</h2>
+
+<h3>3.1 页面信息架构</h3>
+<p>「数智-健康档案」功能链路由以下页面/弹窗组成：</p>
+<ol>
+  <li><strong>数智首页</strong> — AI助手入口聚合页，点击「AI帮你看」等区域进入对话页；</li>
+  <li><strong>数智对话页</strong> — 聊天界面，底部快捷入口可跳转「健康档案」「健康盒子」；</li>
+  <li><strong>健康档案详情页</strong> — 核心页面，展示日/周/月/年维度下的体重、BMI、体脂率及记录列表/趋势图；</li>
+  <li><strong>记录身体数据弹窗</strong> — 手动录入体重、体脂率、腰围、身高、日期、时间；</li>
+  <li><strong>完善基础信息弹窗/页面</strong> — 补充性别、生日、身高，用于计算BMI/体脂率。</li>
+</ol>
+
+<h3>3.2 主业务流程</h3>
+<ol>
+  <li>用户通过底部Tab进入「数智」首页；</li>
+  <li>用户点击入口进入「健康档案」详情页；</li>
+  <li>系统加载当前选中日期/周期的健康数据：
+    <ul>
+      <li>若当天有记录，顶部显示最新体重/BMI/体脂率，下方展示记录列表或趋势图；</li>
+      <li>若当天无记录，顶部显示「--」或最近一次数据，中部展示空状态插画+「去记录」按钮；</li>
+    </ul>
+  </li>
+  <li>用户点击「去记录」，弹出「记录身体数据」弹窗；</li>
+  <li>用户填写数据并确认，系统校验后保存；</li>
+  <li>保存成功后弹窗关闭，详情页刷新展示最新记录；</li>
+  <li>用户查看BMI/体脂率时，若缺少性别/生日/身高，触发「完善基础信息」弹窗。</li>
+</ol>
+
+<div class="warn">
+<strong>范围外声明</strong>：本需求不涉及商家端后台、设备同步连接、健康盒子（百宝箱）物品管理、AI拍照识别、AI帮你买/省/选/看的对话逻辑。
+</div>
+
+<!-- ==================== 四、功能需求详情 ==================== -->
+<h2 id="s4">四、功能需求详情</h2>
+
+<!-------------------------- 4.1 数智首页 -------------------------->
+<h3>4.1 数智首页 <span class="scope-tag scope-existing">已有-沿用</span></h3>
+<h4>4.1.1 页面原型与交互示意</h4>
+<img src="shuzhi-health-prd-assets/01-shuzhi-home.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="数智首页原型">
+<p style="font-size:13px;color:#666;">图1：数智首页，顶部AI助手欢迎区+4个AI能力入口（买/看/省/选）</p>
+
+<h4>4.1.2 详细逻辑规则</h4>
+<p>沿用现有功能。</p>
+<p><strong>涉及终端明细：</strong>App端（iOS/Android）。</p>
+<p><strong>界面元素：</strong>顶部标题「数智」；AI助手欢迎文案「Hi~ 我是你的AI助手」；四个入口卡片：AI帮你买、AI帮你看、AI帮你省、AI帮你选。</p>
+<p><strong>交互：</strong>点击「AI帮你看」进入数智对话页；点击其他入口进入对应AI能力页。本期健康档案仅把数智首页作为入口引用，不改变其现有逻辑。</p>
+
+<!-------------------------- 4.2 数智对话页 -------------------------->
+<h3>4.2 数智对话页 <span class="scope-tag scope-existing">已有-沿用</span></h3>
+<h4>4.2.1 页面原型与交互示意</h4>
+<img src="shuzhi-health-prd-assets/02-shuzhi-chat.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="数智对话页原型">
+<p style="font-size:13px;color:#666;">图2：数智对话页，底部快捷入口含「健康档案」「健康盒子」</p>
+
+<h4>4.2.2 详细逻辑规则</h4>
+<p>沿用现有功能。</p>
+<p><strong>涉及终端明细：</strong>App端（iOS/Android）。</p>
+<p><strong>界面元素：</strong>顶部标题「数智」+返回按钮+菜单按钮；中部对话区；底部输入区（按住说话/相机/键盘切换）；底部快捷标签「健康档案」「健康盒子」。</p>
+<p><strong>交互：</strong>点击「健康档案」标签跳转至健康档案详情页；点击「健康盒子」跳转至健康盒子页（不在本期范围）。</p>
+
+<!-------------------------- 4.3 健康档案详情页 -------------------------->
+<h3>4.3 健康档案详情页 <span class="scope-tag scope-modified">本期改动</span></h3>
+
+<h4>4.3.1 页面原型与交互示意</h4>
+<img src="shuzhi-health-prd-assets/03-archive-detail.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="健康档案详情页-日视图">
+<p style="font-size:13px;color:#666;">图3：健康档案详情页-日视图，展示当天记录列表</p>
+
+<img src="shuzhi-health-prd-assets/04-trend-week.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="健康档案详情页-周视图">
+<p style="font-size:13px;color:#666;">图4：健康档案详情页-周视图，展示身体趋势图</p>
+
+<h4>4.3.2 详细逻辑规则</h4>
+<p><strong>需求影响范围：</strong>本期重点补全日/周/月/年切换规则、当天无记录空状态、记录删除交互。影响健康档案详情页的数据展示与操作逻辑。</p>
+<p><strong>涉及终端明细：</strong>App端（iOS/Android）。</p>
+
+<p><strong>界面与展示规则：</strong></p>
+<table>
+<thead>
+  <tr><th>字段/区域</th><th>需求说明</th><th>备注</th></tr>
+</thead>
+<tbody>
+  <tr><td>页面标题</td><td>顶部导航栏居中显示「健康档案」，左侧返回按钮，右侧用户头像</td><td>沿用现有</td></tr>
+  <tr><td>时间维度Tab</td><td>日 / 周 / 月 / 年 四个Tab，默认选中「日」</td><td>切换时保持当前日期所在周期</td></tr>
+  <tr><td>日期导航</td><td>左右箭头切换上/下一周期，中间显示当前周期范围，「回今天」按钮返回今日周期</td><td>日视图显示「X月X日」；周视图显示「X月X日-X月X日」；月视图显示「X月」；年视图显示「X年」</td></tr>
+  <tr><td>顶部指标区</td><td>左侧BMI+等级标签；中间体重（kg）大数字；右侧体脂率。所有指标数值统一展示与存储为<strong>小数点后1位</strong>（如 67.0、23.2、20.0）。日视图取当日唯一记录值；周/月/年视图取该周期结束日那条记录值</td><td>若无记录则显示「--」；精度1位小数</td></tr>
+  <tr><td>编辑基础信息按钮</td><td>位于指标区下方，点击跳转基础信息编辑页或弹窗</td><td>必填项未填时按钮可高亮提示</td></tr>
+  <tr><td>记录列表（日视图）</td><td>展示当天<strong>唯一一条</strong>身体数据记录（按记录日期唯一）；点击该记录进入记录弹窗（编辑/覆盖模式）</td><td>展示数值、时间、数据来源；一天仅保留一条</td></tr>
+  <tr><td>身体趋势（周/月/年视图）</td><td>展示体重/BMI/体脂率随时间变化曲线，可切换指标与单位（kg/斤）</td><td>取该周期内各日唯一记录点（一天一条）</td></tr>
+  <tr><td>空状态</td><td>当天/当周/当月/当年无记录时，中部展示空插画与文案，底部保留「去记录」按钮</td><td>详见4.3.3</td></tr>
+  <tr><td>去记录按钮</td><td>页面底部固定悬浮/置底大按钮，文案「去记录」</td><td>点击唤起记录弹窗</td></tr>
+</tbody>
+</table>
+
+<div class="note"><strong>数据精度统一规则（全局）</strong>：本需求所有身体指标（体重、身高、体脂率、腰围）的输入、展示与存储精度统一为<strong>小数点后1位</strong>（如 67.0、23.2、20.0）；BMI 由体重与身高计算得出，同样保留1位小数。计算与四舍五入：采用四舍五入，展示层与存储层保持一致。</div>
+
+<p><strong>业务逻辑与边界条件：</strong></p>
+<ol>
+  <li><strong>日视图加载逻辑：</strong>
+    <ul>
+      <li>进入页面默认加载「今日」数据；</li>
+      <li>若今日有记录：顶部指标取今日唯一记录；下方展示该条记录（点击可编辑/覆盖）；</li>
+      <li>若今日无记录：顶部指标显示「--」或最近一次记录（带「今日未记录」提示）；列表区展示空状态+「去记录」按钮。</li>
+    </ul>
+  </li>
+  <li><strong>周/月/年视图加载逻辑：</strong>
+    <ul>
+      <li>顶部大数字取该周期结束日那条记录（一天一条，即结束日的唯一记录）；</li>
+      <li>下方展示趋势图，X轴为该周期内日期，Y轴为数值；</li>
+      <li>若该周期内无记录：展示空状态+「去记录」按钮，趋势图为空。</li>
+    </ul>
+  </li>
+  <li><strong>单位切换：</strong>
+    <ul>
+      <li>体重支持 kg / 斤 切换，1kg = 2斤；</li>
+      <li>切换仅影响展示，后端统一存储kg；</li>
+      <li>默认展示kg。</li>
+    </ul>
+  </li>
+  <li><strong>删除交互（物理删除，一天一条）：</strong>
+    <ul>
+      <li>当天仅存在一条记录；用户在记录项上左滑，出现「删除」按钮；</li>
+      <li>点击「删除」后二次确认弹窗「确定删除这条记录吗？删除后不可恢复」；</li>
+      <li>确认删除后后端<strong>物理删除</strong>该日记录，列表与顶部指标清空，页面切换为<strong>空状态</strong>+「去记录」按钮；</li>
+      <li>删除后该日无任何记录，用户再次点击「去记录」为<strong>新建</strong>（不会恢复旧数据）。</li>
+    </ul>
+  </li>
+  <li><strong>BMI/体脂率计算触发：</strong>
+    <ul>
+      <li>当用户查看BMI或体脂率时，若缺少性别/生日/身高任一字段，弹出「完善基础信息」弹窗；</li>
+      <li>完善后才显示BMI等级标签与体脂率分析。</li>
+    </ul>
+  </li>
+</ol>
+
+<h4>4.3.3 空状态规则</h4>
+<table>
+<thead>
+  <tr><th>场景</th><th>展示内容</th><th>用户操作</th></tr>
+</thead>
+<tbody>
+  <tr><td>日视图当天无记录</td><td>顶部体重显示「--」，BMI/体脂率显示「--」；中部空插画+文案「今天还没有记录哦」；底部「去记录」按钮</td><td>点击「去记录」弹出记录弹窗</td></tr>
+  <tr><td>周/月/年视图该周期无记录</td><td>趋势图区域展示空插画+文案「本周/本月/本年还没有记录哦」；底部「去记录」按钮</td><td>点击「去记录」弹出记录弹窗，记录日期默认落在当前周期内最近一天</td></tr>
+</tbody>
+</table>
+
+<h4>4.3.4 功能按钮总表</h4>
+<table>
+<thead>
+  <tr><th>功能名称</th><th>功能说明</th><th>备注</th></tr>
+</thead>
+<tbody>
+  <tr><td>返回</td><td>返回上一级页面</td><td>沿用现有</td></tr>
+  <tr><td>日期切换（左/右箭头）</td><td>切换到上/下一日或上/下一周期</td><td>无边界限制，可无限前后翻</td></tr>
+  <tr><td>回今天</td><td>快速回到包含今日的周期</td><td>日视图回到今日，周视图回到本周</td></tr>
+  <tr><td>日/周/月/年Tab</td><td>切换时间维度</td><td>切换后保持当前日期所在周期</td></tr>
+  <tr><td>编辑基础信息</td><td>进入基础信息编辑页/弹窗</td><td>见4.5</td></tr>
+  <tr><td>去记录</td><td>唤起记录身体数据弹窗</td><td>当日已存在记录时为「编辑/覆盖」模式（预填当日记录）；当日无记录时为「新建」模式，见4.4</td></tr>
+  <tr><td>删除（左滑）</td><td>删除当日唯一记录</td><td>物理删除，二次确认，删除后不可恢复</td></tr>
+</tbody>
+</table>
+
+<h4>4.3.5 数据来源</h4>
+<table>
+<thead>
+  <tr><th>字段名称</th><th>取值逻辑说明</th></tr>
+</thead>
+<tbody>
+  <tr><td>体重</td><td>取《用户身体数据记录表》.weight 字段，单位kg，按记录日期取唯一一条；展示保留1位小数</td></tr>
+  <tr><td>体脂率</td><td>取《用户身体数据记录表》.body_fat_rate 字段，按记录日期取唯一一条；展示保留1位小数</td></tr>
+  <tr><td>腰围</td><td>取《用户身体数据记录表》.waistline 字段，按记录日期取唯一一条；展示保留1位小数</td></tr>
+  <tr><td>BMI</td><td>根据最新体重与身高计算：BMI = 体重(kg) / (身高(m))^2，计算结果保留1位小数</td></tr>
+  <tr><td>BMI等级</td><td>根据BMI值与性别、年龄匹配《BMI分级标准表》得出「偏瘦/标准/偏高/过高」</td></tr>
+  <tr><td>记录时间</td><td>取《用户身体数据记录表》.record_time 字段，展示格式 HH:mm</td></tr>
+  <tr><td>数据来源</td><td>固定显示「手动输入」，本期不支持设备同步</td></tr>
+</tbody>
+</table>
+
+<!-------------------------- 4.4 记录身体数据弹窗 -------------------------->
+<h3>4.4 记录身体数据弹窗 <span class="scope-tag scope-new">本期新增</span></h3>
+
+<h4>4.4.1 页面原型与交互示意</h4>
+<img src="shuzhi-health-prd-assets/05-record-modal.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="记录身体数据弹窗">
+<p style="font-size:13px;color:#666;">图5：记录身体数据弹窗，可录入日期、时间、体重、体脂率、腰围、身高</p>
+
+<h4>4.4.2 详细逻辑规则</h4>
+<p><strong>需求影响范围：</strong>本期新增弹窗，用于手动录入身体数据。录入后实时影响健康档案详情页展示与BMI计算。</p>
+<p><strong>涉及终端明细：</strong>App端（iOS/Android）。</p>
+
+<p><strong>界面与展示规则：</strong></p>
+<table>
+<thead>
+  <tr><th>字段/区域</th><th>需求说明</th><th>备注</th></tr>
+</thead>
+<tbody>
+  <tr><td>弹窗标题</td><td>「记录身体数据」</td><td>顶部关闭按钮 X</td></tr>
+  <tr><td>记录日期</td><td>默认选中当前日期，点击唤起日期选择器</td><td>可补录历史日期，不可选择未来日期</td></tr>
+  <tr><td>记录时间</td><td>默认当前时间，点击唤起时间选择器</td><td>精确到分钟</td></tr>
+  <tr><td>体重（kg）</td><td>必填，数字输入框，默认带入最近一次体重值</td><td>输入范围 2.0~300.0，最多1位小数（常见人类占位值，待产品确认）</td></tr>
+  <tr><td>体脂率（%）</td><td>选填，数字输入框，默认带入最近一次体脂率值</td><td>输入范围 2.0~75.0，最多1位小数（常见人类占位值，待产品确认）</td></tr>
+  <tr><td>腰围（cm）</td><td>选填，数字输入框，默认带入最近一次腰围值</td><td>输入范围 30.0~200.0，最多1位小数（常见人类占位值，待产品确认）</td></tr>
+  <tr><td>身高（cm）</td><td>选填，数字输入框，默认带入用户基础信息身高</td><td>保存时<strong>同步更新《用户基础信息表》.height</strong>（覆盖原值，影响BMI/体脂率计算）；输入范围 30.0~250.0，最多1位小数（占位）</td></tr>
+  <tr><td>确认按钮</td><td>底部固定大按钮，默认置灰，必填项填写完整且校验通过后高亮可点击</td><td>点击后保存并关闭弹窗</td></tr>
+</tbody>
+</table>
+
+<p><strong>业务逻辑与边界条件：</strong></p>
+<ol>
+  <li><strong>默认值规则：</strong>
+    <ul>
+      <li>记录日期默认今日；</li>
+      <li>记录时间默认当前系统时间；</li>
+      <li>体重默认取用户最近一次有效记录值，无记录时显示提示文案「请输入体重」；</li>
+      <li>体脂率、腰围默认取最近一次有效记录值，无记录时显示提示文案「请输入」；</li>
+      <li>身高默认取用户基础信息中的身高，未填写时显示提示文案「请输入身高」。</li>
+      <li>若所选日期当日已存在记录，弹窗<strong>预填该记录全部字段值</strong>（编辑/覆盖模式），保存即覆盖该日记录；若当日无记录则为新建模式。</li>
+    </ul>
+  </li>
+  <li><strong>校验规则：</strong>
+    <ul>
+      <li>体重必填，为空时点击确认提示「请输入体重」；</li>
+      <li>体重、体脂率、腰围、身高均为数字，非法字符输入时拦截并提示「只能输入数字」；</li>
+      <li>记录日期不能选择未来日期，选择未来日期时提示「不能选择未来日期」；</li>
+      <li>数值范围：体重 2.0~300.0kg、身高 30.0~250.0cm、体脂率 2.0~75.0%、腰围 30.0~200.0cm，超出范围提示「数值超出正常范围，请核对」；所有数值最多1位小数，超出小数位提示「最多保留1位小数」。（区间均为常见人类占位值，待产品负责人确认）</li>
+    </ul>
+  </li>
+  <li><strong>保存逻辑：</strong>
+    <ul>
+      <li>校验通过后，将记录写入《用户身体数据记录表》；</li>
+      <li><strong>按记录日期唯一，一天只保留一条记录</strong>：保存时若当日已存在记录则<strong>覆盖更新（update）</strong>，否则新增（insert）；记录弹窗中修改的身高同步写入《用户基础信息表》.height；</li>
+      <li>保存成功后Toast提示「记录成功」，弹窗关闭，详情页刷新；</li>
+      <li>保存失败时保持弹窗，提示具体错误信息。</li>
+    </ul>
+  </li>
+  <li><strong>防重与网络异常：</strong>
+    <ul>
+      <li>提交时按钮进入loading态，防止重复提交；</li>
+      <li>弱网/断网时提示「网络异常，请稍后重试」，用户可再次点击确认；</li>
+      <li>后端返回重复提交时，前端提示「请勿重复提交」。</li>
+    </ul>
+  </li>
+</ol>
+
+<h4>4.4.3 编辑/新增表单字段表</h4>
+<table>
+<thead>
+  <tr><th>区域</th><th>字段</th><th>功能逻辑说明</th><th>备注</th></tr>
+</thead>
+<tbody>
+  <tr><td>基础信息</td><td>记录日期</td><td>日期选择器，默认今日，不可选未来</td><td>必填</td></tr>
+  <tr><td>基础信息</td><td>记录时间</td><td>时间选择器，默认当前时间，精确到分钟</td><td>必填</td></tr>
+  <tr><td>身体数据</td><td>体重（kg）</td><td>数字输入框，默认最近一次体重，范围2.0~300.0kg，最多1位小数（占位）</td><td>必填</td></tr>
+  <tr><td>身体数据</td><td>体脂率（%）</td><td>数字输入框，默认最近一次体脂率，2.0~75.0%，最多1位小数（占位）</td><td>选填</td></tr>
+  <tr><td>身体数据</td><td>腰围（cm）</td><td>数字输入框，默认最近一次腰围，30.0~200.0cm，最多1位小数（占位）</td><td>选填</td></tr>
+  <tr><td>身体数据</td><td>身高（cm）</td><td>数字输入框，默认基础信息身高，30.0~250.0cm，最多1位小数（占位）</td><td>选填；保存时同步更新基础信息身高</td></tr>
+</tbody>
+</table>
+
+<h4>4.4.4 功能按钮总表</h4>
+<table>
+<thead>
+  <tr><th>功能名称</th><th>功能说明</th><th>备注</th></tr>
+</thead>
+<tbody>
+  <tr><td>关闭</td><td>点击关闭弹窗，不保存</td><td>滑动/点击蒙层也可关闭</td></tr>
+  <tr><td>确认</td><td>校验并保存记录</td><td>必填项未填或校验未通过时置灰</td></tr>
+</tbody>
+</table>
+
+<!-------------------------- 4.5 完善基础信息弹窗/页面 -------------------------->
+<h3>4.5 完善基础信息弹窗/页面 <span class="scope-tag scope-modified">本期改动</span></h3>
+
+<h4>4.5.1 页面原型与交互示意</h4>
+<img src="shuzhi-health-prd-assets/06-basic-info-modal.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="完善基础信息弹窗">
+<p style="font-size:13px;color:#666;">图6：完善基础信息弹窗，必填性别、出生日期、身高</p>
+
+<img src="shuzhi-health-prd-assets/08-basic-info-page.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="基础信息编辑页">
+<p style="font-size:13px;color:#666;">图7：基础信息编辑页，展示性别、生日、身高、当前体重、体脂率、腰围</p>
+
+<h4>4.5.2 详细逻辑规则</h4>
+<p><strong>需求影响范围：</strong>本期明确基础信息的触发条件与保存规则。基础信息用于BMI/体脂率计算，不强制首次进入填写。</p>
+<p><strong>涉及终端明细：</strong>App端（iOS/Android）。</p>
+
+<p><strong>界面与展示规则：</strong></p>
+<table>
+<thead>
+  <tr><th>字段/区域</th><th>需求说明</th><th>备注</th></tr>
+</thead>
+<tbody>
+  <tr><td>弹窗标题</td><td>「完善信息，才可完成体脂测量」或「完善基础信息」</td><td>关闭按钮 X</td></tr>
+  <tr><td>性别</td><td>单选：男 / 女，必填</td><td>默认未选中</td></tr>
+  <tr><td>出生日期</td><td>日期选择器，必填</td><td>默认未选择，格式 YYYY-MM-DD</td></tr>
+  <tr><td>身高</td><td>数字输入框，单位cm，必填</td><td>范围 30.0~250.0，最多1位小数（常见人类占位值，待产品确认）</td></tr>
+  <tr><td>确认保存按钮</td><td>底部固定大按钮，必填项完整后高亮可点击</td><td>保存后关闭弹窗</td></tr>
+</tbody>
+</table>
+
+<p><strong>业务逻辑与边界条件：</strong></p>
+<ol>
+  <li><strong>触发条件：</strong>
+    <ul>
+      <li>用户查看BMI等级标签或体脂率分析时，若缺少性别/生日/身高任一字段，自动弹出完善信息弹窗；</li>
+      <li>用户点击健康档案详情页「编辑基础信息」按钮，进入基础信息编辑页；</li>
+      <li>不强制用户首次进入健康档案时填写。</li>
+    </ul>
+  </li>
+  <li><strong>校验规则：</strong>
+    <ul>
+      <li>性别必选，未选提示「请选择性别」；</li>
+      <li>出生日期必选，未选提示「请选择出生日期」；</li>
+      <li>身高必填，为空提示「请输入身高」；非法字符拦截；</li>
+      <li>身高范围 30.0~250.0cm，超出提示「数值超出正常范围」；最多1位小数。</li>
+    </ul>
+  </li>
+  <li><strong>保存逻辑：</strong>
+    <ul>
+      <li>校验通过后写入《用户基础信息表》；</li>
+      <li>保存成功后，健康档案详情页重新计算并展示BMI/体脂率；</li>
+      <li>弹窗场景保存后自动关闭；页面场景保存后返回详情页。</li>
+    </ul>
+  </li>
+</ol>
+
+<h4>4.5.3 编辑/新增表单字段表</h4>
+<table>
+<thead>
+  <tr><th>区域</th><th>字段</th><th>功能逻辑说明</th><th>备注</th></tr>
+</thead>
+<tbody>
+  <tr><td>基础信息</td><td>性别</td><td>单选按钮，男/女</td><td>必填</td></tr>
+  <tr><td>基础信息</td><td>出生日期</td><td>日期选择器，格式YYYY-MM-DD</td><td>必填</td></tr>
+  <tr><td>基础信息</td><td>身高（cm）</td><td>数字输入框，30.0~250.0cm，最多1位小数（占位）</td><td>必填</td></tr>
+</tbody>
+</table>
+
+<h4>4.5.4 数据来源</h4>
+<table>
+<thead>
+  <tr><th>字段名称</th><th>取值逻辑说明</th></tr>
+</thead>
+<tbody>
+  <tr><td>性别</td><td>取《用户基础信息表》.gender 字段</td></tr>
+  <tr><td>出生日期</td><td>取《用户基础信息表》.birthday 字段</td></tr>
+  <tr><td>身高</td><td>取《用户基础信息表》.height 字段，单位cm</td></tr>
+</tbody>
+</table>
+
+<!-- ==================== 五、非功能性需求 ==================== -->
+<h2 id="s5">五、非功能性需求</h2>
+
+<h3>5.1 性能要求</h3>
+<table>
+<thead>
+  <tr><th>项</th><th>要求</th></tr>
+</thead>
+<tbody>
+  <tr><td>页面加载</td><td>健康档案详情页首屏加载时间 ≤ 1.5s（含记录列表/趋势图数据）</td></tr>
+  <tr><td>记录保存</td><td>点击确认到保存完成 ≤ 800ms</td></tr>
+  <tr><td>切换维度</td><td>日/周/月/年Tab切换无白屏，骨架屏或缓存过渡</td></tr>
+</tbody>
+</table>
+
+<h3>5.2 兼容性要求</h3>
+<table>
+<thead>
+  <tr><th>项</th><th>要求</th></tr>
+</thead>
+<tbody>
+  <tr><td>App版本</td><td>支持绿韵家App当前主版本及上一版本；老版本不展示新入口时按已有逻辑处理</td></tr>
+  <tr><td>数据兼容</td><td>老用户已有身体数据记录需保留，新字段（如腰围）为空时展示「--」</td></tr>
+</tbody>
+</table>
+
+<h3>5.3 安全与隐私</h3>
+<table>
+<thead>
+  <tr><th>项</th><th>要求</th></tr>
+</thead>
+<tbody>
+  <tr><td>数据权限</td><td>用户只能查看和操作自己的身体数据记录</td></tr>
+  <tr><td>删除不可逆</td><td>删除记录后后端<strong>物理删除</strong>（本需求约定：一天仅一条记录，删除即彻底移除该日记录，不保留历史），前端提示「删除后不可恢复」</td></tr>
+</tbody>
+</table>
+
+<h3>5.4 埋点需求</h3>
+<p>本需求埋点事件与属性遵循《绿韵家埋点规范》（友盟+ 事件体系）。规范在线文档待补充链接后更新此处；本期事件英文名与参数为<strong>建议命名</strong>，最终须与绿韵家现有埋点规范对齐，禁止直接套用。</p>
+<p>本期聚焦「健康档案」链路，涉及以下用户行为事件（精简清单，仅列本期用到的事件）：</p>
+<table>
+<thead>
+  <tr><th>事件英文名（建议）</th><th>事件显示名</th><th>所属层</th><th>平台</th><th>触发时机</th><th>必含上报参数（友盟中文名）</th><th>备注</th></tr>
+</thead>
+<tbody>
+  <tr><td>page_view</td><td>健康档案页曝光</td><td>L1 基础层</td><td>App</td><td>健康档案详情页加载完成</td><td>页面名称、来源页面</td><td>来源页面含：数智首页/数智对话页</td></tr>
+  <tr><td>button_click</td><td>点击去记录</td><td>L1 基础层</td><td>App</td><td>点击「去记录」按钮</td><td>页面名称、按钮名称、记录模式</td><td>记录模式：新建/覆盖</td></tr>
+  <tr><td>popup_view</td><td>记录弹窗曝光</td><td>L1 基础层</td><td>App</td><td>记录身体数据弹窗展示</td><td>弹窗名称、触发来源</td><td>触发来源：底部去记录/补录</td></tr>
+  <tr><td>popup_close</td><td>记录弹窗关闭</td><td>L1 基础层</td><td>App</td><td>记录弹窗关闭（确认/取消/蒙层）</td><td>弹窗名称、关闭方式、用户选择</td><td>用户选择：保存/取消</td></tr>
+  <tr><td>record_body_data_submit</td><td>提交身体数据记录</td><td>L2 业务层</td><td>App</td><td>记录弹窗「确认」且校验通过</td><td>操作类型、是否含体脂率、是否含腰围、是否同步身高</td><td>操作类型：新增/覆盖</td></tr>
+  <tr><td>record_body_data_delete</td><td>删除身体数据记录</td><td>L2 业务层</td><td>App</td><td>二次确认删除当日记录</td><td>记录日期、删除类型</td><td>删除类型：物理删除</td></tr>
+  <tr><td>profile_update</td><td>更新基础信息</td><td>L2 业务层</td><td>App</td><td>完善/编辑基础信息保存成功</td><td>编辑区域、编辑字段列表、是否同步身高</td><td>编辑字段列表：性别;出生日期;身高</td></tr>
+</tbody>
+</table>
+<div class="warn">
+<strong>埋点待确认</strong>：上述事件英文名与参数为本次PRD建议命名，需与绿韵家现有埋点规范对齐，禁止直接套用。⚠️ 待确认 @数据负责人 提供规范链接与本期事件最终命名。
+</div>
+
+<!-- ==================== 六、验收标准 ==================== -->
+<h2 id="s6">六、验收标准</h2>
+
+<table>
+<thead>
+  <tr><th>编号</th><th>验收场景</th><th>Given（前提）</th><th>When（操作）</th><th>Then（结果）</th></tr>
+</thead>
+<tbody>
+  <tr><td>AC-01</td><td>当天无记录进入健康档案</td><td>用户今日未记录任何身体数据</td><td>进入健康档案详情页</td><td>顶部体重/BMI/体脂率显示「--」；中部展示空状态插画与「今天还没有记录哦」；底部显示「去记录」按钮</td></tr>
+  <tr><td>AC-02</td><td>当天有记录进入健康档案</td><td>用户今日已录入体重67.0kg、体脂率20.0%</td><td>进入健康档案详情页</td><td>顶部显示体重67.0、BMI 23.2（标准）、体脂率20.0%（均保留1位小数）；下方展示当日唯一记录</td></tr>
+  <tr><td>AC-03</td><td>切换周视图</td><td>用户进入健康档案，默认日视图</td><td>点击「周」Tab</td><td>顶部显示本周结束日最新体重；下方展示本周身体趋势图（体重曲线）</td></tr>
+  <tr><td>AC-04</td><td>补录历史记录</td><td>用户在日视图选中昨日</td><td>点击「去记录」，日期选择昨日，输入体重66kg，点击确认</td><td>弹窗关闭，详情页刷新，昨日记录列表新增一条体重66kg记录</td></tr>
+  <tr><td>AC-05</td><td>修改记录覆盖当日</td><td>用户今日已记录体重67.0kg</td><td>点击「去记录」，弹窗预填67.0，改为66.5，点击确认</td><td>弹窗关闭，当日记录被覆盖为66.5，列表仍仅1条记录，顶部指标更新</td></tr>
+  <tr><td>AC-09</td><td>删除当日记录（物理删除）</td><td>用户今日已记录体重67.0kg</td><td>左滑记录，点击删除并二次确认</td><td>后端物理删除该日记录，页面切换为空状态+去记录按钮，该日不再有记录</td></tr>
+  <tr><td>AC-06</td><td>缺少基础信息查看BMI</td><td>用户未填写身高</td><td>进入健康档案查看BMI</td><td>弹出「完善信息，才可完成体脂测量」弹窗，要求填写性别/生日/身高</td></tr>
+  <tr><td>AC-07</td><td>校验未来日期</td><td>用户打开记录弹窗</td><td>选择明天日期，点击确认</td><td>提示「不能选择未来日期」，不提交保存</td></tr>
+  <tr><td>AC-08</td><td>断网保存</td><td>用户处于断网状态</td><td>填写体重后点击确认</td><td>按钮loading后提示「网络异常，请稍后重试」，不关闭弹窗</td></tr>
+</tbody>
+</table>
+
+<!-- ==================== 七、关键边界设计检查清单 ==================== -->
+<h2 id="s7">七、关键边界设计检查清单</h2>
+
+<table>
+<thead>
+  <tr><th>检查项</th><th>状态</th><th>说明</th></tr>
+</thead>
+<tbody>
+  <tr><td>网络与异常状态</td><td>已考虑</td><td>弱网/断网保存提示重试；加载失败支持下拉刷新</td></tr>
+  <tr><td>登录与游客态</td><td>沿用现有</td><td>健康档案需登录后查看，游客态点击入口先引导登录</td></tr>
+  <tr><td>极限值与空状态</td><td>已考虑</td><td>当天/当周/当月/当年无记录均展示空状态+去记录按钮</td></tr>
+  <tr><td>版本兼容性</td><td>已考虑</td><td>老版本无新入口按旧逻辑；老数据保留，新字段为空展示「--」</td></tr>
+  <tr><td>逆向流 / 退款</td><td>不涉及</td><td>健康档案记录无退款/逆向流程</td></tr>
+  <tr><td>高并发与防重</td><td>已考虑</td><td>保存按钮loading态，后端幂等防重提交</td></tr>
+</tbody>
+</table>
+
+<!-- ==================== 八、文档维护与变更规范 ==================== -->
+<h2 id="s8">八、文档维护与变更规范</h2>
+<ol>
+  <li><strong>版本号规范</strong>：大迭代 V1.0/V2.0；小修改 V1.1/V1.2。每次修订须更新§一历史修订记录表。</li>
+  <li><strong>变更周知</strong>：定稿后若发生需求变更，须在文档中高亮标出变更点，并主动@对应开发和测试负责人。</li>
+  <li><strong>待确认项闭环</strong>：所有「⚠️ 待确认 @干系人」项确认后，修订正文并删除对应待确认标记，同时在历史修订记录中注明。</li>
+</ol>
+
+<!-- ==================== 九、待确认项汇总 ==================== -->
+<h2 id="s9">九、待确认项汇总</h2>
+<table>
+<thead>
+  <tr><th>序号</th><th>待确认事项</th><th>影响范围</th><th>建议决策人</th></tr>
+</thead>
+<tbody>
+  <tr><td>1</td><td>体重/身高/体脂率/腰围输入范围的最终值（当前已给常见人类占位：体重2.0~300.0kg、身高30.0~250.0cm、体脂率2.0~75.0%、腰围30.0~200.0cm，精度均1位小数）</td><td>记录弹窗校验规则（§4.4）</td><td>@产品负责人</td></tr>
+  <tr><td>2</td><td>记录弹窗修改身高同步更新基础信息<strong>已确认</strong>（保存时覆盖《用户基础信息表》.height）</td><td>身高数据来源一致性（§4.4/§4.5）</td><td>—</td></tr>
+  <tr><td>3</td><td>健康档案日活跃率/基础信息完善率 KPI 基线（当前占位：日活≥15%、完善率≥60%），待确认最终值</td><td>§2.3 衡量指标</td><td>@产品负责人</td></tr>
+  <tr><td>4</td><td>埋点事件英文名与参数命名需与绿韵家现有埋点规范对齐（本期事件清单已起草于§5.4，事件名为建议命名）</td><td>§5.4 埋点需求</td><td>@数据负责人</td></tr>
+  <tr><td>5</td><td>删除记录采用物理删除<strong>已确认</strong>（一天仅一条记录，删除即彻底移除该日记录）</td><td>§5.3 安全与隐私 / §4.3 删除交互</td><td>—</td></tr>
+</tbody>
+</table>
+
+</body>
+</html>
