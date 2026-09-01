@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>新人激活码礼包 · 后台管理总览 - 绿韵家管理系统</title>
+<meta name="viewport" content="width=1280">
+<style>
+:root{
+  --topbar:#2e3338; --topbar-hover:#3a3f44; --topbar-active:#f56c6c;
+  --sidebar:#2e3338; --sidebar-text:#cfd3d8; --sidebar-text-dim:#8a8f95;
+  --sidebar-active-bg:#f56c6c;
+  --main:#f0f2f5; --card:#ffffff; --line:#e8eaed; --line-strong:#d9dbe0;
+  --text:#2e3338; --text-2:#5f6368; --text-3:#9aa0a6;
+  --primary:#f56c6c; --primary-hover:#f04757;
+  --link:#5b6dd1; --link-hover:#3b51d1;
+  --warn:#e6a23c; --ok:#67c23a; --danger:#f56c6c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;font-size:13px;color:var(--text);background:var(--main);overflow:hidden}
+
+.topbar{height:50px;background:var(--topbar);color:#fff;display:flex;align-items:center;padding:0 16px;position:relative;z-index:30}
+.topbar .logo{font-size:15px;font-weight:700;margin-right:24px;letter-spacing:.5px;display:flex;align-items:center;gap:6px}
+.topbar .logo::before{content:"";display:inline-block;width:18px;height:18px;background:var(--primary);border-radius:3px}
+.topbar .nav{display:flex;height:100%}
+.topbar .nav a{color:#cfd3d8;text-decoration:none;padding:0 18px;height:100%;display:flex;align-items:center;font-size:13px}
+.topbar .nav a:hover{background:var(--topbar-hover);color:#fff}
+.topbar .nav a.active{background:var(--topbar-active);color:#fff}
+.topbar .user{margin-left:auto;display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:#cfd3d8}
+.topbar .user .avatar{width:24px;height:24px;border-radius:50%;background:#f56c6c;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px}
+
+.main{display:flex;height:calc(100% - 50px)}
+.sidebar{width:200px;background:var(--sidebar);color:var(--sidebar-text);overflow-y:auto;flex-shrink:0}
+.sidebar .group{padding:6px 0;border-bottom:1px solid #22272b}
+.sidebar .group-title{padding:8px 16px;color:var(--sidebar-text-dim);font-size:12px}
+.sidebar .menu-item{display:flex;align-items:center;gap:8px;padding:8px 16px;color:var(--sidebar-text);text-decoration:none;font-size:13px;cursor:pointer}
+.sidebar .menu-item:hover{background:#3a3f44;color:#fff}
+.sidebar .menu-item.active{background:var(--sidebar-active-bg);color:#fff}
+.sidebar .menu-item .arrow{margin-left:auto;font-size:10px}
+.sidebar .sub-menu{padding-left:0;background:#25292d}
+.sidebar .sub-menu .menu-item{padding:6px 16px 6px 30px;font-size:12px}
+
+.content{flex:1;overflow-y:auto;padding:16px 18px;background:var(--main)}
+.breadcrumb{font-size:12px;color:var(--text-3);margin-bottom:12px}
+.breadcrumb .sep{margin:0 4px}
+.breadcrumb .cur{color:var(--text)}
+
+.page-head{display:flex;align-items:center;margin-bottom:14px}
+.page-head .title{font-size:18px;font-weight:700}
+.page-head .sub{color:var(--text-3);font-size:12px;margin-left:10px;margin-top:3px}
+.page-head .actions{margin-left:auto;color:var(--text-3);font-size:12px}
+
+/* Tabs */
+.tabs{display:flex;align-items:center;border-bottom:1px solid var(--line);background:#fff;padding:0 16px;border-radius:4px 4px 0 0}
+.tab{height:42px;padding:0 16px;display:inline-flex;align-items:center;gap:6px;color:var(--text-2);text-decoration:none;cursor:pointer;position:relative;font-size:13px}
+.tab:hover{color:var(--primary)}
+.tab.active{color:var(--primary);font-weight:600}
+.tab.active::after{content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:2px;background:var(--primary)}
+
+.card{background:var(--card);border-radius:4px;border:1px solid var(--line);margin-bottom:12px}
+.card .card-head{height:46px;padding:0 16px;display:flex;align-items:center;border-bottom:1px solid var(--line)}
+.card .card-head .title{font-size:15px;font-weight:600}
+.card .card-head .actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.card .card-body{padding:16px}
+
+.btn{height:28px;padding:0 12px;border-radius:3px;border:1px solid var(--line-strong);background:#fff;color:var(--text);font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.btn:hover{border-color:var(--primary);color:var(--primary)}
+.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn-primary:hover{background:var(--primary-hover);border-color:var(--primary-hover);color:#fff}
+
+/* 数据口径条 */
+.kpi-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.kpi{flex:1;min-width:160px;background:#fff;border:1px solid var(--line);border-radius:4px;padding:12px 14px}
+.kpi .k{font-size:12px;color:var(--text-3)}
+.kpi .v{font-size:20px;font-weight:700;margin-top:4px}
+.kpi .v small{font-size:12px;font-weight:400;color:var(--text-3)}
+.kpi .d{font-size:12px;color:var(--text-2);margin-top:2px}
+
+/* 模块卡片网格 */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.mod{border:1px solid var(--line);border-radius:4px;background:#fff;padding:14px;display:flex;flex-direction:column;transition:box-shadow .15s,border-color .15s}
+.mod:hover{border-color:var(--primary);box-shadow:0 2px 10px rgba(245,108,108,.12)}
+.mod .ic{width:34px;height:34px;border-radius:6px;background:#fef0f0;color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;margin-bottom:8px}
+.mod .mt{font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px}
+.mod .mt .tag{font-size:11px;padding:1px 7px;border-radius:3px;background:#f0f2f5;color:var(--text-2)}
+.mod .md{font-size:12px;color:var(--text-2);margin:6px 0 10px;line-height:1.5;min-height:36px}
+.mod .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.mod .chip{font-size:11px;padding:2px 7px;border-radius:3px;background:#f6f8fa;color:var(--text-2);border:1px solid var(--line)}
+.mod .enter{margin-top:auto;align-self:flex-start;font-size:12px;color:var(--link);cursor:pointer;display:inline-flex;align-items:center;gap:3px}
+.mod .enter:hover{color:var(--link-hover)}
+
+.note{margin-top:14px;background:#fff7e6;border:1px solid #ffe2ad;color:#8a5500;border-radius:4px;padding:10px 14px;font-size:12px;line-height:1.7}
+.note b{color:#a35a00}
+
+/* 业务全景流 */
+.flow{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding:6px 0 14px}
+.node{flex:1;min-width:150px;background:#fff;border:1px solid var(--line);border-radius:6px;padding:12px;cursor:pointer;position:relative;transition:border-color .15s,box-shadow .15s}
+.node:hover{border-color:var(--primary)}
+.node.active{border-color:var(--primary);box-shadow:0 0 0 2px rgba(245,108,108,.2)}
+.node .idx{position:absolute;top:-9px;left:12px;width:20px;height:20px;border-radius:50%;background:var(--primary);color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.node .nt{font-size:13px;font-weight:600;margin:4px 0 4px}
+.node .nd{font-size:11px;color:var(--text-3);line-height:1.5}
+.node .arrow{position:absolute;right:-9px;top:50%;transform:translateY(-50%);color:var(--text-3);font-size:16px;z-index:2}
+.node:last-child .arrow{display:none}
+
+.detail-panel{margin-top:4px;background:#fff;border:1px solid var(--line);border-radius:4px;padding:16px;display:none}
+.detail-panel.show{display:block}
+.detail-panel .dp-title{font-size:15px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.detail-panel .dp-title .idx{width:22px;height:22px;border-radius:50%;background:var(--primary);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.detail-panel ul{margin:0;padding-left:18px}
+.detail-panel li{font-size:13px;color:var(--text-2);line-height:1.9}
+.detail-panel li b{color:var(--text)}
+.detail-panel .badge{display:inline-block;font-size:11px;padding:1px 7px;border-radius:3px;background:#eef7ff;color:#2b6cb0;border:1px solid #cfe3fb;margin-left:6px}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo">绿韵家</div>
+  <div class="nav">
+    <a href="admin-orders.html">工作台</a>
+    <a href="admin-invite-codes.html">商品</a>
+    <a href="admin-orders.html" class="active">订单中心</a>
+    <a href="admin-invite-codes.html">客户</a>
+    <a href="admin-invite-codes.html">数据</a>
+  </div>
+  <div class="user"><span>后台运营-袁</span><div class="avatar">袁</div></div>
+</div>
+
+<div class="main">
+  <div class="sidebar">
+    <div class="group">
+      <div class="group-title">订单中心</div>
+      <a class="menu-item" href="admin-orders.html">订单管理</a>
+    </div>
+    <div class="group">
+      <div class="group-title">店铺</div>
+      <div class="menu-item">商品中心 <span class="arrow">▾</span></div>
+      <div class="sub-menu">
+        <a class="menu-item" href="admin-invite-codes.html">商品分类</a>
+        <a class="menu-item" href="admin-invite-codes.html">商品管理</a>
+        <a class="menu-item" href="admin-invite-codes.html">商品评价</a>
+        <a class="menu-item" href="admin-invite-codes.html">商品上架审核</a>
+        <a class="menu-item" href="admin-invite-codes.html">品牌管理</a>
+        <a class="menu-item active" href="admin-summary.html">邀请码管理</a>
+      </div>
+    </div>
+    <div class="group">
+      <div class="group-title">新人激活码礼包</div>
+      <a class="menu-item" href="admin-summary.html">后台管理总览</a>
+      <a class="menu-item" href="admin-orders.html">订单列表</a>
+      <a class="menu-item" href="admin-invite-codes.html">邀请码管理</a>
+      <a class="menu-item" href="admin-invite-code-generate.html">邀请码生成</a>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="breadcrumb">店铺<span class="sep">/</span>商品中心<span class="sep">/</span><span class="cur">新人激活码礼包 · 后台管理总览</span></div>
+    <div class="page-head">
+      <div class="title">新人激活码礼包 · 后台管理总览</div>
+      <div class="sub">会员端 ¥35/个 · C端销售价 ¥49.9 · 激活实付 ¥0（激活码抵扣）</div>
+      <div class="actions">原型版本 V0.5</div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" id="tab_nav" onclick="switchTab('nav')">模块导航</div>
+      <div class="tab" id="tab_flow" onclick="switchTab('flow')">业务全景</div>
+    </div>
+
+    <!-- ===== 模块导航 ===== -->
+    <div id="view_nav">
+      <div class="kpi-row">
+        <div class="kpi"><div class="k">邀请码总数（示例）</div><div class="v">8 <small>条</small></div><div class="d">购买生成 6 · 系统生成 2</div></div>
+        <div class="kpi"><div class="k">已下单</div><div class="v">5 <small>条</small></div><div class="d">未下单 3（可禁用）</div></div>
+        <div class="kpi"><div class="k">关联新人订单</div><div class="v">5 <small>笔</small></div><div class="d">订单类型=新人订单</div></div>
+        <div class="kpi"><div class="k">支付单号记录</div><div class="v" style="color:var(--text-3)">不记录</div><div class="d">新人订单仅记订单编号</div></div>
+      </div>
+
+      <div class="grid">
+        <div class="mod">
+          <div class="ic">订</div>
+          <div class="mt">订单列表 <span class="tag">订单中心</span></div>
+          <div class="md">用户激活后生成的待发货订单在此可见，订单类型二级筛选含「新人订单」。</div>
+          <div class="chips"><span class="chip">新人订单筛选</span><span class="chip">支付单号=—</span><span class="chip">查看详情</span></div>
+          <span class="enter" onclick="go('admin-orders.html')">进入 →</span>
+        </div>
+        <div class="mod">
+          <div class="ic">详</div>
+          <div class="mt">订单详情 <span class="tag">订单中心</span></div>
+          <div class="md">沿用当前订单详情页，含上下级绑定记录、激活码礼包商品、实付¥0。</div>
+          <div class="chips"><span class="chip">上下级绑定记录</span><span class="chip">激活码抵扣</span><span class="chip">5节点时间线</span></div>
+          <span class="enter" onclick="go('admin-order-detail.html?id=605893')">进入 →</span>
+        </div>
+        <div class="mod">
+          <div class="ic">码</div>
+          <div class="mt">邀请码管理 <span class="tag">商品中心</span></div>
+          <div class="md">记录生成时间、购买人/生成人、生成途径、下单状态、关联订单号，可禁用未下单码。</div>
+          <div class="chips"><span class="chip">生成途径</span><span class="chip">购买人/生成人</span><span class="chip">禁用</span></div>
+          <span class="enter" onclick="go('admin-invite-codes.html')">进入 →</span>
+        </div>
+        <div class="mod">
+          <div class="ic">详</div>
+          <div class="mt">邀请码详情 <span class="tag">商品中心</span></div>
+          <div class="md">单条邀请码全量信息：生成途径、购买人/生成人、关联订单、生命周期时间线。</div>
+          <div class="chips"><span class="chip">生成途径</span><span class="chip">2节点时间线</span><span class="chip">禁用邀请码</span></div>
+          <span class="enter" onclick="go('admin-invite-code-detail.html?code=A8kL9mN2Pq')">进入 →</span>
+        </div>
+        <div class="mod">
+          <div class="ic">+</div>
+          <div class="mt">邀请码生成 <span class="tag">系统生成</span></div>
+          <div class="md">后台手动新增邀请码，生成途径固定「系统生成」，提交后跳转列表。</div>
+          <div class="chips"><span class="chip">生成数量1-99</span><span class="chip">不绑定上下级</span><span class="chip">提交跳列表</span></div>
+          <span class="enter" onclick="go('admin-invite-code-generate.html')">进入 →</span>
+        </div>
+        <div class="mod">
+          <div class="ic">C</div>
+          <div class="mt">C端 / 会员端 <span class="tag">用户侧</span></div>
+          <div class="md">购买激活码、输入激活码激活、生成待发货订单的完整用户侧原型。</div>
+          <div class="chips"><span class="chip">c-app</span><span class="chip">member</span><span class="chip">激活流程</span></div>
+          <span class="enter" onclick="goExternal('https://ddyuan-spec.github.io/lvyunji/newuser-gift-c-app.html')">新窗口 ↗</span>
+        </div>
+      </div>
+
+      <div class="note">
+        <b>数据口径（V0.5 终稿）：</b>
+        ① 邀请码表<b>无「激活状态」字段</b>——「激活」已被「下单」替代；
+        ② <b>生成途径</b>区分「购买生成」（会员购买）与「系统生成」（后台新增）；
+        ③ <b>购买人/生成人</b>记录昵称 + 账号（手机号原文，内部不脱敏）；
+        ④ <b>禁用</b>仅放行未下单的邀请码；
+        ⑤ 激活时用户无上下级 → 自动绑定到<b>购买人</b>的上下级；<b>系统生成的不绑定</b>。
+      </div>
+    </div>
+
+    <!-- ===== 业务全景 ===== -->
+    <div id="view_flow" style="display:none">
+      <div class="card">
+        <div class="card-head"><div class="title">业务全景流（点击节点查看规则）</div></div>
+        <div class="card-body">
+          <div class="flow" id="flow">
+            <div class="node active" onclick="selectNode(0)">
+              <div class="idx">1</div><div class="nt">会员购买激活码</div>
+              <div class="nd">会员端 ¥35/个，生成「购买生成」邀请码</div>
+              <div class="arrow">›</div>
+            </div>
+            <div class="node" onclick="selectNode(1)">
+              <div class="idx">2</div><div class="nt">用户激活</div>
+              <div class="nd">C端输入激活码，自动绑定上下级</div>
+              <div class="arrow">›</div>
+            </div>
+            <div class="node" onclick="selectNode(2)">
+              <div class="idx">3</div><div class="nt">生成待发货订单</div>
+              <div class="nd">新人订单 · 实付¥0（激活码抵扣）</div>
+              <div class="arrow">›</div>
+            </div>
+            <div class="node" onclick="selectNode(3)">
+              <div class="idx">4</div><div class="nt">后台订单管理</div>
+              <div class="nd">订单类型筛选「新人订单」</div>
+              <div class="arrow">›</div>
+            </div>
+            <div class="node" onclick="selectNode(4)">
+              <div class="idx">5</div><div class="nt">邀请码管理</div>
+              <div class="nd">查看/禁用，记录下单状态</div>
+              <div class="arrow">›</div>
+            </div>
+            <div class="node" onclick="selectNode(5)">
+              <div class="idx">6</div><div class="nt">后台系统生成</div>
+              <div class="nd">新增「系统生成」邀请码</div>
+              <div class="arrow">›</div>
+            </div>
+          </div>
+
+          <div class="detail-panel show" id="dp">
+            <div class="dp-title"><span class="idx">1</span><span id="dp_t">会员购买激活码</span></div>
+            <ul id="dp_l"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var NODES = [
+  {t:'会员购买激活码',
+   l:['<b>入口</b>：会员端「新人激活码礼包」购买页，¥35/个（C端销售价 ¥49.9）','<b>生成途径</b>：<span class="badge">购买生成</span>','<b>结果</b>：按购买数量生成 N 个含特殊符号大小写的激活码，绑定到购买会员','<b>记录字段</b>：生成时间、购买人（昵称+账号）、购买数量']},
+  {t:'用户激活',
+   l:['<b>入口</b>：C端用户输入激活码 → 确认激活','<b>上下级绑定</b>：激活用户<b>无上级</b>时，自动绑定到<b>购买人</b>的上级','<b>系统生成跳过</b>：邀请码为「系统生成」时，激活<b>不绑定</b>任何上下级','<b>不覆盖</b>：已存在上级的用户，激活任何码均不改写其上级']},
+  {t:'生成待发货订单',
+   l:['<b>订单类型</b>：<span class="badge">新人订单</span>','<b>实付</b>：¥0.00（由激活码全额抵扣）','<b>商品</b>：激活码礼包（关联子商品：5L水×7袋 + 赠水袋×7）','<b>支付单号</b>：不记录，订单列表该列显示「—」','<b>售后</b>：不可退款、不可申请售后，仅「联系客服 / 提醒发货」']},
+  {t:'后台订单管理',
+   l:['<b>位置</b>：订单中心 → 订单管理','<b>筛选</b>：二级筛选「订单类型」含「新人订单」（全部/常规/新人订单/拼团/秒杀）','<b>查看详情</b>：沿用当前订单详情页（见「订单详情」模块）','<b>示例</b>：子订单 605893，总金额 ¥49.90，已抵扣 ¥0 实付']},
+  {t:'邀请码管理',
+   l:['<b>位置</b>：店铺 → 商品中心 → 邀请码管理','<b>列表字段</b>：邀请码、生成时间、购买人/生成人、生成途径、下单状态、关联订单编号、操作','<b>禁用</b>：仅未下单的邀请码可「禁用」；已下单置灰','<b>详情</b>：见「邀请码详情」模块（2节点时间线）']},
+  {t:'后台系统生成',
+   l:['<b>入口</b>：邀请码管理右上「+ 生成邀请码」','<b>生成途径</b>：<span class="badge">系统生成</span>','<b>上下级</b>：系统生成的码激活后<b>不绑定</b>上下级关系','<b>提交</b>：生成数量 1-99，提交后跳转列表页']}
+];
+
+function switchTab(name){
+  document.getElementById('tab_nav').classList.toggle('active', name==='nav');
+  document.getElementById('tab_flow').classList.toggle('active', name==='flow');
+  document.getElementById('view_nav').style.display = name==='nav' ? '' : 'none';
+  document.getElementById('view_flow').style.display = name==='flow' ? '' : 'none';
+}
+function go(url){ window.location.href = url; }
+function goExternal(url){ window.open(url, '_blank'); }
+function selectNode(i){
+  var ns = document.querySelectorAll('#flow .node');
+  ns.forEach(function(n,k){ n.classList.toggle('active', k===i); });
+  var n = NODES[i];
+  document.querySelector('#dp .idx').textContent = (i+1);
+  document.getElementById('dp_t').textContent = n.t;
+  document.getElementById('dp_l').innerHTML = n.l.map(function(x){return '<li>'+x+'</li>';}).join('');
+  document.getElementById('dp').classList.add('show');
+}
+</script>
+</body>
+</html>
