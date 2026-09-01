@@ -123,6 +123,15 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 .buy .pkg .row .name{font-size:13px;color:var(--c-text)}
 .buy .pkg .row .spec{font-size:11px;color:var(--c-text-3);margin-top:2px}
 .buy .pkg .row .qty{font-size:13px;color:var(--c-text-3);text-align:right}
+.buy .pkg .row .qty-stepper{display:inline-flex;align-items:center;border:1px solid var(--c-line-2);border-radius:14px;height:28px;padding:0 4px;gap:4px}
+.buy .pkg .row .qty-stepper button{width:24px;height:24px;border:none;background:transparent;font-size:18px;color:var(--c-text-2);cursor:pointer;line-height:1;padding:0}
+.buy .pkg .row .qty-stepper button:disabled{color:var(--c-line-2);cursor:not-allowed}
+.buy .pkg .row .qty-stepper .n{min-width:24px;text-align:center;font-size:13px;color:var(--c-text);font-weight:600}
+.buy .pkg .row .stepper-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.buy .pkg .row .stepper-wrap .unit{font-size:11px;color:var(--c-text-3)}
+
+.gift-card .price{position:relative}
+.gift-card .price .member-price{display:inline-block;margin-left:6px;padding:1px 6px;background:#FFF1E6;color:var(--c-orange);font-size:11px;border-radius:4px;font-weight:600}
 
 .buy .price-card{margin:0 12px 10px;background:#fff;border-radius:10px;padding:12px 14px;font-size:12px;color:var(--c-text-2);box-shadow:0 1px 4px rgba(0,0,0,.04)}
 .buy .price-card .line{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
@@ -200,7 +209,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
       <div class="body">
         <div class="ttl">新人激活码礼包</div>
         <div class="sub">牙膏 + Q10 + 5L 水×7 袋（需自备水袋）</div>
-        <div class="price">¥39.9<small>/份</small></div>
+        <div class="price">¥49.9<small>/份</small><span class="member-price">会员 ¥35</span></div>
       </div>
       <div class="arrow">›</div>
     </div>
@@ -279,20 +288,27 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
       <div class="row">
         <div class="thumb">🎁</div>
         <div class="info"><div class="name">新人礼包激活码</div><div class="spec">含特殊符号大小写 · 一次性使用</div></div>
-        <div class="qty">×1</div>
+        <div class="stepper-wrap">
+          <div class="qty-stepper" id="qty_stepper">
+            <button type="button" id="qty_minus" aria-label="减少">−</button>
+            <span class="n" id="qty_n">1</span>
+            <button type="button" id="qty_plus" aria-label="增加">+</button>
+          </div>
+          <div class="unit">1 份</div>
+        </div>
       </div>
     </div>
 
     <div class="price-card">
-      <div class="line"><span>商品总价</span><span class="v">¥39.9</span></div>
+      <div class="line"><span>商品总价</span><span class="v" id="line_total">¥49.9</span></div>
       <div class="line"><span>运费</span><span class="v">¥0</span></div>
-      <div class="line"><span>专享优惠（服务达人）</span><span class="v">- ¥10</span></div>
-      <div class="line"><span>实付金额</span><span class="v red">¥29.9</span></div>
+      <div class="line"><span>会员专享价</span><span class="v" id="line_save">- ¥14.9</span></div>
+      <div class="line"><span>实付金额</span><span class="v red" id="line_pay">¥35</span></div>
       <div class="tip">⚠️ 一经购买不可退，激活码生成后即生效</div>
     </div>
 
     <div class="footer">
-      <div class="left">合计：<span class="amt">¥29.9</span><span class="qty">×1 份</span></div>
+      <div class="left">合计：<span class="amt" id="line_amt">¥35</span><span class="qty" id="line_qty">×1 份</span></div>
       <button class="btn-confirm" id="btn_buy_confirm">确认购买</button>
     </div>
   </div>
@@ -331,6 +347,7 @@ function go(id){
   var t=document.getElementById(id);
   if(t){t.classList.add('active');t.scrollTop=0;}
   if(id==='p_member_codes') renderCodes();
+  if(id==='p_member_buy'){ window._qty = 1; qtyChange(0); }
 }
 function toast(msg){
   var el=document.getElementById('toast');
@@ -360,9 +377,11 @@ function doBuyConfirm(){
   var d = new Date();
   var pad=function(n){return n<10?'0'+n:n;};
   var ts = d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes());
-  var code = genCode();
-  window._codes.unshift({ code: code, status: 0, time: ts });
-  toast('购买成功，激活码已发放');
+  var n = window._qty || 1;
+  var newOnes = [];
+  for(var i=0;i<n;i++){ newOnes.push({ code: genCode(), status: 0, time: ts }); }
+  window._codes = newOnes.concat(window._codes);
+  toast(n===1?'购买成功，激活码已发放':'购买成功，已生成 '+n+' 个激活码');
   setTimeout(function(){go('p_member_codes');},500);
 }
 window._codeSeq = 0;
@@ -384,8 +403,38 @@ function genCode(){
   s+=S[(n*23+7)%S.length];
   return s;
 }
+
+// ===== 会员价 / 数量 stepper =====
+var MEMBER_ORIG = 49.9;   // 销售价
+var MEMBER_PRICE = 35;    // 会员价
+var MEMBER_MIN = 1;
+var MEMBER_MAX = 99;
+window._qty = 1;
+function fmtMoney(n){
+  // 去浮点尾零：49.9×2=99.8, 35×2=70
+  return parseFloat((Math.round(n*100)/100).toFixed(2)).toString();
+}
+function qtyChange(delta){
+  var n = (window._qty||1) + delta;
+  if(n < MEMBER_MIN || n > MEMBER_MAX) return;
+  window._qty = n;
+  document.getElementById('qty_n').textContent = n;
+  document.getElementById('qty_minus').disabled = (n <= MEMBER_MIN);
+  document.getElementById('qty_plus').disabled = (n >= MEMBER_MAX);
+  var totalOrig = MEMBER_ORIG * n;
+  var save = (MEMBER_ORIG - MEMBER_PRICE) * n;
+  var pay = MEMBER_PRICE * n;
+  document.getElementById('line_total').textContent = '¥' + fmtMoney(totalOrig);
+  document.getElementById('line_save').textContent = '- ¥' + fmtMoney(save);
+  document.getElementById('line_pay').textContent = '¥' + fmtMoney(pay);
+  document.getElementById('line_amt').textContent = '¥' + fmtMoney(pay);
+  document.getElementById('line_qty').textContent = '×' + n + ' 份';
+}
 document.getElementById('fab_buy_more').onclick = function(){ go('p_member_buy'); };
 document.getElementById('btn_buy_confirm').onclick = doBuyConfirm;
+document.getElementById('qty_minus').onclick = function(){ qtyChange(-1); };
+document.getElementById('qty_plus').onclick = function(){ qtyChange(1); };
+qtyChange(0);
 renderCodes();
 </script>
 </body>
