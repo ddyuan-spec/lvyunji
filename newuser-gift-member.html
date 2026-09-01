@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>新人激活码礼包 · 会员端原型（有享12123）</title>
+<style>
+:root{
+  --c-primary:#1AAD7C;
+  --c-primary-2:#0F8E63;
+  --c-orange:#FF7800;
+  --c-red:#E04D4D;
+  --c-red-2:#FF5757;
+  --c-purple:#7B5BD9;
+  --c-purple-2:#5E40C6;
+  --c-text:#222;
+  --c-text-2:#666;
+  --c-text-3:#999;
+  --c-line:#EEE;
+  --c-line-2:#F0F0F0;
+  --c-bg:#F5F6F8;
+  --c-card:#FFF;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--c-text);font-size:13px}
+.phone{position:relative;width:375px;height:812px;margin:20px auto;background:#fff;border-radius:32px;box-shadow:0 12px 40px rgba(0,0,0,.15);overflow:hidden}
+.page{position:absolute;inset:0;overflow-y:auto;background:#fff;display:none}
+.page.active{display:block;-webkit-animation:fade .25s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+.nav{position:sticky;top:0;left:0;right:0;height:44px;display:flex;align-items:center;justify-content:center;background:#fff;border-bottom:1px solid var(--c-line);z-index:5;font-size:15px;font-weight:600}
+.nav .back{position:absolute;left:12px;top:0;height:44px;display:flex;align-items:center;color:var(--c-text);font-size:22px}
+.nav .right{position:absolute;right:12px;top:0;height:44px;display:flex;align-items:center;font-size:13px;color:var(--c-text-2)}
+
+/* 会员端主页 - 顶部 */
+.member-top{background:linear-gradient(160deg,#E2F4EC 0%,#F5F6F8 80%);padding:18px 16px 14px;display:flex;align-items:center;gap:12px;position:relative}
+.avatar{width:48px;height:48px;border-radius:50%;background:var(--c-purple);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;flex-shrink:0}
+.name-block{flex:1;min-width:0}
+.name-row{display:flex;align-items:center;gap:6px}
+.name-row .nm{font-size:17px;font-weight:700;color:var(--c-text)}
+.badge-purple{font-size:10px;padding:2px 7px;border-radius:8px;background:rgba(123,91,217,.12);color:var(--c-purple-2);font-weight:500}
+.reg{font-size:11px;color:var(--c-text-3);margin-top:3px}
+
+/* 升级成为服务达人 */
+.upgrade{margin:0 12px;background:#fff;border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.upgrade .left .ttl{font-size:13px;font-weight:600;color:var(--c-text)}
+.upgrade .left .sub{font-size:11px;color:var(--c-text-3);margin-top:3px}
+.upgrade .left .sub .em{color:var(--c-primary);font-weight:600}
+.btn-upgrade{height:30px;padding:0 14px;background:#fff;border:1.5px solid var(--c-primary);color:var(--c-primary);border-radius:15px;font-size:12px;font-weight:600;cursor:pointer;line-height:27px}
+
+/* 邀请好友 */
+.invite{margin:10px 12px 0;background:#fff;border-radius:10px;padding:14px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.invite .left{display:flex;align-items:center;gap:10px}
+.invite .ic{width:36px;height:36px;border-radius:10px;background:#E9F8F1;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--c-primary)}
+.invite .ttl{font-size:14px;font-weight:600;color:var(--c-text)}
+.invite .q{width:14px;height:14px;border-radius:50%;border:1px solid #C8C8C8;color:var(--c-text-3);font-size:10px;display:flex;align-items:center;justify-content:center}
+.invite .right{font-size:11px;color:var(--c-primary)}
+
+/* 新人礼包商品卡（新增） */
+.gift-card{margin:10px 12px 0;background:linear-gradient(135deg,#E9F8F1 0%,#D4F1E2 100%);border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,.04);cursor:pointer;border:1px solid #C5E8D5}
+.gift-card .thumb{width:54px;height:54px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.gift-card .body{flex:1;min-width:0}
+.gift-card .ttl{font-size:14px;font-weight:700;color:var(--c-text)}
+.gift-card .sub{font-size:11px;color:var(--c-text-2);margin-top:2px;line-height:1.4}
+.gift-card .price{color:var(--c-red-2);font-size:18px;font-weight:700;margin-top:3px}
+.gift-card .price small{font-size:11px;color:var(--c-text-3);font-weight:400;margin-left:2px}
+.gift-card .arrow{color:var(--c-primary);font-size:20px}
+
+/* 标题栏 */
+.section-hd{margin:18px 12px 6px;display:flex;align-items:center;justify-content:space-between}
+.section-hd .ttl{font-size:15px;font-weight:700;color:var(--c-text)}
+.section-hd .link{font-size:11px;color:var(--c-primary);display:flex;align-items:center;gap:2px}
+.section-hd .q{width:12px;height:12px;border-radius:50%;border:1px solid #C8C8C8;color:var(--c-text-3);font-size:9px;display:flex;align-items:center;justify-content:center;margin-left:4px}
+
+/* 我的业绩 */
+.perf{margin:0 12px;background:#fff;border-radius:10px;padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.perf .row1{display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px dashed var(--c-line)}
+.perf .row1 .l{font-size:13px;color:var(--c-text-2)}
+.perf .row1 .l .em{color:var(--c-primary);font-weight:700;font-size:14px}
+.perf .row1 .r{font-size:12px;color:var(--c-primary)}
+.perf .cols{display:grid;grid-template-columns:repeat(3,1fr);padding-top:10px;gap:8px}
+.perf .cols .c .ttl{font-size:13px;font-weight:600;color:var(--c-text)}
+.perf .cols .c .stat{display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--c-text-3)}
+.perf .cols .c .stat .v{color:var(--c-text);font-weight:500}
+.perf .cols .c .stat .v.zero{color:var(--c-primary);font-weight:600}
+.perf .cols .c .stat .v.cash{color:var(--c-text);font-weight:600;font-size:12px}
+
+/* 我的钱包 */
+.wallet{margin:10px 12px;background:#fff;border-radius:10px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.wallet .row1{display:grid;grid-template-columns:1fr 1fr;padding-bottom:10px;border-bottom:1px dashed var(--c-line);text-align:center}
+.wallet .row1 .c .lbl{font-size:12px;color:var(--c-text-2)}
+.wallet .row1 .c .num{font-size:20px;font-weight:700;color:var(--c-text);margin-top:2px}
+.wallet .row2{display:grid;grid-template-columns:1fr 1fr;padding-top:10px;text-align:center}
+.wallet .row2 .c .lbl{font-size:11px;color:var(--c-text-3)}
+.wallet .row2 .c .num{font-size:17px;font-weight:700;color:var(--c-text);margin-top:2px}
+
+/* 我的团队入口 */
+.team{margin:10px 12px;background:#fff;border-radius:10px;padding:14px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.team .ttl{font-size:14px;font-weight:600;color:var(--c-text)}
+.team .arr{color:#C8C8C8;font-size:16px}
+
+/* 我的激活码入口（新增） */
+.codes-entry{margin:10px 12px 24px;background:#fff;border-radius:10px;padding:14px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,.04);cursor:pointer}
+.codes-entry .left{display:flex;align-items:center;gap:10px}
+.codes-entry .ic{width:36px;height:36px;border-radius:10px;background:#FFF1E6;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--c-orange)}
+.codes-entry .ttl{font-size:14px;font-weight:600;color:var(--c-text)}
+.codes-entry .sub{font-size:11px;color:var(--c-text-3);margin-top:2px}
+.codes-entry .arr{color:#C8C8C8;font-size:16px}
+
+/* ===== 会员端确认购买页 ===== */
+.buy{padding-bottom:80px;background:var(--c-bg)}
+.buy .addr-bar{margin:10px 12px;background:#fff;border-radius:10px;padding:14px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.buy .addr-bar .ico{width:32px;height:32px;border-radius:50%;background:#FFF1E6;color:var(--c-orange);display:flex;align-items:center;justify-content:center;font-size:16px}
+.buy .addr-bar .body{flex:1}
+.buy .addr-bar .ttl{font-size:13px;color:var(--c-text);font-weight:600}
+.buy .addr-bar .sub{font-size:11px;color:var(--c-text-3);margin-top:3px}
+
+.buy .pkg{margin:0 12px 10px;background:#fff;border-radius:10px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.buy .pkg .gtitle{font-size:14px;font-weight:600;color:var(--c-text);margin-bottom:8px}
+.buy .pkg .gdesc{font-size:11px;color:var(--c-text-3);margin-bottom:10px;line-height:1.5}
+.buy .pkg .row{display:flex;gap:10px;align-items:center;padding:6px 0}
+.buy .pkg .row .thumb{width:48px;height:48px;border-radius:6px;background:var(--c-bg);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.buy .pkg .row .info{flex:1;min-width:0}
+.buy .pkg .row .name{font-size:13px;color:var(--c-text)}
+.buy .pkg .row .spec{font-size:11px;color:var(--c-text-3);margin-top:2px}
+.buy .pkg .row .qty{font-size:13px;color:var(--c-text-3);text-align:right}
+
+.buy .price-card{margin:0 12px 10px;background:#fff;border-radius:10px;padding:12px 14px;font-size:12px;color:var(--c-text-2);box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.buy .price-card .line{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
+.buy .price-card .line .v{color:var(--c-text)}
+.buy .price-card .line .v.red{color:var(--c-red-2);font-size:15px;font-weight:600}
+.buy .price-card .line.muted{color:var(--c-text-3);font-size:11px}
+.buy .price-card .tip{padding-top:6px;border-top:1px dashed var(--c-line);margin-top:8px;color:var(--c-orange);font-size:11px}
+
+.buy .footer{position:absolute;left:0;right:0;bottom:0;height:60px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-top:1px solid var(--c-line)}
+.buy .footer .left{font-size:12px;color:var(--c-text-2)}
+.buy .footer .left .amt{font-size:18px;font-weight:700;color:var(--c-red-2);margin:0 4px}
+.buy .footer .left .qty{font-size:11px;color:var(--c-text-3)}
+.buy .footer .btn-confirm{height:40px;padding:0 28px;background:var(--c-red);color:#fff;border-radius:20px;border:none;font-size:14px;font-weight:600;cursor:pointer}
+
+/* ===== 激活码列表 ===== */
+.codes-page .top-tips{padding:12px 14px;background:#FFF8E6;color:#B07B12;font-size:12px;line-height:1.6}
+.codes-page .top-tips strong{color:#8B5E0B}
+
+.codes-list{padding:0 12px}
+.code-row{background:#fff;border-radius:10px;padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.code-row .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.code-row .head .label{font-size:11px;color:var(--c-text-3)}
+.code-row .head .status{font-size:11px;font-weight:600;padding:2px 8px;border-radius:8px}
+.code-row .head .status.s0{background:#FFF1E6;color:var(--c-orange)}
+.code-row .head .status.s1{background:#E9F8F1;color:var(--c-primary);background:#EAEAEA;color:var(--c-text-3)}
+.code-row .code{font-family:monospace;font-size:18px;color:var(--c-text);letter-spacing:1px;font-weight:600;padding:6px 0}
+.code-row .code.used{color:var(--c-text-3);text-decoration:line-through;text-decoration-color:var(--c-text-3);text-decoration-thickness:1.5px}
+.code-row .meta{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
+.code-row .meta .time{font-size:11px;color:var(--c-text-3)}
+.code-row .actions{display:flex;gap:8px}
+.code-row .actions .btn-copy{height:28px;padding:0 12px;border:1px solid var(--c-primary);color:var(--c-primary);background:#fff;border-radius:14px;font-size:12px;cursor:pointer;line-height:26px}
+.code-row .actions .btn-copy.used{border-color:var(--c-line-2);color:var(--c-text-3)}
+
+.fab-newcode{position:absolute;right:14px;bottom:74px;width:54px;height:54px;border-radius:50%;background:var(--c-primary);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px rgba(26,173,124,.4);font-size:11px;font-weight:600;line-height:1.1;z-index:10;border:none}
+.fab-newcode .em{font-size:18px;font-weight:700;margin-bottom:2px}
+.fab-newcode:active{transform:scale(.95)}
+
+.toast{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.active{opacity:1}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- ===== p_member_home 会员端主页 ===== -->
+  <div class="page active" id="p_member_home">
+    <div class="member-top">
+      <div class="avatar">有</div>
+      <div class="name-block">
+        <div class="name-row"><span class="nm">有享12123</span><span class="badge-purple">★ 潜力达人</span></div>
+        <div class="reg">注册日期：2025-11-25</div>
+      </div>
+    </div>
+
+    <div class="upgrade">
+      <div class="left">
+        <div class="ttl">升级成为服务达人</div>
+        <div class="sub">升级成长服务达人，自购分享收益提升 <span class="em">4%</span></div>
+      </div>
+      <div class="btn-upgrade" onclick="toast('升级服务达人')">立即升级</div>
+    </div>
+
+    <div class="invite" onclick="toast('打开邀请好友')">
+      <div class="left">
+        <div class="ic">🪁</div>
+        <div class="ttl">邀请好友</div>
+        <div class="q">?</div>
+      </div>
+      <div class="right"> ›</div>
+    </div>
+
+    <!-- 新人礼包商品卡（新增） -->
+    <div class="gift-card" id="card_gift" onclick="go('p_member_buy')">
+      <div class="thumb">🎁</div>
+      <div class="body">
+        <div class="ttl">新人激活码礼包</div>
+        <div class="sub">牙膏 + Q10 + 5L 水×7 袋（需自备水袋）</div>
+        <div class="price">¥39.9<small>/份</small></div>
+      </div>
+      <div class="arrow">›</div>
+    </div>
+
+    <div class="section-hd"><div class="ttl">我的业绩</div><div class="link">数据说明<div class="q">?</div></div></div>
+    <div class="perf">
+      <div class="row1">
+        <div class="l">昨日业绩：<span class="em">0</span></div>
+        <div class="r">查看明细 ›</div>
+      </div>
+      <div class="cols">
+        <div class="c"><div class="ttl">自购</div>
+          <div class="stat"><span>本月</span><span class="v zero">0</span></div>
+          <div class="stat"><span>待结</span><span class="v">37.6</span></div>
+          <div class="stat"><span>已结</span><span class="v">13119.3</span></div>
+        </div>
+        <div class="c"><div class="ttl">我的分享</div>
+          <div class="stat"><span>待结</span><span class="v">853</span></div>
+          <div class="stat"><span>已结</span><span class="v">3600</span></div>
+        </div>
+        <div class="c"><div class="ttl">推广</div>
+          <div class="stat"><span>待结</span><span class="v">853</span></div>
+          <div class="stat"><span>已结</span><span class="v">3600</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-hd"><div class="ttl">我的钱包</div><div class="link">数据说明<div class="q">?</div></div></div>
+    <div class="wallet">
+      <div class="row1">
+        <div class="c"><div class="lbl">电子币余额</div><div class="num">0</div></div>
+        <div class="c"><div class="lbl">已使用电子币</div><div class="num">0</div></div>
+      </div>
+      <div class="row2">
+        <div class="c"><div class="lbl">可用奖励（元）</div><div class="num">9421</div></div>
+        <div class="c"><div class="lbl">总预估奖励（元）</div><div class="num">126.34</div></div>
+      </div>
+    </div>
+
+    <div class="team" onclick="toast('我的团队')">
+      <div class="ttl">我的团队</div>
+      <div class="arr">›</div>
+    </div>
+
+    <!-- 我的激活码入口 -->
+    <div class="codes-entry" id="entry_codes" onclick="go('p_member_codes')">
+      <div class="left">
+        <div class="ic">🔑</div>
+        <div>
+          <div class="ttl">我的激活码</div>
+          <div class="sub">查看已购激活码、复制分享给新人</div>
+        </div>
+      </div>
+      <div class="arr">›</div>
+    </div>
+  </div>
+
+  <!-- ===== p_member_buy 会员端确认购买 ===== -->
+  <div class="page buy" id="p_member_buy">
+    <div class="nav">
+      <div class="back" onclick="go('p_member_home')">‹</div>
+      确认购买
+    </div>
+
+    <div class="addr-bar">
+      <div class="ico">📍</div>
+      <div class="body">
+        <div class="ttl">配送至：有享12123</div>
+        <div class="sub">收货地址（确认后激活码将自动发放到您的账号）</div>
+      </div>
+    </div>
+
+    <div class="pkg">
+      <div class="gtitle">新人激活码礼包</div>
+      <div class="gdesc">激活码（会员购买后随机生成，发给新人激活即可下单）</div>
+      <div class="row">
+        <div class="thumb">🎁</div>
+        <div class="info"><div class="name">新人礼包激活码</div><div class="spec">含特殊符号大小写 · 一次性使用</div></div>
+        <div class="qty">×1</div>
+      </div>
+    </div>
+
+    <div class="price-card">
+      <div class="line"><span>商品总价</span><span class="v">¥39.9</span></div>
+      <div class="line"><span>运费</span><span class="v">¥0</span></div>
+      <div class="line"><span>专享优惠（服务达人）</span><span class="v">- ¥10</span></div>
+      <div class="line"><span>实付金额</span><span class="v red">¥29.9</span></div>
+      <div class="tip">⚠️ 一经购买不可退，激活码生成后即生效</div>
+    </div>
+
+    <div class="footer">
+      <div class="left">合计：<span class="amt">¥29.9</span><span class="qty">×1 份</span></div>
+      <button class="btn-confirm" id="btn_buy_confirm">确认购买</button>
+    </div>
+  </div>
+
+  <!-- ===== p_member_codes 我的激活码列表 ===== -->
+  <div class="page codes-page" id="p_member_codes">
+    <div class="nav">
+      <div class="back" onclick="go('p_member_home')">‹</div>
+      我的激活码
+      <div class="right" onclick="toast('已分享激活码列表')">分享</div>
+    </div>
+
+    <div class="top-tips">
+      <strong>使用说明：</strong>复制激活码分享给新人，新人在 C 端「绿韵家」小程序首页 → 新人礼包 → 输入激活码即可下单领取礼包。每个激活码仅可使用一次。
+    </div>
+
+    <div class="codes-list" id="codes_list"></div>
+
+    <div style="height:140px"></div>
+
+    <button class="fab-newcode" id="fab_buy_more"><div class="em">+</div>购买激活码</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+window._codes = [
+  { code: 'A8$kL9#mN2@', status: 0, time: '2026-08-30 10:23' },
+  { code: 'Bk3&Mp7!XrQv', status: 0, time: '2026-08-30 10:24' },
+  { code: 'Cm4#Yx8@ZpTw', status: 1, time: '2026-08-28 16:05' }
+];
+
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  var t=document.getElementById(id);
+  if(t){t.classList.add('active');t.scrollTop=0;}
+  if(id==='p_member_codes') renderCodes();
+}
+function toast(msg){
+  var el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('active');
+  clearTimeout(window._toastT);
+  window._toastT=setTimeout(function(){el.classList.remove('active');},1800);
+}
+
+function renderCodes(){
+  var list = document.getElementById('codes_list');
+  list.innerHTML = window._codes.map(function(c,i){
+    var used = c.status === 1;
+    return '<div class="code-row" data-i="'+i+'">'
+      +'<div class="head"><span class="label">激活码</span><span class="status '+(used?'s1':'s0')+'">'
+      +(used?'已激活':'未激活')+'</span></div>'
+      +'<div class="code '+(used?'used':'')+'">'+c.code+'</div>'
+      +'<div class="meta"><span class="time">'+c.time+'</span>'
+      +'<div class="actions"><button class="btn-copy '+(used?'used':'')+'" '+(used?'disabled':'')+' data-code="'+c.code+'" onclick="doCopy(this)">复制</button></div>'
+      +'</div></div>';
+  }).join('');
+}
+function doCopy(btn){
+  var code = btn.getAttribute('data-code');
+  toast('已复制：'+code);
+}
+function doBuyConfirm(){
+  var d = new Date();
+  var pad=function(n){return n<10?'0'+n:n;};
+  var ts = d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes());
+  var code = genCode();
+  window._codes.unshift({ code: code, status: 0, time: ts });
+  toast('购买成功，激活码已发放');
+  setTimeout(function(){go('p_member_codes');},500);
+}
+window._codeSeq = 0;
+function genCode(){
+  window._codeSeq += 1;
+  var U='ABCDEFGHJKMNPQRSTUVWXYZ';
+  var L='abcdefghijkmnpqrstuvwxyz';
+  var D='23456789';
+  var S='@#$%&*';
+  var n = window._codeSeq;
+  var s='';
+  s+=U[(n*3)%U.length];
+  s+=L[(n*5+1)%L.length];
+  s+=D[(n*7+2)%D.length];
+  s+=S[(n*11+3)%S.length];
+  s+=U[(n*13+4)%U.length];
+  s+=L[(n*17+5)%L.length];
+  s+=D[(n*19+6)%D.length];
+  s+=S[(n*23+7)%S.length];
+  return s;
+}
+document.getElementById('fab_buy_more').onclick = function(){ go('p_member_buy'); };
+document.getElementById('btn_buy_confirm').onclick = doBuyConfirm;
+renderCodes();
+</script>
+</body>
+</html>
