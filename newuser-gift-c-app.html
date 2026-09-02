@@ -324,6 +324,52 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 
 .mycodes .tip{padding:10px 14px;font-size:11px;color:var(--c-text-3);line-height:1.5}
 
+/* ===== 我的订单（p_my_orders，按@image#2/@image#3样式） ===== */
+.orders{padding-bottom:24px;background:var(--c-bg)}
+.orders .search-bar{padding:10px 12px;background:var(--c-primary)}
+.orders .search-bar input{width:100%;height:36px;padding:0 14px;border-radius:18px;border:none;background:#fff;font-size:13px;color:var(--c-text);outline:none}
+.orders .search-bar input::placeholder{color:var(--c-text-3)}
+.orders .order-tabs{display:flex;background:#fff;border-bottom:1px solid var(--c-line);position:sticky;top:46px;z-index:5}
+.orders .order-tabs .ot{flex:1;height:42px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--c-text-2);cursor:pointer;position:relative}
+.orders .order-tabs .ot.active{color:var(--c-text);font-weight:600}
+.orders .order-tabs .ot.active::after{content:"";position:absolute;left:50%;bottom:6px;transform:translateX(-50%);width:24px;height:3px;background:var(--c-primary);border-radius:2px}
+.orders .order-list{padding:10px 12px 24px}
+.orders .order-card{margin-bottom:10px;background:#fff;border-radius:10px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.orders .order-card .och{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--c-text-2);margin-bottom:10px;font-weight:500}
+.orders .order-card .och .oid{color:var(--c-text);font-weight:500}
+.orders .order-card .och .ostatus{font-size:13px;color:var(--c-text-2);font-weight:400}
+.orders .order-card .och .ostatus.red{color:#f56c6c}
+.orders .order-card .och .ostatus.green{color:var(--c-primary)}
+.orders .order-card .och .ostatus.orange{color:var(--c-orange)}
+.orders .order-card .och .otype-tag{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:500}
+.orders .order-card .och .otype-tag.member{background:#FFF5E6;color:#e6a23c;border:1px solid #f7d68a}
+.orders .order-card .och .otype-tag.exchange{background:#F0F5FF;color:#5b6dd1;border:1px solid #b8c2f0}
+.orders .order-card .ogoods{display:flex;gap:10px;padding-bottom:10px;border-bottom:1px solid var(--c-line)}
+.orders .order-card .ogoods .othumb{width:84px;height:84px;flex-shrink:0;border-radius:6px;background:#E9F8F1;display:flex;align-items:center;justify-content:center;font-size:36px}
+.orders .order-card .ogoods .oinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.orders .order-card .ogoods .oinfo .name{font-size:14px;color:var(--c-text);font-weight:500;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.orders .order-card .ogoods .oinfo .desc{font-size:11px;color:var(--c-text-3);line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.orders .order-card .ogoods .oinfo .badges{display:flex;gap:6px;align-items:center;margin-top:auto}
+.orders .order-card .ogoods .oinfo .badges .b{font-size:10px;padding:1px 6px;border-radius:3px;background:#FFF1F0;color:#f56c6c;border:1px solid #f5c2c2}
+.orders .order-card .ogoods .oinfo .badges .b.discount{background:#E9F8F1;color:var(--c-primary);border-color:#aee0c8}
+.orders .order-card .ogoods .oinfo .badges .b.member{background:#FFF5E6;color:#e6a23c;border-color:#f7d68a}
+.orders .order-card .ogoods .oinfo .badges .b.exchange{background:#F0F5FF;color:#5b6dd1;border-color:#b8c2f0}
+.orders .order-card .ogoods .oinfo .badges .b.normal{background:#F0F2F5;color:var(--c-text-2);border-color:var(--c-line)}
+.orders .order-card .ogoods .oinfo .pricerow{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;font-size:13px;color:var(--c-text)}
+.orders .order-card .ogoods .oinfo .pricerow .amt{color:var(--c-text);font-weight:500}
+.orders .order-card .ogoods .oinfo .pricerow .qty{color:var(--c-text-2);font-size:12px;margin-left:8px}
+.orders .order-card .ofoot{padding-top:10px;display:flex;flex-direction:column;gap:8px}
+.orders .order-card .ofoot .ptime{font-size:11px;color:var(--c-text-3)}
+.orders .order-card .ofoot .psum{display:flex;justify-content:flex-end;align-items:baseline;font-size:13px;color:var(--c-text-2)}
+.orders .order-card .ofoot .psum .paid{color:var(--c-primary);font-weight:600;font-size:15px;margin-left:4px}
+.orders .order-card .ofoot .psum .paid.zero{color:var(--c-text-3);font-weight:500}
+.orders .order-card .ofoot .pactions{display:flex;justify-content:flex-end;gap:8px;margin-top:2px}
+.orders .order-card .ofoot .pactions .btn{min-height:30px;padding:0 14px;border-radius:15px;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;background:#fff;color:var(--c-primary);border:1px solid var(--c-primary)}
+.orders .order-card .ofoot .pactions .btn.solid{background:var(--c-primary);color:#fff;border-color:var(--c-primary)}
+.orders .order-card .ofoot .pactions .btn.plain{color:var(--c-text-2);border-color:var(--c-line)}
+.orders .empty-state{padding:60px 24px;text-align:center;color:var(--c-text-3);font-size:13px}
+.orders .empty-state .ic{font-size:48px;opacity:.4;margin-bottom:12px}
+
 /* ===== 邀请码弹窗（code-modal） ===== */
 .code-modal{position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:50;display:none;align-items:flex-end;justify-content:center}
 .code-modal.active{display:flex;-webkit-animation:fade .2s ease}
@@ -694,6 +740,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
     <div class="services-card">
       <div class="hd">我的服务</div>
       <div class="grid">
+        <div class="item" onclick="go('p_my_orders')"><div class="ic">📋</div><div class="lbl">我的订单</div></div>
         <div class="item" onclick="toast('数商服务')"><div class="ic">🏪</div><div class="lbl">数商服务</div></div>
         <div class="item" onclick="toast('网格水站')"><div class="ic">💧</div><div class="lbl">网格水站</div></div>
         <div class="item" onclick="toast('排行榜')"><div class="ic">🏆</div><div class="lbl">排行榜</div></div>
@@ -722,6 +769,29 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
       <div class="tb" data-tab="msg"><div class="ic"></div>消息</div>
       <div class="tb on" data-tab="me" onclick="go('p_me')"><div class="ic"></div>我的</div>
     </div>
+  </div>
+
+  <!-- ===== p_my_orders 我的订单（按@image#2/@image#3样式） ===== -->
+  <div class="page orders" id="p_my_orders">
+    <div class="nav">
+      <div class="back" onclick="go('p_me')">‹</div>
+      全部订单
+    </div>
+
+    <div class="search-bar">
+      <input type="text" placeholder="搜索商品名称/订单号" id="order_search_input" oninput="onOrderSearch()">
+    </div>
+
+    <div class="order-tabs">
+      <div class="ot active" data-tab="all" onclick="switchOrderTab('all', this)">全部</div>
+      <div class="ot" data-tab="waitpay" onclick="switchOrderTab('waitpay', this)">代付订单</div>
+      <div class="ot" data-tab="pending" onclick="switchOrderTab('pending', this)">待付款</div>
+      <div class="ot" data-tab="toship" onclick="switchOrderTab('toship', this)">待发货/待核销</div>
+      <div class="ot" data-tab="receiving" onclick="switchOrderTab('receiving', this)">待收货</div>
+      <div class="ot" data-tab="done" onclick="switchOrderTab('done', this)">已完成</div>
+    </div>
+
+    <div class="order-list" id="order_list"></div>
   </div>
 
   <!-- ===== p_my_codes 我的邀请码 ===== -->
@@ -916,6 +986,34 @@ window._user = {
 };
 var _codesCache = [];
 
+/* ========== 订单数据（模拟） ==========
+   orderType: 'normal'常规订单 / 'member'会员订单 / 'exchange'兑换订单
+   status: 'cancelled'已取消 / 'done'已完成 / 'pending'待付款 / 'toship'待发货·待核销 / 'receiving'待收货 / 'waitpay'代付订单
+*/
+window._orderTypeMap = {
+  normal:   { label: '常规订单', badgeCls: 'normal' },
+  member:   { label: '会员订单', badgeCls: 'member' },
+  exchange: { label: '兑换订单', badgeCls: 'exchange' }
+};
+window._orderStatusMap = {
+  all:       { label: '全部',       color: '' },
+  waitpay:   { label: '代付订单',   color: 'orange' },
+  pending:   { label: '待付款',     color: 'orange' },
+  toship:    { label: '待发货',     color: 'orange' },
+  receiving: { label: '待收货',     color: 'green' },
+  done:      { label: '已完成',     color: '' },
+  cancelled: { label: '已取消',     color: 'red' }
+};
+window._orders = [
+  // 历史常规订单样例（沿用@image#2/@image#3 的真实数字）
+  { id: '605897', type: 'normal', status: 'cancelled', goods: { name: '惠民补贴套餐包2', desc: '浓缩磷脂酰胆碱(至臻版31片)*3盒 + 活力益酸复合草本粉(3克*20条)*1盒 + 茶萃棉益生菌固体饮料(3克*20条)*3盒', thumb: '🧴', price: 1558.00, qty: 1, discount: '155折' }, paid: 1197.59, payTime: null },
+  { id: '605703', type: 'normal', status: 'done',      goods: { name: '康和宣爆头皮营养液', desc: '120ML', thumb: '💧', price: 268.00, qty: 8, discount: '157折' }, paid: 1775.58, payTime: '2026-07-20 14:59:33' },
+  { id: '605702', type: 'normal', status: 'done',      goods: { name: '康和宣爆头皮营养液', desc: '120ML', thumb: '💧', price: 268.00, qty: 8, discount: '157折' }, paid: 1775.81, payTime: '2026-07-20 14:45:28' },
+  { id: '605701', type: 'normal', status: 'done',      goods: { name: '康和宣爆头皮营养液', desc: '120ML', thumb: '💧', price: 268.00, qty: 8, discount: '157折' }, paid: 1775.73, payTime: '2026-07-20 14:39:11' }
+];
+window._orderTab = 'all';
+window._orderKw = '';
+
 /* ========== 导航 ========== */
 function go(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -926,6 +1024,7 @@ function go(id){
   if(id === 'p_home') updateFab();
   if(id === 'p_me') renderMe();
   if(id === 'p_invite_confirm') renderInviteConfirm();
+  if(id === 'p_my_orders') renderOrderList();
 }
 function goBackFromAddress(){
   go('p_gift_intro');
@@ -1069,6 +1168,7 @@ function submitCodeModal(){
   document.getElementById('order_no').textContent = orderNo;
   document.getElementById('pay_time').textContent = formatNow();
   document.getElementById('show_code').textContent = k;
+  addExchangeOrder(k);                     // 写入「兑换订单」到我的订单
   closeCodeModal();
   toast('邀请码核销成功');
   setTimeout(function(){ go('p_order'); }, 400);
@@ -1107,6 +1207,105 @@ function formatNow(){
   var d = new Date();
   function p(n){return n<10?'0'+n:''+n;}
   return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());
+}
+
+/* ========== 我的订单（p_my_orders） ==========
+   数据模型见顶部 _orders/_orderTypeMap/_orderStatusMap；
+   Flow A 购买邀请码成功 → addOrder('member', ...)；
+   Flow B 兑换商品成功  → addOrder('exchange', ...)。*/
+function switchOrderTab(tab, el){
+  window._orderTab = tab;
+  window._orderKw = '';
+  var ipt = document.getElementById('order_search_input');
+  if(ipt) ipt.value = '';
+  document.querySelectorAll('#p_my_orders .order-tabs .ot').forEach(function(t){ t.classList.remove('active'); });
+  if(el) el.classList.add('active');
+  renderOrderList();
+}
+function onOrderSearch(){
+  window._orderKw = (document.getElementById('order_search_input').value || '').trim().toLowerCase();
+  renderOrderList();
+}
+function renderOrderList(){
+  var list = document.getElementById('order_list');
+  if(!list) return;
+  var tab = window._orderTab || 'all';
+  var kw = window._orderKw || '';
+  var arr = window._orders.filter(function(o){
+    if(tab !== 'all' && o.status !== tab) return false;
+    if(kw){
+      var hit = String(o.id).toLowerCase().indexOf(kw) >= 0
+             || (o.goods.name||'').toLowerCase().indexOf(kw) >= 0
+             || (o.goods.desc||'').toLowerCase().indexOf(kw) >= 0;
+      if(!hit) return false;
+    }
+    return true;
+  });
+  if(!arr.length){
+    list.innerHTML = '<div class="empty-state"><div class="ic">📭</div>暂无相关订单</div>';
+    return;
+  }
+  var html = '';
+  arr.forEach(function(o){
+    var t = window._orderTypeMap[o.type] || window._orderTypeMap.normal;
+    var s = window._orderStatusMap[o.status] || window._orderStatusMap.done;
+    var paidCls = o.paid === 0 ? 'zero' : '';
+    var paidAmt = o.paid === 0 ? '¥0.00' : '¥' + o.paid.toFixed(2);
+    var orderBtn = o.status === 'done' ? '<div class="btn solid" onclick="toast(\'评价订单 '+o.id+'\')">评价</div>' : '';
+    var contactBtn = '<div class="btn" onclick="toast(\'联系客服 /订单 '+o.id+'\')">联系客服</div>';
+    var actionsHtml = '<div class="pactions">' + contactBtn + orderBtn + '</div>';
+    var discountBadge = o.type === 'member'   ? '<div class="b member">会员专享</div>'
+                      : o.type === 'exchange' ? '<div class="b exchange">邀请码抵扣</div>'
+                      : (o.goods.discount ? '<div class="b discount">'+o.goods.discount+'</div>' : '');
+    var ptimeHtml = o.payTime ? '<div class="ptime">支付时间: '+o.payTime+'</div>' : '';
+    html += '<div class="order-card" data-type="'+o.type+'" data-status="'+o.status+'">'
+      + '<div class="och">'
+      +   '<div class="oid">订单号：'+o.id+' <span class="otype-tag '+t.badgeCls+'">'+t.label+'</span></div>'
+      +   '<div class="ostatus '+(s.color||'')+'">'+s.label+'</div>'
+      + '</div>'
+      + '<div class="ogoods">'
+      +   '<div class="othumb">'+o.goods.thumb+'</div>'
+      +   '<div class="oinfo">'
+      +     '<div class="name">'+o.goods.name+'</div>'
+      +     '<div class="desc">'+o.goods.desc+'</div>'
+      +     '<div class="badges">'+discountBadge+'</div>'
+      +     '<div class="pricerow"><span class="amt">¥'+o.goods.price.toFixed(2)+'</span><span class="qty">x'+o.goods.qty+'</span></div>'
+      +   '</div>'
+      + '</div>'
+      + '<div class="ofoot">'
+      +   ptimeHtml
+      +   '<div class="psum">共'+o.goods.qty+'件，实付：<span class="paid '+paidCls+'">'+paidAmt+'</span></div>'
+      +   actionsHtml
+      + '</div>'
+      + '</div>';
+  });
+  list.innerHTML = html;
+}
+
+/* Flow A 购买邀请码成功 → 写入一条会员订单（无地址 / 实付 35×N）*/
+function addMemberOrder(qty){
+  var id = String(++window._orderSeq);
+  var price = 35 * qty;
+  window._orders.unshift({
+    id: id,
+    type: 'member',
+    status: 'toship',
+    goods: { name: '新人邀请码礼包', desc: '邀请码 × '+qty+'（购买即自动发到「我的邀请码」）', thumb: '🎁', price: 35.00, qty: qty, discount: '会员专享' },
+    paid: price,
+    payTime: formatNow()
+  });
+}
+/* Flow B 邀请码兑换实物成功 → 写入一条兑换订单（实付 0 / 邀请码抵扣）*/
+function addExchangeOrder(code){
+  window._orders.unshift({
+    id: String(++window._orderSeq),
+    type: 'exchange',
+    status: 'toship',
+    goods: { name: '惠民补贴套餐包（益齿健套装）', desc: '益齿健牙膏(120g/支) ×1 + 辅酶 Q10(10粒/瓶) ×1 + 5L饮用水 ×7袋', thumb: '🎁', price: 49.90, qty: 1, discount: '邀请码抵扣' },
+    paid: 0,
+    payTime: formatNow(),
+    code: code
+  });
 }
 
 /* ========== 复制源码工具（顶部 copy-bar） ========== */
@@ -1198,6 +1397,7 @@ function doInvitePay(){
   window._user.has_codes = true;
   window._user.code_count = (window._user.code_count || 0) + n;
   addMyCodes(n);
+  addMemberOrder(n);                       // 写入「会员订单」到我的订单
   var sc = document.getElementById('success_cnt'); if(sc) sc.textContent = n;
   toast('支付成功');
   setTimeout(function(){ go('p_invite_buy_success'); }, 300);
