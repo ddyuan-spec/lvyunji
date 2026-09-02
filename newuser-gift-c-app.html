@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>新人激活码礼包 · C 端用户原型 v3</title>
+<title>新人邀请码礼包 · C 端用户原型 v3</title>
 <style>
 :root{
   --c-primary:#1AAD7C;
@@ -86,7 +86,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 .fab.hidden{display:none}
 .fab-share{position:absolute;right:14px;bottom:138px;width:48px;height:48px;border-radius:50%;background:#fff;color:var(--c-primary);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.1);font-size:20px;z-index:10;border:1px solid var(--c-line)}
 
-/* 兑换券悬浮窗（仅初级会员以上） */
+/* 邀请码悬浮窗（仅初级会员以上） */
 .fab-exchange{position:absolute;right:14px;bottom:202px;width:54px;height:54px;border-radius:50%;background:var(--c-orange);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px rgba(255,120,0,.35);font-size:11px;font-weight:600;line-height:1.1;z-index:10;border:none}
 .fab-exchange .em{font-size:18px;font-weight:700;margin-bottom:2px}
 .fab-exchange:active{transform:scale(.95)}
@@ -127,7 +127,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 .gift-int .submit-wrap{padding:16px 14px}
 .gift-int .foot-tip{padding:0 14px 20px;font-size:11px;color:var(--c-text-3);text-align:center}
 
-/* ===== 商品详情页（p_gift_detail，按@image#1样式） ===== */
+/* ===== 邀请码商品详情页（p_invite_detail） ===== */
 .gift-detail{padding-bottom:64px}
 .gift-detail .top-bar{position:sticky;top:0;left:0;right:0;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:#fff;border-bottom:1px solid var(--c-line);z-index:5}
 .gift-detail .top-bar .ico{font-size:18px;color:var(--c-text);cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center}
@@ -324,7 +324,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 
 .mycodes .tip{padding:10px 14px;font-size:11px;color:var(--c-text-3);line-height:1.5}
 
-/* ===== 激活码弹窗（code-modal） ===== */
+/* ===== 邀请码弹窗（code-modal） ===== */
 .code-modal{position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:50;display:none;align-items:flex-end;justify-content:center}
 .code-modal.active{display:flex;-webkit-animation:fade .2s ease}
 .code-modal .panel{width:100%;background:#fff;border-radius:14px 14px 0 0;padding:20px 16px 24px}
@@ -343,12 +343,16 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 /* toast */
 .toast{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s}
 .toast.active{opacity:1}
+
+/* 收银台支付选择 */
+.pay-dot{color:#C8C8C8;font-size:16px}
+.pay-dot.on{color:var(--c-primary)}
 </style>
 </head>
 <body>
   <div class="copy-bar">
     <div class="copy-bar__title">
-      <div class="copy-bar__name">📋 新人激活码礼包 · C端原型 v3</div>
+      <div class="copy-bar__name">📋 新人邀请码礼包 · C端原型 v3</div>
       <div class="copy-bar__hint">单文件原型 · 可整份或逐页复制源码</div>
     </div>
     <div class="copy-bar__actions">
@@ -412,7 +416,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
     </div>
 
     <button class="fab-share" onclick="toast('分享功能')">分</button>
-    <button class="fab-exchange hidden" id="fab_exchange" onclick="go('p_gift_detail')"><div class="em">券</div>兑换券</button>
+    <button class="fab-exchange hidden" id="fab_exchange" onclick="go('p_invite_detail')"><div class="em">码</div>邀请码</button>
     <button class="fab" id="fab_gift" onclick="go('p_gift_intro')"><div class="em">礼</div>新人礼包</button>
   </div>
 
@@ -425,8 +429,8 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 
     <div class="hero">
       <div class="bag-icon">🎁</div>
-      <div class="ttl">新人激活码大礼包</div>
-      <div class="sub">输入会员朋友分享的激活码即可领取</div>
+      <div class="ttl">新人邀请码大礼包</div>
+      <div class="sub">输入会员朋友分享的邀请码即可领取</div>
     </div>
 
     <div class="card">
@@ -452,17 +456,17 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
     <div class="foot-tip">购买即视为同意礼包配送安排</div>
   </div>
 
-  <!-- ===== p_gift_detail 兑换券商品详情页（按@image#1样式） ===== -->
-  <div class="page gift-detail" id="p_gift_detail">
+  <!-- ===== p_invite_detail 邀请码商品详情页（仅购买邀请码时展示，Flow A） ===== -->
+  <div class="page gift-detail" id="p_invite_detail">
     <div class="top-bar">
       <div class="ico" onclick="go('p_home')">‹</div>
-      <div style="font-size:14px;font-weight:600">新人礼包兑换券</div>
+      <div style="font-size:14px;font-weight:600">新人邀请码礼包</div>
       <div class="fav" id="fav_btn" onclick="toggleFav()">♡</div>
     </div>
 
     <div class="ship-bar">
       <span class="lbl">📍 运费</span>
-      <span>新疆维吾尔自治区1件内24.5元，每增加2件加...</span>
+      <span>虚拟商品，无需物流，购买后自动生成邀请码</span>
       <span class="arr">›</span>
     </div>
     <div class="param" onclick="toast('参数说明')">
@@ -481,7 +485,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 
     <div class="detail-block">
       <div class="ttl">商品详情</div>
-      <div class="pic">🎁 新人礼包<br><small style="font-size:11px;font-weight:400;opacity:.9">兑换商品 · 凭激活码领取</small></div>
+      <div class="pic">🎁 新人邀请码礼包<br><small style="font-size:11px;font-weight:400;opacity:.9">购买即生成邀请码 · 分享新人可兑换礼包</small></div>
     </div>
 
     <div style="height:160px"></div>
@@ -490,25 +494,25 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
       <div class="goods">
         <div class="thumb"></div>
         <div class="info">
-          <div><span class="tag">自营</span><span style="font-size:13px;color:var(--c-text);font-weight:600">惠民补贴套餐包13</span></div>
-          <div class="sku-no">商品编号: 996</div>
+          <div><span class="tag">自营</span><span style="font-size:13px;color:var(--c-text);font-weight:600">新人邀请码礼包</span></div>
+          <div class="sku-no">商品编号: 由后台配置</div>
           <div class="price-row">
-            <span class="ptag">🔥 4500</span>
-            <span class="amt">¥5000.00</span>
+            <span class="ptag">🔥 热销</span>
+            <span class="amt">¥49.9</span>
           </div>
         </div>
         <div class="qty">
-          <button onclick="changeQty(-1)">−</button>
-          <span class="n" id="gift_qty">1</span>
-          <button onclick="changeQty(1)">+</button>
+          <button onclick="changeInviteQty(-1)">−</button>
+          <span class="n" id="invite_qty">1</span>
+          <button onclick="changeInviteQty(1)">+</button>
         </div>
       </div>
-      <div class="spec-label">规格</div>
+      <div class="spec-label">权益说明</div>
       <div class="spec-row">
-        <div class="sp">益齿健牙膏(120g/支) ×1 + 辅酶 Q10(10粒/瓶) ×1 + 5L饮用水 ×7袋</div>
-        <div class="sp off">益齿健牙膏 ×1</div>
+        <div class="sp">购买即按数量生成邀请码，自动存入「我的邀请码」</div>
+        <div class="sp off">每个邀请码可被 1 位新人使用，兑换新人礼包（益齿健套装 + 5L 饮用水×7 袋）</div>
       </div>
-      <button class="buy-btn" onclick="go('p_address')">立即购买</button>
+      <button class="buy-btn" onclick="go('p_invite_confirm')">立即购买</button>
     </div>
   </div>
 
@@ -526,7 +530,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
     <div class="add-btn" onclick="go('p_address_edit')">+ 新增收货地址</div>
 
     <div class="footer">
-      <button class="btn-primary" id="btn_addr_use">使用此地址</button>
+      <button class="btn-primary" id="btn_addr_use" onclick="useAddress()">使用此地址</button>
     </div>
   </div>
 
@@ -543,17 +547,17 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
       <div class="row"><div class="label">详细地址</div><input class="input" id="ae_addr" placeholder="街道、楼栋、门牌号"></div>
       <div class="row"><div class="label">设为默认</div><div style="text-align:right;color:var(--c-primary);font-size:13px">默认地址</div></div>
     </div>
-    <div class="submit-wrap"><button class="btn-primary" id="btn_addr_save">保存并使用</button></div>
+    <div class="submit-wrap"><button class="btn-primary" id="btn_addr_save" onclick="doSaveAddress()">保存并使用</button></div>
   </div>
 
-  <!-- ===== p_confirm 确认订单（去水行 + 弹激活码输入） ===== -->
+  <!-- ===== p_confirm 确认订单（去水行 + 弹邀请码输入） ===== -->
   <div class="page confirm" id="p_confirm">
     <div class="nav">
-      <div class="back" onclick="go(window._detailPage ? 'p_gift_detail' : 'p_gift_intro')">‹</div>
+      <div class="back" onclick="go('p_address')">‹</div>
       确认订单
     </div>
 
-    <div class="addr-bar empty" onclick="go('p_address')">
+    <div class="addr-bar empty" id="confirm_addr" onclick="go('p_address')">
       <div class="ico">+</div>
       <div>添加收货地址</div>
     </div>
@@ -579,9 +583,9 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
     <div class="price-card">
       <div class="line"><span>商品总价</span><span class="v">¥49.9</span></div>
       <div class="line"><span>运费</span><span class="v">¥0</span></div>
-      <div class="line"><span>激活码抵扣</span><span class="v">- ¥49.9</span></div>
+      <div class="line"><span>邀请码抵扣</span><span class="v">- ¥49.9</span></div>
       <div class="line"><span>实付金额</span><span class="v red">¥0.00</span></div>
-      <div class="line muted" style="margin-top:4px">激活后无需再支付，订单由会员分享激活码赠送</div>
+      <div class="line muted" style="margin-top:4px">兑换后无需再支付，订单由会员分享邀请码赠送</div>
       <div class="benefit">权益赠水：兑换成功后 30 天内到店自提 5L 饮用水 ×7 袋，每次限取 1 袋，过期自动清零（无需水袋，由店内配桶）。</div>
     </div>
 
@@ -636,7 +640,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
       </div>
 
       <div class="code-display" style="background:#F5F6F8;border-radius:8px;padding:10px;margin-top:10px;font-size:11px;color:var(--c-text-2)">
-        <div><span style="display:inline-block;width:70px;color:var(--c-text-3)">激活码</span><span style="color:var(--c-text);font-family:monospace" id="show_code">-</span></div>
+        <div><span style="display:inline-block;width:70px;color:var(--c-text-3)">邀请码</span><span style="color:var(--c-text);font-family:monospace" id="show_code">-</span></div>
       </div>
 
       <div class="btns">
@@ -729,7 +733,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 
     <div class="hd-card">
       <div class="ttl">🔑 我的邀请码</div>
-      <div class="sub">复制邀请码分享给新人，新人在 C 端「绿韵家」新人礼包页 → 立即购买 → 输入激活码即可下单领取礼包。每个激活码仅可使用一次。</div>
+      <div class="sub">复制邀请码分享给新人，新人在 C 端「绿韵家」新人礼包页 → 立即购买 → 输入邀请码即可下单领取礼包。每个邀请码仅可使用一次。</div>
       <div class="stat">
         <div class="s"><div class="n">3</div><div class="l">未使用</div></div>
         <div class="s"><div class="n">5</div><div class="l">已使用</div></div>
@@ -737,49 +741,49 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
       </div>
     </div>
 
-    <div class="list">
+    <div class="list" id="my_codes_list">
       <div class="code-card">
         <div class="ch">
-          <span>兑换券 · 新人礼包-益齿健套装</span>
+          <span>邀请码 · 新人礼包-益齿健套装</span>
           <span class="tag unused">未使用</span>
         </div>
         <div class="code">A8$kL9#mN2@</div>
         <div class="meta"><span>生成时间: 2026-08-31 14:22</span><span>来源: 购买生成</span></div>
         <div class="btns">
-          <div class="btn-copy" onclick="copyText('A8$kL9#mN2@', '激活码已复制')">复制</div>
+          <div class="btn-copy" onclick="copyText('A8$kL9#mN2@', '邀请码已复制')">复制</div>
           <div class="btn-share" onclick="toast('分享给好友')">分享</div>
         </div>
       </div>
 
       <div class="code-card">
         <div class="ch">
-          <span>兑换券 · 新人礼包-益齿健套装</span>
+          <span>邀请码 · 新人礼包-益齿健套装</span>
           <span class="tag unused">未使用</span>
         </div>
         <div class="code">Dg3$Uy3@Wq</div>
         <div class="meta"><span>生成时间: 2026-08-31 11:08</span><span>来源: 购买生成</span></div>
         <div class="btns">
-          <div class="btn-copy" onclick="copyText('Dg3$Uy3@Wq', '激活码已复制')">复制</div>
+          <div class="btn-copy" onclick="copyText('Dg3$Uy3@Wq', '邀请码已复制')">复制</div>
           <div class="btn-share" onclick="toast('分享给好友')">分享</div>
         </div>
       </div>
 
       <div class="code-card">
         <div class="ch">
-          <span>兑换券 · 新人礼包-益齿健套装</span>
+          <span>邀请码 · 新人礼包-益齿健套装</span>
           <span class="tag unused">未使用</span>
         </div>
         <div class="code">Hy7*Pz8@Qr</div>
         <div class="meta"><span>生成时间: 2026-08-30 16:55</span><span>来源: 系统生成</span></div>
         <div class="btns">
-          <div class="btn-copy" onclick="copyText('Hy7*Pz8@Qr', '激活码已复制')">复制</div>
+          <div class="btn-copy" onclick="copyText('Hy7*Pz8@Qr', '邀请码已复制')">复制</div>
           <div class="btn-share" onclick="toast('分享给好友')">分享</div>
         </div>
       </div>
 
       <div class="code-card">
         <div class="ch">
-          <span>兑换券 · 新人礼包-益齿健套装</span>
+          <span>邀请码 · 新人礼包-益齿健套装</span>
           <span class="tag used">已使用</span>
         </div>
         <div class="code">Wp2#Xc6!Yq</div>
@@ -790,24 +794,106 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
       </div>
     </div>
 
-    <div class="tip">激活码一经使用不可恢复，请妥善保管。</div>
+    <div class="tip">邀请码一经使用不可恢复，请妥善保管。</div>
   </div>
 
-  <!-- ===== 激活码弹窗（code-modal） ===== -->
+  <!-- ===== 邀请码弹窗（code-modal） ===== -->
   <div class="code-modal" id="code_modal" onclick="if(event.target===this) closeCodeModal()">
     <div class="panel">
-      <div class="ttl">输入激活码</div>
+      <div class="ttl">输入邀请码</div>
       <div class="sub">请输入您获得的兑换码，激活后将自动抵扣本次订单</div>
       <div class="field">
-        <input class="ipt" id="code_modal_input" placeholder="请输入激活码" maxlength="20" autocomplete="off">
+        <input class="ipt" id="code_modal_input" placeholder="请输入邀请码" maxlength="20" autocomplete="off">
         <span class="close" onclick="clearCodeModalInput()">✕</span>
       </div>
-      <div class="hint">每个账号仅可使用一次激活码</div>
+      <div class="hint">每个账号仅可使用一次邀请码</div>
       <div class="actions">
         <button class="cancel" onclick="closeCodeModal()">取消</button>
         <button class="submit" onclick="submitCodeModal()">确认</button>
       </div>
       <div class="protocol">点击「确认」即视为同意兑换规则与权益安排</div>
+    </div>
+  </div>
+
+  <!-- ===== p_invite_confirm 购买邀请码·确认订单（无地址，Flow A） ===== -->
+  <div class="page confirm" id="p_invite_confirm">
+    <div class="nav">
+      <div class="back" onclick="go('p_invite_detail')">‹</div>
+      确认订单
+    </div>
+
+    <div class="pkg">
+      <div class="gtitle">新人邀请码礼包</div>
+      <div class="gdesc">虚拟商品 · 无需收货地址 · 购买后自动生成邀请码</div>
+      <div class="row">
+        <div class="thumb">🎫</div>
+        <div class="info"><div class="name">新人邀请码礼包</div><div class="spec">数量：<span id="invite_confirm_qty">1</span> 个</div></div>
+        <div class="qty" id="invite_confirm_cnt">共 1 个邀请码</div>
+      </div>
+      <div class="price-row"><span>单价</span><span class="v">¥49.9</span></div>
+    </div>
+
+    <div class="price-card">
+      <div class="line"><span>商品总价</span><span class="v" id="invite_total_label">¥49.90</span></div>
+      <div class="line"><span>运费</span><span class="v">¥0</span></div>
+      <div class="line"><span>实付金额</span><span class="v red" id="invite_confirm_amt">¥49.90</span></div>
+      <div class="benefit">购买后按数量生成邀请码，自动存入「我的邀请码」，可分享给新人兑换礼包。</div>
+    </div>
+
+    <div class="remark">
+      <div class="label">订单备注</div>
+      <input class="input" placeholder="请填写您的备注信息（可不填）">
+    </div>
+
+    <div class="footer">
+      <div class="left">合计：<span class="amt" id="invite_confirm_amt2">¥49.90</span><span class="qty" id="invite_confirm_cnt2">共 1 个</span></div>
+      <button class="btn-confirm" id="btn_invite_confirm" onclick="goInviteCashier()">去支付</button>
+    </div>
+  </div>
+
+  <!-- ===== p_invite_cashier 收银台（Flow A） ===== -->
+  <div class="page" id="p_invite_cashier" style="background:#fff">
+    <div class="nav">
+      <div class="back" onclick="go('p_invite_confirm')">‹</div>
+      收银台
+    </div>
+    <div style="padding:24px 16px;text-align:center">
+      <div style="font-size:13px;color:var(--c-text-2)">需支付</div>
+      <div style="font-size:32px;font-weight:800;color:var(--c-red-2);margin:8px 0" id="cashier_amt">¥49.90</div>
+      <div style="font-size:12px;color:var(--c-text-3)" id="cashier_desc">新人邀请码礼包 ×1</div>
+    </div>
+    <div style="margin:16px 12px;background:#fff;border-radius:10px;padding:6px 14px;border:1px solid var(--c-line)">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--c-line);cursor:pointer" onclick="selectPay('wechat')">
+        <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:50%;background:#07c160;color:#fff;display:flex;align-items:center;justify-content:center">微</div><span>微信支付</span></div>
+        <div id="pay_wechat" class="pay-dot on">●</div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--c-line);cursor:pointer" onclick="selectPay('alipay')">
+        <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:50%;background:#1677ff;color:#fff;display:flex;align-items:center;justify-content:center">支</div><span>支付宝</span></div>
+        <div id="pay_alipay" class="pay-dot">●</div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;cursor:pointer" onclick="selectPay('card')">
+        <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:50%;background:#FF7800;color:#fff;display:flex;align-items:center;justify-content:center">卡</div><span>银行卡</span></div>
+        <div id="pay_card" class="pay-dot">●</div>
+      </div>
+    </div>
+    <div style="padding:0 12px;margin-top:24px">
+      <button class="btn-primary" onclick="doInvitePay()">确认支付</button>
+    </div>
+  </div>
+
+  <!-- ===== p_invite_buy_success 购买成功（Flow A） ===== -->
+  <div class="page" id="p_invite_buy_success" style="background:var(--c-bg)">
+    <div style="padding:40px 16px;text-align:center">
+      <div style="width:64px;height:64px;border-radius:50%;background:var(--c-primary);color:#fff;font-size:32px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">✓</div>
+      <div style="font-size:18px;font-weight:700">购买成功</div>
+      <div style="font-size:13px;color:var(--c-text-2);margin-top:8px">已生成 <span id="success_cnt">1</span> 个邀请码，已存入「我的邀请码」</div>
+    </div>
+    <div style="margin:16px 12px;background:#fff;border-radius:10px;padding:14px;font-size:12px;color:var(--c-text-2);line-height:1.6">
+      分享邀请码给新人，新人在「绿韵家」新人礼包页输入邀请码即可下单领取礼包（益齿健套装 + 5L 饮用水×7 袋）。每个邀请码仅可使用一次。
+    </div>
+    <div style="padding:0 12px;margin-top:16px">
+      <button class="btn-primary" onclick="go('p_my_codes')">查看我的邀请码</button>
+      <button class="btn-outline-grey" style="width:100%;height:44px;border-radius:22px;margin-top:10px;background:#fff;font-size:14px;cursor:pointer" onclick="go('p_home')">返回首页</button>
     </div>
   </div>
 
@@ -839,9 +925,10 @@ function go(id){
   if(id === 'p_confirm') renderConfirmAddr();
   if(id === 'p_home') updateFab();
   if(id === 'p_me') renderMe();
+  if(id === 'p_invite_confirm') renderInviteConfirm();
 }
 function goBackFromAddress(){
-  go(window._address ? 'p_confirm' : (window._detailPage ? 'p_gift_detail' : 'p_gift_intro'));
+  go('p_gift_intro');
 }
 
 /* ========== FAB / 悬浮窗可见性 ========== */
@@ -849,7 +936,7 @@ function updateFab(){
   // 新人礼包 FAB（首页常显）
   var fabGift = document.getElementById('fab_gift');
   if(fabGift) fabGift.classList.remove('hidden');
-  // 兑换券 FAB（仅初级会员以上）
+  // 邀请码 FAB（仅初级会员以上）
   var fabEx = document.getElementById('fab_exchange');
   if(fabEx){
     var show = (window._user.level === 'primary' || window._user.level === 'svip' || window._user.level === 'master');
@@ -951,7 +1038,7 @@ function toggleFav(){
   toast(window._favOn ? '已收藏' : '已取消收藏');
 }
 
-/* ========== 激活码弹窗 ========== */
+/* ========== 邀请码弹窗 ========== */
 function openCodeModal(){
   var modal = document.getElementById('code_modal');
   modal.classList.add('active');
@@ -972,10 +1059,10 @@ function clearCodeModalInput(){
 }
 function submitCodeModal(){
   var k = document.getElementById('code_modal_input').value.trim();
-  if(!k){toast('请输入激活码');return;}
-  if(k.length < 8){toast('激活码至少 8 位');return;}
+  if(!k){toast('请输入邀请码');return;}
+  if(k.length < 8){toast('邀请码至少 8 位');return;}
   if(!/[a-z]/.test(k) || !/[A-Z]/.test(k) || !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(k)){
-    toast('激活码需包含大小写字母与特殊符号');return;
+    toast('邀请码需包含大小写字母与特殊符号');return;
   }
   // 后端核销成功后生成订单
   var orderNo = ++window._orderSeq;
@@ -983,7 +1070,7 @@ function submitCodeModal(){
   document.getElementById('pay_time').textContent = formatNow();
   document.getElementById('show_code').textContent = k;
   closeCodeModal();
-  toast('激活码核销成功');
+  toast('邀请码核销成功');
   setTimeout(function(){ go('p_order'); }, 400);
 }
 
@@ -1042,6 +1129,78 @@ function markCopied(btn){
   btn.textContent = '已复制 ✓';
   btn.classList.add('copied');
   setTimeout(function(){btn.textContent=old;btn.classList.remove('copied');},1600);
+}
+
+/* ========== Flow A：购买邀请码（会员订单，无地址） ========== */
+window._inviteQty = 1;
+window._payMethod = 'wechat';
+function changeInviteQty(d){
+  var n = window._inviteQty + d;
+  if(n < 1) n = 1;
+  if(n > 99) n = 99;
+  window._inviteQty = n;
+  var el = document.getElementById('invite_qty'); if(el) el.textContent = n;
+  renderInviteConfirmPrice();
+}
+function renderInviteConfirmPrice(){
+  var unit = 49.9;
+  var total = (unit * window._inviteQty).toFixed(2);
+  var lbl = document.getElementById('invite_total_label'); if(lbl) lbl.textContent = '¥'+total;
+  var amt = document.getElementById('invite_confirm_amt'); if(amt) amt.textContent = '¥'+total;
+  var amt2 = document.getElementById('invite_confirm_amt2'); if(amt2) amt2.textContent = '¥'+total;
+  var cnt = document.getElementById('invite_confirm_cnt'); if(cnt) cnt.textContent = '共 '+window._inviteQty+' 个邀请码';
+  var cnt2 = document.getElementById('invite_confirm_cnt2'); if(cnt2) cnt2.textContent = '共 '+window._inviteQty+' 个';
+}
+function renderInviteConfirm(){
+  var q = document.getElementById('invite_confirm_qty'); if(q) q.textContent = window._inviteQty;
+  renderInviteConfirmPrice();
+}
+function selectPay(m){
+  window._payMethod = m;
+  ['wechat','alipay','card'].forEach(function(k){
+    var el = document.getElementById('pay_'+k); if(el) el.classList.toggle('on', k===m);
+  });
+}
+function goInviteCashier(){
+  selectPay(window._payMethod || 'wechat');
+  renderCashier();
+  go('p_invite_cashier');
+}
+function renderCashier(){
+  var n = window._inviteQty;
+  var total = (49.9 * n).toFixed(2);
+  var a = document.getElementById('cashier_amt'); if(a) a.textContent = '¥'+total;
+  var d = document.getElementById('cashier_desc'); if(d) d.textContent = '新人邀请码礼包 ×'+n;
+}
+function genOneCode(){
+  var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%^*()';
+  var s = '';
+  for(var i=0;i<12;i++){ s += chars[Math.floor(Math.random()*chars.length)]; }
+  return s;
+}
+function addMyCodes(n){
+  var list = document.getElementById('my_codes_list'); if(!list) return;
+  var now = formatNow();
+  var html = '';
+  for(var i=0;i<n;i++){
+    var c = genOneCode();
+    html += '<div class="code-card">'
+      + '<div class="ch"><span>邀请码 · 新人礼包-益齿健套装</span><span class="tag unused">未使用</span></div>'
+      + '<div class="code">'+c+'</div>'
+      + '<div class="meta"><span>生成时间: '+now+'</span><span>来源: 购买生成</span></div>'
+      + '<div class="btns"><div class="btn-copy" onclick="copyText(\''+c+'\', \'邀请码已复制\')">复制</div>'
+      + '<div class="btn-share" onclick="toast(\'分享给好友\')">分享</div></div></div>';
+  }
+  list.insertAdjacentHTML('afterbegin', html);
+}
+function doInvitePay(){
+  var n = window._inviteQty;
+  window._user.has_codes = true;
+  window._user.code_count = (window._user.code_count || 0) + n;
+  addMyCodes(n);
+  var sc = document.getElementById('success_cnt'); if(sc) sc.textContent = n;
+  toast('支付成功');
+  setTimeout(function(){ go('p_invite_buy_success'); }, 300);
 }
 
 /* ========== 入口态 ========== */
