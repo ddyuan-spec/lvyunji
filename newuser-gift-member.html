@@ -441,25 +441,35 @@ qtyChange(0);
 renderCodes();
 
 /* ========== 复制源码到墨刀 ========== */
-function copySource(){
-  var t = '';
-  try { t = document.documentElement.outerHTML; } catch(e){ t = ''; }
-  var ok = false;
+/* 兜底复制：execCommand */
+function fallbackCopy(text){
   try {
     var ta = document.createElement('textarea');
-    ta.value = t;
+    ta.value = text;
     ta.setAttribute('readonly', '');
     ta.style.position = 'fixed';
     ta.style.top = '-9999px';
     ta.style.opacity = '0';
     document.body.appendChild(ta);
     ta.select();
-    ok = document.execCommand('copy');
+    var ok = document.execCommand('copy');
     document.body.removeChild(ta);
-  } catch(e) { ok = false; }
-  toast(ok ? '源码已复制，去墨刀粘贴即可' : '复制失败，请手动复制源码');
+    return ok;
+  } catch(e){ return false; }
+}
+/* 复制源码到墨刀：优先 navigator.clipboard，复制初始纯净态 */
+function copySource(){
+  var src = window.__PROTO_SOURCE__ || ('<!DOCTYPE html>\n' + document.documentElement.outerHTML);
+  function done(ok){ toast(ok ? '源码已复制，去墨刀粘贴即可' : '复制失败，请手动复制源码'); }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(src).then(function(){ done(true); }).catch(function(){ done(fallbackCopy(src)); });
+  } else {
+    done(fallbackCopy(src));
+  }
 }
 document.getElementById('btn_copy_source').onclick = copySource;
+// 记录初始纯净源码（默认页面态），供复制粘贴墨刀
+window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
 </script>
 </body>
 </html>
