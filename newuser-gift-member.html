@@ -168,14 +168,18 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 .fab-newcode{position:absolute;right:14px;bottom:74px;width:54px;height:54px;border-radius:50%;background:var(--c-primary);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px rgba(26,173,124,.4);font-size:11px;font-weight:600;line-height:1.1;z-index:10;border:none}
 .fab-newcode .em{font-size:18px;font-weight:700;margin-bottom:2px}
 .fab-newcode:active{transform:scale(.95)}
-/* ===== 一键复制源码工具条（skill 标准组件） ===== */
-.copy-bar{position:sticky;top:0;left:0;z-index:200;background:#1f1f2e;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 18px;box-shadow:0 2px 10px rgba(0,0,0,.2);}
-.copy-bar .t{font-size:13px;font-weight:600;line-height:1.3;}
-.copy-bar .i{font-size:11px;color:#a6b0c8;margin-top:2px;}
-.copy-btn{padding:8px 18px;border:none;border-radius:20px;background:linear-gradient(135deg,#07c160,#06ad56);color:#fff;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;transition:transform .1s,box-shadow .2s;}
-.copy-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(7,193,96,.35);}
+/* ===== 复制源码标准组件（proto-c skill · PROTO-SMK-011） ===== */
+.copy-bar{position:sticky;top:0;left:0;right:0;z-index:9999;background:#1f1f2e;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 16px;box-shadow:0 2px 10px rgba(0,0,0,.2);font-family:inherit}
+.copy-bar__title{display:flex;flex-direction:column;gap:2px;min-width:0}
+.copy-bar__name{font-size:13px;font-weight:700;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.copy-bar__hint{font-size:11px;color:#a6b0c8}
+.copy-bar__actions{display:flex;gap:8px;flex-shrink:0}
+.copy-btn{padding:7px 14px;border:none;border-radius:18px;background:linear-gradient(135deg,#07c160,#06ad56);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:transform .1s,box-shadow .2s}
+.copy-btn--ghost{background:transparent;border:1px solid rgba(255,255,255,.4);font-weight:600}
+.copy-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(7,193,96,.35)}
+.copy-btn:active{transform:translateY(0)}
 .copy-btn.copied{background:linear-gradient(135deg,#059669,#047857);}
-.copy-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1f1f2e;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.25);opacity:0;transition:opacity .3s;pointer-events:none;z-index:300;}
+.copy-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1f1f2e;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.25);opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999}
 .copy-toast.show{opacity:1;}
 
 .toast{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s}
@@ -184,11 +188,14 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 </head>
 <body>
   <div class="copy-bar">
-    <div>
-      <div class="t">📋 新人激活码礼包 · 会员端原型</div>
-      <div class="i">单文件原型 · 一键复制整页 HTML 源码</div>
+    <div class="copy-bar__title">
+      <div class="copy-bar__name">📋 新人激活码礼包 · 会员端原型</div>
+      <div class="copy-bar__hint">单文件原型 · 可整份或逐页复制源码</div>
     </div>
-    <button class="copy-btn" id="copyBtn" onclick="copyPageSource()" title="点击复制完整 HTML 源码，粘贴本地即可运行">一键复制源码</button>
+    <div class="copy-bar__actions">
+      <button class="copy-btn" id="copyCurrentPage" data-label="复制当前页" onclick="copyCurrentPage()">复制当前页</button>
+      <button class="copy-btn copy-btn--ghost" id="copyAllSource" data-label="复制全部源码" onclick="copyAllSource()">复制全部源码</button>
+    </div>
   </div>
   <div class="copy-toast" id="copyToast"></div>
 <div class="phone">
@@ -454,46 +461,49 @@ document.getElementById('qty_plus').onclick = function(){ qtyChange(1); };
 qtyChange(0);
 renderCodes();
 
-/* ========== 复制源码到墨刀（skill 标准组件） ========== */
-/* 兜底复制：execCommand */
-function fallbackCopy(text){
-  try {
-    var ta = document.createElement('textarea');
-    ta.value = text;
-    ta.setAttribute('readonly', '');
-    ta.style.position = 'fixed';
-    ta.style.top = '-9999px';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
-    var ok = document.execCommand('copy');
-    document.body.removeChild(ta);
-    return ok;
-  } catch(e){ return false; }
+/* ========== 复制源码到墨刀（proto-c 标准组件 · PROTO-SMK-011，函数名 __proto 前缀防撞名） ========== */
+function __protoGetStyle(){ var s=document.querySelector('head style'); return s?s.innerHTML:''; }
+function __protoActivePage(){
+  return document.querySelector('.phone .page.active, .phone .view.active')
+      || document.querySelector('.page.active, .view.active')
+      || document.querySelector('.page, .view')
+      || document.querySelector('.phone > *');
 }
-/* 复制源码到墨刀：优先 navigator.clipboard，复制初始纯净态 */
-function copyPageSource(){
-  var src = window.__PROTO_SOURCE__ || ('<!DOCTYPE html>\n' + document.documentElement.outerHTML);
-  function showToast(msg){
-    var t = document.getElementById('copyToast');
-    t.textContent = msg; t.classList.add('show');
-    setTimeout(function(){ t.classList.remove('show'); }, 1800);
-  }
+/* 把单个页面包成独立可运行 HTML：继承完整 <style> + .phone 外壳，粘墨刀单屏可直接运行 */
+function __protoBuildStandalone(pageEl, title){
+  var style = __protoGetStyle();
+  var phoneCls = (pageEl && pageEl.closest && pageEl.closest('.phone')) ? ' class="phone"' : '';
+  var inner = pageEl ? pageEl.outerHTML : document.body.innerHTML;
+  return '<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n<meta charset="utf-8">\n<title>'
+       + (title||'原型单页') + '</title>\n<style>\n' + style + '\n</style>\n</head>\n<body>\n<div'
+       + phoneCls + '>\n' + inner + '\n</div>\n</body>\n</html>';
+}
+function __protoCopy(text, btnId, okMsg){
+  function toast(msg){ var t=document.getElementById('copyToast'); if(t){ t.textContent=msg; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},1800); } }
   function done(ok){
-    var b = document.getElementById('copyBtn');
-    if (ok) {
-      b.textContent = '✓ 已复制'; b.classList.add('copied');
-      showToast('已复制整页源码，粘贴到墨刀即可运行');
-      setTimeout(function(){ b.textContent = '一键复制源码'; b.classList.remove('copied'); }, 1800);
-    } else { showToast('复制失败，请手动复制源码'); }
+    var b=document.getElementById(btnId);
+    if(ok){ if(b){ b.textContent='✓ 已复制'; b.classList.add('copied'); setTimeout(function(){ b.textContent=b.getAttribute('data-label')||'复制'; b.classList.remove('copied'); },1800); } toast(okMsg); }
+    else { toast('复制失败，请手动复制源码'); }
   }
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(src).then(function(){ done(true); }).catch(function(){ done(fallbackCopy(src)); });
-  } else {
-    done(fallbackCopy(src));
-  }
+  function fb(t){ try{ var ta=document.createElement('textarea'); ta.value=t; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.top='-9999px'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); var ok=document.execCommand('copy'); document.body.removeChild(ta); return ok; }catch(e){ return false; } }
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(function(){done(true);}).catch(function(){done(fb(text));}); }
+  else { done(fb(text)); }
 }
-// 记录初始纯净源码（默认页面态），供复制粘贴墨刀
+/* 复制当前页：所见即所得，抓取当前屏幕这一页的实时内容，包成独立可运行 HTML（挑页复制用） */
+function copyCurrentPage(){
+  var page = __protoActivePage();
+  var title = (page && page.getAttribute('data-title'))
+           || (page && page.querySelector && page.querySelector('.nav') && page.querySelector('.nav').textContent)
+           || document.title || '原型单页';
+  var html = __protoBuildStandalone(page, title);
+  __protoCopy(html, 'copyCurrentPage', '已复制当前页，粘贴到墨刀即可');
+}
+/* 复制全部源码：初始纯净态整份文件（从首屏运行用） */
+function copyAllSource(){
+  var src = window.__PROTO_SOURCE__ || ('<!DOCTYPE html>\n' + document.documentElement.outerHTML);
+  __protoCopy(src, 'copyAllSource', '已复制整份源码，粘贴到墨刀即可运行');
+}
+// 记录初始纯净源码（首屏态），供「复制全部源码」粘贴墨刀
 window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
 </script>
 </body>
