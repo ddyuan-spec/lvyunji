@@ -5,7 +5,7 @@
 <title>新人激活码礼包 · 后台管理总览 - 绿韵家管理系统</title>
 <meta name="viewport" content="width=1280">
 <style>
-/* ===== 1:1 复刻绿韵家后台基线（与 admin-orders / admin-invite-codes 同源） ===== */
+/* ===== 1:1 复刻绿韵家后台基线 ===== */
 :root{
   --topbar:#2e3338; --topbar-hover:#3a3f44; --topbar-active:#f56c6c;
   --sidebar:#2e3338; --sidebar-text:#cfd3d8; --sidebar-text-dim:#8a8f95;
@@ -34,14 +34,11 @@ html,body{height:100%;font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans
 .sidebar .menu-item{display:flex;align-items:center;gap:8px;padding:8px 16px;color:var(--sidebar-text);text-decoration:none;font-size:13px;cursor:pointer}
 .sidebar .menu-item:hover{background:#3a3f44;color:#fff}
 .sidebar .menu-item.active{background:var(--sidebar-active-bg);color:#fff}
-.sidebar .sub-menu{padding-left:0;background:#25292d}
-.sidebar .sub-menu .menu-item{padding:6px 16px 6px 30px;font-size:12px}
 
 main{flex:1;overflow:hidden;background:var(--main);min-width:0}
 main .view{display:none;height:100%;overflow-y:auto}
 main .view.active{display:block}
 
-/* ===== dashboard 内容样式 ===== */
 .dashboard{padding:16px 18px}
 
 /* 欢迎条 */
@@ -77,15 +74,25 @@ main .view.active{display:block}
 .card .card-head .more:hover{color:var(--link-hover)}
 .card .card-body{padding:0}
 
-/* 待办表 */
+/* 表格 */
 .tbl{width:100%;font-size:13px;border-collapse:collapse}
 .tbl thead th{background:#fafbfc;padding:10px 12px;font-weight:600;color:var(--text-2);text-align:left;border-bottom:1px solid var(--line);font-size:12px}
 .tbl tbody td{padding:10px 12px;border-bottom:1px solid var(--line);color:var(--text);font-size:13px}
 .tbl tbody tr:hover{background:#fafbfc}
+.tbl tbody tr:last-child td{border-bottom:0}
 .tbl .num{color:var(--link);text-decoration:none}
 .tbl .num:hover{text-decoration:underline}
 .tbl .act{color:var(--link);font-size:12px;text-decoration:none}
 .tbl .act:hover{text-decoration:underline}
+
+/* 短链汇总 */
+.link-card .tbl tbody td{padding:12px}
+.link-card .tbl td:first-child{width:90px;color:var(--text-2);font-weight:500}
+.link-card .tbl td a{color:var(--link);text-decoration:none;word-break:break-all}
+.link-card .tbl td a:hover{text-decoration:underline}
+.link-card .copy-cell{text-align:right}
+.link-card .copy-tag{font-size:12px;color:var(--text-3);cursor:pointer}
+.link-card .copy-tag:hover{color:var(--primary)}
 
 /* 快捷入口 */
 .quick{padding:14px}
@@ -122,18 +129,8 @@ main .view.active{display:block}
 <div class="layout">
   <div class="sidebar">
     <div class="group">
-      <div class="group-title">订单中心</div>
-      <a class="menu-item" href="newuser-gift-admin-orders.html">订单管理</a>
-    </div>
-    <div class="group">
-      <div class="group-title">店铺</div>
-      <div class="sub-menu">
-        <a class="menu-item active" href="newuser-gift-admin-summary.html">邀请码管理</a>
-      </div>
-    </div>
-    <div class="group">
       <div class="group-title">新人激活码礼包</div>
-      <a class="menu-item" href="newuser-gift-admin-summary.html">后台管理总览</a>
+      <a class="menu-item active" href="newuser-gift-admin-summary.html">后台管理总览</a>
       <a class="menu-item" href="newuser-gift-admin-orders.html">订单列表</a>
       <a class="menu-item" href="newuser-gift-admin-invite-codes.html">邀请码管理</a>
       <a class="menu-item" href="newuser-gift-admin-invite-code-generate.html">邀请码生成</a>
@@ -141,8 +138,6 @@ main .view.active{display:block}
   </div>
 
   <main>
-
-    <!-- viewDashboard：拟真后台首页 -->
     <section id="viewDashboard" class="view active">
       <div class="dashboard">
 
@@ -248,6 +243,25 @@ main .view.active{display:block}
           </div>
 
           <div class="col-right">
+            <div class="card link-card">
+              <div class="card-head"><div class="title">短链汇总</div></div>
+              <div class="card-body">
+                <table class="tbl">
+                  <thead><tr><th>终端</th><th>短链</th></tr></thead>
+                  <tbody>
+                    <tr>
+                      <td>C 端</td>
+                      <td><a href="https://ddyuan-spec.github.io/lvyunji/newuser-gift-c-app.html" target="_blank">https://ddyuan-spec.github.io/lvyunji/newuser-gift-c-app.html</a></td>
+                    </tr>
+                    <tr>
+                      <td>会员端</td>
+                      <td><a href="https://ddyuan-spec.github.io/lvyunji/newuser-gift-member.html" target="_blank">https://ddyuan-spec.github.io/lvyunji/newuser-gift-member.html</a></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
             <div class="card">
               <div class="card-head"><div class="title">快捷入口</div></div>
               <div class="card-body">
@@ -265,11 +279,11 @@ main .view.active{display:block}
                       <div class="ic">+</div>
                       <div class="lbl"><div class="t">邀请码生成</div><div class="s">后台手动新增 · 系统生成</div></div>
                     </a>
-                    <a class="qa-btn" href="https://ddyuan-spec.github.io/lvyunji/newuser-gift-newuser-gift-c-app.html" target="_blank">
+                    <a class="qa-btn" href="https://ddyuan-spec.github.io/lvyunji/newuser-gift-c-app.html" target="_blank">
                       <div class="ic">C</div>
                       <div class="lbl"><div class="t">C 端激活流程</div><div class="s">用户侧 · 激活码使用</div></div>
                     </a>
-                    <a class="qa-btn" href="https://ddyuan-spec.github.io/lvyunji/newuser-gift-newuser-gift-member.html" target="_blank">
+                    <a class="qa-btn" href="https://ddyuan-spec.github.io/lvyunji/newuser-gift-member.html" target="_blank">
                       <div class="ic">M</div>
                       <div class="lbl"><div class="t">会员端购买</div><div class="s">会员侧 · 购买激活码</div></div>
                     </a>
@@ -350,58 +364,10 @@ main .view.active{display:block}
 
       </div>
     </section>
-
-    <!-- 其他 4 个视图：iframe 加载独立 HTML，顶条显示视图标题与"全屏打开" -->
-    <section id="viewOrders" class="view">
-      <div style="height:46px;padding:0 16px;display:flex;align-items:center;background:#fff;border-bottom:1px solid var(--line);font-size:14px;font-weight:600">
-        <span>订单列表</span>
-        <span style="font-size:12px;color:var(--text-3);font-weight:400;margin-left:10px">订单中心 · 订单管理</span>
-        <a href="newuser-gift-admin-orders.html" target="_blank" style="margin-left:auto;font-size:12px;color:var(--link);text-decoration:none">在新窗口打开 →</a>
-      </div>
-      <iframe src="newuser-gift-admin-orders.html" style="width:100%;height:calc(100% - 46px);border:0" title="订单列表"></iframe>
-    </section>
-    <section id="viewInviteCodes" class="view">
-      <div style="height:46px;padding:0 16px;display:flex;align-items:center;background:#fff;border-bottom:1px solid var(--line);font-size:14px;font-weight:600">
-        <span>邀请码管理</span>
-        <span style="font-size:12px;color:var(--text-3);font-weight:400;margin-left:10px">店铺 · 商品中心 · 邀请码管理</span>
-        <a href="newuser-gift-admin-invite-codes.html" target="_blank" style="margin-left:auto;font-size:12px;color:var(--link);text-decoration:none">在新窗口打开 →</a>
-      </div>
-      <iframe src="newuser-gift-admin-invite-codes.html" style="width:100%;height:calc(100% - 46px);border:0" title="邀请码管理"></iframe>
-    </section>
-    <section id="viewInviteCodeDetail" class="view">
-      <div style="height:46px;padding:0 16px;display:flex;align-items:center;background:#fff;border-bottom:1px solid var(--line);font-size:14px;font-weight:600">
-        <span>邀请码详情</span>
-        <span style="font-size:12px;color:var(--text-3);font-weight:400;margin-left:10px">单条邀请码全量信息（生成途径 · 购买人/生成人 · 关联订单 · 生命周期时间线）</span>
-        <a href="newuser-gift-admin-invite-code-detail.html" target="_blank" style="margin-left:auto;font-size:12px;color:var(--link);text-decoration:none">在新窗口打开 →</a>
-      </div>
-      <iframe src="newuser-gift-admin-invite-code-detail.html" style="width:100%;height:calc(100% - 46px);border:0" title="邀请码详情"></iframe>
-    </section>
-    <section id="viewInviteCodeGenerate" class="view">
-      <div style="height:46px;padding:0 16px;display:flex;align-items:center;background:#fff;border-bottom:1px solid var(--line);font-size:14px;font-weight:600">
-        <span>邀请码生成</span>
-        <span style="font-size:12px;color:var(--text-3);font-weight:400;margin-left:10px">后台手动新增邀请码 · 生成途径固定为系统生成</span>
-        <a href="newuser-gift-admin-invite-code-generate.html" target="_blank" style="margin-left:auto;font-size:12px;color:var(--link);text-decoration:none">在新窗口打开 →</a>
-      </div>
-      <iframe src="newuser-gift-admin-invite-code-generate.html" style="width:100%;height:calc(100% - 46px);border:0" title="邀请码生成"></iframe>
-    </section>
-
   </main>
 </div>
 
 <script>
-var NAV_OF = {
-  dashboard: 'viewDashboard',
-  orders: 'viewOrders',
-  inviteCodes: 'viewInviteCodes',
-  inviteCodeDetail: 'viewInviteCodeDetail',
-  inviteCodeGenerate: 'viewInviteCodeGenerate'
-};
-function go(key){
-  var id = NAV_OF[key];
-  if(!id) return;
-  document.querySelectorAll('main .view').forEach(function(v){ v.classList.toggle('active', v.id === id); });
-}
-// 顶部时钟
 function tick(){
   var d = new Date();
   var p = function(n){ return n<10?'0'+n:n; };
