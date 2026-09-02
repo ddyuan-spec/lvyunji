@@ -583,8 +583,8 @@
     <!-- 当前生效卡片 -->
     <div class="config-card">
       <div class="config-label">当前生效配置</div>
-      <div class="config-value">5 积分</div>
-      <div class="config-meta">生效日期：2026-09-01 &nbsp;|&nbsp; 设置人：产品小王 &nbsp;|&nbsp; 备注：V0.5 上线调整</div>
+      <div class="config-value" id="initCurrentValue">5 积分</div>
+      <div class="config-meta" id="initCurrentMeta">生效日期：2026-09-01 &nbsp;|&nbsp; 设置人：产品小王 &nbsp;|&nbsp; 备注：V0.5 上线调整</div>
     </div>
     <!-- 设置表单 -->
     <div style="margin-bottom:20px;padding:16px;background:#fafafa;border-radius:6px;border:1px solid var(--border);">
@@ -605,7 +605,7 @@
       </div>
       <div class="form-row">
         <label class="form-label"></label>
-        <button class="btn btn-primary" style="height:36px;padding:0 24px;" onclick="toast('配置已保存')">保存配置</button>
+        <button class="btn btn-primary" style="height:36px;padding:0 24px;" onclick="saveInitConfig()">保存配置</button>
       </div>
     </div>
     <!-- 历史快照 -->
@@ -621,7 +621,7 @@
           <th>操作</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="initHistoryTbody">
         <tr>
           <td><b>5</b></td>
           <td>2026-09-01</td>
@@ -661,8 +661,8 @@
     <!-- 当前生效卡片 -->
     <div class="config-card">
       <div class="config-label">当前生效定价</div>
-      <div class="config-value">1 积分 = <b style="color:var(--primary);font-size:22px;">¥0.10</b></div>
-      <div class="config-meta">生效日期：2026-09-01 &nbsp;|&nbsp; 设置人：运营小李 &nbsp;|&nbsp; 备注：上线首发定价</div>
+      <div class="config-value" id="pricingCurrentValue">1 积分 = <b style="color:var(--primary);font-size:22px;">¥0.10</b></div>
+      <div class="config-meta" id="pricingCurrentMeta">生效日期：2026-09-01 &nbsp;|&nbsp; 设置人：运营小李 &nbsp;|&nbsp; 备注：上线首发定价</div>
     </div>
     <!-- 设置表单 -->
     <div style="margin-bottom:20px;padding:16px;background:#fafafa;border-radius:6px;border:1px solid var(--border);">
@@ -684,7 +684,7 @@
       </div>
       <div class="form-row">
         <label class="form-label"></label>
-        <button class="btn btn-primary" style="height:36px;padding:0 24px;" onclick="toast('定价已保存')">保存定价</button>
+        <button class="btn btn-primary" style="height:36px;padding:0 24px;" onclick="savePricing()">保存定价</button>
       </div>
     </div>
     <!-- 历史定价时间线 -->
@@ -700,7 +700,7 @@
           <th>操作</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="pricingHistoryTbody">
         <tr>
           <td><b>¥0.10</b></td>
           <td>2026-09-01</td>
@@ -746,7 +746,7 @@
           <div style="font-size:15px;font-weight:600;">图片生成</div>
           <span class="badge badge-success" style="margin-left:auto;">生效中</span>
         </div>
-        <div class="config-value">每次消耗 <b style="color:var(--primary);">1</b> 积分</div>
+        <div class="config-value" id="costImageValue">每次消耗 <b style="color:var(--primary);">1</b> 积分</div>
         <div class="config-meta">生效：2026-09-01 &nbsp;|&nbsp; 运营小李</div>
       </div>
       <div class="config-card" style="padding:14px;opacity:0.6;">
@@ -788,7 +788,7 @@
       </div>
       <div class="form-row">
         <label class="form-label"></label>
-        <button class="btn btn-primary" style="height:36px;padding:0 24px;" onclick="toast('消耗配置已保存')">保存</button>
+        <button class="btn btn-primary" style="height:36px;padding:0 24px;" onclick="saveCostConfig()">保存</button>
       </div>
     </div>
 
@@ -805,7 +805,7 @@
           <th>操作</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="costHistoryTbody">
         <tr>
           <td><b>1 积分/次</b></td>
           <td>2026-09-01</td>
@@ -993,6 +993,7 @@
         <tbody id="firstOrderTbody"></tbody>
       </table>
     </div>
+    <div id="foSummary" style="margin-top:16px;padding:12px 16px;background:#f6ffed;border:1px solid #b7eb8f;border-radius:6px;font-size:13px;color:var(--text-secondary);"></div>
   </div>
 </section>
 
@@ -1038,6 +1039,21 @@ function submitCreditAdjust() {
   var remark = document.getElementById('adjustRemark').value.trim();
   if (amount <= 0) { alert('请输入有效数值'); return; }
   var action = adjustMode === 'gift' ? '赠送' : '扣除';
+  // 同步会员列表余额（修复"调整了但列表不变"空转）
+  var name = document.getElementById('adjustUserName').textContent;
+  var rows = document.querySelectorAll('#viewMember tbody tr');
+  for (var i = 0; i < rows.length; i++) {
+    var cells = rows[i].querySelectorAll('td');
+    if (cells.length > 9 && cells[1].textContent.indexOf(name) >= 0) {
+      var balCell = cells[9];
+      var cur = parseInt((balCell.textContent || '0').replace(/[^0-9\-]/g, ''), 10) || 0;
+      var nv = adjustMode === 'gift' ? cur + amount : cur - amount;
+      balCell.textContent = nv;
+      balCell.style.color = nv > 0 ? 'var(--primary)' : 'var(--red)';
+      balCell.style.fontWeight = '600';
+      break;
+    }
+  }
   toast('已' + action + ' ' + amount + ' 积分');
   setTimeout(function () { go('member'); }, 800);
 }
@@ -1108,7 +1124,7 @@ function submitPackageForm() {
   if (credits <= 0) { alert('积分数须大于 0'); return; }
   if (price <= 0) { alert('售价须大于 0'); return; }
   // 写回唯一数据源 pkgData（套餐管理 + 首单优惠配置共用，套餐变更自动联动）
-  pkgData[name] = { credits: credits, price: price, tag: tag, sort: sort };
+  pkgData[name] = { credits: credits, price: price, tag: tag, sort: sort, status: pkgStatus };
   var action = pkgEditKey ? '已保存套餐' : '已新增套餐';
   toast(action + '「' + name + '」· ' + credits + ' 积分 / ¥' + price.toFixed(1) + ' · ' + (pkgStatus === 'on' ? '上架' : '下架'));
   setTimeout(function () { go('package'); }, 800);
@@ -1130,11 +1146,11 @@ function renderPackageTable() {
       '<td style="padding:10px 12px;font-size:13px;">¥' + d.price.toFixed(1) + '</td>' +
       '<td style="padding:10px 12px;">' + tagHtml + '</td>' +
       '<td style="padding:10px 12px;font-size:13px;">' + d.sort + '</td>' +
-      '<td style="padding:10px 12px;"><span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f;">上架</span></td>' +
+      '<td style="padding:10px 12px;">' + (d.status === 'off' ? '<span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#fff1f0;color:#ff4d4f;border:1px solid #ffa39e;">下架</span>' : '<span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f;">上架</span>') + '</td>' +
       '<td style="padding:10px 12px;text-align:center;">' +
         '<span class="btn-link" onclick="openPackageForm(\'' + k + '\')">编辑</span>' +
         '<span style="color:var(--border);margin:0 6px;">|</span>' +
-        '<span class="btn-link" style="color:var(--red);" onclick="toast(\'已下架\')">下架</span>' +
+        '<span class="btn-link" style="color:var(--red);" onclick="togglePackageStatus(\'' + k + '\')">' + (d.status === 'off' ? '上架' : '下架') + '</span>' +
       '</td></tr>';
   });
   tbody.innerHTML = html;
@@ -1142,6 +1158,8 @@ function renderPackageTable() {
 
 // ===== 首单优惠配置（数据源来自 pkgData，套餐变更自动同步） =====
 // method: equal=等额赠送(送=购买积分) / percent=比例赠送(按购买积分X%) / fixed=固定赠送(N积分)
+var firstOrderGlobal = true;   // 首单优惠总开关（true=开启）
+
 var firstOrderData = {
   '入门包': { enabled: true,  method: 'equal',   amount: 0,   copy: '新人首单立赠等额积分' },
   '标准包': { enabled: true,  method: 'equal',   amount: 0,   copy: '新人首单立赠等额积分' },
@@ -1150,12 +1168,13 @@ var firstOrderData = {
 };
 
 function toggleGlobalFirstOrder() {
-  var el = document.getElementById('foGlobalToggle');
-  el.classList.toggle('on');
-  toast('首单优惠总开关已' + (el.classList.contains('on') ? '开启' : '关闭'));
+  firstOrderGlobal = !firstOrderGlobal;
+  renderFirstOrder();
+  toast('首单优惠总开关已' + (firstOrderGlobal ? '开启' : '关闭'));
 }
 
 function toggleRowFirstOrder(pkgName) {
+  if (!firstOrderGlobal) return;          // 总开关关闭时不允许单独配置
   var d = firstOrderData[pkgName];
   if (!d) return;
   d.enabled = !d.enabled;
@@ -1163,6 +1182,7 @@ function toggleRowFirstOrder(pkgName) {
 }
 
 function onFoMethodChange(pkgName, val) {
+  if (!firstOrderGlobal) return;
   var d = firstOrderData[pkgName];
   if (!d) return;
   d.method = val;
@@ -1170,45 +1190,143 @@ function onFoMethodChange(pkgName, val) {
 }
 
 function saveFirstOrderRow(pkgName) {
+  if (!firstOrderGlobal) { toast('请先开启首单优惠总开关'); return; }
   var d = firstOrderData[pkgName];
   if (!d) return;
   var amtEl = document.getElementById('foAmount_' + pkgName);
   var copyEl = document.getElementById('foCopy_' + pkgName);
+  if (!amtEl && !copyEl) return;   // 极端竞态（元素已被重渲染）安全退出
   if (d.method === 'equal') {
-    d.amount = 0;
+    d.amount = pkgData[pkgName].credits;   // 等额赠送 = 购买积分数（修复原存 0 的 bug）
   } else {
-    d.amount = parseInt(amtEl.value, 10) || 0;
+    d.amount = parseInt((amtEl ? amtEl.value : '0'), 10) || 0;
   }
-  d.copy = copyEl.value.trim() || '新人首单赠送';
+  d.copy = copyEl ? (copyEl.value.trim() || '新人首单赠送') : (d.copy || '新人首单赠送');
+  // 保存反馈：链接短暂变「已保存 ✓」
+  var link = document.getElementById('foSave_' + pkgName);
+  if (link) {
+    var oldTxt = link.textContent;
+    link.textContent = '已保存 ✓';
+    link.style.color = '#52c41a';
+    setTimeout(function () { link.textContent = oldTxt; link.style.color = ''; }, 1500);
+  }
+  renderFirstOrder();   // 刷新摘要
   toast('已保存「' + pkgName + '」首单优惠配置');
 }
 
 function renderFirstOrder() {
   var tbody = document.getElementById('firstOrderTbody');
   if (!tbody) return;
+  // 同步全局开关视觉
+  var g = document.getElementById('foGlobalToggle');
+  if (g) g.classList.toggle('on', firstOrderGlobal);
   var keys = Object.keys(pkgData).sort(function (a, b) { return pkgData[a].sort - pkgData[b].sort; });
   var methodLabel = { equal: '等额赠送', percent: '比例赠送', fixed: '固定赠送' };
   var html = '';
+  // 总开关关闭：保留配置行但整体禁用，并提示（不删除元素，避免交互失效/竞态崩溃）
+  if (!firstOrderGlobal) {
+    html += '<tr><td colspan="6" style="padding:14px 12px;background:#fff1f0;color:#ff4d4f;font-size:13px;border-bottom:1px solid var(--border-light);">首单优惠总开关已关闭：所有新用户首次购买均不享受赠送。开启总开关后即可配置各套餐规则（下方配置暂不可编辑）。</td></tr>';
+  }
   keys.forEach(function (k) {
     var d = firstOrderData[k] || { enabled: false, method: 'fixed', amount: 0, copy: '新人首单赠送' };
     var credits = pkgData[k].credits;
     var toggleCls = d.enabled ? 'toggle-switch lg on' : 'toggle-switch lg';
-    var amountDisabled = d.method === 'equal' ? 'disabled style="background:#f5f5f5;color:#999;"' : '';
+    var toggleStyle = firstOrderGlobal ? '' : ' style="opacity:.45;pointer-events:none;"';
+    var dis = firstOrderGlobal ? '' : ' disabled';
+    var amountDisabled = (d.method === 'equal' || !firstOrderGlobal) ? 'disabled style="background:#f5f5f5;color:#999;"' : '';
     var amountVal = d.method === 'equal' ? credits : d.amount;
     var amountHint = d.method === 'equal' ? '（=购买积分' + credits + '）' : (d.method === 'percent' ? '（%）' : '（积分）');
     var opts = ['equal', 'percent', 'fixed'].map(function (m) {
       return '<option value="' + m + '"' + (d.method === m ? ' selected' : '') + '>' + methodLabel[m] + '</option>';
     }).join('');
-    html += '<tr style="border-bottom:1px solid var(--border-light);">' +
+    html += '<tr style="border-bottom:1px solid var(--border-light);' + (firstOrderGlobal ? '' : 'opacity:.6;') + '">' +
       '<td style="padding:10px 12px;font-size:13px;">' + k + '</td>' +
-      '<td style="padding:10px 12px;"><div class="' + toggleCls + '" onclick="toggleRowFirstOrder(\'' + k + '\')"><div class="knob"></div></div><div style="font-size:11px;color:var(--text-tertiary);margin-top:4px;">' + (d.enabled ? '参与' : '不参与') + '</div></td>' +
-      '<td style="padding:10px 12px;"><select onchange="onFoMethodChange(\'' + k + '\', this.value)" style="padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;">' + opts + '</select></td>' +
+      '<td style="padding:10px 12px;"><div class="' + toggleCls + '"' + toggleStyle + ' onclick="toggleRowFirstOrder(\'' + k + '\')"><div class="knob"></div></div><div style="font-size:11px;color:var(--text-tertiary);margin-top:4px;">' + (d.enabled ? '参与' : '不参与') + '</div></td>' +
+      '<td style="padding:10px 12px;"><select' + dis + ' onchange="onFoMethodChange(\'' + k + '\', this.value)" style="padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;">' + opts + '</select></td>' +
       '<td style="padding:10px 12px;"><input id="foAmount_' + k + '" value="' + amountVal + '" ' + amountDisabled + ' style="width:64px;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;"> <span style="font-size:11px;color:var(--text-tertiary);">' + amountHint + '</span></td>' +
-      '<td style="padding:10px 12px;"><input id="foCopy_' + k + '" value="' + d.copy + '" style="width:160px;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;"></td>' +
-      '<td style="padding:10px 12px;text-align:center;"><span class="btn-link" onclick="saveFirstOrderRow(\'' + k + '\')">保存</span></td>' +
+      '<td style="padding:10px 12px;"><input id="foCopy_' + k + '" value="' + d.copy + '"' + dis + ' style="width:160px;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;"></td>' +
+      '<td style="padding:10px 12px;text-align:center;"><span class="btn-link" id="foSave_' + k + '" onclick="saveFirstOrderRow(\'' + k + '\')">保存</span></td>' +
     '</tr>';
   });
   tbody.innerHTML = html;
+  renderFoSummary();
+}
+
+function renderFoSummary() {
+  var box = document.getElementById('foSummary');
+  if (!box) return;
+  if (!firstOrderGlobal) {
+    box.style.background = '#fff1f0';
+    box.style.borderColor = '#ffa39e';
+    box.style.color = '#ff4d4f';
+    box.innerHTML = '首单优惠总开关：<b>已关闭</b> —— 所有新用户首次购买无赠送。';
+    return;
+  }
+  box.style.background = '#f6ffed';
+  box.style.borderColor = '#b7eb8f';
+  box.style.color = 'var(--text-secondary)';
+  var lines = [];
+  Object.keys(pkgData).sort(function (a, b) { return pkgData[a].sort - pkgData[b].sort; }).forEach(function (k) {
+    var d = firstOrderData[k];
+    if (!d || !d.enabled) { lines.push(k + '：不参与'); return; }
+    var txt = d.method === 'equal' ? ('立赠等额积分 ' + pkgData[k].credits) : (d.method === 'percent' ? ('加赠 ' + d.amount + '%') : ('固定赠送 ' + d.amount + ' 积分'));
+    lines.push(k + '：' + txt + '（C端文案「' + d.copy + '」）');
+  });
+  box.innerHTML = '当前生效配置 —— ' + lines.join('；') + '。';
+}
+
+// ===== 配置类页面：保存真实生效（修复"只 toast 不落地"空转） =====
+function _markHistoryObsolete(tbody) {
+  var rows = tbody.querySelectorAll('tr');
+  for (var i = 1; i < rows.length; i++) {
+    var b = rows[i].querySelector('.badge-success');
+    if (b) { b.className = 'badge badge-default'; b.textContent = '已失效'; }
+  }
+}
+function saveInitConfig() {
+  var v = parseInt(document.querySelector('#viewInit input[type=number]').value, 10) || 0;
+  var date = document.querySelector('#viewInit input[type=date]').value || '2026-09-01';
+  var remark = document.querySelector('#viewInit textarea').value.trim() || '手动调整';
+  document.getElementById('initCurrentValue').textContent = v + ' 积分';
+  document.getElementById('initCurrentMeta').textContent = '生效日期：' + date + ' | 设置人：产品小王 | 备注：' + remark;
+  var tb = document.getElementById('initHistoryTbody');
+  var tr = document.createElement('tr');
+  tr.innerHTML = '<td><b>' + v + '</b></td><td>' + date + '</td><td>产品小王</td><td>' + remark + '</td><td><span class="badge badge-success">生效中</span></td><td><span class="action-link" onclick="toast(\'作废 ' + v + ' 积分配置\')">作废</span></td>';
+  tb.insertBefore(tr, tb.firstChild);
+  _markHistoryObsolete(tb);
+  toast('初始积分配置已保存：新用户注册发放 ' + v + ' 积分');
+}
+function savePricing() {
+  var v = parseFloat(document.querySelector('#viewPricing input[type=number]').value) || 0;
+  var date = document.querySelector('#viewPricing input[type=date]').value || '2026-09-01';
+  var remark = document.querySelector('#viewPricing textarea').value.trim() || '调价';
+  document.getElementById('pricingCurrentValue').innerHTML = '1 积分 = <b style="color:var(--primary);font-size:22px;">¥' + v.toFixed(2) + '</b>';
+  document.getElementById('pricingCurrentMeta').textContent = '生效日期：' + date + ' | 设置人：运营小李 | 备注：' + remark;
+  var tb = document.getElementById('pricingHistoryTbody');
+  var tr = document.createElement('tr');
+  tr.innerHTML = '<td><b>¥' + v.toFixed(2) + '</b></td><td>' + date + '</td><td>运营小李</td><td>' + remark + '</td><td><span class="badge badge-success">生效中</span></td><td><span class="action-link" onclick="toast(\'作废 ¥' + v.toFixed(2) + ' 定价\')">作废</span></td>';
+  tb.insertBefore(tr, tb.firstChild);
+  _markHistoryObsolete(tb);
+  toast('积分定价已保存：1 积分 = ¥' + v.toFixed(2));
+}
+function saveCostConfig() {
+  var v = parseInt(document.querySelector('#viewCost input[type=number]').value, 10) || 1;
+  var date = document.querySelector('#viewCost input[type=date]').value || '2026-09-01';
+  var remark = document.querySelector('#viewCost textarea').value.trim() || '调整';
+  document.getElementById('costImageValue').innerHTML = '每次消耗 <b style="color:var(--primary);">' + v + '</b> 积分';
+  var tb = document.getElementById('costHistoryTbody');
+  var tr = document.createElement('tr');
+  tr.innerHTML = '<td><b>' + v + ' 积分/次</b></td><td>' + date + '</td><td>运营小李</td><td>' + remark + '</td><td><span class="badge badge-success">生效中</span></td><td><span class="action-link" onclick="toast(\'作废 ' + v + ' 积分/次 配置\')">作废</span></td>';
+  tb.insertBefore(tr, tb.firstChild);
+  _markHistoryObsolete(tb);
+  toast('图片生成消耗已保存：每次 ' + v + ' 积分');
+}
+function togglePackageStatus(name) {
+  var d = pkgData[name];
+  if (!d) return;
+  d.status = d.status === 'off' ? 'on' : 'off';
+  renderPackageTable();
+  toast(name + (d.status === 'on' ? ' 已上架' : ' 已下架'));
 }
 
 // 初始进入会员管理
