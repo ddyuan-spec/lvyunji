@@ -475,7 +475,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 
     <div class="hero">
       <div class="bag-icon">🎁</div>
-      <div class="ttl">新人邀请码大礼包</div>
+      <div class="ttl">新人礼包</div>
       <div class="sub">输入会员朋友分享的邀请码即可领取</div>
     </div>
 
@@ -494,19 +494,24 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
         <div class="meta"><div class="name">辅酶 Q10 体验装</div><div class="desc">10 粒装 · 快递配送</div></div>
         <div class="qty">×1</div>
       </div>
+      <div class="item">
+        <div class="thumb">💧</div>
+        <div class="meta"><div class="name">5L 饮用水</div><div class="desc">兑换后到店自提 · 共 7 袋，30 天有效</div></div>
+        <div class="qty">×7</div>
+      </div>
     </div>
 
     <div class="submit-wrap">
-      <button class="btn-primary" id="btn_intro_buy" onclick="go('p_address')">立即购买</button>
+      <button class="btn-primary" id="btn_intro_buy" onclick="go('p_address')">立即激活</button>
     </div>
-    <div class="foot-tip">购买即视为同意礼包配送安排</div>
+    <div class="foot-tip">激活即视为同意礼包配送安排</div>
   </div>
 
-  <!-- ===== p_invite_detail 邀请码商品详情页（仅购买邀请码时展示，Flow A） ===== -->
+  <!-- ===== p_invite_detail 邀请码商品详情页（Flow A） ===== -->
   <div class="page gift-detail" id="p_invite_detail">
     <div class="top-bar">
       <div class="ico" onclick="go('p_home')">‹</div>
-      <div style="font-size:14px;font-weight:600">新人邀请码礼包</div>
+      <div style="font-size:14px;font-weight:600">新人激活码礼包</div>
       <div class="fav" id="fav_btn" onclick="toggleFav()">♡</div>
     </div>
 
@@ -531,7 +536,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 
     <div class="detail-block">
       <div class="ttl">商品详情</div>
-      <div class="pic">🎁 新人邀请码礼包<br><small style="font-size:11px;font-weight:400;opacity:.9">购买即生成邀请码 · 分享新人可兑换礼包</small></div>
+      <div class="pic">🎁 新人激活码礼包<br><small style="font-size:11px;font-weight:400;opacity:.9">购买即生成激活码 · 分享新人可兑换礼包</small></div>
     </div>
 
     <div style="height:160px"></div>
@@ -540,7 +545,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
       <div class="goods">
         <div class="thumb"></div>
         <div class="info">
-          <div><span class="tag">自营</span><span style="font-size:13px;color:var(--c-text);font-weight:600">新人邀请码礼包</span></div>
+          <div><span class="tag">自营</span><span style="font-size:13px;color:var(--c-text);font-weight:600">新人激活码礼包</span></div>
           <div class="sku-no">商品编号: 由后台配置</div>
           <div class="price-row">
             <span class="ptag">🔥 热销</span>
@@ -632,7 +637,6 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
       <div class="line"><span>邀请码抵扣</span><span class="v">- ¥49.9</span></div>
       <div class="line"><span>实付金额</span><span class="v red">¥0.00</span></div>
       <div class="line muted" style="margin-top:4px">兑换后无需再支付，订单由会员分享邀请码赠送</div>
-      <div class="benefit">权益赠水：兑换成功后 30 天内到店自提 5L 饮用水 ×7 袋，每次限取 1 袋，过期自动清零（无需水袋，由店内配桶）。</div>
     </div>
 
     <div class="remark">
@@ -803,7 +807,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 
     <div class="hd-card">
       <div class="ttl">🔑 我的邀请码</div>
-      <div class="sub">复制邀请码分享给新人，新人在 C 端「绿韵家」新人礼包页 → 立即购买 → 输入邀请码即可下单领取礼包。每个邀请码仅可使用一次。</div>
+      <div class="sub">复制邀请码分享给新人，新人在 C 端「绿韵家」新人礼包页 → 立即激活 → 输入邀请码即可下单领取礼包。每个邀请码仅可使用一次。</div>
       <div class="stat">
         <div class="s"><div class="n">3</div><div class="l">未使用</div></div>
         <div class="s"><div class="n">5</div><div class="l">已使用</div></div>
@@ -821,8 +825,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
         <div class="meta"><span>生成时间: 2026-08-31 14:22</span><span>来源: 购买生成</span></div>
         <div class="btns">
           <div class="btn-copy" onclick="copyText('A8$kL9#mN2@', '邀请码已复制')">复制</div>
-          <div class="btn-share" onclick="toast('分享给好友')">分享</div>
-        </div>
+                  </div>
       </div>
 
       <div class="code-card">
@@ -834,8 +837,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
         <div class="meta"><span>生成时间: 2026-08-31 11:08</span><span>来源: 购买生成</span></div>
         <div class="btns">
           <div class="btn-copy" onclick="copyText('Dg3$Uy3@Wq', '邀请码已复制')">复制</div>
-          <div class="btn-share" onclick="toast('分享给好友')">分享</div>
-        </div>
+                  </div>
       </div>
 
       <div class="code-card">
@@ -847,8 +849,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
         <div class="meta"><span>生成时间: 2026-08-30 16:55</span><span>来源: 系统生成</span></div>
         <div class="btns">
           <div class="btn-copy" onclick="copyText('Hy7*Pz8@Qr', '邀请码已复制')">复制</div>
-          <div class="btn-share" onclick="toast('分享给好友')">分享</div>
-        </div>
+                  </div>
       </div>
 
       <div class="code-card">
@@ -893,11 +894,11 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
     </div>
 
     <div class="pkg">
-      <div class="gtitle">新人邀请码礼包</div>
-      <div class="gdesc">虚拟商品 · 无需收货地址 · 购买后自动生成邀请码</div>
+      <div class="gtitle">新人激活码礼包</div>
+      <div class="gdesc">虚拟商品 · 无需收货地址 · 购买后自动生成激活码</div>
       <div class="row">
         <div class="thumb">🎫</div>
-        <div class="info"><div class="name">新人邀请码礼包</div><div class="spec">数量：<span id="invite_confirm_qty">1</span> 个</div></div>
+        <div class="info"><div class="name">新人激活码礼包</div><div class="spec">数量：<span id="invite_confirm_qty">1</span> 个</div></div>
         <div class="qty" id="invite_confirm_cnt">共 1 个邀请码</div>
       </div>
       <div class="price-row"><span>单价</span><span class="v">¥49.9</span></div>
@@ -980,6 +981,7 @@ window._giftQty = 1;
 window._user = {
   has_codes: true,        // 是否有邀请码（控制「我的邀请码」入口显示）
   code_count: 33,          // 我的邀请码数量（显示徽标）
+  activated: false,       // 是否已激活新人礼包（首次核销邀请码后置 true，控制 FAB 入口隐藏）
   level: 'primary',        // 用户等级：'guest'(无)/'primary'(初级会员及以上才显示悬浮窗)
   name: '大不列颠蛋黄酥啊啊啊啊',
   account: '12345678'
@@ -1032,9 +1034,9 @@ function goBackFromAddress(){
 
 /* ========== FAB / 悬浮窗可见性 ========== */
 function updateFab(){
-  // 新人礼包 FAB（首页常显）
+  // 新人礼包 FAB（已激活后隐藏，未激活时常显）
   var fabGift = document.getElementById('fab_gift');
-  if(fabGift) fabGift.classList.remove('hidden');
+  if(fabGift) fabGift.classList.toggle('hidden', !!window._user.activated);
   // 邀请码 FAB（仅初级会员以上）
   var fabEx = document.getElementById('fab_exchange');
   if(fabEx){
@@ -1169,6 +1171,9 @@ function submitCodeModal(){
   document.getElementById('pay_time').textContent = formatNow();
   document.getElementById('show_code').textContent = k;
   addExchangeOrder(k);                     // 写入「兑换订单」到我的订单
+  // 首次核销邀请码成功 → 标记已激活新人礼包，FAB 入口隐藏（一人只能领一次）
+  window._user.activated = true;
+  updateFab();
   closeCodeModal();
   toast('邀请码核销成功');
   setTimeout(function(){ go('p_order'); }, 400);
@@ -1290,7 +1295,7 @@ function addMemberOrder(qty){
     id: id,
     type: 'member',
     status: 'toship',
-    goods: { name: '新人邀请码礼包', desc: '邀请码 × '+qty+'（购买即自动发到「我的邀请码」）', thumb: '🎁', price: 35.00, qty: qty, discount: '会员专享' },
+    goods: { name: '新人激活码礼包', desc: '激活码 × '+qty+'（购买即自动发到「我的邀请码」）', thumb: '🎁', price: 35.00, qty: qty, discount: '会员专享' },
     paid: price,
     payTime: formatNow()
   });
@@ -1369,7 +1374,7 @@ function renderCashier(){
   var n = window._inviteQty;
   var total = (49.9 * n).toFixed(2);
   var a = document.getElementById('cashier_amt'); if(a) a.textContent = '¥'+total;
-  var d = document.getElementById('cashier_desc'); if(d) d.textContent = '新人邀请码礼包 ×'+n;
+  var d = document.getElementById('cashier_desc'); if(d) d.textContent = '新人激活码礼包 ×'+n;
 }
 function genOneCode(){
   var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%^*()';
@@ -1387,8 +1392,7 @@ function addMyCodes(n){
       + '<div class="ch"><span>邀请码 · 新人礼包-益齿健套装</span><span class="tag unused">未使用</span></div>'
       + '<div class="code">'+c+'</div>'
       + '<div class="meta"><span>生成时间: '+now+'</span><span>来源: 购买生成</span></div>'
-      + '<div class="btns"><div class="btn-copy" onclick="copyText(\''+c+'\', \'邀请码已复制\')">复制</div>'
-      + '<div class="btn-share" onclick="toast(\'分享给好友\')">分享</div></div></div>';
+      + '<div class="btns"><div class="btn-copy" onclick="copyText(\''+c+'\', \'邀请码已复制\')">复制</div></div></div>';
   }
   list.insertAdjacentHTML('afterbegin', html);
 }
