@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
@@ -161,7 +161,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
   </div>
 
   <!-- ===== 主区 ===== -->
-  <div class="content">
+  <main><section id="viewMain" class="view active"><div class="content">
 
     <div class="breadcrumb">
       <span>店铺</span>
@@ -176,7 +176,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
         <div class="title">邀请码管理</div>
         <div class="actions">
           <button class="btn btn-sm">批量导出</button>
-          <button class="btn btn-sm btn-primary" onclick="goGenerate()">+ 生成邀请码</button>
+          <a class="btn btn-sm btn-primary" href="admin-invite-code-generate.html">+ 生成邀请码</a>
         </div>
       </div>
 
@@ -239,10 +239,10 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                 <div>账号: 13812345678</div>
               </td>
               <td><span class="tag order-yes">已下单</span></td>
-              <td><a class="link" onclick="goOrderDetail('605893')">605893</a></td>
+              <td><span class="link" title="订单详情沿用当前既有模板（不新建独立页）">605893</span></td>
               <td>
                 <div class="op-list">
-                  <span class="op" onclick="goDetail('A8$kL9#mN2@')">查看详情</span>
+                  <a class="op" href="admin-invite-code-detail.html?code=A8$kL9#mN2@">查看详情</a>
                 </div>
               </td>
             </tr>
@@ -256,10 +256,10 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                 <div>账号: 13987654321</div>
               </td>
               <td><span class="tag order-yes">已下单</span></td>
-              <td><a class="link" onclick="goOrderDetail('605880')">605880</a></td>
+              <td><span class="link" title="订单详情沿用当前既有模板（不新建独立页）">605880</span></td>
               <td>
                 <div class="op-list">
-                  <span class="op" onclick="goDetail('Dg3$Uy3@Wq')">查看详情</span>
+                  <a class="op" href="admin-invite-code-detail.html?code=Dg3$Uy3@Wq">查看详情</a>
                 </div>
               </td>
             </tr>
@@ -273,10 +273,10 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                 <div>账号: 13645217896</div>
               </td>
               <td><span class="tag order-yes">已下单</span></td>
-              <td><a class="link" onclick="goOrderDetail('605875')">605875</a></td>
+              <td><span class="link" title="订单详情沿用当前既有模板（不新建独立页）">605875</span></td>
               <td>
                 <div class="op-list">
-                  <span class="op" onclick="goDetail('Hy7*Pz8@Qr')">查看详情</span>
+                  <a class="op" href="admin-invite-code-detail.html?code=Hy7*Pz8@Qr">查看详情</a>
                 </div>
               </td>
             </tr>
@@ -290,10 +290,10 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                 <div>账号: 13578963214</div>
               </td>
               <td><span class="tag order-yes">已下单</span></td>
-              <td><a class="link" onclick="goOrderDetail('605868')">605868</a></td>
+              <td><span class="link" title="订单详情沿用当前既有模板（不新建独立页）">605868</span></td>
               <td>
                 <div class="op-list">
-                  <span class="op" onclick="goDetail('Bm4@Tn5$Kp')">查看详情</span>
+                  <a class="op" href="admin-invite-code-detail.html?code=Bm4@Tn5$Kp">查看详情</a>
                 </div>
               </td>
             </tr>
@@ -307,10 +307,10 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                 <div>账号: 13854789632</div>
               </td>
               <td><span class="tag order-yes">已下单</span></td>
-              <td><a class="link" onclick="goOrderDetail('605852')">605852</a></td>
+              <td><span class="link" title="订单详情沿用当前既有模板（不新建独立页）">605852</span></td>
               <td>
                 <div class="op-list">
-                  <span class="op" onclick="goDetail('Wp2#Xc6!Yq')">查看详情</span>
+                  <a class="op" href="admin-invite-code-detail.html?code=Wp2#Xc6!Yq">查看详情</a>
                 </div>
               </td>
             </tr>
@@ -327,9 +327,9 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
               <td><span class="muted">—</span></td>
               <td>
                 <div class="op-list">
-                  <span class="op" onclick="goDetail('Qt9%Fn1!Zd')">查看详情</span>
+                  <a class="op" href="admin-invite-code-detail.html?code=Qt9%Fn1!Zd">查看详情</a>
                   <span class="dot">·</span>
-                  <span class="op danger" onclick="if(confirm('确定禁用该邀请码？禁用后不可用于激活'))rowDisable(this)">禁用</span>
+                  <span class="op danger" onclick="rowDisable(this)">禁用</span>
                 </div>
               </td>
             </tr>
@@ -347,9 +347,9 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
               <td><span class="muted">—</span></td>
               <td>
                 <div class="op-list">
-                  <span class="op" onclick="goDetail('Gc1@Mp9#Rz')">查看详情</span>
+                  <a class="op" href="admin-invite-code-detail.html?code=Gc1@Mp9#Rz">查看详情</a>
                   <span class="dot">·</span>
-                  <span class="op danger" onclick="if(confirm('确定禁用该邀请码？禁用后不可用于激活'))rowDisable(this)">禁用</span>
+                  <span class="op danger" onclick="rowDisable(this)">禁用</span>
                 </div>
               </td>
             </tr>
@@ -367,9 +367,9 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
               <td><span class="muted">—</span></td>
               <td>
                 <div class="op-list">
-                  <span class="op" onclick="goDetail('Yt6#Kv2$Lm')">查看详情</span>
+                  <a class="op" href="admin-invite-code-detail.html?code=Yt6#Kv2$Lm">查看详情</a>
                   <span class="dot">·</span>
-                  <span class="op danger" onclick="if(confirm('确定禁用该邀请码？禁用后不可用于激活'))rowDisable(this)">禁用</span>
+                  <span class="op danger" onclick="rowDisable(this)">禁用</span>
                 </div>
               </td>
             </tr>
@@ -390,7 +390,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
       </div>
     </div>
 
-  </div>
+  </div></section></main>
 </div>
 
 <script>
@@ -426,19 +426,9 @@ function applyFilters(){
   if (total) total.textContent = '共 ' + n + ' 条';
 }
 
-/* 跳转独立页（PROTO-STR-001） */
-function goDetail(code){
-  // 激活码含特殊符号，用 encodeURI() 替代 encodeURIComponent（冒烟白名单兼容）
-  window.location.href = 'admin-invite-code-detail.html?code=' + encodeURI(code);
-}
-function goGenerate(){
-  window.location.href = 'admin-invite-code-generate.html';
-}
-function goOrderDetail(orderId){
-  // 订单号是纯数字，URL 安全字符，直接拼接；订单详情页沿用当前（PRD 标注）
-  window.location.href = 'admin-order-detail.html?id=' + orderId;
-}
+/* 行内禁用（原型演示，确认后置灰，不独立跳转） */
 function rowDisable(btn){
+  if (!confirm('确定禁用该邀请码？禁用后不可用于激活')) return;
   var tr = btn.closest('tr');
   if (!tr) return;
   tr.style.opacity = '0.5';
