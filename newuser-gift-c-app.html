@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>新人激活码礼包 · C 端用户原型 v2</title>
+<title>新人激活码礼包 · C 端用户原型 v3</title>
 <style>
 :root{
   --c-primary:#1AAD7C;
@@ -20,16 +20,15 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--c-text);font-size:13px}
-.phone{
-  position:relative;width:375px;height:812px;margin:20px auto;background:#fff;border-radius:32px;
-  box-shadow:0 12px 40px rgba(0,0,0,.15);overflow:hidden;
-}
+.phone{position:relative;width:375px;height:812px;margin:20px auto;background:#fff;border-radius:32px;box-shadow:0 12px 40px rgba(0,0,0,.15);overflow:hidden}
 .page{position:absolute;inset:0;overflow-y:auto;background:#fff;display:none}
 .page.active{display:block;-webkit-animation:fade .25s ease}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 
 .nav{position:sticky;top:0;left:0;right:0;height:44px;display:flex;align-items:center;justify-content:center;background:#fff;border-bottom:1px solid var(--c-line);z-index:5;font-size:15px;font-weight:600}
 .nav .back{position:absolute;left:12px;top:0;height:44px;display:flex;align-items:center;color:var(--c-text);font-size:22px}
+.nav .act{position:absolute;right:12px;top:0;height:44px;display:flex;align-items:center;color:var(--c-text-2);font-size:13px}
+
 .btn-primary{display:block;width:100%;height:44px;border-radius:22px;background:var(--c-primary);color:#fff;font-size:15px;font-weight:600;border:none;cursor:pointer;line-height:44px;text-align:center}
 .btn-primary:active{background:var(--c-primary-2)}
 .btn-red{display:block;width:100%;height:44px;border-radius:22px;background:var(--c-red);color:#fff;font-size:15px;font-weight:600;border:none;cursor:pointer;line-height:44px;text-align:center}
@@ -76,7 +75,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 .promo-big .num small{font-size:14px;color:#FF5757;font-weight:600}
 
 .tabbar{position:sticky;bottom:0;left:0;right:0;height:50px;background:#fff;border-top:1px solid var(--c-line);display:flex;z-index:5}
-.tabbar .tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--c-text-3);font-size:11px;gap:2px}
+.tabbar .tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--c-text-3);font-size:11px;gap:2px;cursor:pointer}
 .tabbar .tb.on{color:var(--c-primary)}
 .tabbar .tb .ic{width:22px;height:22px;border-radius:6px;background:#DDD}
 .tabbar .tb.on .ic{background:var(--c-primary)}
@@ -86,7 +85,14 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 .fab:active{transform:scale(.95)}
 .fab.hidden{display:none}
 .fab-share{position:absolute;right:14px;bottom:138px;width:48px;height:48px;border-radius:50%;background:#fff;color:var(--c-primary);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.1);font-size:20px;z-index:10;border:1px solid var(--c-line)}
-/* ===== 复制源码标准组件（proto-c skill · PROTO-SMK-011） ===== */
+
+/* 兑换券悬浮窗（仅初级会员以上） */
+.fab-exchange{position:absolute;right:14px;bottom:202px;width:54px;height:54px;border-radius:50%;background:var(--c-orange);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px rgba(255,120,0,.35);font-size:11px;font-weight:600;line-height:1.1;z-index:10;border:none}
+.fab-exchange .em{font-size:18px;font-weight:700;margin-bottom:2px}
+.fab-exchange:active{transform:scale(.95)}
+.fab-exchange.hidden{display:none}
+
+/* ===== 复制源码标准组件 ===== */
 .copy-bar{position:sticky;top:0;left:0;right:0;z-index:9999;background:#1f1f2e;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 16px;box-shadow:0 2px 10px rgba(0,0,0,.2);font-family:inherit}
 .copy-bar__title{display:flex;flex-direction:column;gap:2px;min-width:0}
 .copy-bar__name{font-size:13px;font-weight:700;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -100,32 +106,72 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 .copy-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1f1f2e;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.25);opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999}
 .copy-toast.show{opacity:1;}
 
-/* ===== 激活页 ===== */
-.activate{padding-bottom:24px}
-.activate .hero{padding:24px 16px 16px;background:linear-gradient(135deg,#E9F8F1,#D4F1E2);text-align:center}
-.activate .hero .bag-icon{width:64px;height:64px;border-radius:50%;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:10px;box-shadow:0 4px 12px rgba(26,173,124,.15)}
-.activate .hero .ttl{font-size:18px;font-weight:700;color:var(--c-text)}
-.activate .hero .sub{font-size:12px;color:var(--c-text-2);margin-top:4px}
+/* ===== 礼包介绍页（p_gift_intro，原 p_activate 改造） ===== */
+.gift-int{padding-bottom:80px}
+.gift-int .hero{padding:24px 16px 16px;background:linear-gradient(135deg,#E9F8F1,#D4F1E2);text-align:center}
+.gift-int .hero .bag-icon{width:64px;height:64px;border-radius:50%;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:10px;box-shadow:0 4px 12px rgba(26,173,124,.15)}
+.gift-int .hero .ttl{font-size:18px;font-weight:700;color:var(--c-text)}
+.gift-int .hero .sub{font-size:12px;color:var(--c-text-2);margin-top:4px}
 
-.activate .card{margin:-8px 14px 14px;background:#fff;border-radius:12px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
-.activate .card .hd{font-size:13px;font-weight:600;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
-.activate .card .hd .price{color:var(--c-red);font-size:15px}
-.activate .item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--c-line)}
-.activate .item:last-child{border-bottom:none}
-.activate .item .thumb{width:48px;height:48px;border-radius:8px;background:#F5F6F8;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.activate .item .meta{flex:1}
-.activate .item .name{font-size:13px;color:var(--c-text)}
-.activate .item .desc{font-size:11px;color:var(--c-text-3);margin-top:2px}
-.activate .item .qty{font-size:12px;color:var(--c-text-3)}
+.gift-int .card{margin:-8px 14px 14px;background:#fff;border-radius:12px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.gift-int .card .hd{font-size:13px;font-weight:600;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.gift-int .card .hd .price{color:var(--c-red);font-size:15px}
+.gift-int .item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--c-line)}
+.gift-int .item:last-child{border-bottom:none}
+.gift-int .item .thumb{width:48px;height:48px;border-radius:8px;background:#F5F6F8;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.gift-int .item .meta{flex:1}
+.gift-int .item .name{font-size:13px;color:var(--c-text)}
+.gift-int .item .desc{font-size:11px;color:var(--c-text-3);margin-top:2px}
+.gift-int .item .qty{font-size:12px;color:var(--c-text-3)}
 
-.activate .form{margin:0 14px;background:#fff;border-radius:12px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
-.activate .form .row{margin-bottom:6px}
-.activate .form .label{font-size:13px;color:var(--c-text);font-weight:600;margin-bottom:6px}
-.activate .form .input{width:100%;height:42px;border:1px solid var(--c-line);border-radius:8px;padding:0 12px;font-size:14px;color:var(--c-text);background:#FAFAFB;outline:none;font-family:monospace}
-.activate .form .input:focus{border-color:var(--c-primary);background:#fff}
-.activate .form .hint{font-size:11px;color:var(--c-orange);margin-top:6px}
-.activate .submit-wrap{padding:16px 14px}
-.activate .foot-tip{padding:0 14px 20px;font-size:11px;color:var(--c-text-3);text-align:center}
+.gift-int .submit-wrap{padding:16px 14px}
+.gift-int .foot-tip{padding:0 14px 20px;font-size:11px;color:var(--c-text-3);text-align:center}
+
+/* ===== 商品详情页（p_gift_detail，按@image#1样式） ===== */
+.gift-detail{padding-bottom:64px}
+.gift-detail .top-bar{position:sticky;top:0;left:0;right:0;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:#fff;border-bottom:1px solid var(--c-line);z-index:5}
+.gift-detail .top-bar .ico{font-size:18px;color:var(--c-text);cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center}
+.gift-detail .top-bar .fav{font-size:20px;color:var(--c-text-3)}
+.gift-detail .top-bar .fav.on{color:var(--c-red)}
+
+.gift-detail .ship-bar{display:flex;align-items:center;gap:6px;padding:8px 12px;background:#fff;font-size:11px;color:var(--c-text-2);border-bottom:1px solid var(--c-line)}
+.gift-detail .ship-bar .lbl{display:flex;align-items:center;gap:4px;color:var(--c-text-2)}
+.gift-detail .ship-bar .arr{margin-left:auto;color:var(--c-text-3);font-size:14px}
+
+.gift-detail .param{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#fff;font-size:11px;color:var(--c-text-2);border-bottom:1px solid var(--c-line);cursor:pointer}
+.gift-detail .param .arr{color:var(--c-text-3);font-size:14px}
+
+.gift-detail .merchant{margin:8px 12px;background:#fff;border-radius:8px;padding:10px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.gift-detail .merchant .logo{width:36px;height:36px;border-radius:6px;background:linear-gradient(135deg,#5BC89A,#1AAD7C);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.gift-detail .merchant .info{flex:1}
+.gift-detail .merchant .name{font-size:13px;font-weight:600;color:var(--c-text)}
+.gift-detail .merchant .addr{font-size:11px;color:var(--c-text-3);margin-top:2px}
+.gift-detail .merchant .nav-btn{color:var(--c-primary);font-size:12px;display:flex;align-items:center;gap:2px;cursor:pointer}
+
+.gift-detail .detail-block{margin:0 12px 12px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.gift-detail .detail-block .ttl{padding:8px 12px;font-size:12px;font-weight:600;color:var(--c-text);border-bottom:1px solid var(--c-line)}
+.gift-detail .detail-block .pic{height:200px;background:linear-gradient(135deg,#FFD5DA,#FFA8B4);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:700}
+
+.gift-detail .sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:14px 14px 0 0;padding:10px 12px 14px;box-shadow:0 -2px 12px rgba(0,0,0,.08);z-index:6}
+.gift-detail .sheet .goods{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+.gift-detail .sheet .goods .thumb{width:60px;height:60px;border-radius:6px;background:linear-gradient(135deg,#FFD5DA,#FFA8B4);flex-shrink:0}
+.gift-detail .sheet .goods .info{flex:1;min-width:0}
+.gift-detail .sheet .goods .tag{display:inline-block;background:#FFF1E6;color:var(--c-orange);font-size:10px;padding:2px 6px;border-radius:3px;margin-right:4px}
+.gift-detail .sheet .goods .name{font-size:13px;color:var(--c-text);font-weight:600;margin-top:4px}
+.gift-detail .sheet .goods .sku-no{font-size:11px;color:var(--c-text-3);margin-top:2px}
+.gift-detail .sheet .goods .price-row{margin-top:4px;display:flex;align-items:center;gap:6px}
+.gift-detail .sheet .goods .price-row .ptag{display:inline-flex;align-items:center;gap:2px;background:#FFF1F0;color:#f56c6c;font-size:11px;padding:1px 6px;border-radius:3px}
+.gift-detail .sheet .goods .price-row .amt{color:var(--c-red);font-size:16px;font-weight:700}
+.gift-detail .sheet .goods .qty{position:absolute;right:12px;top:14px;display:flex;align-items:center;border:1px solid var(--c-line);border-radius:16px;overflow:hidden}
+.gift-detail .sheet .goods .qty button{width:28px;height:28px;border:none;background:#fff;font-size:14px;color:var(--c-text-2);cursor:pointer}
+.gift-detail .sheet .goods .qty .n{min-width:30px;text-align:center;font-size:13px;color:var(--c-text)}
+
+.gift-detail .sheet .spec-label{font-size:13px;color:var(--c-text);font-weight:600;margin-bottom:6px}
+.gift-detail .sheet .spec-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.gift-detail .sheet .spec-row .sp{flex:1;min-width:0;padding:6px 10px;border:1px solid var(--c-primary);background:#E9F8F1;color:var(--c-primary);border-radius:4px;font-size:11px;cursor:pointer;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gift-detail .sheet .spec-row .sp.off{border:1px solid var(--c-line);background:#fff;color:var(--c-text-2)}
+
+.gift-detail .sheet .buy-btn{display:block;width:100%;height:42px;border-radius:21px;background:var(--c-primary);color:#fff;font-size:14px;font-weight:600;border:none;cursor:pointer;margin-top:6px}
 
 /* ===== 地址页 ===== */
 .address{padding-bottom:80px}
@@ -144,7 +190,6 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 .address .add-btn{margin:14px;background:#fff;border:1px dashed #C8C8C8;border-radius:10px;padding:14px;text-align:center;color:var(--c-text-2);font-size:13px;cursor:pointer}
 .address .footer{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;background:#fff;border-top:1px solid var(--c-line)}
 
-/* ===== 地址编辑 ===== */
 .addr-edit .form{margin:14px;background:#fff;border-radius:10px;padding:6px 14px}
 .addr-edit .form .row{padding:12px 0;border-bottom:1px solid var(--c-line)}
 .addr-edit .form .row:last-child{border-bottom:none}
@@ -152,7 +197,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 .addr-edit .form .input{width:100%;border:none;outline:none;font-size:14px;color:var(--c-text);background:transparent;padding:0}
 .addr-edit .submit-wrap{padding:14px}
 
-/* ===== 确认订单页（1:1 套 image#1） ===== */
+/* ===== 确认订单页 ===== */
 .confirm{padding-bottom:80px;background:var(--c-bg)}
 .confirm .addr-bar{margin:10px 12px;background:#fff;border-radius:10px;padding:14px;display:flex;align-items:center;gap:10px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.04)}
 .confirm .addr-bar .ico{width:32px;height:32px;border-radius:50%;background:#FFF1E6;color:var(--c-orange);display:flex;align-items:center;justify-content:center;font-size:16px}
@@ -173,9 +218,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 .confirm .pkg .row .name{font-size:13px;color:var(--c-text)}
 .confirm .pkg .row .spec{font-size:11px;color:var(--c-text-3);margin-top:2px}
 .confirm .pkg .row .qty{font-size:13px;color:var(--c-text-3);text-align:right}
-.confirm .pkg .rightory{display:flex;justify-content:space-between;font-size:12px;color:var(--c-text-2);padding-top:10px;border-top:1px dashed var(--c-line);margin-top:8px}
-.confirm .pkg .rightory .num{color:var(--c-orange);font-weight:600}
-.confirm .pkg .price-row{display:flex;justify-content:space-between;font-size:12px;color:var(--c-text-2);padding-top:4px}
+.confirm .pkg .price-row{display:flex;justify-content:space-between;font-size:12px;color:var(--c-text-2);padding-top:8px;border-top:1px dashed var(--c-line);margin-top:6px}
 .confirm .pkg .price-row .v{color:var(--c-text)}
 
 .confirm .price-card{margin:0 12px 10px;background:#fff;border-radius:10px;padding:12px 14px;font-size:12px;color:var(--c-text-2);box-shadow:0 1px 4px rgba(0,0,0,.04)}
@@ -183,6 +226,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 .confirm .price-card .line .v{color:var(--c-text)}
 .confirm .price-card .line .v.red{color:var(--c-red-2);font-size:15px;font-weight:600}
 .confirm .price-card .line.muted{color:var(--c-text-3);font-size:11px}
+.confirm .price-card .benefit{margin-top:8px;padding-top:8px;border-top:1px dashed var(--c-line);font-size:11px;color:var(--c-orange);line-height:1.5}
 
 .confirm .remark{margin:0 12px 10px;background:#fff;border-radius:10px;padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
 .confirm .remark .label{font-size:12px;color:var(--c-text-2);margin-bottom:6px}
@@ -213,9 +257,88 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 .order .ord-card .payinfo{display:flex;justify-content:space-between;align-items:center;padding-top:10px;font-size:12px;color:var(--c-text-2)}
 .order .ord-card .payinfo .pay{color:var(--c-red);font-size:15px;font-weight:600}
 .order .ord-card .btns{display:flex;justify-content:flex-end;gap:8px;padding-top:10px;border-top:1px solid var(--c-line);margin-top:10px}
-.order .ord-card .btns .btn-cancel{display:none}
-.order .ord-card .btns .btn-aftersale{display:none}
 .order .footer-bar{height:60px}
+
+/* ===== 我的页（p_me） ===== */
+.me{padding-bottom:60px;background:var(--c-bg)}
+.me .user-card{margin:12px;background:linear-gradient(135deg,#E9F8F1,#D4F1E2);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px}
+.me .user-card .avatar{width:54px;height:54px;border-radius:50%;background:#fff;color:var(--c-primary);font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.me .user-card .info{flex:1}
+.me .user-card .name{font-size:15px;font-weight:700;color:var(--c-text)}
+.me .user-card .level{display:inline-block;background:var(--c-primary);color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;margin-top:4px}
+.me .user-card .meta{font-size:11px;color:var(--c-text-2);margin-top:4px}
+.me .user-card .arr{color:var(--c-text-3);font-size:18px}
+
+.me .orders-card{margin:0 12px 12px;background:#fff;border-radius:10px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.me .orders-card .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.me .orders-card .hd .ttl{font-size:13px;font-weight:600}
+.me .orders-card .hd .more{font-size:11px;color:var(--c-text-3)}
+.me .orders-card .list{display:flex;justify-content:space-around;text-align:center}
+.me .orders-card .list .item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.me .orders-card .list .item .ic{position:relative;width:30px;height:30px;border-radius:8px;background:var(--c-bg);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--c-text-2)}
+.me .orders-card .list .item .ic .badge{position:absolute;top:-4px;right:-6px;min-width:14px;height:14px;border-radius:7px;background:var(--c-red);color:#fff;font-size:9px;line-height:14px;text-align:center;padding:0 3px}
+.me .orders-card .list .item .lbl{font-size:11px;color:var(--c-text-2)}
+
+.me .invite-banner{margin:0 12px 12px;background:linear-gradient(135deg,#FFD5DA,#FFA8B4);border-radius:10px;padding:12px;color:#fff;display:flex;align-items:center;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.me .invite-banner .gift-icon{font-size:30px}
+.me .invite-banner .info{flex:1}
+.me .invite-banner .ttl{font-size:14px;font-weight:700}
+.me .invite-banner .sub{font-size:11px;margin-top:2px;opacity:.9}
+.me .invite-banner .arr{color:#fff;font-size:18px}
+
+.me .services-card{margin:0 12px 12px;background:#fff;border-radius:10px;padding:14px 8px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.me .services-card .hd{padding:0 4px 10px;font-size:13px;font-weight:600;color:var(--c-text);border-bottom:1px solid var(--c-line);margin-bottom:10px}
+.me .services-card .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 4px}
+.me .services-card .item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 4px;cursor:pointer}
+.me .services-card .item .ic{width:32px;height:32px;border-radius:10px;background:var(--c-bg);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--c-primary)}
+.me .services-card .item .lbl{font-size:11px;color:var(--c-text)}
+.me .services-card .item .badge{position:absolute;top:-4px;right:-4px;background:var(--c-red);color:#fff;font-size:9px;border-radius:7px;padding:0 4px;height:14px;line-height:14px}
+.me .services-card .item.relative{position:relative}
+
+.me .benefit-card{margin:0 12px 12px;background:linear-gradient(135deg,#FFE6CC,#FFD699);border-radius:10px;padding:12px;display:flex;align-items:center;justify-content:space-between}
+.me .benefit-card .info .ttl{font-size:13px;font-weight:600;color:#A85A00}
+.me .benefit-card .info .sub{font-size:11px;color:#A85A00;margin-top:2px}
+.me .benefit-card .arr{color:#A85A00;font-size:18px}
+
+/* ===== 我的邀请码（p_my_codes） ===== */
+.mycodes{padding-bottom:60px;background:var(--c-bg)}
+.mycodes .hd-card{margin:12px;background:linear-gradient(135deg,#FFD5DA,#FFA8B4);border-radius:10px;padding:14px;color:#fff}
+.mycodes .hd-card .ttl{font-size:16px;font-weight:700}
+.mycodes .hd-card .sub{font-size:12px;margin-top:4px;opacity:.95;line-height:1.5}
+.mycodes .hd-card .stat{display:flex;justify-content:space-around;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.3)}
+.mycodes .hd-card .stat .s{text-align:center}
+.mycodes .hd-card .stat .n{font-size:18px;font-weight:700}
+.mycodes .hd-card .stat .l{font-size:11px;opacity:.85}
+
+.mycodes .list{padding:0 12px}
+.mycodes .code-card{margin-bottom:10px;background:#fff;border-radius:10px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.mycodes .code-card .ch{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--c-text-2);margin-bottom:6px}
+.mycodes .code-card .ch .tag{display:inline-block;padding:2px 8px;border-radius:3px;font-size:10px}
+.mycodes .code-card .ch .tag.unused{background:#FFF1F0;color:#f56c6c;border:1px solid #f5c2c2}
+.mycodes .code-card .ch .tag.used{background:#F0F2F5;color:var(--c-text-2);border:1px solid var(--c-line)}
+.mycodes .code-card .code{font-family:"SFMono-Regular",Consolas,monospace;font-size:15px;font-weight:600;color:#1e2a3a;background:#F5F6F8;padding:10px;border-radius:6px;letter-spacing:1px;text-align:center;margin-bottom:8px}
+.mycodes .code-card .meta{display:flex;justify-content:space-between;font-size:11px;color:var(--c-text-3)}
+.mycodes .code-card .btns{display:flex;gap:8px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--c-line)}
+.mycodes .code-card .btns .btn-copy{flex:1;height:32px;background:#E9F8F1;color:var(--c-primary);border-radius:16px;font-size:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none}
+.mycodes .code-card .btns .btn-share{flex:1;height:32px;background:var(--c-primary);color:#fff;border-radius:16px;font-size:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none}
+
+.mycodes .tip{padding:10px 14px;font-size:11px;color:var(--c-text-3);line-height:1.5}
+
+/* ===== 激活码弹窗（code-modal） ===== */
+.code-modal{position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:50;display:none;align-items:flex-end;justify-content:center}
+.code-modal.active{display:flex;-webkit-animation:fade .2s ease}
+.code-modal .panel{width:100%;background:#fff;border-radius:14px 14px 0 0;padding:20px 16px 24px}
+.code-modal .panel .ttl{font-size:16px;font-weight:700;color:var(--c-text);text-align:center;margin-bottom:6px}
+.code-modal .panel .sub{font-size:12px;color:var(--c-text-2);text-align:center;margin-bottom:18px;line-height:1.5}
+.code-modal .panel .field{position:relative;margin-bottom:6px}
+.code-modal .panel .field .ipt{width:100%;height:48px;border:1px solid var(--c-primary);border-radius:8px;padding:0 14px;font-size:15px;color:var(--c-text);background:#FAFAFB;outline:none;font-family:monospace;letter-spacing:1px}
+.code-modal .panel .field .ipt:focus{border-color:var(--c-primary);background:#fff}
+.code-modal .panel .field .close{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--c-text-3);cursor:pointer;width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+.code-modal .panel .hint{font-size:11px;color:var(--c-orange);margin-bottom:18px}
+.code-modal .panel .actions{display:flex;gap:10px}
+.code-modal .panel .actions .cancel{flex:1;height:44px;background:#fff;border:1px solid var(--c-line);border-radius:22px;color:var(--c-text-2);font-size:14px;cursor:pointer}
+.code-modal .panel .actions .submit{flex:1;height:44px;background:var(--c-primary);color:#fff;border:1px solid var(--c-primary);border-radius:22px;font-size:14px;font-weight:600;cursor:pointer}
+.code-modal .panel .protocol{font-size:11px;color:var(--c-text-3);text-align:center;margin-top:10px}
 
 /* toast */
 .toast{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s}
@@ -225,7 +348,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 <body>
   <div class="copy-bar">
     <div class="copy-bar__title">
-      <div class="copy-bar__name">📋 新人激活码礼包 · C端原型</div>
+      <div class="copy-bar__name">📋 新人激活码礼包 · C端原型 v3</div>
       <div class="copy-bar__hint">单文件原型 · 可整份或逐页复制源码</div>
     </div>
     <div class="copy-bar__actions">
@@ -277,26 +400,27 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
       <div class="ttl">520 健康节</div>
       <div class="sub">把爱藏在健康里</div>
       <div class="num">1314<small>个</small></div>
-      <div class="sub">活动名额 送完即止</div>
+      <div class="sub" style="margin-top:6px">活动名额 送完即止</div>
     </div>
 
     <div style="height:80px"></div>
     <div class="tabbar">
-      <div class="tb on"><div class="ic"></div>首页</div>
-      <div class="tb"><div class="ic"></div>数智</div>
-      <div class="tb"><div class="ic"></div>消息</div>
-      <div class="tb"><div class="ic"></div>我的</div>
+      <div class="tb on" data-tab="home" onclick="go('p_home')"><div class="ic"></div>首页</div>
+      <div class="tb" data-tab="ai"><div class="ic"></div>数智</div>
+      <div class="tb" data-tab="msg"><div class="ic"></div>消息</div>
+      <div class="tb" data-tab="me" onclick="go('p_me')"><div class="ic"></div>我的</div>
     </div>
 
     <button class="fab-share" onclick="toast('分享功能')">分</button>
-    <button class="fab" id="fab_gift"><div class="em">礼</div>新人礼包</button>
+    <button class="fab-exchange hidden" id="fab_exchange" onclick="go('p_gift_detail')"><div class="em">券</div>兑换券</button>
+    <button class="fab" id="fab_gift" onclick="go('p_gift_intro')"><div class="em">礼</div>新人礼包</button>
   </div>
 
-  <!-- ===== p_activate 激活页 ===== -->
-  <div class="page activate" id="p_activate">
+  <!-- ===== p_gift_intro 礼包介绍页（新人活动入口，按钮改为立即购买） ===== -->
+  <div class="page gift-int" id="p_gift_intro">
     <div class="nav">
       <div class="back" onclick="go('p_home')">‹</div>
-      新人礼包激活
+      新人礼包
     </div>
 
     <div class="hero">
@@ -320,25 +444,72 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
         <div class="meta"><div class="name">辅酶 Q10 体验装</div><div class="desc">10 粒装 · 快递配送</div></div>
         <div class="qty">×1</div>
       </div>
-      <div class="item">
-        <div class="thumb">💧</div>
-        <div class="meta"><div class="name">5L 饮用水</div><div class="desc">需自备水袋 · 到店自提</div></div>
-        <div class="qty">×7 袋</div>
-      </div>
-    </div>
-
-    <div class="form">
-      <div class="row">
-        <div class="label">激活码</div>
-        <input id="input_code" class="input" type="text" placeholder="请输入激活码" maxlength="20">
-        <div class="hint">每个账号仅可使用一次激活码</div>
-      </div>
     </div>
 
     <div class="submit-wrap">
-      <button class="btn-primary" id="btn_activate">立即激活</button>
+      <button class="btn-primary" id="btn_intro_buy" onclick="go('p_address')">立即购买</button>
     </div>
-    <div class="foot-tip">激活即视为同意礼包配送安排</div>
+    <div class="foot-tip">购买即视为同意礼包配送安排</div>
+  </div>
+
+  <!-- ===== p_gift_detail 兑换券商品详情页（按@image#1样式） ===== -->
+  <div class="page gift-detail" id="p_gift_detail">
+    <div class="top-bar">
+      <div class="ico" onclick="go('p_home')">‹</div>
+      <div style="font-size:14px;font-weight:600">新人礼包兑换券</div>
+      <div class="fav" id="fav_btn" onclick="toggleFav()">♡</div>
+    </div>
+
+    <div class="ship-bar">
+      <span class="lbl">📍 运费</span>
+      <span>新疆维吾尔自治区1件内24.5元，每增加2件加...</span>
+      <span class="arr">›</span>
+    </div>
+    <div class="param" onclick="toast('参数说明')">
+      <span>参数</span>
+      <span style="display:flex;align-items:center;gap:4px">暂无参数 <span class="arr">›</span></span>
+    </div>
+
+    <div class="merchant">
+      <div class="logo">绿</div>
+      <div class="info">
+        <div class="name">绿韵家官方自营</div>
+        <div class="addr">湖南省长沙市雨花区万博汇云谷</div>
+      </div>
+      <div class="nav-btn">导航 ›</div>
+    </div>
+
+    <div class="detail-block">
+      <div class="ttl">商品详情</div>
+      <div class="pic">🎁 新人礼包<br><small style="font-size:11px;font-weight:400;opacity:.9">兑换商品 · 凭激活码领取</small></div>
+    </div>
+
+    <div style="height:160px"></div>
+
+    <div class="sheet">
+      <div class="goods">
+        <div class="thumb"></div>
+        <div class="info">
+          <div><span class="tag">自营</span><span style="font-size:13px;color:var(--c-text);font-weight:600">惠民补贴套餐包13</span></div>
+          <div class="sku-no">商品编号: 996</div>
+          <div class="price-row">
+            <span class="ptag">🔥 4500</span>
+            <span class="amt">¥5000.00</span>
+          </div>
+        </div>
+        <div class="qty">
+          <button onclick="changeQty(-1)">−</button>
+          <span class="n" id="gift_qty">1</span>
+          <button onclick="changeQty(1)">+</button>
+        </div>
+      </div>
+      <div class="spec-label">规格</div>
+      <div class="spec-row">
+        <div class="sp">益齿健牙膏(120g/支) ×1 + 辅酶 Q10(10粒/瓶) ×1 + 5L饮用水 ×7袋</div>
+        <div class="sp off">益齿健牙膏 ×1</div>
+      </div>
+      <button class="buy-btn" onclick="go('p_address')">立即购买</button>
+    </div>
   </div>
 
   <!-- ===== p_address 收货地址 ===== -->
@@ -375,21 +546,21 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
     <div class="submit-wrap"><button class="btn-primary" id="btn_addr_save">保存并使用</button></div>
   </div>
 
-  <!-- ===== p_confirm 确认订单 ===== -->
+  <!-- ===== p_confirm 确认订单（去水行 + 弹激活码输入） ===== -->
   <div class="page confirm" id="p_confirm">
     <div class="nav">
-      <div class="back" onclick="go('p_activate')">‹</div>
+      <div class="back" onclick="go(window._detailPage ? 'p_gift_detail' : 'p_gift_intro')">‹</div>
       确认订单
     </div>
 
-    <div class="addr-bar empty" id="confirm_addr" onclick="go('p_address')">
+    <div class="addr-bar empty" onclick="go('p_address')">
       <div class="ico">+</div>
       <div>添加收货地址</div>
     </div>
 
     <div class="pkg">
-      <div class="gtitle">新人礼包 - 益齿健牙膏套装</div>
-      <div class="gdesc">益齿健牙膏(120g)*1 · 辅酶 Q10 体验装(10 粒)*1 · 5L 饮用水*7 袋(到店自提)</div>
+      <div class="gtitle">新人礼包 - 益齿健套装</div>
+      <div class="gdesc">益齿健牙膏(120g)*1 · 辅酶 Q10 体验装(10 粒)*1</div>
 
       <div class="row">
         <div class="thumb">🪥</div>
@@ -401,13 +572,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
         <div class="info"><div class="name">辅酶 Q10 体验装</div><div class="spec">1 瓶（10 粒/瓶）</div></div>
         <div class="qty">×1</div>
       </div>
-      <div class="row">
-        <div class="thumb">💧</div>
-        <div class="info"><div class="name">5L 饮用水</div><div class="spec">到店自提 · 需自备水袋</div></div>
-        <div class="qty">×7 袋</div>
-      </div>
 
-      <div class="rightory"><span>权益：赠水袋</span><span class="num">×7 个</span></div>
       <div class="price-row"><span>运费</span><span class="v">¥0</span></div>
     </div>
 
@@ -417,6 +582,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
       <div class="line"><span>激活码抵扣</span><span class="v">- ¥49.9</span></div>
       <div class="line"><span>实付金额</span><span class="v red">¥0.00</span></div>
       <div class="line muted" style="margin-top:4px">激活后无需再支付，订单由会员分享激活码赠送</div>
+      <div class="benefit">权益赠水：兑换成功后 30 天内到店自提 5L 饮用水 ×7 袋，每次限取 1 袋，过期自动清零（无需水袋，由店内配桶）。</div>
     </div>
 
     <div class="remark">
@@ -425,12 +591,12 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
     </div>
 
     <div class="footer">
-      <div class="left">合计：<span class="amt">¥0.00</span><span class="qty">共 9 件</span></div>
-      <button class="btn-confirm" id="btn_confirm">确认购买</button>
+      <div class="left">合计：<span class="amt">¥0.00</span><span class="qty">共 2 件</span></div>
+      <button class="btn-confirm" id="btn_confirm" onclick="openCodeModal()">确认购买</button>
     </div>
   </div>
 
-  <!-- ===== p_order 订单详情 ===== -->
+  <!-- ===== p_order 订单详情（去水行） ===== -->
   <div class="page order" id="p_order">
     <div class="nav">
       <div class="back" onclick="go('p_home')">‹</div>
@@ -464,15 +630,9 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
         <div><div class="price">¥2.0</div><div class="xqty">×1</div></div>
       </div>
 
-      <div class="goods">
-        <div class="thumb">💧</div>
-        <div class="info"><div class="gtitle">5L 饮用水</div><div class="spec">到店自提 · 需自备水袋</div></div>
-        <div><div class="price">¥18.0</div><div class="xqty">×7 袋</div></div>
-      </div>
-
       <div class="payinfo">
         <div>支付时间：<span id="pay_time">2026-09-01 14:17</span></div>
-        <div>共 9 件，实付款：<span class="pay" id="pay_amt">¥0.00</span></div>
+        <div>共 2 件，实付款：<span class="pay" id="pay_amt">¥0.00</span></div>
       </div>
 
       <div class="code-display" style="background:#F5F6F8;border-radius:8px;padding:10px;margin-top:10px;font-size:11px;color:var(--c-text-2)">
@@ -488,17 +648,187 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
     <div class="footer-bar"></div>
   </div>
 
+  <!-- ===== p_me 我的 ===== -->
+  <div class="page me" id="p_me">
+    <div class="nav">
+      <div class="back" onclick="go('p_home')">‹</div>
+      我的
+    </div>
+
+    <div class="user-card" onclick="toast('用户信息')">
+      <div class="avatar">大</div>
+      <div class="info">
+        <div class="name">大不列颠蛋黄酥啊啊啊啊</div>
+        <div class="level">至尊达人</div>
+        <div class="meta">账号: 12345678</div>
+      </div>
+      <div class="arr">›</div>
+    </div>
+
+    <div class="orders-card">
+      <div class="hd">
+        <span class="ttl">我的订单</span>
+        <span class="more" onclick="go('p_order')">全部订单 ›</span>
+      </div>
+      <div class="list">
+        <div class="item" onclick="toast('待支付')"><div class="ic">💰<div class="badge">1</div></div><div class="lbl">待支付</div></div>
+        <div class="item" onclick="toast('待发货/待核销')"><div class="ic">📦<div class="badge">2</div></div><div class="lbl">待发货/核销</div></div>
+        <div class="item" onclick="toast('待评价')"><div class="ic">💬</div><div class="lbl">待评价</div></div>
+        <div class="item" onclick="toast('退款/售后')"><div class="ic">↩</div><div class="lbl">退款/售后</div></div>
+      </div>
+    </div>
+
+    <div class="invite-banner" onclick="toast('邀请好友福利')">
+      <div class="gift-icon">🎁</div>
+      <div class="info">
+        <div class="ttl">邀请好友福利多多 ●</div>
+        <div class="sub">邀多得礼，等你来领取！</div>
+      </div>
+      <div class="arr">›</div>
+    </div>
+
+    <div class="services-card">
+      <div class="hd">我的服务</div>
+      <div class="grid">
+        <div class="item" onclick="toast('数商服务')"><div class="ic">🏪</div><div class="lbl">数商服务</div></div>
+        <div class="item" onclick="toast('网格水站')"><div class="ic">💧</div><div class="lbl">网格水站</div></div>
+        <div class="item" onclick="toast('排行榜')"><div class="ic">🏆</div><div class="lbl">排行榜</div></div>
+        <div class="item" onclick="toast('优惠券')"><div class="ic">🎟</div><div class="lbl">优惠券</div></div>
+        <div class="item" onclick="toast('我的积分')"><div class="ic">⭐</div><div class="lbl">我的积分</div></div>
+        <div class="item" onclick="go('p_address')"><div class="ic">📍</div><div class="lbl">收货地址</div></div>
+        <div class="item" onclick="toast('我的收藏')"><div class="ic">♡</div><div class="lbl">我的收藏</div></div>
+        <div class="item" onclick="toast('联系客服')"><div class="ic">🎧</div><div class="lbl">联系客服</div></div>
+        <div class="item" onclick="toast('意见反馈')"><div class="ic">✉</div><div class="lbl">意见反馈</div></div>
+        <div class="item relative" onclick="go('p_my_codes')" id="my_codes_entry"><div class="ic">🔑<div class="badge" id="my_codes_badge">33</div></div><div class="lbl">我的邀请码</div></div>
+      </div>
+    </div>
+
+    <div class="benefit-card" onclick="toast('我的权益')">
+      <div class="info">
+        <div class="ttl">我的权益</div>
+        <div class="sub">查看会员等级与专属权益</div>
+      </div>
+      <div class="arr">›</div>
+    </div>
+
+    <div style="height:20px"></div>
+    <div class="tabbar">
+      <div class="tb" data-tab="home" onclick="go('p_home')"><div class="ic"></div>首页</div>
+      <div class="tb" data-tab="ai"><div class="ic"></div>数智</div>
+      <div class="tb" data-tab="msg"><div class="ic"></div>消息</div>
+      <div class="tb on" data-tab="me" onclick="go('p_me')"><div class="ic"></div>我的</div>
+    </div>
+  </div>
+
+  <!-- ===== p_my_codes 我的邀请码 ===== -->
+  <div class="page mycodes" id="p_my_codes">
+    <div class="nav">
+      <div class="back" onclick="go('p_me')">‹</div>
+      我的邀请码
+    </div>
+
+    <div class="hd-card">
+      <div class="ttl">🔑 我的邀请码</div>
+      <div class="sub">复制邀请码分享给新人，新人在 C 端「绿韵家」新人礼包页 → 立即购买 → 输入激活码即可下单领取礼包。每个激活码仅可使用一次。</div>
+      <div class="stat">
+        <div class="s"><div class="n">3</div><div class="l">未使用</div></div>
+        <div class="s"><div class="n">5</div><div class="l">已使用</div></div>
+        <div class="s"><div class="n">8</div><div class="l">共生成</div></div>
+      </div>
+    </div>
+
+    <div class="list">
+      <div class="code-card">
+        <div class="ch">
+          <span>兑换券 · 新人礼包-益齿健套装</span>
+          <span class="tag unused">未使用</span>
+        </div>
+        <div class="code">A8$kL9#mN2@</div>
+        <div class="meta"><span>生成时间: 2026-08-31 14:22</span><span>来源: 购买生成</span></div>
+        <div class="btns">
+          <div class="btn-copy" onclick="copyText('A8$kL9#mN2@', '激活码已复制')">复制</div>
+          <div class="btn-share" onclick="toast('分享给好友')">分享</div>
+        </div>
+      </div>
+
+      <div class="code-card">
+        <div class="ch">
+          <span>兑换券 · 新人礼包-益齿健套装</span>
+          <span class="tag unused">未使用</span>
+        </div>
+        <div class="code">Dg3$Uy3@Wq</div>
+        <div class="meta"><span>生成时间: 2026-08-31 11:08</span><span>来源: 购买生成</span></div>
+        <div class="btns">
+          <div class="btn-copy" onclick="copyText('Dg3$Uy3@Wq', '激活码已复制')">复制</div>
+          <div class="btn-share" onclick="toast('分享给好友')">分享</div>
+        </div>
+      </div>
+
+      <div class="code-card">
+        <div class="ch">
+          <span>兑换券 · 新人礼包-益齿健套装</span>
+          <span class="tag unused">未使用</span>
+        </div>
+        <div class="code">Hy7*Pz8@Qr</div>
+        <div class="meta"><span>生成时间: 2026-08-30 16:55</span><span>来源: 系统生成</span></div>
+        <div class="btns">
+          <div class="btn-copy" onclick="copyText('Hy7*Pz8@Qr', '激活码已复制')">复制</div>
+          <div class="btn-share" onclick="toast('分享给好友')">分享</div>
+        </div>
+      </div>
+
+      <div class="code-card">
+        <div class="ch">
+          <span>兑换券 · 新人礼包-益齿健套装</span>
+          <span class="tag used">已使用</span>
+        </div>
+        <div class="code">Wp2#Xc6!Yq</div>
+        <div class="meta"><span>使用时间: 2026-08-29 19:30</span><span>关联订单: 605852</span></div>
+        <div class="btns">
+          <div class="btn-copy" style="background:#F5F6F8;color:var(--c-text-3);cursor:default">已使用</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip">激活码一经使用不可恢复，请妥善保管。</div>
+  </div>
+
+  <!-- ===== 激活码弹窗（code-modal） ===== -->
+  <div class="code-modal" id="code_modal" onclick="if(event.target===this) closeCodeModal()">
+    <div class="panel">
+      <div class="ttl">输入激活码</div>
+      <div class="sub">请输入您获得的兑换码，激活后将自动抵扣本次订单</div>
+      <div class="field">
+        <input class="ipt" id="code_modal_input" placeholder="请输入激活码" maxlength="20" autocomplete="off">
+        <span class="close" onclick="clearCodeModalInput()">✕</span>
+      </div>
+      <div class="hint">每个账号仅可使用一次激活码</div>
+      <div class="actions">
+        <button class="cancel" onclick="closeCodeModal()">取消</button>
+        <button class="submit" onclick="submitCodeModal()">确认</button>
+      </div>
+      <div class="protocol">点击「确认」即视为同意兑换规则与权益安排</div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 </div>
 
 <script>
 /* ========== 状态 ========== */
-window._activated = false;       // 是否已激活（隐藏 FAB）
-window._orderSeq = 605832;       // 订单号累加器
-window._address = null;           // 当前选中地址
-var _codesCache = [               // 演示地址数据：首激活用户通常为空，需新增
-  // { id: 'a1', name: '王小明', phone: '138****8888', region: '北京市 朝阳区', addr: '建国路 88 号 SOHO 现代城 A 座 1808 室', default: true }
-];
+window._orderSeq = 605832;
+window._address = null;
+window._favOn = false;
+window._giftQty = 1;
+/* 模拟用户态：实际接入后端时替换 */
+window._user = {
+  has_codes: true,        // 是否有邀请码（控制「我的邀请码」入口显示）
+  code_count: 33,          // 我的邀请码数量（显示徽标）
+  level: 'primary',        // 用户等级：'guest'(无)/'primary'(初级会员及以上才显示悬浮窗)
+  name: '大不列颠蛋黄酥啊啊啊啊',
+  account: '12345678'
+};
+var _codesCache = [];
 
 /* ========== 导航 ========== */
 function go(id){
@@ -508,28 +838,50 @@ function go(id){
   if(id === 'p_address') renderAddressList();
   if(id === 'p_confirm') renderConfirmAddr();
   if(id === 'p_home') updateFab();
+  if(id === 'p_me') renderMe();
 }
 function goBackFromAddress(){
-  // 没有地址则回首页；有则回确认订单
-  go(window._address ? 'p_confirm' : 'p_activate');
+  go(window._address ? 'p_confirm' : (window._detailPage ? 'p_gift_detail' : 'p_gift_intro'));
 }
 
-/* ========== FAB 可见性 ========== */
+/* ========== FAB / 悬浮窗可见性 ========== */
 function updateFab(){
-  var fab = document.getElementById('fab_gift');
-  if(fab) fab.classList.toggle('hidden', !!window._activated);
+  // 新人礼包 FAB（首页常显）
+  var fabGift = document.getElementById('fab_gift');
+  if(fabGift) fabGift.classList.remove('hidden');
+  // 兑换券 FAB（仅初级会员以上）
+  var fabEx = document.getElementById('fab_exchange');
+  if(fabEx){
+    var show = (window._user.level === 'primary' || window._user.level === 'svip' || window._user.level === 'master');
+    fabEx.classList.toggle('hidden', !show);
+  }
 }
 
-/* ========== 地址列表渲染 ========== */
+/* ========== 我的页渲染 ========== */
+function renderMe(){
+  // 我的邀请码：仅当用户有邀请码时显示
+  var entry = document.getElementById('my_codes_entry');
+  if(entry){
+    entry.style.display = window._user.has_codes ? '' : 'none';
+    var badge = document.getElementById('my_codes_badge');
+    if(badge && window._user.has_codes){
+      badge.style.display = window._user.code_count > 0 ? '' : 'none';
+      badge.textContent = window._user.code_count;
+    }
+  }
+}
+
+/* ========== 地址列表 ========== */
 function renderAddressList(){
   var list = document.getElementById('addr_list');
   if(!list) return;
   if(!_codesCache.length){
     list.innerHTML = '<div class="empty"><div class="ico">📭</div>暂无收货地址<br>请添加后再选择</div>';
-    document.getElementById('btn_addr_use').classList.add('btn-outline-grey');
-    document.getElementById('btn_addr_use').classList.remove('btn-primary');
-    document.getElementById('btn_addr_use').disabled = true;
-    document.getElementById('btn_addr_use').style.opacity = '0.4';
+    var btn = document.getElementById('btn_addr_use');
+    btn.classList.add('btn-outline-grey');
+    btn.classList.remove('btn-primary');
+    btn.disabled = true;
+    btn.style.opacity = '0.4';
     return;
   }
   list.innerHTML = _codesCache.map(function(a){
@@ -540,17 +892,16 @@ function renderAddressList(){
       +(a.default?'<span class="tag">默认</span>':'')
       +'</div><div class="addr">'+a.region+' '+a.addr+'</div></div></div>';
   }).join('');
-  document.getElementById('btn_addr_use').classList.remove('btn-outline-grey');
-  document.getElementById('btn_addr_use').classList.add('btn-primary');
-  document.getElementById('btn_addr_use').disabled = false;
-  document.getElementById('btn_addr_use').style.opacity = '1';
+  var btn = document.getElementById('btn_addr_use');
+  btn.classList.remove('btn-outline-grey');
+  btn.classList.add('btn-primary');
+  btn.disabled = false;
+  btn.style.opacity = '1';
 }
 function pickAddress(id){
   window._address = _codesCache.find(function(a){return a.id===id;}) || null;
   renderAddressList();
 }
-
-/* ========== 确认订单页地址栏 ========== */
 function renderConfirmAddr(){
   var bar = document.getElementById('confirm_addr');
   if(!bar) return;
@@ -561,26 +912,6 @@ function renderConfirmAddr(){
     bar.classList.add('empty');
     bar.innerHTML = '<div class="ico">+</div><div>添加收货地址</div>';
   }
-}
-
-/* ========== Toast ========== */
-function toast(msg){
-  var el=document.getElementById('toast');
-  el.textContent=msg;el.classList.add('active');
-  clearTimeout(window._toastT);
-  window._toastT=setTimeout(function(){el.classList.remove('active');},1800);
-}
-
-/* ========== 激活 ========== */
-function doActivate(){
-  var k = document.getElementById('input_code').value.trim();
-  if(!k){toast('请输入激活码');return;}
-  if(!/[a-z]/.test(k) || !/[A-Z]/.test(k) || !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(k)){
-    toast('激活码需包含大小写字母与特殊符号');return;
-  }
-  if(k.length < 8){toast('激活码至少 8 位');return;}
-  // 激活成功：进入收货地址
-  go('p_address');
 }
 
 /* ========== 地址保存 ========== */
@@ -599,96 +930,123 @@ function doSaveAddress(){
   toast('地址已保存');
   setTimeout(function(){go('p_confirm');},400);
 }
-
-/* ========== 使用此地址 ========== */
 function useAddress(){
   if(!window._address){toast('请先选择一个地址');return;}
   go('p_confirm');
 }
 
-/* ========== 确认购买 ========== */
-function doConfirm(){
-  if(!window._address){toast('请先添加收货地址');return;}
-  // 生成订单
-  document.getElementById('show_code').textContent = document.getElementById('input_code').value.trim() || '-';
-  document.getElementById('order_no').textContent = genOrderNo();
-  var d = new Date();
-  var pad = function(n){return n<10?'0'+n:n;};
-  document.getElementById('pay_time').textContent = d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes());
-  window._activated = true;
-  toast('订单已生成');
-  setTimeout(function(){go('p_order');},500);
+/* ========== 商品详情数量/收藏 ========== */
+function changeQty(d){
+  var n = window._giftQty + d;
+  if(n < 1) n = 1;
+  if(n > 99) n = 99;
+  window._giftQty = n;
+  document.getElementById('gift_qty').textContent = n;
 }
-function genOrderNo(){
-  window._orderSeq += 1; return window._orderSeq;
-}
-
-/* ========== 提醒发货 ========== */
-function doRemind(){
-  var btn=document.getElementById('btn_remind');
-  if(!btn||btn.dataset.done==='1')return;
-  btn.dataset.done='1';
-  btn.textContent='已提醒';
-  btn.style.color='#999';
-  btn.style.borderColor='#DDD';
-  toast('已提醒商家发货');
+function toggleFav(){
+  window._favOn = !window._favOn;
+  var el = document.getElementById('fav_btn');
+  el.textContent = window._favOn ? '♥' : '♡';
+  el.classList.toggle('on', window._favOn);
+  toast(window._favOn ? '已收藏' : '已取消收藏');
 }
 
-/* ========== 事件绑定 ========== */
-document.getElementById('fab_gift').onclick = function(){ go('p_activate'); };
-document.getElementById('btn_activate').onclick = doActivate;
-document.getElementById('btn_addr_save').onclick = doSaveAddress;
-document.getElementById('btn_addr_use').onclick = useAddress;
-document.getElementById('btn_confirm').onclick = doConfirm;
-document.getElementById('btn_remind').onclick = doRemind;
-
-// 初始 FAB 可见性
-updateFab();
-
-/* ========== 复制源码到墨刀（proto-c 标准组件 · PROTO-SMK-011，函数名 __proto 前缀防撞名） ========== */
-function __protoGetStyle(){ var s=document.querySelector('head style'); return s?s.innerHTML:''; }
-function __protoActivePage(){
-  return document.querySelector('.phone .page.active, .phone .view.active')
-      || document.querySelector('.page.active, .view.active')
-      || document.querySelector('.page, .view')
-      || document.querySelector('.phone > *');
+/* ========== 激活码弹窗 ========== */
+function openCodeModal(){
+  var modal = document.getElementById('code_modal');
+  modal.classList.add('active');
+  setTimeout(function(){
+    var ipt = document.getElementById('code_modal_input');
+    if(ipt) ipt.focus();
+  }, 100);
 }
-/* 把单个页面包成独立可运行 HTML：继承完整 <style> + .phone 外壳，粘墨刀单屏可直接运行 */
-function __protoBuildStandalone(pageEl, title){
-  var style = __protoGetStyle();
-  var phoneCls = (pageEl && pageEl.closest && pageEl.closest('.phone')) ? ' class="phone"' : '';
-  var inner = pageEl ? pageEl.outerHTML : document.body.innerHTML;
-  return '<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n<meta charset="utf-8">\n<title>'
-       + (title||'原型单页') + '</title>\n<style>\n' + style + '\n</style>\n</head>\n<body>\n<div'
-       + phoneCls + '>\n' + inner + '\n</div>\n</body>\n</html>';
+function closeCodeModal(){
+  var modal = document.getElementById('code_modal');
+  modal.classList.remove('active');
+  var ipt = document.getElementById('code_modal_input');
+  if(ipt) ipt.value = '';
 }
-function __protoCopy(text, btnId, okMsg){
-  function toast(msg){ var t=document.getElementById('copyToast'); if(t){ t.textContent=msg; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},1800); } }
-  function done(ok){
-    var b=document.getElementById(btnId);
-    if(ok){ if(b){ b.textContent='✓ 已复制'; b.classList.add('copied'); setTimeout(function(){ b.textContent=b.getAttribute('data-label')||'复制'; b.classList.remove('copied'); },1800); } toast(okMsg); }
-    else { toast('复制失败，请手动复制源码'); }
+function clearCodeModalInput(){
+  var ipt = document.getElementById('code_modal_input');
+  if(ipt) ipt.value = '';
+}
+function submitCodeModal(){
+  var k = document.getElementById('code_modal_input').value.trim();
+  if(!k){toast('请输入激活码');return;}
+  if(k.length < 8){toast('激活码至少 8 位');return;}
+  if(!/[a-z]/.test(k) || !/[A-Z]/.test(k) || !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(k)){
+    toast('激活码需包含大小写字母与特殊符号');return;
   }
-  function fb(t){ try{ var ta=document.createElement('textarea'); ta.value=t; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.top='-9999px'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); var ok=document.execCommand('copy'); document.body.removeChild(ta); return ok; }catch(e){ return false; } }
-  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(function(){done(true);}).catch(function(){done(fb(text));}); }
-  else { done(fb(text)); }
+  // 后端核销成功后生成订单
+  var orderNo = ++window._orderSeq;
+  document.getElementById('order_no').textContent = orderNo;
+  document.getElementById('pay_time').textContent = formatNow();
+  document.getElementById('show_code').textContent = k;
+  closeCodeModal();
+  toast('激活码核销成功');
+  setTimeout(function(){ go('p_order'); }, 400);
 }
-/* 复制当前页：所见即所得，抓取当前屏幕这一页的实时内容，包成独立可运行 HTML（挑页复制用） */
+
+/* ========== Toast ========== */
+function toast(msg){
+  var el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('active');
+  clearTimeout(window._toastT);
+  window._toastT=setTimeout(function(){el.classList.remove('active');},1800);
+}
+
+/* ========== 复制 ========== */
+function copyText(t, msg){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(function(){
+      toast(msg || '已复制');
+    }).catch(function(){
+      fallbackCopy(t);toast(msg || '已复制');
+    });
+  } else {
+    fallbackCopy(t);toast(msg || '已复制');
+  }
+}
+function fallbackCopy(t){
+  var ta = document.createElement('textarea');
+  ta.value = t; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta);
+}
+
+/* ========== 时间格式化 ========== */
+function formatNow(){
+  var d = new Date();
+  function p(n){return n<10?'0'+n:''+n;}
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());
+}
+
+/* ========== 复制源码工具（顶部 copy-bar） ========== */
 function copyCurrentPage(){
-  var page = __protoActivePage();
-  var title = (page && page.getAttribute('data-title'))
-           || (page && page.querySelector && page.querySelector('.nav') && page.querySelector('.nav').textContent)
-           || document.title || '原型单页';
-  var html = __protoBuildStandalone(page, title);
-  __protoCopy(html, 'copyCurrentPage', '已复制当前页，粘贴到墨刀即可');
+  var active = document.querySelector('.page.active');
+  if(!active) return;
+  var html = active.outerHTML;
+  copyText(html, '当前页源码已复制');
+  markCopied(document.getElementById('copyCurrentPage'));
 }
-/* 复制全部源码：初始纯净态整份文件（从首屏运行用） */
 function copyAllSource(){
-  var src = window.__PROTO_SOURCE__ || ('<!DOCTYPE html>\n' + document.documentElement.outerHTML);
-  __protoCopy(src, 'copyAllSource', '已复制整份源码，粘贴到墨刀即可运行');
+  var phone = document.querySelector('.phone');
+  if(!phone) return;
+  copyText(phone.outerHTML, '全部源码已复制');
+  markCopied(document.getElementById('copyAllSource'));
 }
-// 记录初始纯净源码（首屏态），供「复制全部源码」粘贴墨刀
-window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+function markCopied(btn){
+  if(!btn) return;
+  var old = btn.textContent;
+  btn.textContent = '已复制 ✓';
+  btn.classList.add('copied');
+  setTimeout(function(){btn.textContent=old;btn.classList.remove('copied');},1600);
+}
+
+/* ========== 入口态 ========== */
+window._detailPage = false;
+updateFab();
 </script>
 </body>
 </html>
