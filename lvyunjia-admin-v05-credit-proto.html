@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>绿韵家管理系统 · V0.5 积分管理</title>
+<title>绿韵家管理系统 · AI工具管理</title>
 <style>
   :root {
     --primary: #FF4D4F;
     --primary-hover: #FF7875;
     --sidebar-bg: #001529;
-    --sidebar-text: #rgba(255,255,255,0.65);
+    --sidebar-text: rgba(255,255,255,0.65);
     --sidebar-active: #fff;
     --sidebar-width: 200px;
     --header-height: 50px;
@@ -34,18 +34,18 @@
   .top-bar .user-info { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); }
   .top-bar .avatar { width: 28px; height: 28px; border-radius: 50%; background: #e6f7ff; color: #1890FF; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px; }
 
-  /* ===== Tab 栏 ===== */
+  /* ===== Tab 栏（与真实后台截图对齐） ===== */
   .tab-bar { height: var(--tab-height); background: #fff; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; gap: 4px; position: fixed; top: 50px; left: 0; right: 0; z-index: 99; }
-  .tab-item { padding: 6px 16px; font-size: 13px; color: var(--text-secondary); cursor: pointer; border-radius: 4px; transition: all .15s; }
-  .tab-item:hover { color: var(--text); }
+  .tab-item { padding: 6px 16px; font-size: 13px; color: var(--text-secondary); cursor: default; border-radius: 4px; }
   .tab-item.active { background: var(--primary); color: #fff; }
 
-  /* ===== 侧栏 ===== */
+  /* ===== 侧栏（与真实后台截图逐字对齐 + V0.5 新增 AI工具管理） ===== */
   .sidebar { position: fixed; top: 92px; left: 0; bottom: 0; width: var(--sidebar-width); background: var(--sidebar-bg); overflow-y: auto; z-index: 98; }
   .sidebar-group { margin-bottom: 2px; }
   .sidebar-label { padding: 10px 16px 6px; font-size: 12px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 1px; }
-  .sidebar-item { display: flex; align-items: center; gap: 8px; padding: 10px 16px; color: var(--sidebar-text); cursor: pointer; transition: all .15s; font-size: 14px; }
-  .sidebar-item:hover { color: #fff; background: rgba(255,255,255,0.06); }
+  .sidebar-item { display: flex; align-items: center; gap: 8px; padding: 10px 16px; color: var(--sidebar-text); cursor: default; transition: all .15s; font-size: 14px; }
+  .sidebar-item.nav { cursor: pointer; }
+  .sidebar-item.nav:hover { color: #fff; background: rgba(255,255,255,0.06); }
   .sidebar-item.active { color: #fff; background: var(--primary); }
   .sidebar-item .icon { width: 16px; text-align: center; font-size: 14px; flex-shrink: 0; }
   .sidebar-sub { padding-left: 32px; }
@@ -54,7 +54,9 @@
   /* ===== 主内容区 ===== */
   .main-content { margin-left: var(--sidebar-width); margin-top: 92px; padding: 20px; min-height: calc(100vh - 92px); }
 
-  /* ===== 页面容器（5页平铺） ===== */
+  /* ===== 页面容器（SPA 独立视图） ===== */
+  .view { display: none; }
+  .view.active { display: block; }
   .admin-page { background: #fff; border-radius: 4px; margin-bottom: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
   .page-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
   .page-title { font-size: 16px; font-weight: 700; color: var(--text); }
@@ -71,9 +73,7 @@
   .btn-default { background: #fff; color: var(--text); border: 1px solid #d9d9d9; }
   .btn-default:hover { color: var(--primary); border-color: var(--primary); }
   .btn-link { background: transparent; color: var(--blue-link); padding: 0; height: auto; }
-  .btn-link:hover { color: #40a9ff; text-decoration: underline; }
 
-  /* 筛选标签栏 */
   .filter-tabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
   .filter-tab { padding: 4px 12px; border-radius: 4px; font-size: 13px; cursor: pointer; border: 1px solid var(--border); background: #fff; color: var(--text-secondary); }
   .filter-tab.active { color: var(--primary); border-color: var(--primary); background: #fff1f0; }
@@ -123,25 +123,19 @@
   .snapshot-table th { background: var(--table-header); padding: 8px 12px; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border); }
   .snapshot-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
 
-  /* 调整积分弹窗 */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; display: none; align-items: center; justify-content: center; }
-  .modal-overlay.active { display: flex; }
-  .modal-box { background: #fff; border-radius: 8px; width: 480px; max-width: 90vw; box-shadow: 0 6px 24px rgba(0,0,0,0.15); }
-  .modal-head { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-  .modal-head h3 { font-size: 16px; font-weight: 600; }
-  .modal-close { font-size: 20px; cursor: pointer; color: var(--text-tertiary); }
-  .modal-body { padding: 20px; }
-  .modal-foot { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
-  .tab-switch { display: flex; gap: 0; border: 1px solid #d9d9d9; border-radius: 4px; overflow: hidden; margin-bottom: 16px; width: fit-content; }
-  .tab-switch-item { padding: 6px 24px; font-size: 13px; cursor: pointer; background: #f5f5f5; color: var(--text-secondary); border-right: 1px solid #d9d9d9; }
+  /* 调整积分独立页 */
+  .adjust-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .adjust-back { font-size: 14px; color: var(--blue-link); cursor: pointer; display: flex; align-items: center; gap: 4px; }
+  .adjust-back:hover { text-decoration: underline; }
+  .adjust-user-info { display: flex; align-items: center; gap: 12px; }
+  .adjust-avatar { width: 40px; height: 40px; border-radius: 50%; background: #e6f7ff; color: #1890FF; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; }
+  .adjust-balance-card { background: #fff7e6; border: 1px solid #ffd591; border-radius: 6px; padding: 16px 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+  .adjust-balance-card .label { font-size: 13px; color: var(--text-secondary); }
+  .adjust-balance-card .value { font-size: 28px; font-weight: 700; color: var(--primary); }
+  .tab-switch { display: flex; gap: 0; border: 1px solid #d9d9d9; border-radius: 4px; overflow: hidden; margin-bottom: 20px; width: fit-content; }
+  .tab-switch-item { padding: 8px 32px; font-size: 14px; cursor: pointer; background: #f5f5f5; color: var(--text-secondary); border-right: 1px solid #d9d9d9; }
   .tab-switch-item:last-child { border-right: none; }
   .tab-switch-item.active { background: #fff; color: var(--primary); font-weight: 600; }
-
-  .current-balance { background: #fff7e6; border: 1px solid #ffd591; border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
-  .current-balance .label { font-size: 13px; color: var(--text-secondary); }
-  .current-balance .value { font-size: 24px; font-weight: 700; color: var(--primary); }
-
-  .tip-text { font-size: 12px; color: var(--text-tertiary); margin-top: 8px; line-height: 1.6; }
 </style>
 </head>
 <body>
@@ -152,21 +146,21 @@
   <div class="user-info"><div class="avatar">袁</div><span>袁中天</span></div>
 </div>
 
-<!-- ===== Tab 栏 ===== -->
+<!-- ===== Tab 栏（与真实后台截图对齐） ===== -->
 <div class="tab-bar">
   <div class="tab-item">三 ≡</div>
   <div class="tab-item">店铺</div>
   <div class="tab-item">营销中心</div>
   <div class="tab-item">结算中心</div>
-  <div class="tab-item">会员中心</div>
-  <div class="tab-item active">订单管理</div>
+  <div class="tab-item active">会员中心</div>
+  <div class="tab-item">订单管理</div>
   <div class="tab-item">用户反馈</div>
 </div>
 
-<!-- ===== 侧栏 ===== -->
+<!-- ===== 侧栏（与真实后台截图逐字对齐 + V0.5 新增 AI工具管理） ===== -->
 <div class="sidebar">
   <div class="sidebar-group">
-    <div class="sidebar-item"><span class="icon">📊</span>总控台</div>
+    <div class="sidebar-item"><span class="icon">📊</span>运营台</div>
   </div>
   <div class="sidebar-group">
     <div class="sidebar-item"><span class="icon">📦</span>商品中心</div>
@@ -175,21 +169,16 @@
     <div class="sidebar-item"><span class="icon">🏪</span>商家管理</div>
   </div>
   <div class="sidebar-group">
-    <div class="sidebar-item active"><span class="icon">👥</span>会员中心</div>
+    <div class="sidebar-item"><span class="icon">👥</span>会员中心</div>
     <div class="sidebar-sub">
-      <div class="sidebar-item active" onclick="document.getElementById('p1').scrollIntoView({behavior:'smooth'})">会员管理</div>
+      <div class="sidebar-item nav active" data-view="member" onclick="go('member')">会员管理</div>
     </div>
   </div>
   <div class="sidebar-group">
-    <div class="sidebar-item" style="background:#fff1f0;color:var(--primary);"><span class="icon">🔧</span>售后中心</div>
-    <div class="sidebar-sub">
-      <div class="sidebar-item">订单管理</div>
-      <div class="sidebar-item">退款列表</div>
-      <div class="sidebar-item">售后记录</div>
-    </div>
+    <div class="sidebar-item"><span class="icon">💱</span>交易中心</div>
   </div>
   <div class="sidebar-group">
-    <div class="sidebar-item"><span class="icon">💬</span>售后中心</div>
+    <div class="sidebar-item"><span class="icon">🔧</span>售后中心</div>
   </div>
   <div class="sidebar-group">
     <div class="sidebar-item"><span class="icon">📈</span>数据中心</div>
@@ -197,23 +186,26 @@
   <div class="sidebar-group">
     <div class="sidebar-item"><span class="icon">⚙️</span>运营中心</div>
   </div>
-  <!-- V0.5 新增：AI 工具管理 -->
+  <!-- V0.5 新增：AI 工具管理（独立栏目，不混入既有分组） -->
   <div class="sidebar-group" style="margin-top:8px;border-top:1px solid rgba(255,255,255,0.1);padding-top:8px;">
     <div class="sidebar-item" style="color:var(--primary);"><span class="icon">🤖</span>AI工具管理</div>
     <div class="sidebar-sub">
-      <div class="sidebar-item" onclick="document.getElementById('p3').scrollIntoView({behavior:'smooth'})">用户生成日志</div>
-      <div class="sidebar-item" onclick="document.getElementById('p4').scrollIntoView({behavior:'smooth'})">初始积分配置</div>
-      <div class="sidebar-item" onclick="document.getElementById('p5').scrollIntoView({behavior:'smooth'})">积分定价管理</div>
-      <div class="sidebar-item" onclick="document.getElementById('p6').scrollIntoView({behavior:'smooth'})">工具消耗配置</div>
+      <div class="sidebar-item nav" data-view="log" onclick="go('log')">用户生成日志</div>
+      <div class="sidebar-item nav" data-view="init" onclick="go('init')">初始积分配置</div>
+      <div class="sidebar-item nav" data-view="pricing" onclick="go('pricing')">积分定价管理</div>
+      <div class="sidebar-item nav" data-view="cost" onclick="go('cost')">工具消耗配置</div>
+      <div class="sidebar-item nav" data-view="package" onclick="go('package')">套餐管理</div>
+      <div class="sidebar-item nav" data-view="firstOrder" onclick="go('firstOrder')">首单优惠配置</div>
     </div>
   </div>
 </div>
 
-<!-- ===== 主内容区 ===== -->
+<!-- ===== 主内容区（所有独立视图写入 <main>，避免点击跳转空白） ===== -->
+<main id="mainArea">
 <div class="main-content">
 
-<!-- ==================== 页面 1：会员管理列表 ==================== -->
-<div class="admin-page" id="p1">
+<!-- ==================== 视图：会员管理列表 ==================== -->
+<section class="view admin-page active" id="viewMember">
   <div class="page-header">
     <div class="page-title">会员管理</div>
   </div>
@@ -255,7 +247,7 @@
         <tr>
           <td>#10001</td>
           <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:32px;height:32px;border-radius:50%;background:#e6f7ff;display:flex;align-items:center;justify-content:center;font-size:12px;color:#1890FF;">袁</div><span>袁中天</span></div></td>
-          <td>138****1234</td>
+          <td>13812341234</td>
           <td><span class="badge badge-warning">高级会员</span></td>
           <td>高级会员</td>
           <td><span class="badge badge-success">已订阅</span></td>
@@ -266,16 +258,16 @@
           <td>2026-03-15</td>
           <td>
             <div class="action-links">
-              <span class="action-link" onclick="openCreditModal('袁中天',88)">调整积分</span>
-              <span class="action-link">查看详情</span>
-              <span class="action-link">修改手机号</span>
+              <span class="action-link" onclick="openCreditAdjust('袁中天',88)">调整积分</span>
+              <span class="action-link" onclick="toast('查看 袁中天 的会员详情')">查看详情</span>
+              <span class="action-link" onclick="toast('修改 袁中天 手机号')">修改手机号</span>
             </div>
           </td>
         </tr>
         <tr>
           <td>#10002</td>
           <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:32px;height:32px;border-radius:50%;background:#f6ffed;display:flex;align-items:center;justify-content:center;font-size:12px;color:#52c41a;">张</div><span>张小明</span></div></td>
-          <td>139****5678</td>
+          <td>13956789012</td>
           <td><span class="badge badge-default">普通会员</span></td>
           <td>普通会员</td>
           <td><span class="badge badge-default">未订阅</span></td>
@@ -286,15 +278,15 @@
           <td>2026-07-20</td>
           <td>
             <div class="action-links">
-              <span class="action-link" onclick="openCreditModal('张小明',0)">调整积分</span>
-              <span class="action-link">查看详情</span>
+              <span class="action-link" onclick="openCreditAdjust('张小明',0)">调整积分</span>
+              <span class="action-link" onclick="toast('查看 张小明 的会员详情')">查看详情</span>
             </div>
           </td>
         </tr>
         <tr>
           <td>#10003</td>
           <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:32px;height:32px;border-radius:50%;background:#fff7e6;display:flex;align-items:center;justify-content:center;font-size:12px;color:#faad14;">李</div><span>李四光</span></div></td>
-          <td>137****9012</td>
+          <td>13790123456</td>
           <td><span class="badge badge-success">VIP</span></td>
           <td>VIP</td>
           <td><span class="badge badge-success">已订阅</span></td>
@@ -305,16 +297,16 @@
           <td>2025-11-08</td>
           <td>
             <div class="action-links">
-              <span class="action-link" onclick="openCreditModal('李四光',36)">调整积分</span>
-              <span class="action-link">查看详情</span>
-              <span class="action-link">修改推荐人</span>
+              <span class="action-link" onclick="openCreditAdjust('李四光',36)">调整积分</span>
+              <span class="action-link" onclick="toast('查看 李四光 的会员详情')">查看详情</span>
+              <span class="action-link" onclick="toast('修改 李四光 推荐人')">修改推荐人</span>
             </div>
           </td>
         </tr>
         <tr>
           <td>#10004</td>
           <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:32px;height:32px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#999;">王</div><span>王小红</span></div></td>
-          <td>136****3456</td>
+          <td>13634567890</td>
           <td><span class="badge badge-default">普通会员</span></td>
           <td>普通会员</td>
           <td><span class="badge badge-default">未订阅</span></td>
@@ -325,15 +317,15 @@
           <td>2026-08-01</td>
           <td>
             <div class="action-links">
-              <span class="action-link" onclick="openCreditModal('王小红',0)">调整积分</span>
-              <span class="action-link">查看详情</span>
+              <span class="action-link" onclick="openCreditAdjust('王小红',0)">调整积分</span>
+              <span class="action-link" onclick="toast('查看 王小红 的会员详情')">查看详情</span>
             </div>
           </td>
         </tr>
         <tr>
           <td>#10005</td>
           <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:32px;height:32px;border-radius:50%;background:#fff0f6;display:flex;align-items:center;justify-content:center;font-size:12px;color:#eb2f96;">赵</div><span>赵六六</span></div></td>
-          <td>135****7890</td>
+          <td>13578901234</td>
           <td><span class="badge badge-warning">高级会员</span></td>
           <td>高级会员</td>
           <td><span class="badge badge-success">已订阅</span></td>
@@ -344,17 +336,17 @@
           <td>2026-02-28</td>
           <td>
             <div class="action-links">
-              <span class="action-link" onclick="openCreditModal('赵六六',120)">调整积分</span>
-              <span class="action-link">查看详情</span>
-              <span class="action-link">修改手机号</span>
-              <span class="action-link danger">禁用</span>
+              <span class="action-link" onclick="openCreditAdjust('赵六六',120)">调整积分</span>
+              <span class="action-link" onclick="toast('查看 赵六六 的会员详情')">查看详情</span>
+              <span class="action-link" onclick="toast('修改 赵六六 手机号')">修改手机号</span>
+              <span class="action-link danger" onclick="toast('已禁用 赵六六')">禁用</span>
             </div>
           </td>
         </tr>
         <tr>
           <td>#10006</td>
           <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:32px;height:32px;border-radius:50%;background:#e6f7ff;display:flex;align-items:center;justify-content:center;font-size:12px;color:#1890FF;">陈</div><span>陈大文</span></div></td>
-          <td>134****2345</td>
+          <td>13423456789</td>
           <td><span class="badge badge-default">普通会员</span></td>
           <td>普通会员</td>
           <td><span class="badge badge-default">未订阅</span></td>
@@ -365,15 +357,15 @@
           <td>2026-08-25</td>
           <td>
             <div class="action-links">
-              <span class="action-link" onclick="openCreditModal('陈大文',12)">调整积分</span>
-              <span class="action-link">查看详情</span>
+              <span class="action-link" onclick="openCreditAdjust('陈大文',12)">调整积分</span>
+              <span class="action-link" onclick="toast('查看 陈大文 的会员详情')">查看详情</span>
             </div>
           </td>
         </tr>
         <tr>
           <td>#10007</td>
           <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:32px;height:32px;border-radius:50%;background:#f6ffed;display:flex;align-items:center;justify-content:center;font-size:12px;color:#52c41a;">周</div><span>周小周</span></div></td>
-          <td>133****6789</td>
+          <td>13367890123</td>
           <td><span class="badge badge-success">VIP</span></td>
           <td>VIP</td>
           <td><span class="badge badge-success">已订阅</span></td>
@@ -384,16 +376,16 @@
           <td>2025-06-18</td>
           <td>
             <div class="action-links">
-              <span class="action-link" onclick="openCreditModal('周小周',256)">调整积分</span>
-              <span class="action-link">查看详情</span>
-              <span class="action-link">重置密码</span>
+              <span class="action-link" onclick="openCreditAdjust('周小周',256)">调整积分</span>
+              <span class="action-link" onclick="toast('查看 周小周 的会员详情')">查看详情</span>
+              <span class="action-link" onclick="toast('已重置 周小周 密码')">重置密码</span>
             </div>
           </td>
         </tr>
         <tr>
           <td>#10008</td>
           <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:32px;height:32px;border-radius:50%;background:#fff7e6;display:flex;align-items:center;justify-content:center;font-size:12px;color:#faad14;">吴</div><span>吴小明</span></div></td>
-          <td>132****0123</td>
+          <td>13201234567</td>
           <td><span class="badge badge-default">普通会员</span></td>
           <td>普通会员</td>
           <td><span class="badge badge-default">未订阅</span></td>
@@ -404,8 +396,8 @@
           <td>2026-08-30</td>
           <td>
             <div class="action-links">
-              <span class="action-link" onclick="openCreditModal('吴小明',0)">调整积分</span>
-              <span class="action-link">查看详情</span>
+              <span class="action-link" onclick="openCreditAdjust('吴小明',0)">调整积分</span>
+              <span class="action-link" onclick="toast('查看 吴小明 的会员详情')">查看详情</span>
             </div>
           </td>
         </tr>
@@ -421,11 +413,11 @@
       <span>页</span>
     </div>
   </div>
-</div>
+</section>
 
 
-<!-- ==================== 页面 2：用户生成日志 ==================== -->
-<div class="admin-page" id="p3">
+<!-- ==================== 视图：用户生成日志 ==================== -->
+<section class="view admin-page" id="viewLog">
   <div class="page-header">
     <div class="page-title">用户生成日志</div>
   </div>
@@ -459,9 +451,9 @@
           <td>生图</td>
           <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">AI可爱风蜡笔涂鸦，校服女孩，糖果贴纸</td>
           <td style="color:var(--red);font-weight:600;">-1</td>
-          <td><a href="#" style="color:var(--blue-link);">查看结果</a></td>
+          <td><span class="action-link" onclick="toast('查看 袁中天 的生成结果')">查看结果</span></td>
           <td><span class="badge badge-success">成功</span></td>
-          <td><span class="action-link">复制 URL</span></td>
+          <td><span class="action-link" onclick="toast('复制 袁中天 的结果 URL')">复制 URL</span></td>
         </tr>
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#f6ffed;display:flex;align-items:center;justify-content:center;font-size:10px;color:#52c41a;">李</div>李四光</div></td>
@@ -469,9 +461,9 @@
           <td>生图</td>
           <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">日落街道，男生伸手，电影感逆光</td>
           <td style="color:var(--red);font-weight:600;">-1</td>
-          <td><a href="#" style="color:var(--blue-link);">查看结果</a></td>
+          <td><span class="action-link" onclick="toast('查看 李四光 的生成结果')">查看结果</span></td>
           <td><span class="badge badge-success">成功</span></td>
-          <td><span class="action-link">复制 URL</span></td>
+          <td><span class="action-link" onclick="toast('复制 李四光 的结果 URL')">复制 URL</span></td>
         </tr>
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#fff7e6;display:flex;align-items:center;justify-content:center;font-size:10px;color:#faad14;">张</div>张小明</div></td>
@@ -479,9 +471,9 @@
           <td>生图</td>
           <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">治愈系猫咪，窗台晒太阳，柔光</td>
           <td style="color:var(--red);font-weight:600;">-1</td>
-          <td><a href="#" style="color:var(--blue-link);">查看结果</a></td>
+          <td><span class="action-link" onclick="toast('查看 张小明 的生成结果')">查看结果</span></td>
           <td><span class="badge badge-success">成功</span></td>
-          <td><span class="action-link">复制 URL</span></td>
+          <td><span class="action-link" onclick="toast('复制 张小明 的结果 URL')">复制 URL</span></td>
         </tr>
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#e6f7ff;display:flex;align-items:center;justify-content:center;font-size:10px;color:#1890FF;">袁</div>袁中天</div></td>
@@ -489,9 +481,9 @@
           <td>生图</td>
           <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">赛博朋克城市夜景，霓虹灯，雨后街道</td>
           <td style="color:var(--red);font-weight:600;">-1</td>
-          <td><a href="#" style="color:var(--blue-link);">查看结果</a></td>
+          <td><span class="action-link danger" onclick="toast('查看 袁中天 的错误详情')">查看错误</span></td>
           <td><span class="badge badge-error">失败</span></td>
-          <td><span class="action-link">查看错误</span></td>
+          <td><span class="action-link" onclick="toast('复制 袁中天 的结果 URL')">复制 URL</span></td>
         </tr>
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#fff0f6;display:flex;align-items:center;justify-content:center;font-size:10px;color:#eb2f96;">赵</div>赵六六</div></td>
@@ -501,7 +493,7 @@
           <td style="color:var(--red);font-weight:600;">0</td>
           <td>-</td>
           <td><span class="badge badge-success">成功</span></td>
-          <td><span class="action-link">查看详情</span></td>
+          <td><span class="action-link" onclick="toast('查看 赵六六 的下载详情')">查看详情</span></td>
         </tr>
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#f6ffed;display:flex;align-items:center;justify-content:center;font-size:10px;color:#52c41a;">周</div>周小周</div></td>
@@ -509,9 +501,9 @@
           <td>生图</td>
           <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">水彩风花卉插画，淡雅配色，手绘质感</td>
           <td style="color:var(--red);font-weight:600;">-1</td>
-          <td><a href="#" style="color:var(--blue-link);">查看结果</a></td>
+          <td><span class="action-link" onclick="toast('查看 周小周 的生成结果')">查看结果</span></td>
           <td><span class="badge badge-warning">进行中</span></td>
-          <td><span class="action-link">刷新状态</span></td>
+          <td><span class="action-link" onclick="toast('刷新 周小周 的生成状态')">刷新状态</span></td>
         </tr>
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#e6f7ff;display:flex;align-items:center;justify-content:center;font-size:10px;color:#1890FF;">陈</div>陈大文</div></td>
@@ -519,9 +511,9 @@
           <td>生图</td>
           <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">极简线条人物，黑白配色，扁平设计</td>
           <td style="color:var(--red);font-weight:600;">-1</td>
-          <td><a href="#" style="color:var(--blue-link);">查看结果</a></td>
+          <td><span class="action-link" onclick="toast('查看 陈大文 的生成结果')">查看结果</span></td>
           <td><span class="badge badge-success">成功</span></td>
-          <td><span class="action-link">复制 URL</span></td>
+          <td><span class="action-link" onclick="toast('复制 陈大文 的结果 URL')">复制 URL</span></td>
         </tr>
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#fff7e6;display:flex;align-items:center;justify-content:center;font-size:10px;color:#faad14;">吴</div>吴小明</div></td>
@@ -529,9 +521,9 @@
           <td>生图</td>
           <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">日系动漫少女，樱花背景，春日氛围</td>
           <td style="color:var(--red);font-weight:600;">-1</td>
-          <td><a href="#" style="color:var(--blue-link);">查看结果</a></td>
+          <td><span class="action-link" onclick="toast('查看 吴小明 的生成结果')">查看结果</span></td>
           <td><span class="badge badge-success">成功</span></td>
-          <td><span class="action-link">复制 URL</span></td>
+          <td><span class="action-link" onclick="toast('复制 吴小明 的结果 URL')">复制 URL</span></td>
         </tr>
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#e6f7ff;display:flex;align-items:center;justify-content:center;font-size:10px;color:#1890FF;">袁</div>袁中天</div></td>
@@ -539,9 +531,9 @@
           <td>生图</td>
           <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">3D 渲染产品展示，白色背景，专业摄影光</td>
           <td style="color:var(--red);font-weight:600;">-1</td>
-          <td><a href="#" style="color:var(--blue-link);">查看结果</a></td>
+          <td><span class="action-link" onclick="toast('查看 袁中天 的生成结果')">查看结果</span></td>
           <td><span class="badge badge-success">成功</span></td>
-          <td><span class="action-link">复制 URL</span></td>
+          <td><span class="action-link" onclick="toast('复制 袁中天 的结果 URL')">复制 URL</span></td>
         </tr>
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#f6ffed;display:flex;align-items:center;justify-content:center;font-size:10px;color:#52c41a;">李</div>李四光</div></td>
@@ -549,9 +541,9 @@
           <td>生图</td>
           <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">油画风景，莫奈风格，睡莲池塘</td>
           <td style="color:var(--red);font-weight:600;">-1</td>
-          <td><a href="#" style="color:var(--blue-link);">查看结果</a></td>
+          <td><span class="action-link" onclick="toast('查看 李四光 的生成结果')">查看结果</span></td>
           <td><span class="badge badge-success">成功</span></td>
-          <td><span class="action-link">复制 URL</span></td>
+          <td><span class="action-link" onclick="toast('复制 李四光 的结果 URL')">复制 URL</span></td>
         </tr>
       </tbody>
     </table>
@@ -570,11 +562,11 @@
       <span>页</span>
     </div>
   </div>
-</div>
+</section>
 
 
-<!-- ==================== 页面 4：初始用户积分配置 ==================== -->
-<div class="admin-page" id="p4">
+<!-- ==================== 视图：初始用户积分配置 ==================== -->
+<section class="view admin-page" id="viewInit">
   <div class="page-header">
     <div class="page-title">初始用户积分配置</div>
   </div>
@@ -627,7 +619,7 @@
           <td>产品小王</td>
           <td>V0.5 上线调整</td>
           <td><span class="badge badge-success">生效中</span></td>
-          <td><span class="action-link">作废</span></td>
+          <td><span class="action-link" onclick="toast('作废 5 积分配置')">作废</span></td>
         </tr>
         <tr>
           <td>3</td>
@@ -647,15 +639,12 @@
         </tr>
       </tbody>
     </table>
-    <div class="tip-text">
-      规则说明：新用户注册时，系统自动按「生效日期 ≤ 注册日期」的最新一条配置发放初始积分。老用户不受后续配置变更影响。
-    </div>
   </div>
-</div>
+</section>
 
 
-<!-- ==================== 页面 5：积分定价管理 ==================== -->
-<div class="admin-page" id="p5">
+<!-- ==================== 视图：积分定价管理 ==================== -->
+<section class="view admin-page" id="viewPricing">
   <div class="page-header">
     <div class="page-title">积分定价管理</div>
   </div>
@@ -709,7 +698,7 @@
           <td>运营小李</td>
           <td>上线首发定价</td>
           <td><span class="badge badge-success">生效中</span></td>
-          <td><span class="action-link">作废</span></td>
+          <td><span class="action-link" onclick="toast('作废 ¥0.10 定价')">作废</span></td>
         </tr>
         <tr>
           <td>¥0.15</td>
@@ -729,14 +718,12 @@
         </tr>
       </tbody>
     </table>
-    <div class="tip-text">
-      说明：定价变更不影响已完成的订单（下单时快照当时的定价）。仅影响新创建的订单。
-    </div>
   </div>
-</div>
+</section>
 
-<!-- ==================== 页面 6：AI 工具消耗配置 ==================== -->
-<div class="admin-page" id="p6">
+
+<!-- ==================== 视图：AI 工具消耗配置 ==================== -->
+<section class="view admin-page" id="viewCost">
   <div class="page-header">
     <div class="page-title">AI 工具消耗配置</div>
   </div>
@@ -816,7 +803,7 @@
           <td>运营小李</td>
           <td>默认值</td>
           <td><span class="badge badge-success">生效中</span></td>
-          <td><span class="action-link">作废</span></td>
+          <td><span class="action-link" onclick="toast('作废 1 积分/次 配置')">作废</span></td>
         </tr>
         <tr>
           <td>2 积分/次</td>
@@ -828,85 +815,285 @@
         </tr>
       </tbody>
     </table>
-    <div class="tip-text">
-      说明：每种 AI 工具独立配置消耗积分数。V0.7 视频上线、V0.8 数字人上线时在此页新增对应工具的配置卡片。
+  </div>
+</section>
+
+
+<!-- ==================== 视图：调整积分（独立页，替代原 Modal） ==================== -->
+<section class="view admin-page" id="viewAdjust">
+  <div class="page-header">
+    <div class="adjust-header">
+      <div class="adjust-back" onclick="go('member')">← 返回会员列表</div>
+      <div class="page-title" style="margin:0;">调整积分 - <span id="adjustUserName">-</span></div>
     </div>
   </div>
-</div>
+  <div class="page-body">
+    <!-- 当前余额 -->
+    <div class="adjust-balance-card">
+      <div>
+        <div class="label">当前积分余额</div>
+      </div>
+      <div class="value" id="adjustCurrentBalance">0</div>
+    </div>
+
+    <!-- 赠送/扣除 切换 -->
+    <div class="tab-switch">
+      <div class="tab-switch-item active" id="tabGift" onclick="switchAdjustTab(this,'gift')">赠送</div>
+      <div class="tab-switch-item" id="tabDeduct" onclick="switchAdjustTab(this,'deduct')">扣除</div>
+    </div>
+
+    <!-- 表单 -->
+    <div class="form-row">
+      <label class="form-label" style="min-width:70px;">数值</label>
+      <input class="form-input" type="number" id="adjustAmount" value="10" min="1" max="99999" style="width:140px;">
+      <span style="font-size:13px;color:var(--text-tertiary);">积分</span>
+    </div>
+    <div class="form-row">
+      <label class="form-label" style="min-width:70px;">备注</label>
+      <textarea class="form-textarea" id="adjustRemark" placeholder="填写调整原因（选填）" style="min-height:50px;min-width:260px;"></textarea>
+    </div>
+    <div class="form-row">
+      <label class="form-label" style="min-width:70px;"></label>
+      <button class="btn btn-primary" style="height:36px;padding:0 24px;" onclick="submitCreditAdjust()">确定</button>
+      <button class="btn btn-default" style="height:36px;padding:0 24px;margin-left:8px;" onclick="go('member')">取消</button>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 视图：套餐管理（C端「购买积分」页数据源） ==================== -->
+<section class="view admin-page" id="viewPackage">
+  <div class="page-header">
+    <div class="page-title">套餐管理</div>
+    <div><button class="btn btn-primary" onclick="toast('已打开新增套餐表单')">+ 新增套餐</button></div>
+  </div>
+  <div class="page-body">
+    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6;">
+      管理 C 端「购买积分」页展示的积分套餐。修改后实时生效，C 端下次进入购买页即拉取最新列表。
+    </div>
+    <table class="data-table" style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="background:var(--table-header);">
+          <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">套餐名称</th>
+          <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">积分数</th>
+          <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">售价（元）</th>
+          <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">标签</th>
+          <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">排序</th>
+          <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">状态</th>
+          <th style="padding:10px 12px;text-align:center;font-size:13px;border-bottom:1px solid var(--border);">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--border-light);">
+          <td style="padding:10px 12px;font-size:13px;">入门包</td>
+          <td style="padding:10px 12px;font-size:13px;">30</td>
+          <td style="padding:10px 12px;font-size:13px;">¥3.0</td>
+          <td style="padding:10px 12px;"><span style="font-size:12px;"></span></td>
+          <td style="padding:10px 12px;font-size:13px;">1</td>
+          <td style="padding:10px 12px;"><span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f;">上架</span></td>
+          <td style="padding:10px 12px;text-align:center;">
+            <span class="btn-link" onclick="toast('已打开编辑')">编辑</span>
+            <span style="color:var(--border);margin:0 6px;">|</span>
+            <span class="btn-link" style="color:var(--red);" onclick="toast('已下架')">下架</span>
+          </td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-light);">
+          <td style="padding:10px 12px;font-size:13px;">标准包</td>
+          <td style="padding:10px 12px;font-size:13px;">100</td>
+          <td style="padding:10px 12px;font-size:13px;">¥10.0</td>
+          <td style="padding:10px 12px;"><span style="font-size:12px;background:#fff1f0;color:#ff4d4f;padding:2px 8px;border-radius:4px;border:1px solid #ffa39e;">推荐</span></td>
+          <td style="padding:10px 12px;font-size:13px;">2</td>
+          <td style="padding:10px 12px;"><span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f;">上架</span></td>
+          <td style="padding:10px 12px;text-align:center;">
+            <span class="btn-link" onclick="toast('已打开编辑')">编辑</span>
+            <span style="color:var(--border);margin:0 6px;">|</span>
+            <span class="btn-link" style="color:var(--red);" onclick="toast('已下架')">下架</span>
+          </td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-light);">
+          <td style="padding:10px 12px;font-size:13px;">超值包</td>
+          <td style="padding:10px 12px;font-size:13px;">300</td>
+          <td style="padding:10px 12px;font-size:13px;">¥30.0</td>
+          <td style="padding:10px 12px;"><span style="font-size:12px;background:#fff7e6;color:#faad14;padding:2px 8px;border-radius:4px;border:1px solid #ffd591;">超值</span></td>
+          <td style="padding:10px 12px;font-size:13px;">3</td>
+          <td style="padding:10px 12px;"><span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f;">上架</span></td>
+          <td style="padding:10px 12px;text-align:center;">
+            <span class="btn-link" onclick="toast('已打开编辑')">编辑</span>
+            <span style="color:var(--border);margin:0 6px;">|</span>
+            <span class="btn-link" style="color:var(--red);" onclick="toast('已下架')">下架</span>
+          </td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-light);">
+          <td style="padding:10px 12px;font-size:13px;">企业包</td>
+          <td style="padding:10px 12px;font-size:13px;">1000</td>
+          <td style="padding:10px 12px;font-size:13px;">¥100.0</td>
+          <td style="padding:10px 12px;"><span style="font-size:12px;background:#fff1f0;color:#ff4d4f;padding:2px 8px;border-radius:4px;border:1px solid #ffa39e;">特惠</span></td>
+          <td style="padding:10px 12px;font-size:13px;">4</td>
+          <td style="padding:10px 12px;"><span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f;">上架</span></td>
+          <td style="padding:10px 12px;text-align:center;">
+            <span class="btn-link" onclick="toast('已打开编辑')">编辑</span>
+            <span style="color:var(--border);margin:0 6px;">|</span>
+            <span class="btn-link" style="color:var(--red);" onclick="toast('已下架')">下架</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ==================== 视图：首单优惠配置（跟随套餐，后台可配是否赠送+赠送多少） ==================== -->
+<section class="view admin-page" id="viewFirstOrder">
+  <div class="page-header">
+    <div class="page-title">首单优惠配置</div>
+  </div>
+  <div class="page-body">
+    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:18px;line-height:1.6;">
+      配置新用户首次购买积分时的优惠政策。每个套餐可独立设置是否参与首单优惠及赠送比例。
+    </div>
+
+    <!-- 全局开关 -->
+    <div class="admin-page" style="margin-bottom:20px;">
+      <div style="padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--text);">首单优惠总开关</div>
+          <div style="font-size:12px;color:var(--text-tertiary);margin-top:2px;">关闭后所有新用户首次购买不享受任何赠送</div>
+        </div>
+        <div style="cursor:pointer;width:44px;height:24px;background:var(--primary);border-radius:12px;position:relative;" onclick="toast('已切换')">
+          <div style="position:absolute;right:2px;top:2px;width:20px;height:20px;background:#fff;border-radius:50%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 按套餐配置 -->
+    <div class="admin-page">
+      <div style="padding:14px 18px;border-bottom:1px solid var(--border);">
+        <div style="font-size:14px;font-weight:600;color:var(--text);">按套餐配置赠送规则</div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="background:var(--table-header);">
+            <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">套餐</th>
+            <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">参与首单优惠</th>
+            <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">赠送方式</th>
+            <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">赠送数量</th>
+            <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">C端展示文案</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border-light);">
+            <td style="padding:10px 12px;font-size:13px;">入门包（30 积分）</td>
+            <td style="padding:10px 12px;">
+              <div style="cursor:pointer;width:40px;height:22px;background:var(--primary);border-radius:11px;position:relative;display:inline-block;">
+                <div style="position:absolute;right:2px;top:2px;width:18px;height:18px;background:#fff;border-radius:50%;"></div>
+              </div>
+            </td>
+            <td style="padding:10px 12px;font-size:13px;">等额赠送（买 30 送 30）</td>
+            <td style="padding:10px 12px;font-size:13px;">30 积分</td>
+            <td style="padding:10px 12px;font-size:13px;color:var(--blue-link);">额外赠送 30 积分，实到账 60 积分（仅限一次）</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border-light);">
+            <td style="padding:10px 12px;font-size:13px;">标准包（100 积分）</td>
+            <td style="padding:10px 12px;">
+              <div style="cursor:pointer;width:40px;height:22px;background:var(--primary);border-radius:11px;position:relative;display:inline-block;">
+                <div style="position:absolute;right:2px;top:2px;width:18px;height:18px;background:#fff;border-radius:50%;"></div>
+              </div>
+            </td>
+            <td style="padding:10px 12px;font-size:13px;">等额赠送（买 100 送 100）</td>
+            <td style="padding:10px 12px;font-size:13px;">100 积分</td>
+            <td style="padding:10px 12px;font-size:13px;color:var(--blue-link);">额外赠送 100 积分，实到账 200 积分（仅限一次）</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border-light);">
+            <td style="padding:10px 12px;font-size:13px;">超值包（300 积分）</td>
+            <td style="padding:10px 12px;">
+              <div style="cursor:pointer;width:40px;height:22px;background:var(--primary);border-radius:11px;position:relative;display:inline-block;">
+                <div style="position:absolute;right:2px;top:2px;width:18px;height:18px;background:#fff;border-radius:50%;"></div>
+              </div>
+            </td>
+            <td style="padding:10px 12px;font-size:13px;">等额赠送（买 300 送 300）</td>
+            <td style="padding:10px 12px;font-size:13px;">300 积分</td>
+            <td style="padding:10px 12px;font-size:13px;color:var(--blue-link);">额外赠送 300 积分，实到账 600 积分（仅限一次）</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border-light);">
+            <td style="padding:10px 12px;font-size:13px;">企业包（1000 积分）</td>
+            <td style="padding:10px 12px;">
+              <div style="cursor:pointer;width:40px;height:22px;background:#var(--border);border-radius:11px;position:relative;display:inline-block;">
+                <div style="position:absolute;left:2px;top:2px;width:18px;height:18px;background:#fff;border-radius:50%;"></div>
+              </div>
+            </td>
+            <td style="padding:10px 12px;font-size:13px;color:var(--text-tertiary);">—</td>
+            <td style="padding:10px 12px;font-size:13px;color:var(--text-tertiary);">—</td>
+            <td style="padding:10px 12px;font-size:13px;color:var(--text-tertiary);">该套餐不参与首单优惠</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 说明 -->
+    <div style="margin-top:16px;padding:12px 16px;background:#fffbe6;border:1px solid #ffe58f;border-radius:4px;font-size:12px;color:#ad8b00;line-height:1.8;">
+      <b>配置说明：</b><br>
+      · 首单优惠仅对「从未购买过积分的用户」生效，每人限一次<br>
+      · 赠送积分与付费积分同时到账，用户可在积分明细中看到两条记录<br>
+      · 关闭某套餐的开关后，该套餐仍正常售卖但不触发首单赠送<br>
+      · 修改配置后立即生效，无需发布
+    </div>
+  </div>
+</section>
 
 </div><!-- /main-content -->
-
-
-<!-- ===== 调整积分弹窗 ===== -->
-<div class="modal-overlay" id="creditModal">
-  <div class="modal-box">
-    <div class="modal-head">
-      <h3>调整积分 - <span id="creditUserName">-</span></h3>
-      <div class="modal-close" onclick="closeCreditModal()">&times;</div>
-    </div>
-    <div class="modal-body">
-      <div class="current-balance">
-        <div>
-          <div class="label">当前积分余额</div>
-        </div>
-        <div class="value" id="creditCurrentBalance">0</div>
-      </div>
-      <div class="tab-switch">
-        <div class="tab-switch-item active" onclick="switchCreditTab(this,'gift')">赠送</div>
-        <div class="tab-switch-item" onclick="switchCreditTab(this,'deduct')">扣除</div>
-      </div>
-      <div class="form-row">
-        <label class="form-label" style="min-width:70px;">数值</label>
-        <input class="form-input" type="number" id="creditAmount" value="10" min="1" max="99999" style="width:140px;">
-        <span style="font-size:13px;color:var(--text-tertiary);">积分</span>
-      </div>
-      <div class="form-row">
-        <label class="form-label" style="min-width:70px;">备注</label>
-        <textarea class="form-textarea" id="creditRemark" placeholder="填写调整原因（选填）" style="min-height:50px;min-width:260px;"></textarea>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn btn-default" onclick="closeCreditModal()">取消</button>
-      <button class="btn btn-primary" onclick="submitCreditAdjust()">确定</button>
-    </div>
-  </div>
-</div>
+</main>
 
 <script>
-// ===== 调整积分弹窗逻辑 =====
-function openCreditModal(name, balance) {
-  document.getElementById('creditUserName').textContent = name;
-  document.getElementById('creditCurrentBalance').textContent = balance;
-  document.getElementById('creditModal').classList.add('active');
+// ===== SPA 导航：所有独立视图写在 <main> 内，go(key) 切换 =====
+function go(key) {
+  var target = 'view' + key.charAt(0).toUpperCase() + key.slice(1);
+  var views = document.querySelectorAll('.view');
+  for (var i = 0; i < views.length; i++) views[i].classList.remove('active');
+  var el = document.getElementById(target);
+  if (el) el.classList.add('active');
+  // 侧栏高亮当前页
+  var navs = document.querySelectorAll('.sidebar-item[data-view]');
+  for (var j = 0; j < navs.length; j++) {
+    navs[j].classList.toggle('active', navs[j].getAttribute('data-view') === key);
+  }
+  window.scrollTo(0, 0);
 }
-function closeCreditModal() {
-  document.getElementById('creditModal').classList.remove('active');
+
+// ===== 调整积分独立页逻辑（替代原 Modal） =====
+function openCreditAdjust(name, balance) {
+  go('adjust');
+  document.getElementById('adjustUserName').textContent = name;
+  document.getElementById('adjustCurrentBalance').textContent = balance;
+  document.getElementById('adjustAmount').value = '10';
+  document.getElementById('adjustRemark').value = '';
+  switchAdjustTab(document.getElementById('tabGift'), 'gift');
 }
-let creditMode = 'gift';
-function switchCreditTab(el, mode) {
-  creditMode = mode;
-  el.parentElement.querySelectorAll('.tab-switch-item').forEach(t => t.classList.remove('active'));
+var adjustMode = 'gift';
+function switchAdjustTab(el, mode) {
+  adjustMode = mode;
+  var items = el.parentElement.querySelectorAll('.tab-switch-item');
+  for (var i = 0; i < items.length; i++) items[i].classList.remove('active');
   el.classList.add('active');
 }
 function submitCreditAdjust() {
-  const amount = parseInt(document.getElementById('creditAmount').value) || 0;
-  const remark = document.getElementById('creditRemark').value.trim();
+  var amount = parseInt(document.getElementById('adjustAmount').value, 10) || 0;
+  var remark = document.getElementById('adjustRemark').value.trim();
   if (amount <= 0) { alert('请输入有效数值'); return; }
-  const action = creditMode === 'gift' ? '赠送' : '扣除';
-  closeCreditModal();
+  var action = adjustMode === 'gift' ? '赠送' : '扣除';
   toast('已' + action + ' ' + amount + ' 积分');
+  setTimeout(function () { go('member'); }, 800);
 }
 function toast(msg) {
-  // 简易 toast
-  let t = document.getElementById('_toast');
+  var t = document.getElementById('_toast');
   if (!t) {
     t = document.createElement('div'); t.id = '_toast';
     t.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.75);color:#fff;padding:10px 20px;border-radius:20px;font-size:14px;z-index:9999;';
     document.body.appendChild(t);
   }
   t.textContent = msg; t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', 2000);
+  setTimeout(function () { t.style.display = 'none'; }, 2000);
 }
+
+// 初始进入会员管理
+go('member');
 </script>
 
 </body>
