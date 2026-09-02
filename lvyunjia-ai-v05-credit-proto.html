@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>绿韵家 AI 创作原型 V0.5（积分体系）</title>
+  <title>绿韵家 AI 创作原型 V0.5（灵感值体系）</title>
   <style>
     :root {
       --primary: #4CAF50;
@@ -195,6 +195,14 @@
 
     /* 空状态 */
     .empty-state { text-align: center; padding: 44px 0; color: #999; }
+
+    /* 协议勾选（V0.6 新增：购买前必须勾选购买协议） */
+    .agree-row { display: flex; align-items: flex-start; gap: 8px; margin: 4px 12px 0; cursor: pointer; }
+    .agree-box { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid #ccc; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; }
+    .agree-box.on { background: var(--primary); border-color: var(--primary); }
+    .agree-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+    .agree-link { color: var(--blue); }
+    .gen-btn.disabled { background: #c8e6c9; pointer-events: none; }
   </style>
 </head>
 <body>
@@ -221,42 +229,15 @@
         </div>
       </div>
 
-      <div class="quota-hint">本次剩余 <b id="costPerImageHint">1</b> 个生成额度 · <span class="link" onclick="go('pageQuotaDetail')">查看详情</span></div>
+      <div class="quota-hint">本次剩余 <b id="costPerImageHint">1</b> 个灵感值 · <span class="link" onclick="go('pageQuotaDetail')">查看详情</span></div>
 
       <div class="card">
-        <div class="section-title">辅助提示词</div>
-        <div class="tag-group">
-          <div class="tag-group-title">风格</div>
-          <div class="tag-list">
-            <span class="tag" data-group="style" onclick="toggleTag(this)">写实照片</span>
-            <span class="tag" data-group="style" onclick="toggleTag(this)">动漫插画</span>
-            <span class="tag" data-group="style" onclick="toggleTag(this)">水彩手绘</span>
-            <span class="tag" data-group="style" onclick="toggleTag(this)">蜡笔涂鸦</span>
-            <span class="tag" data-group="style" onclick="toggleTag(this)">国风山水</span>
-          </div>
-        </div>
-        <div class="tag-group">
-          <div class="tag-group-title">场景</div>
-          <div class="tag-list">
-            <span class="tag" data-group="scene" onclick="toggleTag(this)">室内居家</span>
-            <span class="tag" data-group="scene" onclick="toggleTag(this)">城市街景</span>
-            <span class="tag" data-group="scene" onclick="toggleTag(this)">自然风光</span>
-            <span class="tag" data-group="scene" onclick="toggleTag(this)">梦幻星空</span>
-          </div>
-        </div>
-        <div class="tag-group">
-          <div class="tag-group-title">光线 / 氛围</div>
-          <div class="tag-list">
-            <span class="tag" data-group="light" onclick="toggleTag(this)">柔光</span>
-            <span class="tag" data-group="light" onclick="toggleTag(this)">逆光</span>
-            <span class="tag" data-group="light" onclick="toggleTag(this)">暖色调</span>
-            <span class="tag" data-group="light" onclick="toggleTag(this)">电影感</span>
-          </div>
-        </div>
+        <div class="section-title">辅助提示词 <span class="more" style="font-size:12px;color:var(--text-tertiary);">由后台配置</span></div>
+        <div id="promptConfigBox"></div>
       </div>
     </div>
     <div class="bottom-bar">
-      <div class="cost">预计消耗 <b id="costPerImageBottom">1</b> 积分 · <span style="color:var(--blue);cursor:pointer;font-weight:400;" onclick="go('pageHistory')">查看我的作品 ›</span></div>
+      <div class="cost">预计消耗 <b id="costPerImageBottom">1</b> 灵感值 · <span style="color:var(--blue);cursor:pointer;font-weight:400;" onclick="go('pageHistory')">查看我的作品 ›</span></div>
       <div class="gen-btn" onclick="generate('image')">立即生成</div>
     </div>
   </div>
@@ -294,7 +275,7 @@
     <div class="nav-bar">
       <div class="back" onclick="goBack()">‹</div>
       <div>我的作品</div>
-      <div></div>
+      <div class="right" onclick="go('pageMaterial')">素材库</div>
     </div>
     <div class="scroll-view">
       <div class="create-cta" onclick="go('pageImageGen')">
@@ -318,17 +299,17 @@
         <div style="font-size:36px;flex-shrink:0;">🎁</div>
         <div style="flex:1;min-width:0;">
           <div style="font-size:15px;font-weight:600;color:#B0780C;margin-bottom:2px;">新人首单 · 买 100 送 100</div>
-          <div style="font-size:12px;color:#A07808;line-height:1.5;">首次购买积分，实付多少送多少，仅限一次</div>
+          <div style="font-size:12px;color:#A07808;line-height:1.5;">首次购买灵感值，实付多少送多少，仅限一次</div>
         </div>
         <div class="gen-btn" style="flex-shrink:0;padding:0 16px;font-size:13px;background:var(--primary);color:#fff;" onclick="go('pageQuotaBuy')">立即充值</div>
       </div>
 
       <div class="card">
-        <div class="section-title">积分账户</div>
+        <div class="section-title">灵感值账户</div>
         <div style="display:flex;justify-content:space-around;text-align:center;">
           <div>
             <div style="font-size:26px;font-weight:700;color:var(--text);" class="js-quota">12</div>
-            <div style="font-size:12px;color:var(--text-tertiary);">剩余积分</div>
+            <div style="font-size:12px;color:var(--text-tertiary);">剩余灵感值</div>
           </div>
           <div>
             <div style="font-size:26px;font-weight:700;color:var(--text);">36</div>
@@ -340,8 +321,8 @@
           </div>
         </div>
         <div style="display:flex;gap:10px;margin-top:14px;">
-          <div class="db primary" style="flex:1;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:var(--primary);color:#fff;font-size:14px;cursor:pointer;" onclick="go('pageQuotaBuy')">购买积分</div>
-          <div class="db secondary" style="flex:1;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:#f5f5f5;color:var(--text);font-size:14px;cursor:pointer;" onclick="go('pageQuotaDetail')">积分明细</div>
+          <div class="db primary" style="flex:1;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:var(--primary);color:#fff;font-size:14px;cursor:pointer;" onclick="go('pageQuotaBuy')">购买灵感值</div>
+          <div class="db secondary" style="flex:1;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:#f5f5f5;color:var(--text);font-size:14px;cursor:pointer;" onclick="go('pageQuotaDetail')">灵感值明细</div>
         </div>
       </div>
 
@@ -374,15 +355,15 @@
     </div>
   </div>
 
-  <!-- ================== 购买积分页 ================== -->
+  <!-- ================== 购买灵感值页 ================== -->
   <div class="page has-nav has-bottom" id="pageQuotaBuy">
     <div class="nav-bar">
       <div class="back" onclick="goBack()">‹</div>
-      <div>购买积分</div>
+      <div>购买灵感值</div>
     </div>
     <div class="scroll-view">
       <div class="card" style="text-align:center;background:linear-gradient(135deg,#E8F5E9,#fff);">
-        <div style="font-size:13px;color:var(--text-tertiary);">当前剩余积分</div>
+        <div style="font-size:13px;color:var(--text-tertiary);">当前剩余灵感值</div>
         <div style="font-size:40px;font-weight:700;color:var(--primary);margin:4px 0;" class="js-quota">12</div>
       </div>
 
@@ -390,10 +371,18 @@
         <div class="section-title">选择套餐</div>
         <div id="quotaPackList"></div>
       </div>
+
+      <label class="agree-row" id="agreeRow" onclick="toggleAgree()">
+        <span class="agree-box" id="agreeBox"><span class="agree-check">✓</span></span>
+        <span class="agree-text">我已阅读并同意
+          <span class="agree-link" onclick="event.stopPropagation();viewAgreement()">《绿韵家 AI 灵感值购买协议》</span>
+        </span>
+      </label>
+      <div style="font-size:12px;color:var(--text-tertiary);margin:0 12px 4px;line-height:1.5;">灵感值一经购买到账不支持退款，请确认后购买。</div>
     </div>
     <div class="bottom-bar">
       <div class="cost">合计 <b id="quotaBuyPrice">¥29.9</b></div>
-      <div class="gen-btn" onclick="openOrder()">立即购买</div>
+      <div class="gen-btn disabled" id="buyBtn" onclick="onBuyClick()">立即购买</div>
     </div>
   </div>
 
@@ -408,15 +397,15 @@
         <div class="section-title">商品信息</div>
         <div style="display:flex;justify-content:space-between;padding:8px 0;">
           <span style="color:var(--text-secondary);font-size:14px;">商品</span>
-          <span style="font-size:14px;font-weight:600;" id="orderPackName">100 积分</span>
+          <span style="font-size:14px;font-weight:600;" id="orderPackName">100 灵感值</span>
         </div>
         <div style="display:flex;justify-content:space-between;padding:8px 0;">
           <span style="color:var(--text-secondary);font-size:14px;">单价</span>
-          <span style="font-size:14px;" id="orderUnitPrice">¥0.10/积分</span>
+          <span style="font-size:14px;" id="orderUnitPrice">¥0.10/灵感值</span>
         </div>
         <div style="display:flex;justify-content:space-between;padding:8px 0;">
           <span style="color:var(--text-secondary);font-size:14px;">数量</span>
-          <span style="font-size:14px;" id="orderQty">100 积分</span>
+          <span style="font-size:14px;" id="orderQty">100 灵感值</span>
         </div>
         <div style="display:flex;justify-content:space-between;padding:10px 0 0;border-top:1px solid var(--border-light);margin-top:4px;">
           <span style="color:var(--text-secondary);font-size:14px;">应付金额</span>
@@ -426,45 +415,33 @@
 
       <div class="card" id="orderBonus" style="background:linear-gradient(135deg,#FFF7E6,#FFE7BA);">
         <div style="font-size:14px;font-weight:600;color:#B0780C;margin-bottom:4px;">🎁 新人首单优惠</div>
-        <div style="font-size:13px;color:#A07808;line-height:1.5;" id="orderBonusText">额外赠送 100 积分，实到账 200 积分（仅限一次）</div>
+        <div style="font-size:13px;color:#A07808;line-height:1.5;" id="orderBonusText">额外赠送 100 灵感值，实到账 200 灵感值（仅限一次）</div>
       </div>
 
-      <div class="card">
-        <div class="section-title">支付方式</div>
-        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;">
-          <div style="width:18px;height:18px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;">✓</div>
-          <span style="font-size:14px;flex:1;">绿韵钱包（余额 ¥0.00）</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--text-tertiary);">
-          <div style="width:18px;height:18px;border-radius:50%;border:2px solid #ddd;"></div>
-          <span style="font-size:14px;flex:1;">微信支付</span>
-        </div>
-      </div>
-
-      <div style="margin:4px 12px 12px;font-size:12px;color:var(--red);line-height:1.5;">
-        ⚠️ 积分一经购买到账，不支持退款，请确认后提交订单。
+      <div style="margin:4px 12px 12px;font-size:12px;color:var(--text-tertiary);line-height:1.5;">
+        提交后将跳转绿韵家收银台选择支付方式并完成支付（沿用现有下单 / 支付流程，支付方式不在此页展示）。
       </div>
     </div>
     <div class="bottom-bar">
       <div class="cost">应付 <b id="orderPayBtnText">¥10.0</b></div>
-      <div class="gen-btn" onclick="completePurchase()">提交订单</div>
+      <div class="gen-btn" onclick="completePurchase()">去收银台</div>
     </div>
   </div>
 
-  <!-- ================== 积分明细页 ================== -->
+  <!-- ================== 灵感值明细页 ================== -->
   <div class="page has-nav" id="pageQuotaDetail">
     <div class="nav-bar">
       <div class="back" onclick="goBack()">‹</div>
-      <div>积分明细</div>
+      <div>灵感值明细</div>
       <div></div>
     </div>
     <div class="scroll-view" style="top:44px;">
       <div class="card" style="margin-top:12px;">
-        <div class="section-title">积分账户</div>
+        <div class="section-title">灵感值账户</div>
         <div style="display:flex;justify-content:space-around;text-align:center;">
           <div>
             <div style="font-size:24px;font-weight:700;color:var(--primary);" class="js-quota">12</div>
-            <div style="font-size:12px;color:var(--text-tertiary);">剩余积分</div>
+            <div style="font-size:12px;color:var(--text-tertiary);">剩余灵感值</div>
           </div>
           <div>
             <div style="font-size:24px;font-weight:700;color:var(--text);">36</div>
@@ -476,7 +453,7 @@
           </div>
         </div>
         <div style="margin-top:14px;">
-          <div style="width:100%;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:var(--primary);color:#fff;font-size:15px;font-weight:600;cursor:pointer;" onclick="go('pageQuotaBuy')">获取更多积分 ›</div>
+          <div style="width:100%;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:var(--primary);color:#fff;font-size:15px;font-weight:600;cursor:pointer;" onclick="go('pageQuotaBuy')">获取更多灵感值 ›</div>
         </div>
       </div>
 
@@ -491,7 +468,7 @@
         <div class="history-item" data-type="consume">
           <div class="h-thumb" style="background:#FFEBEE;">🎨</div>
           <div class="h-info">
-            <div class="h-prompt">生成图片 · 消耗 1 积分</div>
+            <div class="h-prompt">生成图片 · 消耗 1 灵感值</div>
             <div class="h-meta">2026-08-18 14:32 · 操作后余额 11</div>
           </div>
           <div style="font-size:15px;font-weight:700;color:var(--red);align-self:center;">-1</div>
@@ -499,7 +476,7 @@
         <div class="history-item" data-type="consume">
           <div class="h-thumb" style="background:#FFEBEE;">▶️</div>
           <div class="h-info">
-            <div class="h-prompt">生成视频 · 消耗 1 积分</div>
+            <div class="h-prompt">生成视频 · 消耗 1 灵感值</div>
             <div class="h-meta">2026-08-18 12:10 · 操作后余额 10</div>
           </div>
           <div style="font-size:15px;font-weight:700;color:var(--red);align-self:center;">-1</div>
@@ -507,7 +484,7 @@
         <div class="history-item" data-type="recharge">
           <div class="h-thumb" style="background:#E8F5E9;">💰</div>
           <div class="h-info">
-            <div class="h-prompt">购买 30 次套餐 · 到账 30 积分</div>
+            <div class="h-prompt">购买 30 次套餐 · 到账 30 灵感值</div>
             <div class="h-meta">2026-08-17 10:00 · 操作后余额 60</div>
           </div>
           <div style="font-size:15px;font-weight:700;color:var(--primary);align-self:center;">+30</div>
@@ -515,7 +492,7 @@
         <div class="history-item" data-type="gift">
           <div class="h-thumb" style="background:#FFF3E0;">🎁</div>
           <div class="h-info">
-            <div class="h-prompt">新用户赠送 · 到账 3 积分</div>
+            <div class="h-prompt">新用户赠送 · 到账 3 灵感值</div>
             <div class="h-meta">2026-08-15 09:00 · 操作后余额 13</div>
           </div>
           <div style="font-size:15px;font-weight:700;color:var(--orange);align-self:center;">+3</div>
@@ -523,7 +500,7 @@
         <div class="history-item" data-type="consume">
           <div class="h-thumb" style="background:#FFEBEE;">🎨</div>
           <div class="h-info">
-            <div class="h-prompt">生成图片 · 消耗 1 积分</div>
+            <div class="h-prompt">生成图片 · 消耗 1 灵感值</div>
             <div class="h-meta">2026-08-10 16:20 · 操作后余额 10</div>
           </div>
           <div style="font-size:15px;font-weight:700;color:var(--red);align-self:center;">-1</div>
@@ -531,7 +508,7 @@
         <div class="history-item" data-type="recharge">
           <div class="h-thumb" style="background:#E8F5E9;">💰</div>
           <div class="h-info">
-            <div class="h-prompt">购买 10 次套餐 · 到账 10 积分</div>
+            <div class="h-prompt">购买 10 次套餐 · 到账 10 灵感值</div>
             <div class="h-meta">2026-08-08 20:15 · 操作后余额 11</div>
           </div>
           <div style="font-size:15px;font-weight:700;color:var(--primary);align-self:center;">+10</div>
@@ -539,6 +516,22 @@
       </div>
 
       <div style="text-align:center;font-size:12px;color:var(--text-tertiary);padding:20px 0 30px;">— 已显示全部记录 —</div>
+    </div>
+  </div>
+
+  <!-- ================== 素材库（V0.6 新增：分类 Tab 筛选） ================== -->
+  <div class="page has-nav" id="pageMaterial">
+    <div class="nav-bar">
+      <div class="back" onclick="goBack()">‹</div>
+      <div>素材库</div>
+      <div></div>
+    </div>
+    <div class="scroll-view">
+      <div class="square-tabs" style="position:sticky;top:0;" id="materialTabs"></div>
+      <div id="materialEmptyHint" style="margin:12px;padding:14px 16px;background:#FFF3E0;border-radius:12px;font-size:13px;color:#A07808;line-height:1.6;">
+        栏目分类由运营在后台「素材栏目管理」配置，配置后此处自动展示对应 Tab。当前展示全部素材。
+      </div>
+      <div class="history-list" id="materialList" style="padding:0 12px;"></div>
     </div>
   </div>
 
@@ -569,17 +562,36 @@
     </div>
   </div>
 
-  <!-- ================== 积分不足弹窗（V0.4 原名：额度不足弹窗） ================== -->
+  <!-- ================== 灵感值不足弹窗（V0.4 原名：额度不足弹窗） ================== -->
   <div class="modal" id="modalQuota">
     <div class="modal-backdrop" data-modal="modalQuota"></div>
     <div class="modal-panel" style="border-radius:20px;padding:24px;text-align:center;">
       <div style="font-size:48px;margin-bottom:12px;">⚡</div>
-      <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;">积分不足</div>
-      <div style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;">本次生成需要 <b id="costPerImageModal">1</b> 个积分，你的剩余积分为 0</div>
+      <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;">灵感值不足</div>
+      <div style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;">本次生成需要 <b id="costPerImageModal">1</b> 个灵感值，你的剩余灵感值为 0</div>
       <div style="display:flex;gap:12px;">
         <div style="flex:1;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;background:#f5f5f5;color:var(--text);font-size:15px;cursor:pointer;" onclick="closeModal()">取消</div>
-        <div style="flex:1;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;background:var(--primary);color:#fff;font-size:15px;cursor:pointer;" onclick="closeModal();go('pageQuotaBuy')">购买积分</div>
+        <div style="flex:1;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;background:var(--primary);color:#fff;font-size:15px;cursor:pointer;" onclick="closeModal();go('pageQuotaBuy')">购买灵感值</div>
       </div>
+    </div>
+  </div>
+
+  <!-- ================== 购买协议查看弹窗（V0.6 新增） ================== -->
+  <div class="modal" id="modalAgreement">
+    <div class="modal-backdrop" data-modal="modalAgreement"></div>
+    <div class="modal-panel" style="border-radius:20px;padding:20px;">
+      <div class="modal-head">
+        <div class="modal-title">绿韵家 AI 灵感值购买协议</div>
+        <div class="modal-close" data-modal="modalAgreement">×</div>
+      </div>
+      <div style="font-size:13px;color:var(--text-secondary);line-height:1.8;max-height:50vh;overflow-y:auto;">
+        <p style="margin:0 0 8px;"><b>1. 标的</b>：本协议项下「AI 灵感值」为绿韵家 App 内用于 AI 生图 / 生视频等 AI 工具消耗的虚拟权益，非法定货币，不可提现、不可转让。</p>
+        <p style="margin:0 0 8px;"><b>2. 购买与到账</b>：用户支付成功后，灵感值实时到账；新人首单按活动规则额外赠送。</p>
+        <p style="margin:0 0 8px;color:var(--red);"><b>3. 不支持退款</b>：灵感值一经购买到账，除法律法规另有规定外，不支持任何理由的退款、退换。请购买前确认所需数量。</p>
+        <p style="margin:0 0 8px;"><b>4. 有效期与消耗</b>：灵感值长期有效（活动另有说明的除外），生图 / 生视频按后台配置消耗对应数量。</p>
+        <p style="margin:0;color:var(--text-tertiary);">完整协议条款以法务确认版为准（详见《绿韵家 AI 灵感值购买协议》正式文档）。</p>
+      </div>
+      <div style="margin-top:16px;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;background:var(--primary);color:#fff;font-size:15px;cursor:pointer;" onclick="closeModal()">我已知悉</div>
     </div>
   </div>
 
@@ -595,9 +607,9 @@
       quotaPack: 'p100'
     };
 
-    // V0.5：套餐按「积分」卖，价格 = 积分 × 后台定价（price_per_credit）
-    // 套餐只定义积分数，不绑固定价格；运营改定价即全站生效
-    const PRICE_PER_CREDIT = 0.10;  // 后台「积分定价管理」配置：1 积分 = ¥0.10（可调）
+    // V0.5：套餐按「灵感值」卖，价格 = 灵感值 × 后台定价（price_per_credit）
+    // 套餐只定义灵感值数，不绑固定价格；运营改定价即全站生效
+    const PRICE_PER_CREDIT = 0.10;  // 后台「灵感值定价管理」配置：1 灵感值 = ¥0.10（可调）
     const quotaPacks = [
       { id: 'p30',  credits: 30,   tag: '' },
       { id: 'p100', credits: 100,  tag: '推荐' },
@@ -610,7 +622,7 @@
 
     // ===== V0.5：后台「生图成本配置」（§4.9）模拟 =====
     // 真实实现由后端下发：取 ai_image_cost_config 表 valid_from <= 当前时刻 的最新一条 cost_per_image
-    const COST_PER_IMAGE = 1;   // 后台配置：每张图消耗 N 积分（运营可调，改这里即全站生效）
+    const COST_PER_IMAGE = 1;   // 后台配置：每张图消耗 N 灵感值（运营可调，改这里即全站生效）
 
     let pageStack = ['pageHistory'];
 
@@ -715,7 +727,7 @@
         // 写入我的作品
         state.history.unshift({ id: Date.now(), thumb: '🖼️', prompt: state.image.prompt || '我的 AI 作品', type: '生图', ratio: state.image.ratio, time: '刚刚' });
         renderHistory();
-        toast(`生成成功，已消耗 ${cost} 个积分`);
+        toast(`生成成功，已消耗 ${cost} 个灵感值`);
       }, 2500);
     }
 
@@ -756,12 +768,12 @@
         const active = p.id === state.quotaPack ? 'active' : '';
         const price = (p.credits * PRICE_PER_CREDIT).toFixed(1);
         const tagHtml = p.tag ? `<span class="m-tag" style="margin-left:6px;">${p.tag}</span>` : '';
-        const bonusHtml = isFirstPurchase ? `<div style="font-size:11px;color:var(--primary);margin-top:2px;">首单再送 ${p.credits} 积分</div>` : '';
+        const bonusHtml = isFirstPurchase ? `<div style="font-size:11px;color:var(--primary);margin-top:2px;">首单再送 ${p.credits} 灵感值</div>` : '';
         list.innerHTML += `
           <div class="model-item ${active}" onclick="selectQuotaPack(this,'${p.id}')">
             <div style="flex:1;">
-              <div class="m-name">${p.credits} 积分${tagHtml}</div>
-              <div class="m-desc">¥${PRICE_PER_CREDIT.toFixed(2)}/积分</div>
+              <div class="m-name">${p.credits} 灵感值${tagHtml}</div>
+              <div class="m-desc">¥${PRICE_PER_CREDIT.toFixed(2)}/灵感值</div>
               ${bonusHtml}
             </div>
             <div style="font-size:18px;font-weight:700;color:var(--text);">¥${price}</div>
@@ -782,23 +794,23 @@
     function openOrder() {
       const pack = quotaPacks.find(p => p.id === state.quotaPack);
       const price = (pack.credits * PRICE_PER_CREDIT).toFixed(1);
-      document.getElementById('orderPackName').textContent = pack.credits + ' 积分';
-      document.getElementById('orderUnitPrice').textContent = '¥' + PRICE_PER_CREDIT.toFixed(2) + '/积分';
-      document.getElementById('orderQty').textContent = pack.credits + ' 积分';
+      document.getElementById('orderPackName').textContent = pack.credits + ' 灵感值';
+      document.getElementById('orderUnitPrice').textContent = '¥' + PRICE_PER_CREDIT.toFixed(2) + '/灵感值';
+      document.getElementById('orderQty').textContent = pack.credits + ' 灵感值';
       document.getElementById('orderPay').textContent = '¥' + price;
       document.getElementById('orderPayBtnText').textContent = '¥' + price;
       const bonusBox = document.getElementById('orderBonus');
       if (isFirstPurchase) {
         bonusBox.style.display = '';
         document.getElementById('orderBonusText').textContent =
-          '额外赠送 ' + pack.credits + ' 积分，实到账 ' + (pack.credits * 2) + ' 积分（仅限一次）';
+          '额外赠送 ' + pack.credits + ' 灵感值，实到账 ' + (pack.credits * 2) + ' 灵感值（仅限一次）';
       } else {
         bonusBox.style.display = 'none';
       }
       go('pageQuotaOrder');
     }
 
-    // 提交订单：i. 累加积分（含首单赠送） ii. 标记首单已用 iii. 刷新余额并返回
+    // 提交订单：i. 累加灵感值（含首单赠送） ii. 标记首单已用 iii. 刷新余额并返回
     function completePurchase() {
       const pack = quotaPacks.find(p => p.id === state.quotaPack);
       const bonus = isFirstPurchase ? pack.credits : 0;
@@ -807,13 +819,30 @@
       const gift = document.getElementById('newcomerGift');
       if (gift) gift.style.display = 'none';
       refreshQuotaDisplay();
-      toast('购买成功，积分已到账');
+      toast('购买成功，灵感值已到账');
       go('pageHistory');
     }
 
-    // 同步所有「剩余积分」展示
+    // 同步所有「剩余灵感值」展示
     function refreshQuotaDisplay() {
       document.querySelectorAll('.js-quota').forEach(el => el.textContent = state.quota);
+    }
+
+    // ===== V0.6：购买协议勾选 + 查看（未勾选不可购买） =====
+    let agreed = false;
+    function toggleAgree() {
+      agreed = !agreed;
+      const box = document.getElementById('agreeBox');
+      const btn = document.getElementById('buyBtn');
+      if (agreed) { box.classList.add('on'); btn.classList.remove('disabled'); }
+      else { box.classList.remove('on'); btn.classList.add('disabled'); }
+    }
+    function viewAgreement() {
+      document.getElementById('modalAgreement').classList.add('active');
+    }
+    function onBuyClick() {
+      if (!agreed) { toast('请先勾选并同意购买协议'); return; }
+      openOrder();
     }
 
     function switchQuotaTab(el, tab) {
@@ -827,7 +856,7 @@
     // 监听输入
     document.getElementById('imgPrompt').addEventListener('input', e => state.image.prompt = e.target.value);
 
-    // 把后台生图成本配置写入 AI 生图页三处提示（顶部 hint / 底部栏 / 积分不足弹窗）
+    // 把后台生图成本配置写入 AI 生图页三处提示（顶部 hint / 底部栏 / 灵感值不足弹窗）
     (function renderCostHints() {
       const hint = document.getElementById('costPerImageHint');
       const bottom = document.getElementById('costPerImageBottom');
@@ -837,10 +866,69 @@
       if (modal) modal.textContent = COST_PER_IMAGE;
     })();
 
+    // ===== V0.6：辅助提示词改为后台下发（运维中心「辅助提示词配置」管理） =====
+    const PROMPT_CONFIG = [
+      { group: 'style', title: '风格', tags: ['写实照片','动漫插画','水彩手绘','蜡笔涂鸦','国风山水'] },
+      { group: 'scene', title: '场景', tags: ['室内居家','城市街景','自然风光','梦幻星空'] },
+      { group: 'light', title: '光线 / 氛围', tags: ['柔光','逆光','暖色调','电影感'] }
+    ];
+    function renderPromptConfig() {
+      const box = document.getElementById('promptConfigBox');
+      if (!box) return;
+      let html = '';
+      PROMPT_CONFIG.forEach(g => {
+        html += '<div class="tag-group"><div class="tag-group-title">' + g.title + '</div><div class="tag-list">';
+        g.tags.forEach(t => { html += '<span class="tag" data-group="' + g.group + '" onclick="toggleTag(this)">' + t + '</span>'; });
+        html += '</div></div>';
+      });
+      box.innerHTML = html;
+    }
+
+    // ===== V0.6：素材库（分类 Tab 由后台「素材栏目管理」下发，运营可配初始为空） =====
+    const MATERIAL_CATEGORIES = [];   // 占位：后台配置后填充，如 ['营销海报','产品素材','活动物料']
+    const MATERIALS = [
+      { name: '秋季促销海报模板 v2', type: 'image', fmt: 'JPG', cat: '' },
+      { name: '新品上市主视觉', type: 'image', fmt: 'PNG', cat: '' },
+      { name: '门店探店短视频', type: 'video', fmt: 'MP4', cat: '' },
+      { name: '产品手册', type: 'doc', fmt: 'PDF', cat: '' }
+    ];
+    function renderMaterialTabs() {
+      const tabs = document.getElementById('materialTabs');
+      if (!tabs) return;
+      let html = '<div class="square-tab active" data-mtab="all" onclick="switchMaterialTab(this,\'all\')">全部</div>';
+      MATERIAL_CATEGORIES.forEach(c => { html += '<div class="square-tab" data-mtab="' + c + '" onclick="switchMaterialTab(this,\'' + c + '\')">' + c + '</div>'; });
+      tabs.innerHTML = html;
+      const hint = document.getElementById('materialEmptyHint');
+      if (hint) hint.style.display = MATERIAL_CATEGORIES.length ? 'none' : '';
+    }
+    function renderMaterials(cat) {
+      const list = document.getElementById('materialList');
+      if (!list) return;
+      const items = (cat && cat !== 'all') ? MATERIALS.filter(m => m.cat === cat) : MATERIALS;
+      const icon = { image: '🖼️', video: '▶️', doc: '📄' };
+      const fmtColor = { JPG: '#4CAF50', PNG: '#2196F3', MP4: '#9C27B0', PDF: '#FF9800' };
+      let html = '';
+      items.forEach(m => {
+        html += '<div class="history-item"><div class="h-thumb" style="background:#f0f0f0;font-size:28px;">' + (icon[m.type] || '📦') + '</div>' +
+          '<div class="h-info"><div class="h-prompt">' + m.name + '</div>' +
+          '<div class="h-meta">格式 <b style="color:' + (fmtColor[m.fmt] || '#666') + ';">' + m.fmt + '</b></div></div>' +
+          '<div style="font-size:13px;color:var(--blue);align-self:center;cursor:pointer;" onclick="toast(\'开始下载：' + m.name + '\')">下载</div></div>';
+      });
+      list.innerHTML = html || '<div style="text-align:center;color:#999;padding:30px 0;font-size:13px;">该栏目下暂无素材</div>';
+    }
+    function switchMaterialTab(el, cat) {
+      document.querySelectorAll('#materialTabs .square-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      renderMaterials(cat);
+    }
+
     bindModalEvents();
     renderQuotaPacks();
     renderHistory();
     refreshQuotaDisplay();
+    renderPromptConfig();
+    renderMaterialTabs();
+    renderMaterials('all');
   </script>
 </div>
 </body>
