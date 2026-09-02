@@ -118,6 +118,15 @@
   .form-textarea { border: 1px solid #d9d9d9; border-radius: 4px; padding: 8px 10px; font-size: 14px; outline: none; min-width: 300px; min-height: 60px; resize: vertical; font-family: inherit; }
   .form-textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(255,77,79,0.1); }
 
+  /* 开关（真实可点，状态由 .on 控制） */
+  .toggle-switch { width: 40px; height: 22px; border-radius: 11px; position: relative; cursor: pointer; background: #d9d9d9; display: inline-block; transition: background .2s; }
+  .toggle-switch.on { background: var(--primary); }
+  .toggle-switch .knob { position: absolute; top: 2px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: left .2s, right .2s; }
+  .toggle-switch.on .knob { right: 2px; left: auto; }
+  .toggle-switch:not(.on) .knob { left: 2px; right: auto; }
+  .toggle-switch.lg { width: 44px; height: 24px; border-radius: 12px; }
+  .toggle-switch.lg .knob { width: 20px; height: 20px; }
+
   /* 历史快照表 */
   .snapshot-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px; }
   .snapshot-table th { background: var(--table-header); padding: 8px 12px; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border); }
@@ -882,60 +891,7 @@
           <th style="padding:10px 12px;text-align:center;font-size:13px;border-bottom:1px solid var(--border);">操作</th>
         </tr>
       </thead>
-      <tbody>
-        <tr style="border-bottom:1px solid var(--border-light);">
-          <td style="padding:10px 12px;font-size:13px;">入门包</td>
-          <td style="padding:10px 12px;font-size:13px;">30</td>
-          <td style="padding:10px 12px;font-size:13px;">¥3.0</td>
-          <td style="padding:10px 12px;"><span style="font-size:12px;"></span></td>
-          <td style="padding:10px 12px;font-size:13px;">1</td>
-          <td style="padding:10px 12px;"><span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f;">上架</span></td>
-          <td style="padding:10px 12px;text-align:center;">
-            <span class="btn-link" onclick="openPackageForm('入门包')">编辑</span>
-            <span style="color:var(--border);margin:0 6px;">|</span>
-            <span class="btn-link" style="color:var(--red);" onclick="toast('已下架')">下架</span>
-          </td>
-        </tr>
-        <tr style="border-bottom:1px solid var(--border-light);">
-          <td style="padding:10px 12px;font-size:13px;">标准包</td>
-          <td style="padding:10px 12px;font-size:13px;">100</td>
-          <td style="padding:10px 12px;font-size:13px;">¥10.0</td>
-          <td style="padding:10px 12px;"><span style="font-size:12px;background:#fff1f0;color:#ff4d4f;padding:2px 8px;border-radius:4px;border:1px solid #ffa39e;">推荐</span></td>
-          <td style="padding:10px 12px;font-size:13px;">2</td>
-          <td style="padding:10px 12px;"><span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f;">上架</span></td>
-          <td style="padding:10px 12px;text-align:center;">
-            <span class="btn-link" onclick="openPackageForm('标准包')">编辑</span>
-            <span style="color:var(--border);margin:0 6px;">|</span>
-            <span class="btn-link" style="color:var(--red);" onclick="toast('已下架')">下架</span>
-          </td>
-        </tr>
-        <tr style="border-bottom:1px solid var(--border-light);">
-          <td style="padding:10px 12px;font-size:13px;">超值包</td>
-          <td style="padding:10px 12px;font-size:13px;">300</td>
-          <td style="padding:10px 12px;font-size:13px;">¥30.0</td>
-          <td style="padding:10px 12px;"><span style="font-size:12px;background:#fff7e6;color:#faad14;padding:2px 8px;border-radius:4px;border:1px solid #ffd591;">超值</span></td>
-          <td style="padding:10px 12px;font-size:13px;">3</td>
-          <td style="padding:10px 12px;"><span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f;">上架</span></td>
-          <td style="padding:10px 12px;text-align:center;">
-            <span class="btn-link" onclick="openPackageForm('超值包')">编辑</span>
-            <span style="color:var(--border);margin:0 6px;">|</span>
-            <span class="btn-link" style="color:var(--red);" onclick="toast('已下架')">下架</span>
-          </td>
-        </tr>
-        <tr style="border-bottom:1px solid var(--border-light);">
-          <td style="padding:10px 12px;font-size:13px;">企业包</td>
-          <td style="padding:10px 12px;font-size:13px;">1000</td>
-          <td style="padding:10px 12px;font-size:13px;">¥100.0</td>
-          <td style="padding:10px 12px;"><span style="font-size:12px;background:#fff1f0;color:#ff4d4f;padding:2px 8px;border-radius:4px;border:1px solid #ffa39e;">特惠</span></td>
-          <td style="padding:10px 12px;font-size:13px;">4</td>
-          <td style="padding:10px 12px;"><span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f;">上架</span></td>
-          <td style="padding:10px 12px;text-align:center;">
-            <span class="btn-link" onclick="openPackageForm('企业包')">编辑</span>
-            <span style="color:var(--border);margin:0 6px;">|</span>
-            <span class="btn-link" style="color:var(--red);" onclick="toast('已下架')">下架</span>
-          </td>
-        </tr>
-      </tbody>
+      <tbody id="packageTbody"></tbody>
     </table>
   </div>
 </section>
@@ -1002,18 +958,18 @@
   </div>
   <div class="page-body">
     <div style="font-size:13px;color:var(--text-secondary);margin-bottom:18px;line-height:1.6;">
-      配置新用户首次购买积分时的优惠政策。每个套餐可独立设置是否参与首单优惠及赠送比例。
+      配置新用户首次购买积分时的优惠政策。每个套餐可独立设置是否参与首单优惠及赠送规则。
     </div>
 
     <!-- 全局开关 -->
     <div class="admin-page" style="margin-bottom:20px;">
-      <div style="padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
+      <div style="padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">
         <div>
           <div style="font-size:14px;font-weight:600;color:var(--text);">首单优惠总开关</div>
           <div style="font-size:12px;color:var(--text-tertiary);margin-top:2px;">关闭后所有新用户首次购买不享受任何赠送</div>
         </div>
-        <div style="cursor:pointer;width:44px;height:24px;background:var(--primary);border-radius:12px;position:relative;" onclick="toast('已切换')">
-          <div style="position:absolute;right:2px;top:2px;width:20px;height:20px;background:#fff;border-radius:50%;"></div>
+        <div class="toggle-switch lg on" id="foGlobalToggle" onclick="toggleGlobalFirstOrder()">
+          <div class="knob"></div>
         </div>
       </div>
     </div>
@@ -1031,64 +987,11 @@
             <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">赠送方式</th>
             <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">赠送数量</th>
             <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">C端展示文案</th>
+            <th style="padding:10px 12px;text-align:center;font-size:13px;border-bottom:1px solid var(--border);">操作</th>
           </tr>
         </thead>
-        <tbody>
-          <tr style="border-bottom:1px solid var(--border-light);">
-            <td style="padding:10px 12px;font-size:13px;">入门包（30 积分）</td>
-            <td style="padding:10px 12px;">
-              <div style="cursor:pointer;width:40px;height:22px;background:var(--primary);border-radius:11px;position:relative;display:inline-block;">
-                <div style="position:absolute;right:2px;top:2px;width:18px;height:18px;background:#fff;border-radius:50%;"></div>
-              </div>
-            </td>
-            <td style="padding:10px 12px;font-size:13px;">等额赠送（买 30 送 30）</td>
-            <td style="padding:10px 12px;font-size:13px;">30 积分</td>
-            <td style="padding:10px 12px;font-size:13px;color:var(--blue-link);">额外赠送 30 积分，实到账 60 积分（仅限一次）</td>
-          </tr>
-          <tr style="border-bottom:1px solid var(--border-light);">
-            <td style="padding:10px 12px;font-size:13px;">标准包（100 积分）</td>
-            <td style="padding:10px 12px;">
-              <div style="cursor:pointer;width:40px;height:22px;background:var(--primary);border-radius:11px;position:relative;display:inline-block;">
-                <div style="position:absolute;right:2px;top:2px;width:18px;height:18px;background:#fff;border-radius:50%;"></div>
-              </div>
-            </td>
-            <td style="padding:10px 12px;font-size:13px;">等额赠送（买 100 送 100）</td>
-            <td style="padding:10px 12px;font-size:13px;">100 积分</td>
-            <td style="padding:10px 12px;font-size:13px;color:var(--blue-link);">额外赠送 100 积分，实到账 200 积分（仅限一次）</td>
-          </tr>
-          <tr style="border-bottom:1px solid var(--border-light);">
-            <td style="padding:10px 12px;font-size:13px;">超值包（300 积分）</td>
-            <td style="padding:10px 12px;">
-              <div style="cursor:pointer;width:40px;height:22px;background:var(--primary);border-radius:11px;position:relative;display:inline-block;">
-                <div style="position:absolute;right:2px;top:2px;width:18px;height:18px;background:#fff;border-radius:50%;"></div>
-              </div>
-            </td>
-            <td style="padding:10px 12px;font-size:13px;">等额赠送（买 300 送 300）</td>
-            <td style="padding:10px 12px;font-size:13px;">300 积分</td>
-            <td style="padding:10px 12px;font-size:13px;color:var(--blue-link);">额外赠送 300 积分，实到账 600 积分（仅限一次）</td>
-          </tr>
-          <tr style="border-bottom:1px solid var(--border-light);">
-            <td style="padding:10px 12px;font-size:13px;">企业包（1000 积分）</td>
-            <td style="padding:10px 12px;">
-              <div style="cursor:pointer;width:40px;height:22px;background:var(--border);border-radius:11px;position:relative;display:inline-block;">
-                <div style="position:absolute;left:2px;top:2px;width:18px;height:18px;background:#fff;border-radius:50%;"></div>
-              </div>
-            </td>
-            <td style="padding:10px 12px;font-size:13px;color:var(--text-tertiary);">—</td>
-            <td style="padding:10px 12px;font-size:13px;color:var(--text-tertiary);">—</td>
-            <td style="padding:10px 12px;font-size:13px;color:var(--text-tertiary);">该套餐不参与首单优惠</td>
-          </tr>
-        </tbody>
+        <tbody id="firstOrderTbody"></tbody>
       </table>
-    </div>
-
-    <!-- 说明 -->
-    <div style="margin-top:16px;padding:12px 16px;background:#fffbe6;border:1px solid #ffe58f;border-radius:4px;font-size:12px;color:#ad8b00;line-height:1.8;">
-      <b>配置说明：</b><br>
-      · 首单优惠仅对「从未购买过积分的用户」生效，每人限一次<br>
-      · 赠送积分与付费积分同时到账，用户可在积分明细中看到两条记录<br>
-      · 关闭某套餐的开关后，该套餐仍正常售卖但不触发首单赠送<br>
-      · 修改配置后立即生效，无需发布
     </div>
   </div>
 </section>
@@ -1110,6 +1013,8 @@ function go(key) {
     navs[j].classList.toggle('active', navs[j].getAttribute('data-view') === key);
   }
   window.scrollTo(0, 0);
+  if (key === 'package') renderPackageTable();
+  if (key === 'firstOrder') renderFirstOrder();
 }
 
 // ===== 调整积分独立页逻辑（替代原 Modal） =====
@@ -1176,6 +1081,7 @@ function openPackageForm(name) {
     document.getElementById('pkgTag').value = '';
     document.getElementById('pkgSort').value = '5';
   }
+  document.getElementById('pkgName').disabled = !!name;
   switchPkgStatus(document.getElementById('pkgStatusOn'), 'on');
   go('packageForm');
 }
@@ -1196,12 +1102,113 @@ function submitPackageForm() {
   var name = document.getElementById('pkgName').value.trim();
   var credits = parseInt(document.getElementById('pkgCredits').value, 10) || 0;
   var price = parseFloat(document.getElementById('pkgPrice').value) || 0;
+  var tag = document.getElementById('pkgTag').value;
+  var sort = parseInt(document.getElementById('pkgSort').value, 10) || 99;
   if (!name) { alert('请填写套餐名称'); return; }
   if (credits <= 0) { alert('积分数须大于 0'); return; }
   if (price <= 0) { alert('售价须大于 0'); return; }
+  // 写回唯一数据源 pkgData（套餐管理 + 首单优惠配置共用，套餐变更自动联动）
+  pkgData[name] = { credits: credits, price: price, tag: tag, sort: sort };
   var action = pkgEditKey ? '已保存套餐' : '已新增套餐';
   toast(action + '「' + name + '」· ' + credits + ' 积分 / ¥' + price.toFixed(1) + ' · ' + (pkgStatus === 'on' ? '上架' : '下架'));
   setTimeout(function () { go('package'); }, 800);
+}
+
+// ===== 套餐表格动态渲染（数据源 pkgData，与首单优惠配置联动） =====
+function renderPackageTable() {
+  var tbody = document.getElementById('packageTbody');
+  if (!tbody) return;
+  var keys = Object.keys(pkgData).sort(function (a, b) { return pkgData[a].sort - pkgData[b].sort; });
+  var tagColors = { '': '', '推荐': 'background:#fff1f0;color:#ff4d4f;border:1px solid #ffa39e;', '超值': 'background:#fff7e6;color:#faad14;border:1px solid #ffd591;', '特惠': 'background:#fff1f0;color:#ff4d4f;border:1px solid #ffa39e;' };
+  var html = '';
+  keys.forEach(function (k) {
+    var d = pkgData[k];
+    var tagHtml = d.tag ? '<span style="font-size:12px;' + tagColors[d.tag] + ';padding:2px 8px;border-radius:4px;">' + d.tag + '</span>' : '<span style="font-size:12px;"></span>';
+    html += '<tr style="border-bottom:1px solid var(--border-light);">' +
+      '<td style="padding:10px 12px;font-size:13px;">' + k + '</td>' +
+      '<td style="padding:10px 12px;font-size:13px;">' + d.credits + '</td>' +
+      '<td style="padding:10px 12px;font-size:13px;">¥' + d.price.toFixed(1) + '</td>' +
+      '<td style="padding:10px 12px;">' + tagHtml + '</td>' +
+      '<td style="padding:10px 12px;font-size:13px;">' + d.sort + '</td>' +
+      '<td style="padding:10px 12px;"><span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f;">上架</span></td>' +
+      '<td style="padding:10px 12px;text-align:center;">' +
+        '<span class="btn-link" onclick="openPackageForm(\'' + k + '\')">编辑</span>' +
+        '<span style="color:var(--border);margin:0 6px;">|</span>' +
+        '<span class="btn-link" style="color:var(--red);" onclick="toast(\'已下架\')">下架</span>' +
+      '</td></tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+// ===== 首单优惠配置（数据源来自 pkgData，套餐变更自动同步） =====
+// method: equal=等额赠送(送=购买积分) / percent=比例赠送(按购买积分X%) / fixed=固定赠送(N积分)
+var firstOrderData = {
+  '入门包': { enabled: true,  method: 'equal',   amount: 0,   copy: '新人首单立赠等额积分' },
+  '标准包': { enabled: true,  method: 'equal',   amount: 0,   copy: '新人首单立赠等额积分' },
+  '超值包': { enabled: true,  method: 'percent', amount: 20,  copy: '新人首单加赠20%' },
+  '企业包': { enabled: false, method: 'fixed',   amount: 200, copy: '企业专享首单赠送' }
+};
+
+function toggleGlobalFirstOrder() {
+  var el = document.getElementById('foGlobalToggle');
+  el.classList.toggle('on');
+  toast('首单优惠总开关已' + (el.classList.contains('on') ? '开启' : '关闭'));
+}
+
+function toggleRowFirstOrder(pkgName) {
+  var d = firstOrderData[pkgName];
+  if (!d) return;
+  d.enabled = !d.enabled;
+  renderFirstOrder();
+}
+
+function onFoMethodChange(pkgName, val) {
+  var d = firstOrderData[pkgName];
+  if (!d) return;
+  d.method = val;
+  renderFirstOrder();
+}
+
+function saveFirstOrderRow(pkgName) {
+  var d = firstOrderData[pkgName];
+  if (!d) return;
+  var amtEl = document.getElementById('foAmount_' + pkgName);
+  var copyEl = document.getElementById('foCopy_' + pkgName);
+  if (d.method === 'equal') {
+    d.amount = 0;
+  } else {
+    d.amount = parseInt(amtEl.value, 10) || 0;
+  }
+  d.copy = copyEl.value.trim() || '新人首单赠送';
+  toast('已保存「' + pkgName + '」首单优惠配置');
+}
+
+function renderFirstOrder() {
+  var tbody = document.getElementById('firstOrderTbody');
+  if (!tbody) return;
+  var keys = Object.keys(pkgData).sort(function (a, b) { return pkgData[a].sort - pkgData[b].sort; });
+  var methodLabel = { equal: '等额赠送', percent: '比例赠送', fixed: '固定赠送' };
+  var html = '';
+  keys.forEach(function (k) {
+    var d = firstOrderData[k] || { enabled: false, method: 'fixed', amount: 0, copy: '新人首单赠送' };
+    var credits = pkgData[k].credits;
+    var toggleCls = d.enabled ? 'toggle-switch lg on' : 'toggle-switch lg';
+    var amountDisabled = d.method === 'equal' ? 'disabled style="background:#f5f5f5;color:#999;"' : '';
+    var amountVal = d.method === 'equal' ? credits : d.amount;
+    var amountHint = d.method === 'equal' ? '（=购买积分' + credits + '）' : (d.method === 'percent' ? '（%）' : '（积分）');
+    var opts = ['equal', 'percent', 'fixed'].map(function (m) {
+      return '<option value="' + m + '"' + (d.method === m ? ' selected' : '') + '>' + methodLabel[m] + '</option>';
+    }).join('');
+    html += '<tr style="border-bottom:1px solid var(--border-light);">' +
+      '<td style="padding:10px 12px;font-size:13px;">' + k + '</td>' +
+      '<td style="padding:10px 12px;"><div class="' + toggleCls + '" onclick="toggleRowFirstOrder(\'' + k + '\')"><div class="knob"></div></div><div style="font-size:11px;color:var(--text-tertiary);margin-top:4px;">' + (d.enabled ? '参与' : '不参与') + '</div></td>' +
+      '<td style="padding:10px 12px;"><select onchange="onFoMethodChange(\'' + k + '\', this.value)" style="padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;">' + opts + '</select></td>' +
+      '<td style="padding:10px 12px;"><input id="foAmount_' + k + '" value="' + amountVal + '" ' + amountDisabled + ' style="width:64px;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;"> <span style="font-size:11px;color:var(--text-tertiary);">' + amountHint + '</span></td>' +
+      '<td style="padding:10px 12px;"><input id="foCopy_' + k + '" value="' + d.copy + '" style="width:160px;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;"></td>' +
+      '<td style="padding:10px 12px;text-align:center;"><span class="btn-link" onclick="saveFirstOrderRow(\'' + k + '\')">保存</span></td>' +
+    '</tr>';
+  });
+  tbody.innerHTML = html;
 }
 
 // 初始进入会员管理
