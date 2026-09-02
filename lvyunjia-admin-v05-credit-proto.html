@@ -864,7 +864,7 @@
 <section class="view admin-page" id="viewPackage">
   <div class="page-header">
     <div class="page-title">套餐管理</div>
-    <div><button class="btn btn-primary" onclick="toast('已打开新增套餐表单')">+ 新增套餐</button></div>
+    <div><button class="btn btn-primary" onclick="openPackageForm(null)">+ 新增套餐</button></div>
   </div>
   <div class="page-body">
     <div style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6;">
@@ -891,7 +891,7 @@
           <td style="padding:10px 12px;font-size:13px;">1</td>
           <td style="padding:10px 12px;"><span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f;">上架</span></td>
           <td style="padding:10px 12px;text-align:center;">
-            <span class="btn-link" onclick="toast('已打开编辑')">编辑</span>
+            <span class="btn-link" onclick="openPackageForm('入门包')">编辑</span>
             <span style="color:var(--border);margin:0 6px;">|</span>
             <span class="btn-link" style="color:var(--red);" onclick="toast('已下架')">下架</span>
           </td>
@@ -904,7 +904,7 @@
           <td style="padding:10px 12px;font-size:13px;">2</td>
           <td style="padding:10px 12px;"><span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f;">上架</span></td>
           <td style="padding:10px 12px;text-align:center;">
-            <span class="btn-link" onclick="toast('已打开编辑')">编辑</span>
+            <span class="btn-link" onclick="openPackageForm('标准包')">编辑</span>
             <span style="color:var(--border);margin:0 6px;">|</span>
             <span class="btn-link" style="color:var(--red);" onclick="toast('已下架')">下架</span>
           </td>
@@ -917,7 +917,7 @@
           <td style="padding:10px 12px;font-size:13px;">3</td>
           <td style="padding:10px 12px;"><span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f;">上架</span></td>
           <td style="padding:10px 12px;text-align:center;">
-            <span class="btn-link" onclick="toast('已打开编辑')">编辑</span>
+            <span class="btn-link" onclick="openPackageForm('超值包')">编辑</span>
             <span style="color:var(--border);margin:0 6px;">|</span>
             <span class="btn-link" style="color:var(--red);" onclick="toast('已下架')">下架</span>
           </td>
@@ -930,13 +930,68 @@
           <td style="padding:10px 12px;font-size:13px;">4</td>
           <td style="padding:10px 12px;"><span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f;">上架</span></td>
           <td style="padding:10px 12px;text-align:center;">
-            <span class="btn-link" onclick="toast('已打开编辑')">编辑</span>
+            <span class="btn-link" onclick="openPackageForm('企业包')">编辑</span>
             <span style="color:var(--border);margin:0 6px;">|</span>
             <span class="btn-link" style="color:var(--red);" onclick="toast('已下架')">下架</span>
           </td>
         </tr>
       </tbody>
     </table>
+  </div>
+</section>
+
+<!-- ==================== 视图：新增 / 编辑套餐（独立页，替代 Modal） ==================== -->
+<section class="view admin-page" id="viewPackageForm">
+  <div class="page-header">
+    <div class="adjust-header">
+      <div class="adjust-back" onclick="go('package')">← 返回套餐列表</div>
+      <div class="page-title" style="margin:0;" id="pkgFormTitle">新增套餐</div>
+    </div>
+  </div>
+  <div class="page-body">
+    <div class="form-row">
+      <label class="form-label">套餐名称</label>
+      <input class="form-input" type="text" id="pkgName" placeholder="如：入门包" style="width:240px;">
+      <span style="font-size:13px;color:var(--red);">*</span>
+    </div>
+    <div class="form-row">
+      <label class="form-label">积分数</label>
+      <input class="form-input" type="number" id="pkgCredits" min="1" max="999999" style="width:240px;" oninput="calcPkgPrice()">
+      <span style="font-size:13px;color:var(--text-secondary);">积分</span>
+      <span style="font-size:13px;color:var(--red);">*</span>
+    </div>
+    <div class="form-row">
+      <label class="form-label">售价</label>
+      <input class="form-input" type="number" id="pkgPrice" min="0" step="0.1" style="width:240px;">
+      <span style="font-size:13px;color:var(--text-secondary);">元</span>
+      <span style="font-size:13px;color:var(--red);">*</span>
+      <span class="btn-link" style="margin-left:4px;" onclick="calcPkgPrice()">按定价重算</span>
+    </div>
+    <div class="form-row">
+      <label class="form-label">标签</label>
+      <select class="filter-select" id="pkgTag" style="width:240px;height:36px;">
+        <option value="">无</option>
+        <option value="推荐">推荐</option>
+        <option value="超值">超值</option>
+        <option value="特惠">特惠</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">排序</label>
+      <input class="form-input" type="number" id="pkgSort" min="1" max="999" value="5" style="width:240px;">
+    </div>
+    <div class="form-row">
+      <label class="form-label">状态</label>
+      <div class="tab-switch">
+        <div class="tab-switch-item active" id="pkgStatusOn" onclick="switchPkgStatus(this,'on')">上架</div>
+        <div class="tab-switch-item" id="pkgStatusOff" onclick="switchPkgStatus(this,'off')">下架</div>
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label"></label>
+      <button class="btn btn-primary" style="height:36px;padding:0 24px;" onclick="submitPackageForm()">确定</button>
+      <button class="btn btn-default" style="height:36px;padding:0 24px;margin-left:8px;" onclick="go('package')">取消</button>
+    </div>
   </div>
 </section>
 
@@ -1015,7 +1070,7 @@
           <tr style="border-bottom:1px solid var(--border-light);">
             <td style="padding:10px 12px;font-size:13px;">企业包（1000 积分）</td>
             <td style="padding:10px 12px;">
-              <div style="cursor:pointer;width:40px;height:22px;background:#var(--border);border-radius:11px;position:relative;display:inline-block;">
+              <div style="cursor:pointer;width:40px;height:22px;background:var(--border);border-radius:11px;position:relative;display:inline-block;">
                 <div style="position:absolute;left:2px;top:2px;width:18px;height:18px;background:#fff;border-radius:50%;"></div>
               </div>
             </td>
@@ -1090,6 +1145,63 @@ function toast(msg) {
   }
   t.textContent = msg; t.style.display = 'block';
   setTimeout(function () { t.style.display = 'none'; }, 2000);
+}
+
+// ===== 套餐表单（独立页，替代 Modal） =====
+// 真实实现由后端下发：取 credit_package 表套餐列表
+var pkgData = {
+  '入门包': { credits: 30,   price: 3.0,   tag: '',     sort: 1 },
+  '标准包': { credits: 100,  price: 10.0,  tag: '推荐', sort: 2 },
+  '超值包': { credits: 300,  price: 30.0,  tag: '超值', sort: 3 },
+  '企业包': { credits: 1000, price: 100.0, tag: '特惠', sort: 4 }
+};
+var pkgEditKey = null;   // null = 新增模式
+var pkgStatus = 'on';
+var PRICE_PER_CREDIT_ADMIN = 0.10;   // 取后台「积分定价管理」当前定价
+
+function openPackageForm(name) {
+  pkgEditKey = name || null;
+  document.getElementById('pkgFormTitle').textContent = name ? ('编辑套餐 - ' + name) : '新增套餐';
+  if (name && pkgData[name]) {
+    var d = pkgData[name];
+    document.getElementById('pkgName').value = name;
+    document.getElementById('pkgCredits').value = d.credits;
+    document.getElementById('pkgPrice').value = d.price;
+    document.getElementById('pkgTag').value = d.tag;
+    document.getElementById('pkgSort').value = d.sort;
+  } else {
+    document.getElementById('pkgName').value = '';
+    document.getElementById('pkgCredits').value = '';
+    document.getElementById('pkgPrice').value = '';
+    document.getElementById('pkgTag').value = '';
+    document.getElementById('pkgSort').value = '5';
+  }
+  switchPkgStatus(document.getElementById('pkgStatusOn'), 'on');
+  go('packageForm');
+}
+
+function calcPkgPrice() {
+  var credits = parseFloat(document.getElementById('pkgCredits').value) || 0;
+  document.getElementById('pkgPrice').value = (credits * PRICE_PER_CREDIT_ADMIN).toFixed(1);
+}
+
+function switchPkgStatus(el, mode) {
+  pkgStatus = mode;
+  var items = el.parentElement.querySelectorAll('.tab-switch-item');
+  for (var i = 0; i < items.length; i++) items[i].classList.remove('active');
+  el.classList.add('active');
+}
+
+function submitPackageForm() {
+  var name = document.getElementById('pkgName').value.trim();
+  var credits = parseInt(document.getElementById('pkgCredits').value, 10) || 0;
+  var price = parseFloat(document.getElementById('pkgPrice').value) || 0;
+  if (!name) { alert('请填写套餐名称'); return; }
+  if (credits <= 0) { alert('积分数须大于 0'); return; }
+  if (price <= 0) { alert('售价须大于 0'); return; }
+  var action = pkgEditKey ? '已保存套餐' : '已新增套餐';
+  toast(action + '「' + name + '」· ' + credits + ' 积分 / ¥' + price.toFixed(1) + ' · ' + (pkgStatus === 'on' ? '上架' : '下架'));
+  setTimeout(function () { go('package'); }, 800);
 }
 
 // 初始进入会员管理
