@@ -146,6 +146,28 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 .buy .footer .left .qty{font-size:11px;color:var(--c-text-3)}
 .buy .footer .btn-confirm{height:40px;padding:0 28px;background:var(--c-red);color:#fff;border-radius:20px;border:none;font-size:14px;font-weight:600;cursor:pointer}
 
+/* ===== 收银台页（按绿韵家真实收银台截图 1:1 复刻） ===== */
+.cashier{background:#fff}
+.cashier .amount-wrap{padding:28px 0 22px;text-align:center;background:#fff}
+.cashier .amount-wrap .timer{font-size:12px;color:var(--c-text-3);margin-bottom:10px}
+.cashier .amount-wrap .timer span{color:var(--c-text-2)}
+.cashier .amount-wrap .money{font-size:38px;font-weight:700;color:#000;line-height:1}
+.cashier .amount-wrap .money .unit{font-size:20px;font-weight:600;margin-right:2px}
+.cashier .pay-hd{padding:16px 14px 10px;font-size:13px;color:var(--c-text-2);background:#fff}
+.cashier .pay-list{margin:0 12px;background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.04);overflow:hidden}
+.cashier .pay-item{display:flex;align-items:center;justify-content:space-between;padding:14px 12px;cursor:pointer;background:#fff}
+.cashier .pay-item + .pay-item{border-top:1px solid var(--c-line-2)}
+.cashier .pay-item .left{display:flex;align-items:center;gap:10px}
+.cashier .pay-item .icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.cashier .pay-item .icon.card{background:#E9F8F1;color:var(--c-primary)}
+.cashier .pay-item .name{font-size:14px;color:var(--c-text);font-weight:500}
+.cashier .pay-item .check{width:22px;height:22px;border-radius:50%;border:1.5px solid #D4D4D4;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;transition:all .15s}
+.cashier .pay-item.active .check{background:var(--c-primary);border-color:var(--c-primary)}
+.cashier .pay-item .sub{font-size:11px;color:var(--c-text-3);margin-left:4px}
+.cashier .pay-footer{position:absolute;left:0;right:0;bottom:0;height:76px;background:#fff;border-top:1px solid var(--c-line);padding:10px 12px 18px}
+.cashier .pay-footer .btn-pay{width:100%;height:48px;background:var(--c-primary);color:#fff;border:none;border-radius:24px;font-size:15px;font-weight:600;cursor:pointer}
+.cashier .pay-footer .btn-pay:active{transform:scale(.99)}
+
 /* ===== 激活码列表 ===== */
 .codes-page .top-tips{padding:12px 14px;background:#FFF8E6;color:#B07B12;font-size:12px;line-height:1.6}
 .codes-page .top-tips strong{color:#8B5E0B}
@@ -333,7 +355,35 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 
     <div class="footer">
       <div class="left">合计：<span class="amt" id="line_amt">¥35</span><span class="qty" id="line_qty">×1 份</span></div>
-      <button class="btn-confirm" id="btn_buy_confirm">确认购买</button>
+      <button class="btn-confirm" id="btn_buy_confirm" onclick="go('p_member_cashier')">确认购买</button>
+    </div>
+  </div>
+
+  <!-- ===== p_member_cashier 收银台 ===== -->
+  <div class="page cashier" id="p_member_cashier">
+    <div class="nav">
+      <div class="back" onclick="go('p_member_buy')">‹</div>
+      收银台
+    </div>
+
+    <div class="amount-wrap">
+      <div class="timer">支付剩余时间 <span id="cashier_timer">27:39</span></div>
+      <div class="money"><span class="unit">¥</span><span id="cashier_amt">35</span></div>
+    </div>
+
+    <div class="pay-hd">选择支付方式</div>
+    <div class="pay-list">
+      <div class="pay-item active" id="pay_bank" onclick="selectPay('bank')">
+        <div class="left">
+          <div class="icon card">💳</div>
+          <div class="name">银行卡支付</div>
+        </div>
+        <div class="check">✓</div>
+      </div>
+    </div>
+
+    <div class="pay-footer">
+      <button class="btn-pay" id="btn_pay_confirm" onclick="doCashierConfirm()">确认支付</button>
     </div>
   </div>
 
@@ -372,6 +422,7 @@ function go(id){
   if(t){t.classList.add('active');t.scrollTop=0;}
   if(id==='p_member_codes') renderCodes();
   if(id==='p_member_buy'){ window._qty = 1; qtyChange(0); }
+  if(id==='p_member_cashier') initCashier();
 }
 function toast(msg){
   var el=document.getElementById('toast');
@@ -397,6 +448,37 @@ function doCopy(btn){
   var code = btn.getAttribute('data-code');
   toast('已复制：'+code);
 }
+// ===== 收银台 =====
+var _cashierTimer = null;
+var _cashierSeconds = 30 * 60;
+function initCashier(){
+  var n = window._qty || 1;
+  document.getElementById('cashier_amt').textContent = fmtMoney(MEMBER_PRICE * n);
+  _cashierSeconds = 30 * 60;
+  updateCashierTimer();
+  clearInterval(_cashierTimer);
+  _cashierTimer = setInterval(updateCashierTimer, 1000);
+}
+function updateCashierTimer(){
+  var el = document.getElementById('cashier_timer');
+  if(!el) return;
+  if(_cashierSeconds <= 0){ el.textContent = '00:00'; clearInterval(_cashierTimer); return; }
+  var m = Math.floor(_cashierSeconds / 60);
+  var s = _cashierSeconds % 60;
+  el.textContent = (m<10?'0'+m:m) + ':' + (s<10?'0'+s:s);
+  _cashierSeconds -= 1;
+}
+function selectPay(type){
+  document.querySelectorAll('.cashier .pay-item').forEach(function(item){ item.classList.remove('active'); });
+  var target = document.getElementById('pay_' + type);
+  if(target) target.classList.add('active');
+}
+function doCashierConfirm(){
+  clearInterval(_cashierTimer);
+  toast('支付成功');
+  setTimeout(function(){ doBuyConfirm(); }, 400);
+}
+
 function doBuyConfirm(){
   var d = new Date();
   var pad=function(n){return n<10?'0'+n:n;};
@@ -455,7 +537,6 @@ function qtyChange(delta){
   document.getElementById('line_qty').textContent = '×' + n + ' 份';
 }
 document.getElementById('fab_buy_more').onclick = function(){ go('p_member_buy'); };
-document.getElementById('btn_buy_confirm').onclick = doBuyConfirm;
 document.getElementById('qty_minus').onclick = function(){ qtyChange(-1); };
 document.getElementById('qty_plus').onclick = function(){ qtyChange(1); };
 qtyChange(0);
