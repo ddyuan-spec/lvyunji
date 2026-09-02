@@ -190,7 +190,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
   </div>
 
   <!-- ===== 主区 ===== -->
-  <div class="content">
+  <main><section id="viewMain" class="view active"><div class="content">
 
     <!-- 订单列表卡片 -->
     <div class="card">
@@ -300,7 +300,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
               </td>
               <td>
                 <div class="op-list">
-                  <span class="op" onclick="goDetail('605893')">查看详情</span>
+                  <span class="op" style="color:var(--text-3);cursor:default" title="订单详情页沿用当前既有模板（不新建独立页）">查看详情</span>
                 </div>
               </td>
             </tr>
@@ -479,7 +479,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
       </div>
     </div>
 
-  </div>
+  </div></section></main>
 </div>
 
 <script>
@@ -503,12 +503,8 @@ document.querySelectorAll('.sub-filters .opt').forEach(function(el){
   });
 });
 
-/* 跳转订单详情（独立页） */
-function goDetail(orderId){
-  // PROTO-STR-001：跳转独立页，不弹 modal
-  // 订单号是纯数字，URL 安全字符，直接拼接
-  window.location.href = 'admin-order-detail.html?id=' + orderId;
-}
+/* 订单详情页沿用当前既有模板，不新建独立页（2026-09-02 用户裁定）
+   列表行「查看详情」按钮保留 UI 但无跳转行为，等待后端联动既有详情页模板 */
 </script>
 </body>
 </html>
