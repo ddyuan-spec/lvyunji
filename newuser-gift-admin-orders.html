@@ -98,6 +98,9 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
 .link:hover{color:var(--link-hover);text-decoration:underline}
 .link.danger{color:var(--primary)}
 .tag{display:inline-block;padding:2px 8px;border-radius:3px;font-size:11px;background:#f0f2f5;color:var(--text-2)}
+.tag.normal{background:#f0f2f5;color:var(--text-2)}
+.tag.member{background:#fff5e6;color:#e6a23c;border:1px solid #f7d68a}
+.tag.exchange{background:#f0f5ff;color:#5b6dd1;border:1px solid #b8c2f0}
 .tag.neworder{background:#fff1f0;color:#f56c6c;border:1px solid #fbc4c1}
 .muted{color:var(--text-3)}
 .amount{color:var(--text);font-weight:500}
@@ -125,6 +128,14 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
 .op-list .op.danger{color:var(--primary)}
 .op-list .op.danger:hover{color:var(--primary-hover)}
 .op-list .dot{color:var(--line-strong);font-size:12px;margin:0 2px}
+
+/* ===== 子导航：订单列表 / 批量发货 / 导出虚拟订单 ===== */
+.sub-nav{display:flex;align-items:center;gap:4px;padding:8px 16px;background:#fafbfc;border-bottom:1px solid var(--line)}
+.sub-tab{padding:5px 14px;font-size:12px;color:var(--text-2);cursor:pointer;border-radius:3px}
+.sub-tab:hover{color:var(--primary)}
+.sub-tab.active{background:var(--primary);color:#fff;font-weight:500}
+.sub-tab .num{color:rgba(255,255,255,.85);font-size:11px;margin-left:2px}
+.sub-tab:not(.active) .num{color:var(--text-3)}
 
 /* ===== 二级筛选区（订单类型筛选） ===== */
 .sub-filters{padding:8px 16px;background:#fafbfc;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;font-size:12px}
@@ -203,16 +214,23 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
         </div>
       </div>
 
-      <!-- Tabs -->
+      <!-- 子导航：订单列表 / 批量发货 / 导出虚拟订单 -->
+      <div class="sub-nav">
+        <a class="sub-tab active">订单列表</a>
+        <a class="sub-tab">批量发货 <span class="num">(589)</span></a>
+        <a class="sub-tab">导出虚拟订单</a>
+      </div>
+
+      <!-- 状态 Tabs（按@image#1） -->
       <div class="tabs">
-        <a class="tab active">全部<span class="num">(1)</span></a>
-        <a class="tab">拼团<span class="num">(0)</span></a>
-        <a class="tab">待发货<span class="num">(587)</span></a>
+        <a class="tab active">全部<span class="num">(152907)</span></a>
+        <a class="tab">拼团中<span class="num">(1)</span></a>
+        <a class="tab">待发货<span class="num">(589)</span></a>
         <a class="tab">即将逾期发货<span class="num">(0)</span></a>
-        <a class="tab">已逾期<span class="num">(207)</span></a>
-        <a class="tab">售后中<span class="num">(1621)</span></a>
-        <a class="tab">已完成<span class="num">(4)</span></a>
-        <a class="tab">已取消<span class="num">(147478)</span></a>
+        <a class="tab">已逾期<span class="num">(2207)</span></a>
+        <a class="tab">备货中<span class="num">(1621)</span></a>
+        <a class="tab">已发货<span class="num">(4)</span></a>
+        <a class="tab">已完成<span class="num">(147478)</span></a>
       </div>
 
       <!-- 主筛选 -->
@@ -233,14 +251,13 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
         </div>
       </div>
 
-      <!-- 二级筛选：订单类型（含新人订单） -->
+      <!-- 二级筛选：订单类型（按用户最新裁定，改为 常规/会员/兑换） -->
       <div class="sub-filters">
         <span class="lbl">订单类型：</span>
-        <span class="opt active" id="opt_all">全部</span>
-        <span class="opt" id="opt_normal">常规订单</span>
-        <span class="opt" id="opt_neworder" style="color:#f56c6c">新人订单 <span class="num">(1)</span></span>
-        <span class="opt" id="opt_group">拼团</span>
-        <span class="opt" id="opt_seckill">秒杀</span>
+        <span class="opt active" id="opt_all">全部<span class="num">(152907)</span></span>
+        <span class="opt" id="opt_normal">常规订单<span class="num">(152901)</span></span>
+        <span class="opt" id="opt_member">会员订单<span class="num">(2)</span></span>
+        <span class="opt" id="opt_exchange">兑换订单<span class="num">(4)</span></span>
       </div>
 
       <!-- 表格 -->
@@ -261,17 +278,19 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
             </tr>
           </thead>
           <tbody id="order_tbody">
-            <!-- 新人订单样例 -->
-            <tr data-type="neworder">
+            <!-- 会员订单样例（用户购买邀请码，2026-09-02 改名：新人订单 → 会员订单） -->
+            <tr data-type="member">
               <td>
                 <a class="link">主订单编号:1260001676152770753<br>子订单编号:605893</a>
               </td>
-              <td><span class="muted">—</span></td>
-              <td><span class="tag neworder">新人订单</span></td>
+              <td>
+                <a class="link">支付单号:C2102609016761527707<br>微信支付单号:4200000262026090112345678</a>
+              </td>
+              <td><span class="tag member">会员订单</span></td>
               <td>下单时间:2026-09-01 15:42</td>
               <td>
-                <div class="amount zero">总金额: ¥49.90</div>
-                <div class="muted">优惠折扣: ¥0</div>
+                <div class="amount">总金额: ¥35.00</div>
+                <div class="muted">优惠折扣: -¥14.90</div>
                 <div class="muted">运费: ¥0</div>
               </td>
               <td>
@@ -285,22 +304,82 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                 <div>手机号: 13801234567</div>
               </td>
               <td>
-                <div>昵称: 王小明</div>
-                <div>手机号: 13801234567</div>
+                <div class="muted">-- 不需要收货地址</div>
                 <div class="muted">--</div>
               </td>
               <td>
                 <div class="goods-cell">
-                  <div class="goods-thumb">📦</div>
+                  <div class="goods-thumb">🎁</div>
                   <div>
-                    <div class="goods-name">新人激活码礼包</div>
+                    <div class="goods-name">新人邀请码礼包</div>
                     <div class="goods-id">3562542485</div>
                   </div>
                 </div>
               </td>
               <td>
                 <div class="op-list">
-                  <span class="op" style="color:var(--text-3);cursor:default" title="订单详情页沿用当前既有模板（不新建独立页）">查看详情</span>
+                  <span class="op">查看详情</span>
+                  <span class="dot">·</span>
+                  <span class="op">生成邀请码</span>
+                  <br>
+                  <span class="op danger">无货退款</span>
+                  <span class="dot">·</span>
+                  <span class="op">备注</span>
+                </div>
+              </td>
+            </tr>
+
+            <!-- 兑换订单样例（用户用邀请码兑换实物，2026-09-02 新增订单类型） -->
+            <tr data-type="exchange">
+              <td>
+                <a class="link">主订单编号:1260001676152771189<br>子订单编号:605911</a>
+              </td>
+              <td>
+                <span class="muted">—</span>
+                <div class="muted" style="font-size:11px">邀请码抵扣</div>
+              </td>
+              <td><span class="tag exchange">兑换订单</span></td>
+              <td>下单时间:2026-09-02 10:18</td>
+              <td>
+                <div class="amount zero">总金额: ¥49.90</div>
+                <div class="muted">邀请码抵扣: -¥49.90</div>
+                <div class="muted">运费: ¥0</div>
+                <div class="amount zero">实付: ¥0.00</div>
+              </td>
+              <td>
+                <div>昵称: 李晓琳</div>
+                <div>昵称ID: <a class="link">8821</a></div>
+                <div>手机号: 13812345678</div>
+              </td>
+              <td>
+                <div class="muted">-- 邀请码支付</div>
+                <div class="muted">--</div>
+              </td>
+              <td>
+                <div>昵称: 李晓琳</div>
+                <div>手机号: 13812345678</div>
+                <div class="muted">湖南省长沙市雨花区</div>
+              </td>
+              <td>
+                <div class="goods-cell">
+                  <div class="goods-thumb">🧴</div>
+                  <div>
+                    <div class="goods-name">惠民补贴套餐包（益齿健套装）</div>
+                    <div class="goods-id">益齿健牙膏 ×1 + Q10 ×1 + 5L水×7</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="op-list">
+                  <span class="op">发货</span>
+                  <span class="dot">·</span>
+                  <span class="op">查看详情</span>
+                  <span class="dot">·</span>
+                  <span class="op">取消订单</span>
+                  <br>
+                  <span class="op danger">无货退款</span>
+                  <span class="dot">·</span>
+                  <span class="op">备注</span>
                 </div>
               </td>
             </tr>
@@ -485,7 +564,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
 <script>
 /* ===== 类型筛选交互 ===== */
 var TYPE_LABELS = {
-  all: '全部', normal: '常规订单', neworder: '新人订单', group: '拼团', seckill: '秒杀'
+  all: '全部', normal: '常规订单', member: '会员订单', exchange: '兑换订单'
 };
 document.querySelectorAll('.sub-filters .opt').forEach(function(el){
   el.addEventListener('click', function(){
