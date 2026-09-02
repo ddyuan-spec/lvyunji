@@ -113,9 +113,11 @@ html,body{height:100%;font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans
     <div class="group"><div class="group-title">数据中心</div><div class="menu-item"><span class="icon"></span>数据中心<span class="arrow">▾</span></div></div>
   </div>
 
-  <div class="content">
+  <main>
+    <section id="viewMain" class="view active">
+    <div class="content">
     <div class="breadcrumb">
-      <a class="back" onclick="goBack()">← 返回邀请码管理</a>
+      <a class="back" href="admin-invite-codes.html">← 返回邀请码管理</a>
       <span class="sep" style="margin-left:12px">/</span>
       <span>店铺</span><span class="sep">/</span><span>商品中心</span><span class="sep">/</span><span>邀请码管理</span><span class="sep">/</span><span class="cur">生成邀请码</span>
     </div>
@@ -149,11 +151,13 @@ html,body{height:100%;font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans
         </div>
       </div>
       <div class="form-foot">
-        <button class="btn" onclick="goBack()">取消</button>
-        <button class="btn btn-primary" onclick="submitGen()">确认生成</button>
+        <a class="btn" href="admin-invite-codes.html">取消</a>
+        <a class="btn btn-primary" href="admin-invite-codes.html">确认生成</a>
       </div>
     </div>
-  </div>
+    </div>
+  </section>
+</main>
 </div>
 
 <script>
@@ -161,13 +165,6 @@ function step(d){
   var el = document.getElementById('gen_count');
   var v = Math.max(1, Math.min(99, (parseInt(el.value,10)||1) + d));
   el.value = v;
-}
-function goBack(){ history.back(); }
-function submitGen(){
-  var n = parseInt(document.getElementById('gen_count').value,10) || 1;
-  var remark = document.getElementById('gen_remark').value.trim();
-  // 原型演示：实际写库逻辑由后端实现；提交后直接跳转到列表页查看
-  window.location.href = 'admin-invite-codes.html?generated=' + n + (remark ? '&remark=' + encodeURI(remark) : '');
 }
 </script>
 </body>
