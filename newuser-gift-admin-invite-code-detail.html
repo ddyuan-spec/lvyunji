@@ -137,10 +137,12 @@ html,body{height:100%;font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans
   </div>
 
   <!-- ===== 主区 ===== -->
-  <div class="content">
+  <main>
+    <section id="viewMain" class="view active">
+    <div class="content">
 
     <div class="breadcrumb">
-      <a class="back" onclick="history.back()">← 返回邀请码管理</a>
+      <a class="back" href="admin-invite-codes.html">← 返回邀请码管理</a>
       <span class="sep" style="margin-left:12px">/</span>
       <span>店铺</span>
       <span class="sep">/</span>
@@ -229,7 +231,7 @@ html,body{height:100%;font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans
         <div class="detail-grid">
           <div class="detail-row">
             <div class="lbl">关联订单编号</div>
-            <div class="val"><a class="link" onclick="goOrder('605893')">605893</a></div>
+            <div class="val"><span title="订单详情页沿用当前既有模板（不新建独立页）">605893</span></div>
           </div>
           <div class="detail-row">
             <div class="lbl">下单状态</div>
@@ -281,14 +283,13 @@ html,body{height:100%;font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans
       </div>
     </div>
 
-  </div>
+    </div>
+  </section>
+</main>
 </div>
 
 <script>
-function goOrder(orderId){
-  // 订单号是纯数字，URL 安全字符，直接拼接；订单详情页沿用当前（PRD 标注）
-  window.location.href = 'admin-order-detail.html?id=' + orderId;
-}
+  /* 关联订单链接沿用当前既有订单详情页，不做独立跳转（2026-09-02 用户裁定） */
 </script>
 </body>
 </html>
