@@ -160,6 +160,7 @@ html,body{height:100%;font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans
 .sku-selector .sku-row .qty{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-2)}
 .sku-selector .sku-row .del{color:var(--text-3);font-size:14px;cursor:pointer;padding:4px 8px}
 .sku-selector .sku-row .del:hover{color:var(--primary)}
+.sku-disabled .btn, .sku-disabled .del, .sku-disabled .stepper .ctrl { pointer-events:none; opacity:0.5; cursor:not-allowed }
 
 /* ===== 视图切换 ===== */
 .view{display:none}
@@ -346,8 +347,8 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
         <div class="card-head">
           <div class="title">商家商品管理</div>
           <div class="actions">
-            <button class="btn btn-sm">取消</button>
-            <button class="btn btn-sm">新增商品</button>
+            <button class="btn btn-sm">查询</button>
+            <button class="btn btn-sm btn-primary" onclick="go('create')">新增商品</button>
             <button class="btn btn-sm">重置</button>
           </div>
         </div>
@@ -380,8 +381,8 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                 <option value="">全部</option>
                 <option value="entity">实体商品</option>
                 <option value="group">团购商品</option>
-                <option value="taoke">淘客</option>
-                <option value="cross">跨店</option>
+                <option value="haitao">海淘</option>
+                <option value="cross">跨境</option>
                 <option value="exchange">兑换券</option>
               </select>
             </div>
@@ -393,15 +394,20 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
               <span class="lbl">运营类型</span>
               <select class="select w-md"><option>全部</option></select>
             </div>
-            <a class="expand-btn">展开 ▾</a>
           </div>
         </div>
 
-        <!-- 二级筛选 -->
+        <!-- 二级筛选（按实物） -->
         <div class="sub-filters">
           <span class="lbl">已选择 0 项</span>
-          <span class="opt">询选项</span>
-          <span style="margin-left:auto" class="link" style="color:var(--primary);cursor:pointer;font-size:12px">批量删除</span>
+          <select class="select w-sm" style="height:24px;font-size:12px">
+            <option>请选选项</option>
+            <option>批量上架</option>
+            <option>批量下架</option>
+            <option>批量改价</option>
+            <option>批量删除</option>
+          </select>
+          <button class="btn btn-sm" style="margin-left:auto">批量删除</button>
         </div>
 
         <!-- 表格 -->
@@ -452,11 +458,11 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                     <span class="dot">·</span>
                     <span class="op">编辑</span>
                     <span class="dot">·</span>
-                    <span class="op">下架</span>
+                    <span class="op">上架</span>
+                    <span class="dot">·</span>
+                    <span class="op">删除</span>
                     <span class="dot">·</span>
                     <span class="op">复制商品</span>
-                    <span class="dot">·</span>
-                    <span class="op">光速加送</span>
                   </div>
                 </td>
               </tr>
@@ -485,14 +491,10 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                   <div class="op-list">
                     <span class="op">查看</span>
                     <span class="dot">·</span>
-                    <span class="op">编辑</span>
-                    <span class="dot">·</span>
                     <span class="op">下架</span>
                     <span class="dot">·</span>
                     <span class="op">复制商品</span>
-                    <span class="dot">·</span>
-                    <span class="op">光速加送</span>
-                  </div>
+                    </div>
                 </td>
               </tr>
               <tr data-type="exchange">
@@ -553,14 +555,10 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                   <div class="op-list">
                     <span class="op">查看</span>
                     <span class="dot">·</span>
-                    <span class="op">编辑</span>
-                    <span class="dot">·</span>
                     <span class="op">下架</span>
                     <span class="dot">·</span>
                     <span class="op">复制商品</span>
-                    <span class="dot">·</span>
-                    <span class="op">光速加送</span>
-                  </div>
+                    </div>
                 </td>
               </tr>
               <tr data-type="entity">
@@ -588,14 +586,10 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                   <div class="op-list">
                     <span class="op">查看</span>
                     <span class="dot">·</span>
-                    <span class="op">编辑</span>
-                    <span class="dot">·</span>
                     <span class="op">下架</span>
                     <span class="dot">·</span>
                     <span class="op">复制商品</span>
-                    <span class="dot">·</span>
-                    <span class="op">光速加送</span>
-                  </div>
+                    </div>
                 </td>
               </tr>
               <tr data-type="entity">
@@ -623,14 +617,10 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                   <div class="op-list">
                     <span class="op">查看</span>
                     <span class="dot">·</span>
-                    <span class="op">编辑</span>
-                    <span class="dot">·</span>
                     <span class="op">下架</span>
                     <span class="dot">·</span>
                     <span class="op">复制商品</span>
-                    <span class="dot">·</span>
-                    <span class="op">光速加送</span>
-                  </div>
+                    </div>
                 </td>
               </tr>
             </tbody>
@@ -672,6 +662,11 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
             <button class="btn btn-sm btn-primary">保存</button>
           </div>
         </div>
+        <!-- 顶部提示：让用户能看到下方的兑换商品 SKU 交互 -->
+        <div style="margin:12px 32px 0;padding:10px 14px;background:#fff8e6;border:1px solid #ffd591;border-radius:4px;color:#874d00;font-size:13px;display:flex;align-items:center;gap:8px">
+          <span style="font-size:16px">👇</span>
+          <span><b>往下滚动到「兑换商品 SKU 设置」</b>，可点 <b>+ 添加一个 SKU</b> → 弹窗里<b>搜 SKU</b>（输入名称/编号过滤）+ <b>多选</b>（点行打勾）+ 确认 → 已选 SKU 渲染到下方列表。</span>
+        </div>
         <div class="form-section">
           <div class="form-grid">
             <div class="lbl">分类</div>
@@ -707,7 +702,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                 <label class="radio primary"><input type="radio" name="otype"> 常规</label>
                 <label class="radio"><input type="radio" name="otype"> 秒杀</label>
                 <label class="radio"><input type="radio" name="otype"> 新人特惠</label>
-                <label class="radio"><input type="radio" name="otype"> 推优补贴</label>
+                <label class="radio primary"><input type="radio" name="otype"> 惠民补贴</label>
                 <label class="radio"><input type="radio" name="otype"> 数字人</label>
                 <label class="radio"><input type="radio" name="otype"> 进阶会员</label>
                 <label class="radio"><input type="radio" name="otype"> 享瘦套餐</label>
@@ -778,9 +773,12 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
       </div>
 
       <!-- ★★ 本次新增：兑换商品 SKU 设置区块 ★★ -->
-      <div class="card" id="sku_card" style="display:none">
+      <div class="card" id="sku_card">
         <div class="card-head">
-          <div class="title">兑换商品 SKU 设置</div>
+          <div class="title" style="display:flex;align-items:center;gap:10px">
+            兑换商品 SKU 设置
+            <span class="chip" id="sku_state_chip" style="background:#f5f5f5;color:#9aa0a6;border:1px solid #e5e7eb;border-radius:3px;padding:1px 8px;font-size:11px">未启用</span>
+          </div>
           <div class="actions">
             <span class="muted" style="font-size:12px" id="sku_count_hint">已选 0 个 SKU</span>
           </div>
@@ -790,9 +788,9 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
             <div id="sku_list" class="sku-list">
               <div class="sku-empty">📦 暂未选择兑换商品 SKU，点击下方按钮添加</div>
             </div>
-            <button class="btn btn-primary" onclick="openSkuPicker()">+ 添加一个 SKU</button>
-            <div style="margin-top:10px;color:var(--text-3);font-size:11px;line-height:1.6">
-              💡 仅"商品类型=兑换券"时显示本区块。可多选现有实体商品 SKU 作为该兑换券可兑换的内容；用户成功买到兑换券后，可凭激活码兑换这些 SKU。
+            <button class="btn btn-primary" id="sku_add_btn" onclick="openSkuPicker()">+ 添加一个 SKU</button>
+            <div style="margin-top:10px;color:var(--text-3);font-size:11px;line-height:1.6" id="sku_hint">
+              💡 该兑换券商品可多选现有实体商品 SKU 作为可兑换的内容；用户成功买到兑换券后，可凭激活码兑换这些 SKU。弹窗支持按名称/编号<b>搜索</b> + <b>多选</b>（点行打勾），确认后下方列表可调整单 SKU 兑换数量 + 单独移除。
             </div>
           </div>
         </div>
@@ -904,7 +902,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
               <div class="img-tip">最多上传9张，单张图片限制在800kb以内，建议尺寸：640 × 640 像素</div>
             </div>
             <div>
-              <div class="lbl" style="justify-content:flex-start;text-align:left;padding-left:0;display:block;margin-bottom:6px">分享图</div>
+              <div class="lbl" style="justify-content:flex-start;text-align:left;padding-left:0;display:block;margin-bottom:6px">商城内图片</div>
               <div class="img-uploader">
                 <div class="ic">+</div>
               </div>
@@ -982,12 +980,20 @@ function step(id, n){
   inp.value = v;
 }
 
-/* ============== 商品类型切换 → SKU 区块显示 ============== */
+/* ============== 商品类型切换 → SKU 区块启用/禁用 ============== */
 (function(){
   var radios = document.querySelectorAll('#type_radios input[name="gtype"]');
+  var card = document.getElementById('sku_card');
+  var chip = document.getElementById('sku_state_chip');
+  var btn  = document.getElementById('sku_add_btn');
   function refreshSkuCard(){
-    var v = document.querySelector('#type_radios input[name="gtype"]:checked').value;
-    document.getElementById('sku_card').style.display = (v === 'exchange') ? '' : 'none';
+    // 兑换商品 SKU 区块永远可交互（不再依赖商品类型）
+    chip.textContent = '可设置';
+    chip.style.cssText = 'background:#f0f9ff;color:#1890ff;border:1px solid #91d5ff;border-radius:3px;padding:1px 8px;font-size:11px';
+    btn.disabled = false;
+    btn.style.opacity = '';
+    card.style.opacity = '';
+    card.classList.remove('sku-disabled');
   }
   radios.forEach(function(r){ r.addEventListener('change', refreshSkuCard); });
   refreshSkuCard();
