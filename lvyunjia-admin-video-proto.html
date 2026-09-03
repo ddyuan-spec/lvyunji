@@ -1,0 +1,1931 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>绿韵家管理系统 · AI工具管理</title>
+<style>
+  :root {
+    --primary: #FF4D4F;
+    --primary-hover: #FF7875;
+    --sidebar-bg: #001529;
+    --sidebar-text: rgba(255,255,255,0.65);
+    --sidebar-active: #fff;
+    --sidebar-width: 200px;
+    --header-height: 50px;
+    --tab-height: 42px;
+    --border: #e8e8e8;
+    --table-header: #fafafa;
+    --text: #333;
+    --text-secondary: #666;
+    --text-tertiary: #999;
+    --blue-link: #1890FF;
+    --green: #52c41a;
+    --orange: #faad14;
+    --red: #FF4D4F;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; background: #f0f2f5; color: var(--text); font-size: 14px; }
+
+  /* ===== 顶部导航 ===== */
+  .top-bar { height: var(--header-height); background: #fff; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: fixed; top: 0; left: 0; right: 0; z-index: 100; }
+  .top-bar .logo { font-size: 16px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .top-bar .logo::before { content: ''; width: 24px; height: 24px; background: linear-gradient(135deg,#FF4D4F,#FF7875); border-radius: 4px; }
+  .top-bar .user-info { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); }
+  .top-bar .avatar { width: 28px; height: 28px; border-radius: 50%; background: #e6f7ff; color: #1890FF; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px; }
+
+  /* ===== Tab 栏（与真实后台截图对齐） ===== */
+  .tab-bar { height: var(--tab-height); background: #fff; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; gap: 4px; position: fixed; top: 50px; left: 0; right: 0; z-index: 99; }
+  .tab-item { padding: 6px 16px; font-size: 13px; color: var(--text-secondary); cursor: default; border-radius: 4px; }
+  .tab-item.active { background: var(--primary); color: #fff; }
+
+  /* ===== 侧栏（与真实后台截图逐字对齐 + V0.5 新增 AI工具管理） ===== */
+  .sidebar { position: fixed; top: 92px; left: 0; bottom: 0; width: var(--sidebar-width); background: var(--sidebar-bg); overflow-y: auto; z-index: 98; }
+  .sidebar-group { margin-bottom: 2px; }
+  .sidebar-label { padding: 10px 16px 6px; font-size: 12px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 1px; }
+  .sidebar-item { display: flex; align-items: center; gap: 8px; padding: 10px 16px; color: var(--sidebar-text); cursor: default; transition: all .15s; font-size: 14px; }
+  .sidebar-item.nav { cursor: pointer; }
+  .sidebar-item.nav:hover { color: #fff; background: rgba(255,255,255,0.06); }
+  .sidebar-item.active { color: #fff; background: var(--primary); }
+  .sidebar-item .icon { width: 16px; text-align: center; font-size: 14px; flex-shrink: 0; }
+  .sidebar-sub { padding-left: 32px; }
+  .sidebar-sub .sidebar-item { padding: 8px 16px; font-size: 13px; }
+
+  /* ===== 主内容区 ===== */
+  .main-content { margin-left: var(--sidebar-width); margin-top: 92px; padding: 20px; min-height: calc(100vh - 92px); }
+
+  /* ===== 页面容器（SPA 独立视图） ===== */
+  .view { display: none; }
+  .view.active { display: block; }
+  .admin-page { background: #fff; border-radius: 4px; margin-bottom: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+  .page-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .page-title { font-size: 16px; font-weight: 700; color: var(--text); }
+  .page-body { padding: 16px 20px; }
+
+  /* ===== 筛选区 ===== */
+  .filter-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .filter-input { height: 32px; border: 1px solid #d9d9d9; border-radius: 4px; padding: 0 10px; font-size: 13px; outline: none; min-width: 140px; }
+  .filter-input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(255,77,79,0.1); }
+  .filter-select { height: 32px; border: 1px solid #d9d9d9; border-radius: 4px; padding: 0 8px; font-size: 13px; outline: none; min-width: 100px; }
+  .btn { height: 32px; padding: 0 16px; border-radius: 4px; font-size: 13px; cursor: pointer; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-hover); }
+  .btn-default { background: #fff; color: var(--text); border: 1px solid #d9d9d9; }
+  .btn-default:hover { color: var(--primary); border-color: var(--primary); }
+  .btn-link { background: transparent; color: var(--blue-link); padding: 0; height: auto; }
+
+  .filter-tabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .filter-tab { padding: 4px 12px; border-radius: 4px; font-size: 13px; cursor: pointer; border: 1px solid var(--border); background: #fff; color: var(--text-secondary); }
+  .filter-tab.active { color: var(--primary); border-color: var(--primary); background: #fff1f0; }
+
+  /* ===== 表格 ===== */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .data-table th { background: var(--table-header); padding: 10px 12px; text-align: left; font-weight: 600; color: var(--text); border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .data-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+  .data-table tr:hover td { background: #fafafa; }
+  .table-img { width: 44px; height: 44px; border-radius: 6px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+
+  /* 操作列链接 */
+  .action-links { display: flex; flex-wrap: wrap; gap: 8px; }
+  .action-link { color: var(--blue-link); cursor: pointer; font-size: 13px; white-space: nowrap; }
+  .action-link:hover { color: #40a9ff; text-decoration: underline; }
+  .action-link.danger { color: var(--red); }
+  .action-link.danger:hover { color: #ff7875; }
+
+  /* 状态徽章 */
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 12px; font-weight: 500; }
+  .badge-success { color: var(--green); background: #f6ffed; border: 1px solid #b7eb8f; }
+  .badge-error { color: var(--red); background: #fff2f0; border: 1px solid #ffccc7; }
+  .badge-warning { color: var(--orange); background: #fffbe6; border: 1px solid #ffe58f; }
+  .badge-default { color: var(--text-secondary); background: #f5f5f5; border: 1px solid #d9d9d9; }
+
+  /* 翻页 */
+  .pagination { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 16px; font-size: 13px; color: var(--text-secondary); }
+  .page-btn { min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid #d9d9d9; border-radius: 4px; cursor: pointer; background: #fff; }
+  .page-btn.active { border-color: var(--primary); color: var(--primary); }
+  .page-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
+  .page-input { width: 48px; height: 32px; text-align: center; border: 1px solid #d9d9d9; border-radius: 4px; }
+
+  /* ===== 配置页面专用 ===== */
+  .config-card { background: #f6ffed; border: 1px solid #b7eb8f; border-radius: 6px; padding: 16px 20px; margin-bottom: 18px; }
+  .config-card .config-label { font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px; }
+  .config-card .config-value { font-size: 22px; font-weight: 700; color: var(--text); }
+  .config-card .config-meta { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+  .form-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .form-label { font-size: 14px; color: var(--text); min-width: 90px; }
+  .form-input { height: 36px; border: 1px solid #d9d9d9; border-radius: 4px; padding: 0 10px; font-size: 14px; outline: none; min-width: 160px; }
+  .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(255,77,79,0.1); }
+  .form-textarea { border: 1px solid #d9d9d9; border-radius: 4px; padding: 8px 10px; font-size: 14px; outline: none; min-width: 300px; min-height: 60px; resize: vertical; font-family: inherit; }
+  .form-textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(255,77,79,0.1); }
+
+  /* 开关（真实可点，状态由 .on 控制） */
+  .toggle-switch { width: 40px; height: 22px; border-radius: 11px; position: relative; cursor: pointer; background: #d9d9d9; display: inline-block; transition: background .2s; }
+  .toggle-switch.on { background: var(--primary); }
+  .toggle-switch .knob { position: absolute; top: 2px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: left .2s, right .2s; }
+  .toggle-switch.on .knob { right: 2px; left: auto; }
+  .toggle-switch:not(.on) .knob { left: 2px; right: auto; }
+  .toggle-switch.lg { width: 44px; height: 24px; border-radius: 12px; }
+  .toggle-switch.lg .knob { width: 20px; height: 20px; }
+
+  /* 历史快照表 */
+  .snapshot-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px; }
+  .snapshot-table th { background: var(--table-header); padding: 8px 12px; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border); }
+  .snapshot-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
+
+  /* 调整灵感值独立页 */
+  .adjust-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .adjust-back { font-size: 14px; color: var(--blue-link); cursor: pointer; display: flex; align-items: center; gap: 4px; }
+  .adjust-back:hover { text-decoration: underline; }
+  .adjust-user-info { display: flex; align-items: center; gap: 12px; }
+  .adjust-avatar { width: 40px; height: 40px; border-radius: 50%; background: #e6f7ff; color: #1890FF; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; }
+  .adjust-balance-card { background: #fff7e6; border: 1px solid #ffd591; border-radius: 6px; padding: 16px 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+  .adjust-balance-card .label { font-size: 13px; color: var(--text-secondary); }
+  .adjust-balance-card .value { font-size: 28px; font-weight: 700; color: var(--primary); }
+  .tab-switch { display: flex; gap: 0; border: 1px solid #d9d9d9; border-radius: 4px; overflow: hidden; margin-bottom: 20px; width: fit-content; }
+  .tab-switch-item { padding: 8px 32px; font-size: 14px; cursor: pointer; background: #f5f5f5; color: var(--text-secondary); border-right: 1px solid #d9d9d9; }
+  .tab-switch-item:last-child { border-right: none; }
+  .tab-switch-item.active { background: #fff; color: var(--primary); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- ===== 顶部导航 ===== -->
+<div class="top-bar">
+  <div class="logo">绿韵家管理系统</div>
+  <div class="user-info"><div class="avatar">袁</div><span>袁中天</span></div>
+</div>
+
+<!-- ===== Tab 栏（与真实后台截图对齐） ===== -->
+<div class="tab-bar">
+  <div class="tab-item">三 ≡</div>
+  <div class="tab-item">店铺</div>
+  <div class="tab-item">营销中心</div>
+  <div class="tab-item">结算中心</div>
+  <div class="tab-item active">会员中心</div>
+  <div class="tab-item">订单管理</div>
+  <div class="tab-item">用户反馈</div>
+</div>
+
+<!-- ===== 侧栏（与真实后台截图逐字对齐 + V0.5 新增 AI工具管理） ===== -->
+<div class="sidebar">
+  <div class="sidebar-group">
+    <div class="sidebar-item"><span class="icon">📊</span>运营台</div>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-item"><span class="icon">📦</span>商品中心</div>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-item"><span class="icon">🏪</span>商家管理</div>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-item"><span class="icon">👥</span>会员中心</div>
+    <div class="sidebar-sub">
+      <div class="sidebar-item nav active" data-view="member" onclick="go('member')">会员管理</div>
+    </div>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-item"><span class="icon">💱</span>交易中心</div>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-item"><span class="icon">🔧</span>售后中心</div>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-item"><span class="icon">📈</span>数据中心</div>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-item"><span class="icon">⚙️</span>运营中心</div>
+  </div>
+  <!-- V0.5 新增：AI 工具管理（独立栏目，不混入既有分组） -->
+  <div class="sidebar-group" style="margin-top:8px;border-top:1px solid rgba(255,255,255,0.1);padding-top:8px;">
+    <div class="sidebar-item" style="color:var(--primary);"><span class="icon">🤖</span>AI工具管理</div>
+    <div class="sidebar-sub">
+      <div class="sidebar-item nav" data-view="log" onclick="go('log')">用户生成日志</div>
+      <div class="sidebar-item nav" data-view="init" onclick="go('init')">初始灵感值配置</div>
+      <div class="sidebar-item nav" data-view="pricing" onclick="go('pricing')">灵感值定价管理</div>
+      <div class="sidebar-item nav" data-view="cost" onclick="go('cost')">工具消耗配置</div>
+      <div class="sidebar-item nav" data-view="videoCost" onclick="go('videoCost')">生视频成本配置</div>
+      <div class="sidebar-item nav" data-view="package" onclick="go('package')">套餐管理</div>
+      <div class="sidebar-item nav" data-view="firstOrder" onclick="go('firstOrder')">首单优惠配置</div>
+      <div class="sidebar-item nav" data-view="material" onclick="go('material')">素材管理</div>
+      <div class="sidebar-item nav" data-view="materialCategory" onclick="go('materialCategory')">素材栏目管理</div>
+      <div class="sidebar-item nav" data-view="promptConfig" onclick="go('promptConfig')">辅助提示词配置</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 主内容区（所有独立视图写入 <main>，避免点击跳转空白） ===== -->
+<main id="mainArea">
+<div class="main-content">
+
+<!-- ==================== 视图：会员管理列表 ==================== -->
+<section class="view admin-page active" id="viewMember">
+  <div class="page-header">
+    <div class="page-title">会员管理</div>
+  </div>
+  <div class="page-body">
+    <!-- 筛选标签 -->
+    <div class="filter-tabs">
+      <div class="filter-tab active">全部</div>
+      <div class="filter-tab">灵感值余额 = 0</div>
+      <div class="filter-tab">灵感值余额 &gt; 0</div>
+      <div class="filter-tab">按灵感值排序</div>
+    </div>
+    <!-- 搜索行 -->
+    <div class="filter-row">
+      <input class="filter-input" placeholder="用户账号">
+      <input class="filter-input" placeholder="用户昵称">
+      <select class="filter-select"><option>会员等级</option><option>VIP</option><option>高级会员</option></select>
+      <button class="btn btn-primary">查询</button>
+      <button class="btn btn-default">重置</button>
+    </div>
+    <!-- 表格 -->
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>会员编号</th>
+          <th>会员信息</th>
+          <th>会员等级</th>
+          <th>当前会员等级</th>
+          <th>是否已订购</th>
+          <th>实付金额</th>
+          <th>航行数</th>
+          <th>推荐人</th>
+          <th>灵感值余额</th>
+          <th>注册时间</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>#10001</td>
+          <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:32px;height:32px;border-radius:50%;background:#e6f7ff;display:flex;align-items:center;justify-content:center;font-size:12px;color:#1890FF;">袁</div><div><div style="line-height:1.4;">袁中天</div><div style="font-size:12px;color:#999;">13812341234</div></div></div></td>
+          <td><span class="badge badge-warning">高级会员</span></td>
+          <td>高级会员</td>
+          <td><span class="badge badge-success">已订购</span></td>
+          <td>¥5,280</td>
+          <td>156</td>
+          <td>-</td>
+          <td style="color:var(--primary);font-weight:600;">88</td>
+          <td>2026-03-15</td>
+          <td>
+            <div class="action-links">
+              <span class="action-link" onclick="openCreditAdjust('袁中天',88)">调整灵感值</span>
+              <span class="action-link" onclick="toast('查看 袁中天 的会员详情')">查看详情</span>
+              <span class="action-link" onclick="toast('修改 袁中天 手机号')">修改手机号</span>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>#10002</td>
+          <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:32px;height:32px;border-radius:50%;background:#f6ffed;display:flex;align-items:center;justify-content:center;font-size:12px;color:#52c41a;">张</div><div><div style="line-height:1.4;">张小明</div><div style="font-size:12px;color:#999;">13956789012</div></div></div></td>
+          <td><span class="badge badge-default">普通会员</span></td>
+          <td>普通会员</td>
+          <td><span class="badge badge-default">未订购</span></td>
+          <td>¥0</td>
+          <td>3</td>
+          <td>袁中天</td>
+          <td style="color:var(--red);font-weight:600;">0</td>
+          <td>2026-07-20</td>
+          <td>
+            <div class="action-links">
+              <span class="action-link" onclick="openCreditAdjust('张小明',0)">调整灵感值</span>
+              <span class="action-link" onclick="toast('查看 张小明 的会员详情')">查看详情</span>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>#10003</td>
+          <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:32px;height:32px;border-radius:50%;background:#fff7e6;display:flex;align-items:center;justify-content:center;font-size:12px;color:#faad14;">李</div><div><div style="line-height:1.4;">李四光</div><div style="font-size:12px;color:#999;">13790123456</div></div></div></td>
+          <td><span class="badge badge-success">VIP</span></td>
+          <td>VIP</td>
+          <td><span class="badge badge-success">已订购</span></td>
+          <td>¥12,800</td>
+          <td>342</td>
+          <td>袁中天</td>
+          <td style="color:var(--primary);font-weight:600;">36</td>
+          <td>2025-11-08</td>
+          <td>
+            <div class="action-links">
+              <span class="action-link" onclick="openCreditAdjust('李四光',36)">调整灵感值</span>
+              <span class="action-link" onclick="toast('查看 李四光 的会员详情')">查看详情</span>
+              <span class="action-link" onclick="toast('修改 李四光 推荐人')">修改推荐人</span>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>#10004</td>
+          <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:32px;height:32px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#999;">王</div><div><div style="line-height:1.4;">王小红</div><div style="font-size:12px;color:#999;">13634567890</div></div></div></td>
+          <td><span class="badge badge-default">普通会员</span></td>
+          <td>普通会员</td>
+          <td><span class="badge badge-default">未订购</span></td>
+          <td>¥199</td>
+          <td>8</td>
+          <td>张小明</td>
+          <td style="color:var(--red);font-weight:600;">0</td>
+          <td>2026-08-01</td>
+          <td>
+            <div class="action-links">
+              <span class="action-link" onclick="openCreditAdjust('王小红',0)">调整灵感值</span>
+              <span class="action-link" onclick="toast('查看 王小红 的会员详情')">查看详情</span>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>#10005</td>
+          <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:32px;height:32px;border-radius:50%;background:#fff0f6;display:flex;align-items:center;justify-content:center;font-size:12px;color:#eb2f96;">赵</div><div><div style="line-height:1.4;">赵六六</div><div style="font-size:12px;color:#999;">13578901234</div></div></div></td>
+          <td><span class="badge badge-warning">高级会员</span></td>
+          <td>高级会员</td>
+          <td><span class="badge badge-success">已订购</span></td>
+          <td>¥3,500</td>
+          <td>89</td>
+          <td>李四光</td>
+          <td style="color:var(--primary);font-weight:600;">120</td>
+          <td>2026-02-28</td>
+          <td>
+            <div class="action-links">
+              <span class="action-link" onclick="openCreditAdjust('赵六六',120)">调整灵感值</span>
+              <span class="action-link" onclick="toast('查看 赵六六 的会员详情')">查看详情</span>
+              <span class="action-link" onclick="toast('修改 赵六六 手机号')">修改手机号</span>
+              <span class="action-link danger" onclick="toast('已禁用 赵六六')">禁用</span>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>#10006</td>
+          <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:32px;height:32px;border-radius:50%;background:#e6f7ff;display:flex;align-items:center;justify-content:center;font-size:12px;color:#1890FF;">陈</div><div><div style="line-height:1.4;">陈大文</div><div style="font-size:12px;color:#999;">13423456789</div></div></div></td>
+          <td><span class="badge badge-default">普通会员</span></td>
+          <td>普通会员</td>
+          <td><span class="badge badge-default">未订购</span></td>
+          <td>¥0</td>
+          <td>1</td>
+          <td>-</td>
+          <td style="color:var(--primary);font-weight:600;">12</td>
+          <td>2026-08-25</td>
+          <td>
+            <div class="action-links">
+              <span class="action-link" onclick="openCreditAdjust('陈大文',12)">调整灵感值</span>
+              <span class="action-link" onclick="toast('查看 陈大文 的会员详情')">查看详情</span>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>#10007</td>
+          <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:32px;height:32px;border-radius:50%;background:#f6ffed;display:flex;align-items:center;justify-content:center;font-size:12px;color:#52c41a;">周</div><div><div style="line-height:1.4;">周小周</div><div style="font-size:12px;color:#999;">13367890123</div></div></div></td>
+          <td><span class="badge badge-success">VIP</span></td>
+          <td>VIP</td>
+          <td><span class="badge badge-success">已订购</span></td>
+          <td>¥8,900</td>
+          <td>210</td>
+          <td>赵六六</td>
+          <td style="color:var(--primary);font-weight:600;">256</td>
+          <td>2025-06-18</td>
+          <td>
+            <div class="action-links">
+              <span class="action-link" onclick="openCreditAdjust('周小周',256)">调整灵感值</span>
+              <span class="action-link" onclick="toast('查看 周小周 的会员详情')">查看详情</span>
+              <span class="action-link" onclick="toast('已重置 周小周 密码')">重置密码</span>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>#10008</td>
+          <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:32px;height:32px;border-radius:50%;background:#fff7e6;display:flex;align-items:center;justify-content:center;font-size:12px;color:#faad14;">吴</div><div><div style="line-height:1.4;">吴小明</div><div style="font-size:12px;color:#999;">13201234567</div></div></div></td>
+          <td><span class="badge badge-default">普通会员</span></td>
+          <td>普通会员</td>
+          <td><span class="badge badge-default">未订购</span></td>
+          <td>¥49.9</td>
+          <td>2</td>
+          <td>袁中天</td>
+          <td style="color:var(--red);font-weight:600;">0</td>
+          <td>2026-08-30</td>
+          <td>
+            <div class="action-links">
+              <span class="action-link" onclick="openCreditAdjust('吴小明',0)">调整灵感值</span>
+              <span class="action-link" onclick="toast('查看 吴小明 的会员详情')">查看详情</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="pagination">
+      <span>共 11 条</span>
+      <span>10条/页</span>
+      <div class="page-btn active">1</div>
+      <div class="page-btn">2</div>
+      <span>跳至</span>
+      <input class="page-input" value="1">
+      <span>页</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==================== 视图：用户生成日志 ==================== -->
+<section class="view admin-page" id="viewLog">
+  <div class="page-header">
+    <div class="page-title">用户生成日志</div>
+  </div>
+  <div class="page-body">
+    <div class="filter-row">
+      <input class="filter-input" placeholder="用户账号/昵称">
+      <select class="filter-select"><option>内容类型</option><option>生图</option><option>素材下载</option></select>
+      <select class="filter-select"><option>状态</option><option>成功</option><option>失败</option><option>进行中</option></select>
+      <input class="filter-input" placeholder="开始时间" value="2026-08-25 00:00:00">
+      <input class="filter-input" placeholder="结束时间" value="2026-09-01 23:59:59">
+      <button class="btn btn-primary">查询</button>
+      <button class="btn btn-default">重置</button>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>用户</th>
+          <th>生成时间</th>
+          <th>内容类型</th>
+          <th>提示词</th>
+          <th>消耗灵感值</th>
+          <th>结果</th>
+          <th>状态</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#e6f7ff;display:flex;align-items:center;justify-content:center;font-size:10px;color:#1890FF;">袁</div>袁中天</div></td>
+          <td>2026-09-01 14:32:08</td>
+          <td>生图</td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">AI可爱风蜡笔涂鸦，校服女孩，糖果贴纸</td>
+          <td style="color:var(--red);font-weight:600;">-1</td>
+          <td><span class="action-link" onclick="toast('查看 袁中天 的生成结果')">查看结果</span></td>
+          <td><span class="badge badge-success">成功</span></td>
+          <td><span class="action-link" onclick="toast('复制 袁中天 的结果 URL')">复制 URL</span></td>
+        </tr>
+        <tr>
+          <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#f6ffed;display:flex;align-items:center;justify-content:center;font-size:10px;color:#52c41a;">李</div>李四光</div></td>
+          <td>2026-09-01 12:10:25</td>
+          <td>生图</td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">日落街道，男生伸手，电影感逆光</td>
+          <td style="color:var(--red);font-weight:600;">-1</td>
+          <td><span class="action-link" onclick="toast('查看 李四光 的生成结果')">查看结果</span></td>
+          <td><span class="badge badge-success">成功</span></td>
+          <td><span class="action-link" onclick="toast('复制 李四光 的结果 URL')">复制 URL</span></td>
+        </tr>
+        <tr>
+          <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#fff7e6;display:flex;align-items:center;justify-content:center;font-size:10px;color:#faad14;">张</div>张小明</div></td>
+          <td>2026-09-01 10:05:33</td>
+          <td>生图</td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">治愈系猫咪，窗台晒太阳，柔光</td>
+          <td style="color:var(--red);font-weight:600;">-1</td>
+          <td><span class="action-link" onclick="toast('查看 张小明 的生成结果')">查看结果</span></td>
+          <td><span class="badge badge-success">成功</span></td>
+          <td><span class="action-link" onclick="toast('复制 张小明 的结果 URL')">复制 URL</span></td>
+        </tr>
+        <tr>
+          <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#e6f7ff;display:flex;align-items:center;justify-content:center;font-size:10px;color:#1890FF;">袁</div>袁中天</div></td>
+          <td>2026-08-31 22:48:10</td>
+          <td>生图</td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">赛博朋克城市夜景，霓虹灯，雨后街道</td>
+          <td style="color:var(--red);font-weight:600;">-1</td>
+          <td><span class="action-link danger" onclick="toast('查看 袁中天 的错误详情')">查看错误</span></td>
+          <td><span class="badge badge-error">失败</span></td>
+          <td><span class="action-link" onclick="toast('复制 袁中天 的结果 URL')">复制 URL</span></td>
+        </tr>
+        <tr>
+          <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#fff0f6;display:flex;align-items:center;justify-content:center;font-size:10px;color:#eb2f96;">赵</div>赵六六</div></td>
+          <td>2026-08-31 18:33:21</td>
+          <td>素材下载</td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">下载素材包：秋季促销海报模板 v2</td>
+          <td style="color:var(--red);font-weight:600;">0</td>
+          <td>-</td>
+          <td><span class="badge badge-success">成功</span></td>
+          <td><span class="action-link" onclick="toast('查看 赵六六 的下载详情')">查看详情</span></td>
+        </tr>
+        <tr>
+          <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#f6ffed;display:flex;align-items:center;justify-content:center;font-size:10px;color:#52c41a;">周</div>周小周</div></td>
+          <td>2026-08-31 15:20:45</td>
+          <td>生图</td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">水彩风花卉插画，淡雅配色，手绘质感</td>
+          <td style="color:var(--red);font-weight:600;">-1</td>
+          <td><span class="action-link" onclick="toast('查看 周小周 的生成结果')">查看结果</span></td>
+          <td><span class="badge badge-warning">进行中</span></td>
+          <td><span class="action-link" onclick="toast('刷新 周小周 的生成状态')">刷新状态</span></td>
+        </tr>
+        <tr>
+          <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#e6f7ff;display:flex;align-items:center;justify-content:center;font-size:10px;color:#1890FF;">陈</div>陈大文</div></td>
+          <td>2026-08-30 20:15:00</td>
+          <td>生图</td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">极简线条人物，黑白配色，扁平设计</td>
+          <td style="color:var(--red);font-weight:600;">-1</td>
+          <td><span class="action-link" onclick="toast('查看 陈大文 的生成结果')">查看结果</span></td>
+          <td><span class="badge badge-success">成功</span></td>
+          <td><span class="action-link" onclick="toast('复制 陈大文 的结果 URL')">复制 URL</span></td>
+        </tr>
+        <tr>
+          <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#fff7e6;display:flex;align-items:center;justify-content:center;font-size:10px;color:#faad14;">吴</div>吴小明</div></td>
+          <td>2026-08-30 14:08:33</td>
+          <td>生图</td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">日系动漫少女，樱花背景，春日氛围</td>
+          <td style="color:var(--red);font-weight:600;">-1</td>
+          <td><span class="action-link" onclick="toast('查看 吴小明 的生成结果')">查看结果</span></td>
+          <td><span class="badge badge-success">成功</span></td>
+          <td><span class="action-link" onclick="toast('复制 吴小明 的结果 URL')">复制 URL</span></td>
+        </tr>
+        <tr>
+          <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#e6f7ff;display:flex;align-items:center;justify-content:center;font-size:10px;color:#1890FF;">袁</div>袁中天</div></td>
+          <td>2026-09-01 09:20:14</td>
+          <td>生视频</td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">校服女孩走廊，糖果贴纸，镜头缓慢推近</td>
+          <td style="color:var(--red);font-weight:600;">-10</td>
+          <td><span class="action-link" onclick="toast('查看 袁中天 的视频结果')">查看结果</span></td>
+          <td><span class="badge badge-success">成功</span></td>
+          <td><span class="action-link" onclick="toast('复制 袁中天 的视频 URL')">复制 URL</span></td>
+        </tr>
+        <tr>
+          <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#f6ffed;display:flex;align-items:center;justify-content:center;font-size:10px;color:#52c41a;">李</div>李四光</div></td>
+          <td>2026-08-31 20:11:02</td>
+          <td>生视频</td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">城市夜景延时，霓虹流动，电影感</td>
+          <td style="color:var(--red);font-weight:600;">-10</td>
+          <td><span class="action-link danger" onclick="toast('查看 李四光 的视频错误')">查看错误</span></td>
+          <td><span class="badge badge-error">失败</span></td>
+          <td><span class="action-link" onclick="toast('复制 李四光 的视频 URL')">复制 URL</span></td>
+        </tr>
+        <tr>
+          <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#e6f7ff;display:flex;align-items:center;justify-content:center;font-size:10px;color:#1890FF;">袁</div>袁中天</div></td>
+          <td>2026-08-29 17:55:12</td>
+          <td>生图</td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">3D 渲染产品展示，白色背景，专业摄影光</td>
+          <td style="color:var(--red);font-weight:600;">-1</td>
+          <td><span class="action-link" onclick="toast('查看 袁中天 的生成结果')">查看结果</span></td>
+          <td><span class="badge badge-success">成功</span></td>
+          <td><span class="action-link" onclick="toast('复制 袁中天 的结果 URL')">复制 URL</span></td>
+        </tr>
+        <tr>
+          <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#f6ffed;display:flex;align-items:center;justify-content:center;font-size:10px;color:#52c41a;">李</div>李四光</div></td>
+          <td>2026-08-29 11:30:00</td>
+          <td>生图</td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">油画风景，莫奈风格，睡莲池塘</td>
+          <td style="color:var(--red);font-weight:600;">-1</td>
+          <td><span class="action-link" onclick="toast('查看 李四光 的生成结果')">查看结果</span></td>
+          <td><span class="badge badge-success">成功</span></td>
+          <td><span class="action-link" onclick="toast('复制 李四光 的结果 URL')">复制 URL</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="pagination">
+      <span>共 86 条</span>
+      <span>10条/页</span>
+      <div class="page-btn active">1</div>
+      <div class="page-btn">2</div>
+      <div class="page-btn">3</div>
+      <div class="page-btn">4</div>
+      <div class="page-btn">5</div>
+      <span>...</span>
+      <div class="page-btn">9</div>
+      <span>跳至</span>
+      <input class="page-input" value="1">
+      <span>页</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==================== 视图：初始用户灵感值配置 ==================== -->
+<section class="view admin-page" id="viewInit">
+  <div class="page-header">
+    <div class="page-title">初始用户灵感值配置</div>
+  </div>
+  <div class="page-body">
+    <!-- 当前生效卡片 -->
+    <div class="config-card">
+      <div class="config-label">当前生效配置</div>
+      <div class="config-value" id="initCurrentValue">5 灵感值</div>
+      <div class="config-meta" id="initCurrentMeta">生效日期：2026-09-01 &nbsp;|&nbsp; 设置人：产品小王 &nbsp;|&nbsp; 备注：V0.5 上线调整</div>
+    </div>
+    <!-- 设置表单 -->
+    <div style="margin-bottom:20px;padding:16px;background:#fafafa;border-radius:6px;border:1px solid var(--border);">
+      <div style="font-size:14px;font-weight:600;margin-bottom:14px;">新建/修改配置</div>
+      <div class="form-row">
+        <label class="form-label">灵感值值</label>
+        <input class="form-input" type="number" value="5" min="0" max="99999" style="width:120px;">
+        <span style="font-size:13px;color:var(--text-tertiary);">新用户注册时一次性发放的灵感值数</span>
+      </div>
+      <div class="form-row">
+        <label class="form-label">生效日期</label>
+        <input class="form-input" type="date" value="2026-09-01" style="width:160px;">
+        <span style="font-size:13px;color:var(--text-tertiary);">该日期及之后注册的新用户将按此值发放</span>
+      </div>
+      <div class="form-row">
+        <label class="form-label">备注</label>
+        <textarea class="form-textarea" placeholder="填写变更原因或说明（选填，最多 200 字）"></textarea>
+      </div>
+      <div class="form-row">
+        <label class="form-label"></label>
+        <button class="btn btn-primary" style="height:36px;padding:0 24px;" onclick="saveInitConfig()">保存配置</button>
+      </div>
+    </div>
+    <!-- 历史快照 -->
+    <div style="font-size:14px;font-weight:600;margin-bottom:10px;">历史配置记录</div>
+    <table class="snapshot-table">
+      <thead>
+        <tr>
+          <th>灵感值值</th>
+          <th>生效日期</th>
+          <th>设置人</th>
+          <th>备注</th>
+          <th>状态</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="initHistoryTbody">
+        <tr>
+          <td><b>5</b></td>
+          <td>2026-09-01</td>
+          <td>产品小王</td>
+          <td>V0.5 上线调整</td>
+          <td><span class="badge badge-success">生效中</span></td>
+          <td><span class="action-link" onclick="toast('作废 5 灵感值配置')">作废</span></td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>2026-08-21</td>
+          <td>产品小王</td>
+          <td>上线首发版本</td>
+          <td><span class="badge badge-default">已失效</span></td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td>2026-07-01</td>
+          <td>运营小李</td>
+          <td>内测版本</td>
+          <td><span class="badge badge-default">已失效</span></td>
+          <td>-</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- ==================== 视图：灵感值定价管理 ==================== -->
+<section class="view admin-page" id="viewPricing">
+  <div class="page-header">
+    <div class="page-title">灵感值定价管理</div>
+  </div>
+  <div class="page-body">
+    <!-- 当前生效卡片 -->
+    <div class="config-card">
+      <div class="config-label">当前生效定价</div>
+      <div class="config-value" id="pricingCurrentValue">1 灵感值 = <b style="color:var(--primary);font-size:22px;">¥0.10</b></div>
+      <div class="config-meta" id="pricingCurrentMeta">生效日期：2026-09-01 &nbsp;|&nbsp; 设置人：运营小李 &nbsp;|&nbsp; 备注：上线首发定价</div>
+    </div>
+    <!-- 设置表单 -->
+    <div style="margin-bottom:20px;padding:16px;background:#fafafa;border-radius:6px;border:1px solid var(--border);">
+      <div style="font-size:14px;font-weight:600;margin-bottom:14px;">新建定价</div>
+      <div class="form-row">
+        <label class="form-label">灵感值单价</label>
+        <input class="form-input" type="number" value="0.10" min="0.01" max="99.99" step="0.01" style="width:100px;">
+        <span style="font-size:13px;color:var(--text-tertiary);">元 / 灵感值</span>
+        <span style="font-size:13px;color:var(--text-tertiary);">用户购买灵感值时的计价标准，改后新订单按新价结算</span>
+      </div>
+      <div class="form-row">
+        <label class="form-label">生效日期</label>
+        <input class="form-input" type="date" value="2026-09-01" style="width:160px;">
+        <span style="font-size:13px;color:var(--text-tertiary);">该日期及之后的购买按此定价计算</span>
+      </div>
+      <div class="form-row">
+        <label class="form-label">备注</label>
+        <textarea class="form-textarea" placeholder="填写调价原因（选填，最多 200 字）"></textarea>
+      </div>
+      <div class="form-row">
+        <label class="form-label"></label>
+        <button class="btn btn-primary" style="height:36px;padding:0 24px;" onclick="savePricing()">保存定价</button>
+      </div>
+    </div>
+    <!-- 历史定价时间线 -->
+    <div style="font-size:14px;font-weight:600;margin-bottom:10px;">历史定价记录</div>
+    <table class="snapshot-table">
+      <thead>
+        <tr>
+          <th>单价（元/灵感值）</th>
+          <th>生效日期</th>
+          <th>设置人</th>
+          <th>备注</th>
+          <th>状态</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="pricingHistoryTbody">
+        <tr>
+          <td><b>¥0.10</b></td>
+          <td>2026-09-01</td>
+          <td>运营小李</td>
+          <td>上线首发定价</td>
+          <td><span class="badge badge-success">生效中</span></td>
+          <td><span class="action-link" onclick="toast('作废 ¥0.10 定价')">作废</span></td>
+        </tr>
+        <tr>
+          <td>¥0.15</td>
+          <td>2026-08-21</td>
+          <td>产品小王</td>
+          <td>测试期定价</td>
+          <td><span class="badge badge-default">已失效</span></td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>¥0.20</td>
+          <td>2026-08-01</td>
+          <td>产品小王</td>
+          <td>初始定价</td>
+          <td><span class="badge badge-default">已失效</span></td>
+          <td>-</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- ==================== 视图：AI 工具消耗配置 ==================== -->
+<section class="view admin-page" id="viewCost">
+  <div class="page-header">
+    <div class="page-title">AI 工具消耗配置</div>
+  </div>
+  <div class="page-body">
+    <!-- 当前各工具消耗 -->
+    <div style="font-size:14px;font-weight:600;margin-bottom:12px;">当前各工具消耗</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:20px;">
+      <div class="config-card" style="padding:14px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="font-size:24px;">🖼️</span>
+          <div style="font-size:15px;font-weight:600;">图片生成</div>
+          <span class="badge badge-success" style="margin-left:auto;">生效中</span>
+        </div>
+        <div class="config-value" id="costImageValue">每次消耗 <b style="color:var(--primary);">1</b> 灵感值</div>
+        <div class="config-meta">生效：2026-09-01 &nbsp;|&nbsp; 运营小李</div>
+      </div>
+      <div class="config-card" style="padding:14px;opacity:0.6;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="font-size:24px;">🎬</span>
+          <div style="font-size:15px;font-weight:600;">视频生成</div>
+          <span class="badge badge-default" style="margin-left:auto;">V0.7</span>
+        </div>
+        <div class="config-value" style="color:#999;">待配置</div>
+        <div class="config-meta">预计 V0.7 上线</div>
+      </div>
+      <div class="config-card" style="padding:14px;opacity:0.6;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="font-size:24px;">🧑‍💼</span>
+          <div style="font-size:15px;font-weight:600;">数字人分身</div>
+          <span class="badge badge-default" style="margin-left:auto;">V0.8</span>
+        </div>
+        <div class="config-value" style="color:#999;">待配置</div>
+        <div class="config-meta">预计 V0.8 上线</div>
+      </div>
+    </div>
+
+    <!-- 图片生成 - 配置表单与历史 -->
+    <div style="font-size:14px;font-weight:600;margin-bottom:10px;">图片生成 · 消耗配置</div>
+    <div style="margin-bottom:20px;padding:16px;background:#fafafa;border-radius:6px;border:1px solid var(--border);">
+      <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text-secondary);">修改消耗</div>
+      <div class="form-row">
+        <label class="form-label">每次消耗</label>
+        <input class="form-input" type="number" value="1" min="1" max="999" style="width:100px;">
+        <span style="font-size:13px;color:var(--text-tertiary);">灵感值 / 次</span>
+      </div>
+      <div class="form-row">
+        <label class="form-label">生效日期</label>
+        <input class="form-input" type="date" value="2026-09-01" style="width:160px;">
+      </div>
+      <div class="form-row">
+        <label class="form-label">备注</label>
+        <textarea class="form-textarea" placeholder="填写变更原因（选填）"></textarea>
+      </div>
+      <div class="form-row">
+        <label class="form-label"></label>
+        <button class="btn btn-primary" style="height:36px;padding:0 24px;" onclick="saveCostConfig()">保存</button>
+      </div>
+    </div>
+
+    <!-- 图片生成 - 历史快照 -->
+    <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text-secondary);">历史配置记录</div>
+    <table class="snapshot-table">
+      <thead>
+        <tr>
+          <th>消耗灵感值</th>
+          <th>生效日期</th>
+          <th>设置人</th>
+          <th>备注</th>
+          <th>状态</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="costHistoryTbody">
+        <tr>
+          <td><b>1 灵感值/次</b></td>
+          <td>2026-09-01</td>
+          <td>运营小李</td>
+          <td>默认值</td>
+          <td><span class="badge badge-success">生效中</span></td>
+          <td><span class="action-link" onclick="toast('作废 1 灵感值/次 配置')">作废</span></td>
+        </tr>
+        <tr>
+          <td>2 灵感值/次</td>
+          <td>2026-08-21</td>
+          <td>产品小王</td>
+          <td>测试期高耗量</td>
+          <td><span class="badge badge-default">已失效</span></td>
+          <td>-</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- ==================== 视图：调整灵感值（独立页，替代原 Modal） ==================== -->
+<section class="view admin-page" id="viewAdjust">
+  <div class="page-header">
+    <div class="adjust-header">
+      <div class="adjust-back" onclick="go('member')">← 返回会员列表</div>
+      <div class="page-title" style="margin:0;">调整灵感值 - <span id="adjustUserName">-</span></div>
+    </div>
+  </div>
+  <div class="page-body">
+    <!-- 当前余额 -->
+    <div class="adjust-balance-card">
+      <div>
+        <div class="label">当前灵感值余额</div>
+      </div>
+      <div class="value" id="adjustCurrentBalance">0</div>
+    </div>
+
+    <!-- 赠送/扣除 切换 -->
+    <div class="tab-switch">
+      <div class="tab-switch-item active" id="tabGift" onclick="switchAdjustTab(this,'gift')">赠送</div>
+      <div class="tab-switch-item" id="tabDeduct" onclick="switchAdjustTab(this,'deduct')">扣除</div>
+    </div>
+
+    <!-- 表单 -->
+    <div class="form-row">
+      <label class="form-label" style="min-width:70px;">数值</label>
+      <input class="form-input" type="number" id="adjustAmount" value="10" min="1" max="99999" style="width:140px;">
+      <span style="font-size:13px;color:var(--text-tertiary);">灵感值</span>
+    </div>
+    <div class="form-row">
+      <label class="form-label" style="min-width:70px;">备注</label>
+      <textarea class="form-textarea" id="adjustRemark" placeholder="填写调整原因（选填）" style="min-height:50px;min-width:260px;"></textarea>
+    </div>
+    <div class="form-row">
+      <label class="form-label" style="min-width:70px;"></label>
+      <button class="btn btn-primary" style="height:36px;padding:0 24px;" onclick="submitCreditAdjust()">确定</button>
+      <button class="btn btn-default" style="height:36px;padding:0 24px;margin-left:8px;" onclick="go('member')">取消</button>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 视图：套餐管理（C端「购买灵感值」页数据源） ==================== -->
+<section class="view admin-page" id="viewPackage">
+  <div class="page-header">
+    <div class="page-title">套餐管理</div>
+    <div><button class="btn btn-primary" onclick="openPackageForm(null)">+ 新增套餐</button></div>
+  </div>
+  <div class="page-body">
+    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6;">
+      管理 C 端「购买灵感值」页展示的灵感值套餐。修改后实时生效，C 端下次进入购买页即拉取最新列表。
+    </div>
+    <table class="data-table" style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="background:var(--table-header);">
+          <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">套餐名称</th>
+          <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">灵感值数</th>
+          <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">售价（元）</th>
+          <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">标签</th>
+          <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">排序</th>
+          <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">状态</th>
+          <th style="padding:10px 12px;text-align:center;font-size:13px;border-bottom:1px solid var(--border);">操作</th>
+        </tr>
+      </thead>
+      <tbody id="packageTbody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ==================== 视图：新增 / 编辑套餐（独立页，替代 Modal） ==================== -->
+<section class="view admin-page" id="viewPackageForm">
+  <div class="page-header">
+    <div class="adjust-header">
+      <div class="adjust-back" onclick="go('package')">← 返回套餐列表</div>
+      <div class="page-title" style="margin:0;" id="pkgFormTitle">新增套餐</div>
+    </div>
+  </div>
+  <div class="page-body">
+    <div class="form-row">
+      <label class="form-label">套餐名称</label>
+      <input class="form-input" type="text" id="pkgName" placeholder="如：入门包" style="width:240px;">
+      <span style="font-size:13px;color:var(--red);">*</span>
+    </div>
+    <div class="form-row">
+      <label class="form-label">灵感值数</label>
+      <input class="form-input" type="number" id="pkgCredits" min="1" max="999999" style="width:240px;" oninput="calcPkgPrice()">
+      <span style="font-size:13px;color:var(--text-secondary);">灵感值</span>
+      <span style="font-size:13px;color:var(--red);">*</span>
+    </div>
+    <div class="form-row">
+      <label class="form-label">售价</label>
+      <input class="form-input" type="number" id="pkgPrice" min="0" step="0.1" style="width:240px;">
+      <span style="font-size:13px;color:var(--text-secondary);">元</span>
+      <span style="font-size:13px;color:var(--red);">*</span>
+      <span class="btn-link" style="margin-left:4px;" onclick="calcPkgPrice()">按定价重算</span>
+    </div>
+    <div class="form-row">
+      <label class="form-label">标签</label>
+      <select class="filter-select" id="pkgTag" style="width:240px;height:36px;">
+        <option value="">无</option>
+        <option value="推荐">推荐</option>
+        <option value="超值">超值</option>
+        <option value="特惠">特惠</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">排序</label>
+      <input class="form-input" type="number" id="pkgSort" min="1" max="999" value="5" style="width:240px;">
+    </div>
+    <div class="form-row">
+      <label class="form-label">状态</label>
+      <div class="tab-switch">
+        <div class="tab-switch-item active" id="pkgStatusOn" onclick="switchPkgStatus(this,'on')">上架</div>
+        <div class="tab-switch-item" id="pkgStatusOff" onclick="switchPkgStatus(this,'off')">下架</div>
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label"></label>
+      <button class="btn btn-primary" style="height:36px;padding:0 24px;" onclick="submitPackageForm()">确定</button>
+      <button class="btn btn-default" style="height:36px;padding:0 24px;margin-left:8px;" onclick="go('package')">取消</button>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 视图：首单优惠配置（跟随套餐，后台可配是否赠送+赠送多少） ==================== -->
+<section class="view admin-page" id="viewFirstOrder">
+  <div class="page-header">
+    <div class="page-title">首单优惠配置</div>
+  </div>
+  <div class="page-body">
+    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:18px;line-height:1.6;">
+      配置新用户首次购买灵感值时的优惠政策。每个套餐可独立设置是否参与首单优惠及赠送规则。
+    </div>
+
+    <!-- 全局开关 -->
+    <div class="admin-page" style="margin-bottom:20px;">
+      <div style="padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--text);">首单优惠总开关</div>
+          <div style="font-size:12px;color:var(--text-tertiary);margin-top:2px;">关闭后所有新用户首次购买不享受任何赠送</div>
+        </div>
+        <div class="toggle-switch lg on" id="foGlobalToggle" onclick="toggleGlobalFirstOrder()">
+          <div class="knob"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 按套餐配置 -->
+    <div class="admin-page">
+      <div style="padding:14px 18px;border-bottom:1px solid var(--border);">
+        <div style="font-size:14px;font-weight:600;color:var(--text);">按套餐配置赠送规则</div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="background:var(--table-header);">
+            <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">套餐</th>
+            <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">参与首单优惠</th>
+            <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">赠送方式</th>
+            <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">赠送数量</th>
+            <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">C端展示文案</th>
+            <th style="padding:10px 12px;text-align:center;font-size:13px;border-bottom:1px solid var(--border);">操作</th>
+          </tr>
+        </thead>
+        <tbody id="firstOrderTbody"></tbody>
+      </table>
+    </div>
+    <div id="foSummary" style="margin-top:16px;padding:12px 16px;background:#f6ffed;border:1px solid #b7eb8f;border-radius:6px;font-size:13px;color:var(--text-secondary);"></div>
+  </div>
+</section>
+
+<!-- ==================== 视图：素材管理（列表 + 删除，按栏目归类） ==================== -->
+<section class="view admin-page" id="viewMaterial">
+  <div class="page-header">
+    <div class="page-title">素材管理</div>
+    <div><button class="btn btn-primary" onclick="openUploadModal()">批量上传</button></div>
+  </div>
+  <div class="page-body">
+    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6;">
+      管理可下发的营销素材（图片 / 视频 / PDF），支持按栏目归类与删除。栏目在「素材栏目管理」中配置。
+    </div>
+    <div id="uploadModal" class="modal-mask" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center;">
+      <div style="background:#fff;border-radius:10px;width:560px;max-width:calc(100vw - 40px);max-height:80vh;overflow:auto;padding:24px;box-shadow:0 12px 32px rgba(0,0,0,.18);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div style="font-size:16px;font-weight:600;">批量上传素材</div>
+          <div style="cursor:pointer;font-size:20px;color:var(--text-secondary);" onclick="closeUploadModal()">×</div>
+        </div>
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;line-height:1.6;">
+          支持 JPG / PNG / MP4 / PDF；单次最多 20 个，单个 ≤ 50MB；整批可指定归属栏目。
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+          <label class="btn btn-default" style="height:34px;line-height:34px;padding:0 16px;cursor:pointer;margin:0;">
+            选择文件
+            <input id="uploadInput" type="file" multiple accept=".jpg,.jpeg,.png,.mp4,.pdf" style="display:none;" onchange="handleUploadFiles(this)">
+          </label>
+          <select id="uploadCat" class="form-input" style="width:200px;height:34px;"></select>
+          <button id="startUploadBtn" class="btn btn-primary" style="height:34px;padding:0 18px;" onclick="startUpload()" disabled>开始上传</button>
+        </div>
+        <div id="uploadList" style="display:none;margin-top:8px;"></div>
+      </div>
+    </div>
+    <table class="data-table" style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="background:var(--table-header);">
+          <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">素材名称</th>
+          <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">栏目</th>
+          <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">格式</th>
+          <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">上传时间</th>
+          <th style="padding:10px 12px;text-align:center;font-size:13px;border-bottom:1px solid var(--border);">操作</th>
+        </tr>
+      </thead>
+      <tbody id="materialTbody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 新增/编辑素材表单页已移除：按需求素材管理仅保留「列表 + 删除」，不做新增/编辑/状态切换（避免臆测功能） -->
+
+<!-- ==================== 视图：素材栏目管理（CRUD，运营可配初始为空） ==================== -->
+<section class="view admin-page" id="viewMaterialCategory">
+  <div class="page-header">
+    <div class="page-title">素材栏目管理</div>
+    <div><button class="btn btn-primary" onclick="openCategoryForm(null)">+ 新增栏目</button></div>
+  </div>
+  <div class="page-body">
+    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6;">
+      配置素材库的分类栏目（如：营销海报 / 产品素材 / 活动物料）。配置后 C 端素材库自动展示对应分类 Tab。当前为占位，待运营给出具体栏目后填写。
+    </div>
+    <table class="data-table" style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="background:var(--table-header);">
+          <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">栏目名称</th>
+          <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">排序</th>
+          <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">状态</th>
+          <th style="padding:10px 12px;text-align:center;font-size:13px;border-bottom:1px solid var(--border);">操作</th>
+        </tr>
+      </thead>
+      <tbody id="categoryTbody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ==================== 视图：新增 / 编辑栏目 ==================== -->
+<section class="view admin-page" id="viewCategoryForm">
+  <div class="page-header">
+    <div class="adjust-header">
+      <div class="adjust-back" onclick="go('materialCategory')">← 返回栏目列表</div>
+      <div class="page-title" style="margin:0;" id="catFormTitle">新增栏目</div>
+    </div>
+  </div>
+  <div class="page-body">
+    <div class="form-row">
+      <label class="form-label">栏目名称</label>
+      <input class="form-input" type="text" id="catName" placeholder="如：营销海报" style="width:280px;">
+      <span style="font-size:13px;color:var(--red);">*</span>
+    </div>
+    <div class="form-row">
+      <label class="form-label">排序</label>
+      <input class="form-input" type="number" id="catSort" min="1" max="999" value="5" style="width:160px;">
+    </div>
+    <div class="form-row">
+      <label class="form-label">状态</label>
+      <div class="tab-switch">
+        <div class="tab-switch-item active" id="catStatusOn" onclick="switchCatStatus(this,'on')">启用</div>
+        <div class="tab-switch-item" id="catStatusOff" onclick="switchCatStatus(this,'off')">停用</div>
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label"></label>
+      <button class="btn btn-primary" style="height:36px;padding:0 24px;" onclick="submitCategoryForm()">确定</button>
+      <button class="btn btn-default" style="height:36px;padding:0 24px;margin-left:8px;" onclick="go('materialCategory')">取消</button>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 视图：辅助提示词配置（3 板块，运维中心 AI 板块） ==================== -->
+<section class="view admin-page" id="viewPromptConfig">
+  <div class="page-header">
+    <div class="page-title">辅助提示词配置</div>
+    <div style="font-size:13px;color:var(--text-secondary);">C 端生图页「辅助提示词」按以下板块与词条下发</div>
+  </div>
+  <div class="page-body" id="promptConfigAdmin"></div>
+</section>
+
+  <!-- ==================== 视图：生视频成本配置（复制「工具消耗配置」并增加视频参数） ==================== -->
+  <section class="view admin-page" id="viewVideoCost">
+    <div class="page-header">
+      <div class="page-title">生视频成本配置</div>
+    </div>
+    <div class="page-body">
+      <div style="font-size:14px;font-weight:600;margin-bottom:12px;">当前视频生成消耗</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:20px;">
+        <div class="config-card" style="padding:14px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <span style="font-size:24px;">🎬</span>
+            <div style="font-size:15px;font-weight:600;">视频生成</div>
+            <span class="badge badge-success" style="margin-left:auto;">生效中</span>
+          </div>
+          <div class="config-value" id="costVideoValue2">每次消耗 <b style="color:var(--primary);">10</b> 灵感值</div>
+          <div class="config-meta">生效：2026-09-03 &nbsp;|&nbsp; 运营小李</div>
+        </div>
+      </div>
+
+      <!-- 视频生成 - 配置表单 -->
+      <div style="font-size:14px;font-weight:600;margin-bottom:10px;">视频生成 · 消耗与参数配置</div>
+      <div style="margin-bottom:20px;padding:16px;background:#fafafa;border-radius:6px;border:1px solid var(--border);">
+        <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text-secondary);">修改消耗与参数</div>
+        <div class="form-row">
+          <label class="form-label">每次消耗</label>
+          <input class="form-input" type="number" value="10" min="1" max="999" style="width:100px;">
+          <span style="font-size:13px;color:var(--text-tertiary);">灵感值 / 次</span>
+        </div>
+        <div class="form-row">
+          <label class="form-label">默认时长</label>
+          <select class="filter-select" style="min-width:120px;">
+            <option>3 秒</option>
+            <option selected>5 秒</option>
+            <option>10 秒</option>
+          </select>
+          <span style="font-size:13px;color:var(--text-tertiary);">C 端可选时长见下方</span>
+        </div>
+        <div class="form-row">
+          <label class="form-label">可用时长</label>
+          <div class="tag-list">
+            <span class="tag active">3 秒</span>
+            <span class="tag active">5 秒</span>
+            <span class="tag active">10 秒</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <label class="form-label">画面比例</label>
+          <div class="tag-list">
+            <span class="tag active">9:16</span>
+            <span class="tag active">16:9</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <label class="form-label">视频模型</label>
+          <select class="filter-select" style="min-width:180px;">
+            <option>视频生成模型 A（默认）</option>
+            <option>视频生成模型 B（高质）</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">生效日期</label>
+          <input class="form-input" type="date" value="2026-09-03" style="width:160px;">
+        </div>
+        <div class="form-row">
+          <label class="form-label">备注</label>
+          <textarea class="form-textarea" placeholder="填写变更原因（选填）"></textarea>
+        </div>
+        <div class="form-row">
+          <label class="form-label"></label>
+          <button class="btn btn-primary" style="height:36px;padding:0 24px;" onclick="saveVideoCostConfig()">保存</button>
+        </div>
+      </div>
+
+      <!-- 视频生成 - 历史快照 -->
+      <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text-secondary);">历史配置记录</div>
+      <table class="snapshot-table">
+        <thead>
+          <tr>
+            <th>消耗灵感值</th>
+            <th>默认时长</th>
+            <th>比例</th>
+            <th>模型</th>
+            <th>生效日期</th>
+            <th>设置人</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="videoCostHistoryTbody">
+          <tr>
+            <td><b>10 灵感值/次</b></td>
+            <td>5 秒</td>
+            <td>9:16 / 16:9</td>
+            <td>视频生成模型 A</td>
+            <td>2026-09-03</td>
+            <td>运营小李</td>
+            <td><span class="badge badge-success">生效中</span></td>
+            <td><span class="action-link" onclick="toast('作废 10 灵感值/次 视频配置')">作废</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div><!-- /main-content -->
+
+
+
+
+
+</main>
+
+<script>
+// ===== SPA 导航：所有独立视图写在 <main> 内，go(key) 切换 =====
+function go(key) {
+  var target = 'view' + key.charAt(0).toUpperCase() + key.slice(1);
+  var views = document.querySelectorAll('.view');
+  for (var i = 0; i < views.length; i++) views[i].classList.remove('active');
+  var el = document.getElementById(target);
+  if (el) el.classList.add('active');
+  // 侧栏高亮当前页
+  var navs = document.querySelectorAll('.sidebar-item[data-view]');
+  for (var j = 0; j < navs.length; j++) {
+    navs[j].classList.toggle('active', navs[j].getAttribute('data-view') === key);
+  }
+  window.scrollTo(0, 0);
+  if (key === 'package') renderPackageTable();
+  if (key === 'firstOrder') renderFirstOrder();
+  if (key === 'material') renderMaterialTable();
+  if (key === 'materialCategory') renderCategoryTable();
+  if (key === 'promptConfig') renderPromptConfigAdmin();
+}
+
+// ===== 调整灵感值独立页逻辑（替代原 Modal） =====
+function openCreditAdjust(name, balance) {
+  go('adjust');
+  document.getElementById('adjustUserName').textContent = name;
+  document.getElementById('adjustCurrentBalance').textContent = balance;
+  document.getElementById('adjustAmount').value = '10';
+  document.getElementById('adjustRemark').value = '';
+  switchAdjustTab(document.getElementById('tabGift'), 'gift');
+}
+var adjustMode = 'gift';
+function switchAdjustTab(el, mode) {
+  adjustMode = mode;
+  var items = el.parentElement.querySelectorAll('.tab-switch-item');
+  for (var i = 0; i < items.length; i++) items[i].classList.remove('active');
+  el.classList.add('active');
+}
+function submitCreditAdjust() {
+  var amount = parseInt(document.getElementById('adjustAmount').value, 10) || 0;
+  var remark = document.getElementById('adjustRemark').value.trim();
+  if (amount <= 0) { alert('请输入有效数值'); return; }
+  var action = adjustMode === 'gift' ? '赠送' : '扣除';
+  // 同步会员列表余额（修复"调整了但列表不变"空转）
+  var name = document.getElementById('adjustUserName').textContent;
+  var rows = document.querySelectorAll('#viewMember tbody tr');
+  for (var i = 0; i < rows.length; i++) {
+    var cells = rows[i].querySelectorAll('td');
+    if (cells.length > 8 && cells[1].textContent.indexOf(name) >= 0) {
+      var balCell = cells[8];
+      var cur = parseInt((balCell.textContent || '0').replace(/[^0-9\-]/g, ''), 10) || 0;
+      var nv = adjustMode === 'gift' ? cur + amount : cur - amount;
+      balCell.textContent = nv;
+      balCell.style.color = nv > 0 ? 'var(--primary)' : 'var(--red)';
+      balCell.style.fontWeight = '600';
+      break;
+    }
+  }
+  toast('已' + action + ' ' + amount + ' 灵感值');
+  setTimeout(function () { go('member'); }, 800);
+}
+function toast(msg) {
+  var t = document.getElementById('_toast');
+  if (!t) {
+    t = document.createElement('div'); t.id = '_toast';
+    t.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.75);color:#fff;padding:10px 20px;border-radius:20px;font-size:14px;z-index:9999;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(function () { t.style.display = 'none'; }, 2000);
+}
+
+// ===== 套餐表单（独立页，替代 Modal） =====
+// 真实实现由后端下发：取 credit_package 表套餐列表
+var pkgData = {
+  '入门包': { credits: 30,   price: 3.0,   tag: '',     sort: 1 },
+  '标准包': { credits: 100,  price: 10.0,  tag: '推荐', sort: 2 },
+  '超值包': { credits: 300,  price: 30.0,  tag: '超值', sort: 3 },
+  '企业包': { credits: 1000, price: 100.0, tag: '特惠', sort: 4 }
+};
+var pkgEditKey = null;   // null = 新增模式
+var pkgStatus = 'on';
+var PRICE_PER_CREDIT_ADMIN = 0.10;   // 取后台「灵感值定价管理」当前定价
+
+function openPackageForm(name) {
+  pkgEditKey = name || null;
+  document.getElementById('pkgFormTitle').textContent = name ? ('编辑套餐 - ' + name) : '新增套餐';
+  if (name && pkgData[name]) {
+    var d = pkgData[name];
+    document.getElementById('pkgName').value = name;
+    document.getElementById('pkgCredits').value = d.credits;
+    document.getElementById('pkgPrice').value = d.price;
+    document.getElementById('pkgTag').value = d.tag;
+    document.getElementById('pkgSort').value = d.sort;
+  } else {
+    document.getElementById('pkgName').value = '';
+    document.getElementById('pkgCredits').value = '';
+    document.getElementById('pkgPrice').value = '';
+    document.getElementById('pkgTag').value = '';
+    document.getElementById('pkgSort').value = '5';
+  }
+  document.getElementById('pkgName').disabled = !!name;
+  switchPkgStatus(document.getElementById('pkgStatusOn'), 'on');
+  go('packageForm');
+}
+
+function calcPkgPrice() {
+  var credits = parseFloat(document.getElementById('pkgCredits').value) || 0;
+  document.getElementById('pkgPrice').value = (credits * PRICE_PER_CREDIT_ADMIN).toFixed(1);
+}
+
+function switchPkgStatus(el, mode) {
+  pkgStatus = mode;
+  var items = el.parentElement.querySelectorAll('.tab-switch-item');
+  for (var i = 0; i < items.length; i++) items[i].classList.remove('active');
+  el.classList.add('active');
+}
+
+function submitPackageForm() {
+  var name = document.getElementById('pkgName').value.trim();
+  var credits = parseInt(document.getElementById('pkgCredits').value, 10) || 0;
+  var price = parseFloat(document.getElementById('pkgPrice').value) || 0;
+  var tag = document.getElementById('pkgTag').value;
+  var sort = parseInt(document.getElementById('pkgSort').value, 10) || 99;
+  if (!name) { alert('请填写套餐名称'); return; }
+  if (credits <= 0) { alert('灵感值数须大于 0'); return; }
+  if (price <= 0) { alert('售价须大于 0'); return; }
+  // 写回唯一数据源 pkgData（套餐管理 + 首单优惠配置共用，套餐变更自动联动）
+  pkgData[name] = { credits: credits, price: price, tag: tag, sort: sort, status: pkgStatus };
+  var action = pkgEditKey ? '已保存套餐' : '已新增套餐';
+  toast(action + '「' + name + '」· ' + credits + ' 灵感值 / ¥' + price.toFixed(1) + ' · ' + (pkgStatus === 'on' ? '上架' : '下架'));
+  setTimeout(function () { go('package'); }, 800);
+}
+
+// ===== 套餐表格动态渲染（数据源 pkgData，与首单优惠配置联动） =====
+function renderPackageTable() {
+  var tbody = document.getElementById('packageTbody');
+  if (!tbody) return;
+  var keys = Object.keys(pkgData).sort(function (a, b) { return pkgData[a].sort - pkgData[b].sort; });
+  var tagColors = { '': '', '推荐': 'background:#fff1f0;color:#ff4d4f;border:1px solid #ffa39e;', '超值': 'background:#fff7e6;color:#faad14;border:1px solid #ffd591;', '特惠': 'background:#fff1f0;color:#ff4d4f;border:1px solid #ffa39e;' };
+  var html = '';
+  keys.forEach(function (k) {
+    var d = pkgData[k];
+    var tagHtml = d.tag ? '<span style="font-size:12px;' + tagColors[d.tag] + ';padding:2px 8px;border-radius:4px;">' + d.tag + '</span>' : '<span style="font-size:12px;"></span>';
+    html += '<tr style="border-bottom:1px solid var(--border-light);">' +
+      '<td style="padding:10px 12px;font-size:13px;">' + k + '</td>' +
+      '<td style="padding:10px 12px;font-size:13px;">' + d.credits + '</td>' +
+      '<td style="padding:10px 12px;font-size:13px;">¥' + d.price.toFixed(1) + '</td>' +
+      '<td style="padding:10px 12px;">' + tagHtml + '</td>' +
+      '<td style="padding:10px 12px;font-size:13px;">' + d.sort + '</td>' +
+      '<td style="padding:10px 12px;">' + (d.status === 'off' ? '<span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#fff1f0;color:#ff4d4f;border:1px solid #ffa39e;">下架</span>' : '<span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f;">上架</span>') + '</td>' +
+      '<td style="padding:10px 12px;text-align:center;">' +
+        '<span class="btn-link" onclick="openPackageForm(\'' + k + '\')">编辑</span>' +
+        '<span style="color:var(--border);margin:0 6px;">|</span>' +
+        '<span class="btn-link" style="color:var(--red);" onclick="togglePackageStatus(\'' + k + '\')">' + (d.status === 'off' ? '上架' : '下架') + '</span>' +
+      '</td></tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+// ===== 首单优惠配置（数据源来自 pkgData，套餐变更自动同步） =====
+// method: equal=等额赠送(送=购买灵感值) / percent=比例赠送(按购买灵感值X%) / fixed=固定赠送(N灵感值)
+var firstOrderGlobal = true;   // 首单优惠总开关（true=开启）
+
+var firstOrderData = {
+  '入门包': { enabled: true,  method: 'equal',   amount: 0,   copy: '新人首单立赠等额灵感值' },
+  '标准包': { enabled: true,  method: 'equal',   amount: 0,   copy: '新人首单立赠等额灵感值' },
+  '超值包': { enabled: true,  method: 'percent', amount: 20,  copy: '新人首单加赠20%' },
+  '企业包': { enabled: false, method: 'fixed',   amount: 200, copy: '企业专享首单赠送' }
+};
+
+function toggleGlobalFirstOrder() {
+  firstOrderGlobal = !firstOrderGlobal;
+  renderFirstOrder();
+  toast('首单优惠总开关已' + (firstOrderGlobal ? '开启' : '关闭'));
+}
+
+function toggleRowFirstOrder(pkgName) {
+  if (!firstOrderGlobal) return;          // 总开关关闭时不允许单独配置
+  var d = firstOrderData[pkgName];
+  if (!d) return;
+  d.enabled = !d.enabled;
+  renderFirstOrder();
+}
+
+function onFoMethodChange(pkgName, val) {
+  if (!firstOrderGlobal) return;
+  var d = firstOrderData[pkgName];
+  if (!d) return;
+  d.method = val;
+  renderFirstOrder();
+}
+
+function saveFirstOrderRow(pkgName) {
+  if (!firstOrderGlobal) { toast('请先开启首单优惠总开关'); return; }
+  var d = firstOrderData[pkgName];
+  if (!d) return;
+  var amtEl = document.getElementById('foAmount_' + pkgName);
+  var copyEl = document.getElementById('foCopy_' + pkgName);
+  if (!amtEl && !copyEl) return;   // 极端竞态（元素已被重渲染）安全退出
+  if (d.method === 'equal') {
+    d.amount = pkgData[pkgName].credits;   // 等额赠送 = 购买灵感值数（修复原存 0 的 bug）
+  } else {
+    d.amount = parseInt((amtEl ? amtEl.value : '0'), 10) || 0;
+  }
+  d.copy = copyEl ? (copyEl.value.trim() || '新人首单赠送') : (d.copy || '新人首单赠送');
+  // 保存反馈：链接短暂变「已保存 ✓」
+  var link = document.getElementById('foSave_' + pkgName);
+  if (link) {
+    var oldTxt = link.textContent;
+    link.textContent = '已保存 ✓';
+    link.style.color = '#52c41a';
+    setTimeout(function () { link.textContent = oldTxt; link.style.color = ''; }, 1500);
+  }
+  renderFirstOrder();   // 刷新摘要
+  toast('已保存「' + pkgName + '」首单优惠配置');
+}
+
+function renderFirstOrder() {
+  var tbody = document.getElementById('firstOrderTbody');
+  if (!tbody) return;
+  // 同步全局开关视觉
+  var g = document.getElementById('foGlobalToggle');
+  if (g) g.classList.toggle('on', firstOrderGlobal);
+  var keys = Object.keys(pkgData).sort(function (a, b) { return pkgData[a].sort - pkgData[b].sort; });
+  var methodLabel = { equal: '等额赠送', percent: '比例赠送', fixed: '固定赠送' };
+  var html = '';
+  // 总开关关闭：保留配置行但整体禁用，并提示（不删除元素，避免交互失效/竞态崩溃）
+  if (!firstOrderGlobal) {
+    html += '<tr><td colspan="6" style="padding:14px 12px;background:#fff1f0;color:#ff4d4f;font-size:13px;border-bottom:1px solid var(--border-light);">首单优惠总开关已关闭：所有新用户首次购买均不享受赠送。开启总开关后即可配置各套餐规则（下方配置暂不可编辑）。</td></tr>';
+  }
+  keys.forEach(function (k) {
+    var d = firstOrderData[k] || { enabled: false, method: 'fixed', amount: 0, copy: '新人首单赠送' };
+    var credits = pkgData[k].credits;
+    var toggleCls = d.enabled ? 'toggle-switch lg on' : 'toggle-switch lg';
+    var toggleStyle = firstOrderGlobal ? '' : ' style="opacity:.45;pointer-events:none;"';
+    var dis = firstOrderGlobal ? '' : ' disabled';
+    var amountDisabled = (d.method === 'equal' || !firstOrderGlobal) ? 'disabled style="background:#f5f5f5;color:#999;"' : '';
+    var amountVal = d.method === 'equal' ? credits : d.amount;
+    var amountHint = d.method === 'equal' ? '（=购买灵感值' + credits + '）' : (d.method === 'percent' ? '（%）' : '（灵感值）');
+    var opts = ['equal', 'percent', 'fixed'].map(function (m) {
+      return '<option value="' + m + '"' + (d.method === m ? ' selected' : '') + '>' + methodLabel[m] + '</option>';
+    }).join('');
+    html += '<tr style="border-bottom:1px solid var(--border-light);' + (firstOrderGlobal ? '' : 'opacity:.6;') + '">' +
+      '<td style="padding:10px 12px;font-size:13px;">' + k + '</td>' +
+      '<td style="padding:10px 12px;"><div class="' + toggleCls + '"' + toggleStyle + ' onclick="toggleRowFirstOrder(\'' + k + '\')"><div class="knob"></div></div><div style="font-size:11px;color:var(--text-tertiary);margin-top:4px;">' + (d.enabled ? '参与' : '不参与') + '</div></td>' +
+      '<td style="padding:10px 12px;"><select' + dis + ' onchange="onFoMethodChange(\'' + k + '\', this.value)" style="padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;">' + opts + '</select></td>' +
+      '<td style="padding:10px 12px;"><input id="foAmount_' + k + '" value="' + amountVal + '" ' + amountDisabled + ' style="width:64px;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;"> <span style="font-size:11px;color:var(--text-tertiary);">' + amountHint + '</span></td>' +
+      '<td style="padding:10px 12px;"><input id="foCopy_' + k + '" value="' + d.copy + '"' + dis + ' style="width:160px;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;"></td>' +
+      '<td style="padding:10px 12px;text-align:center;"><span class="btn-link" id="foSave_' + k + '" onclick="saveFirstOrderRow(\'' + k + '\')">保存</span></td>' +
+    '</tr>';
+  });
+  tbody.innerHTML = html;
+  renderFoSummary();
+}
+
+function renderFoSummary() {
+  var box = document.getElementById('foSummary');
+  if (!box) return;
+  if (!firstOrderGlobal) {
+    box.style.background = '#fff1f0';
+    box.style.borderColor = '#ffa39e';
+    box.style.color = '#ff4d4f';
+    box.innerHTML = '首单优惠总开关：<b>已关闭</b> —— 所有新用户首次购买无赠送。';
+    return;
+  }
+  box.style.background = '#f6ffed';
+  box.style.borderColor = '#b7eb8f';
+  box.style.color = 'var(--text-secondary)';
+  var lines = [];
+  Object.keys(pkgData).sort(function (a, b) { return pkgData[a].sort - pkgData[b].sort; }).forEach(function (k) {
+    var d = firstOrderData[k];
+    if (!d || !d.enabled) { lines.push(k + '：不参与'); return; }
+    var txt = d.method === 'equal' ? ('立赠等额灵感值 ' + pkgData[k].credits) : (d.method === 'percent' ? ('加赠 ' + d.amount + '%') : ('固定赠送 ' + d.amount + ' 灵感值'));
+    lines.push(k + '：' + txt + '（C端文案「' + d.copy + '」）');
+  });
+  box.innerHTML = '当前生效配置 —— ' + lines.join('；') + '。';
+}
+
+// ===== 配置类页面：保存真实生效（修复"只 toast 不落地"空转） =====
+function _markHistoryObsolete(tbody) {
+  var rows = tbody.querySelectorAll('tr');
+  for (var i = 1; i < rows.length; i++) {
+    var b = rows[i].querySelector('.badge-success');
+    if (b) { b.className = 'badge badge-default'; b.textContent = '已失效'; }
+  }
+}
+function saveInitConfig() {
+  var v = parseInt(document.querySelector('#viewInit input[type=number]').value, 10) || 0;
+  var date = document.querySelector('#viewInit input[type=date]').value || '2026-09-01';
+  var remark = document.querySelector('#viewInit textarea').value.trim() || '手动调整';
+  document.getElementById('initCurrentValue').textContent = v + ' 灵感值';
+  document.getElementById('initCurrentMeta').textContent = '生效日期：' + date + ' | 设置人：产品小王 | 备注：' + remark;
+  var tb = document.getElementById('initHistoryTbody');
+  var tr = document.createElement('tr');
+  tr.innerHTML = '<td><b>' + v + '</b></td><td>' + date + '</td><td>产品小王</td><td>' + remark + '</td><td><span class="badge badge-success">生效中</span></td><td><span class="action-link" onclick="toast(\'作废 ' + v + ' 灵感值配置\')">作废</span></td>';
+  tb.insertBefore(tr, tb.firstChild);
+  _markHistoryObsolete(tb);
+  toast('初始灵感值配置已保存：新用户注册发放 ' + v + ' 灵感值');
+}
+function savePricing() {
+  var v = parseFloat(document.querySelector('#viewPricing input[type=number]').value) || 0;
+  var date = document.querySelector('#viewPricing input[type=date]').value || '2026-09-01';
+  var remark = document.querySelector('#viewPricing textarea').value.trim() || '调价';
+  document.getElementById('pricingCurrentValue').innerHTML = '1 灵感值 = <b style="color:var(--primary);font-size:22px;">¥' + v.toFixed(2) + '</b>';
+  document.getElementById('pricingCurrentMeta').textContent = '生效日期：' + date + ' | 设置人：运营小李 | 备注：' + remark;
+  var tb = document.getElementById('pricingHistoryTbody');
+  var tr = document.createElement('tr');
+  tr.innerHTML = '<td><b>¥' + v.toFixed(2) + '</b></td><td>' + date + '</td><td>运营小李</td><td>' + remark + '</td><td><span class="badge badge-success">生效中</span></td><td><span class="action-link" onclick="toast(\'作废 ¥' + v.toFixed(2) + ' 定价\')">作废</span></td>';
+  tb.insertBefore(tr, tb.firstChild);
+  _markHistoryObsolete(tb);
+  toast('灵感值定价已保存：1 灵感值 = ¥' + v.toFixed(2));
+}
+function saveCostConfig() {
+  var v = parseInt(document.querySelector('#viewCost input[type=number]').value, 10) || 1;
+  var date = document.querySelector('#viewCost input[type=date]').value || '2026-09-01';
+  var remark = document.querySelector('#viewCost textarea').value.trim() || '调整';
+  document.getElementById('costImageValue').innerHTML = '每次消耗 <b style="color:var(--primary);">' + v + '</b> 灵感值';
+  var tb = document.getElementById('costHistoryTbody');
+  var tr = document.createElement('tr');
+  tr.innerHTML = '<td><b>' + v + ' 灵感值/次</b></td><td>' + date + '</td><td>运营小李</td><td>' + remark + '</td><td><span class="badge badge-success">生效中</span></td><td><span class="action-link" onclick="toast(\'作废 ' + v + ' 灵感值/次 配置\')">作废</span></td>';
+  tb.insertBefore(tr, tb.firstChild);
+  _markHistoryObsolete(tb);
+  toast('图片生成消耗已保存：每次 ' + v + ' 灵感值');
+}
+function togglePackageStatus(name) {
+  var d = pkgData[name];
+  if (!d) return;
+  d.status = d.status === 'off' ? 'on' : 'off';
+  renderPackageTable();
+  toast(name + (d.status === 'on' ? ' 已上架' : ' 已下架'));
+}
+
+// ===== 素材管理（后台，运营可配） =====
+// 数据源：MATERIALS（样例，真实由后端下发）；栏目来自 categoryData（素材栏目管理）
+var MATERIALS = [
+  { name: '秋季促销主视觉海报', cat: '营销海报', fmt: 'JPG', time: '2026-08-28 14:22' },
+  { name: '产品卖点九宫格', cat: '产品素材', fmt: 'PNG', time: '2026-08-27 09:11' },
+  { name: '门店活动宣传短片', cat: '活动物料', fmt: 'MP4', time: '2026-08-25 16:40' },
+  { name: '会员权益说明手册', cat: '产品素材', fmt: 'PDF', time: '2026-08-20 11:05' }
+];
+
+function renderMaterialTable() {
+  var tbody = document.getElementById('materialTbody');
+  if (!tbody) return;
+  if (!MATERIALS.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="padding:18px 12px;text-align:center;color:var(--text-tertiary);font-size:13px;">暂无素材。素材在「素材栏目管理」配置后展示。</td></tr>';
+    return;
+  }
+  var html = '';
+  MATERIALS.forEach(function (m, i) {
+    html += '<tr style="border-bottom:1px solid var(--border-light);">' +
+      '<td style="padding:10px 12px;font-size:13px;">' + m.name + '</td>' +
+      '<td style="padding:10px 12px;font-size:13px;">' + (m.cat || '—') + '</td>' +
+      '<td style="padding:10px 12px;font-size:13px;">' + m.fmt + '</td>' +
+      '<td style="padding:10px 12px;font-size:13px;color:var(--text-secondary);">' + m.time + '</td>' +
+      '<td style="padding:10px 12px;text-align:center;">' +
+        '<span class="btn-link" style="color:var(--red);" onclick="deleteMaterial(' + i + ')">删除</span>' +
+      '</td></tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+function deleteMaterial(idx) {
+  if (idx < 0 || idx >= MATERIALS.length) return;
+  confirmAction('删除素材', '确定要删除「' + MATERIALS[idx].name + '」吗？删除后不可恢复。', function () {
+    MATERIALS.splice(idx, 1);
+    renderMaterialTable();
+    toast('已删除素材');
+  });
+}
+
+// ===== 素材批量上传（后台，V0.5.1 新增；Modal 弹窗，用户 2026-09-03 确认改自原内联面板） =====
+var UPLOAD_MAX_COUNT = 20;
+var UPLOAD_MAX_SIZE = 50 * 1024 * 1024; // 50MB
+var UPLOAD_FMT = { jpg: 'JPG', jpeg: 'JPG', png: 'PNG', mp4: 'MP4', pdf: 'PDF' };
+var pendingUploads = []; // {file,name,fmt,size,status,reason,progress}
+
+function openUploadModal() {
+  var m = document.getElementById('uploadModal');
+  if (!m) return;
+  m.style.display = 'flex';
+  populateUploadCat();
+  document.getElementById('uploadList').style.display = 'none';
+  document.getElementById('uploadList').innerHTML = '';
+  pendingUploads = [];
+  updateStartBtn();
+}
+
+function closeUploadModal() {
+  var m = document.getElementById('uploadModal');
+  if (!m) return;
+  m.style.display = 'none';
+}
+
+function populateUploadCat() {
+  var sel = document.getElementById('uploadCat');
+  if (!sel) return;
+  var html = '<option value="">未分类</option>';
+  categoryData.filter(function (c) { return c.status === 'on'; }).forEach(function (c) {
+    html += '<option value="' + c.id + '">' + c.name + '</option>';
+  });
+  sel.innerHTML = html;
+}
+
+function handleUploadFiles(input) {
+  var files = Array.prototype.slice.call(input.files || []);
+  var list = document.getElementById('uploadList');
+  list.style.display = 'block';
+  pendingUploads = [];
+  files.forEach(function (f) {
+    var ext = (f.name.split('.').pop() || '').toLowerCase();
+    var fmt = UPLOAD_FMT[ext];
+    var reasons = [];
+    if (!fmt) reasons.push('不支持的格式');
+    if (f.size === 0) reasons.push('空文件');
+    if (f.size > UPLOAD_MAX_SIZE) reasons.push('超过 50MB');
+    pendingUploads.push({
+      file: f, name: f.name, fmt: fmt || ext.toUpperCase(),
+      size: f.size, status: reasons.length ? 'invalid' : 'pending',
+      reason: reasons.join('，'), progress: 0
+    });
+  });
+  if (pendingUploads.length > UPLOAD_MAX_COUNT) {
+    toast('单次最多 20 个，已忽略超出部分');
+    pendingUploads = pendingUploads.slice(0, UPLOAD_MAX_COUNT);
+  }
+  renderUploadList();
+  updateStartBtn();
+  input.value = '';
+}
+
+function renderUploadList() {
+  var list = document.getElementById('uploadList');
+  if (!list) return;
+  var html = '';
+  pendingUploads.forEach(function (u, i) {
+    var statusTxt;
+    if (u.status === 'invalid') {
+      statusTxt = '<span style="color:var(--red);">排除：' + u.reason + '</span>';
+    } else if (u.status === 'pending') {
+      statusTxt = '待上传';
+    } else if (u.status === 'uploading') {
+      statusTxt = '上传中 ' + u.progress + '%';
+    } else if (u.status === 'success') {
+      statusTxt = '<span style="color:#52c41a;">成功</span>';
+    } else if (u.status === 'fail') {
+      statusTxt = '<span style="color:var(--red);">失败</span> <span class="btn-link" onclick="retryUpload(' + i + ')">重试</span>';
+    }
+    var pct = (u.status === 'success') ? 100 : (u.status === 'uploading' ? u.progress : 0);
+    html += '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border-light);font-size:13px;">' +
+      '<div style="width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + u.name + '</div>' +
+      '<div style="width:48px;">' + (u.fmt || '-') + '</div>' +
+      '<div style="flex:1;height:6px;background:var(--border-light);border-radius:3px;overflow:hidden;"><div style="width:' + pct + '%;height:100%;background:#52c41a;"></div></div>' +
+      '<div style="width:150px;text-align:right;">' + statusTxt + '</div>' +
+      '</div>';
+  });
+  list.innerHTML = html;
+}
+
+function updateStartBtn() {
+  var btn = document.getElementById('startUploadBtn');
+  if (!btn) return;
+  btn.disabled = !pendingUploads.some(function (u) { return u.status === 'pending'; });
+}
+
+function startUpload() {
+  var catId = document.getElementById('uploadCat').value;
+  pendingUploads.forEach(function (u, i) {
+    if (u.status === 'pending') uploadOne(u, i, catId);
+  });
+}
+
+function uploadOne(u, i, catId) {
+  u.status = 'uploading'; u.progress = 0; renderUploadList();
+  var timer = setInterval(function () {
+    u.progress += Math.floor(Math.random() * 20) + 10;
+    if (u.progress >= 100) {
+      u.progress = 100; clearInterval(timer);
+      if (Math.random() < 0.15) { // 原型演示：模拟偶发失败，可重试
+        u.status = 'fail'; renderUploadList();
+      } else {
+        u.status = 'success'; renderUploadList();
+        commitMaterial(u, catId);
+      }
+    } else {
+      renderUploadList();
+    }
+  }, 200);
+}
+
+function retryUpload(i) {
+  var u = pendingUploads[i];
+  if (!u) return;
+  u.status = 'pending';
+  uploadOne(u, i, document.getElementById('uploadCat').value);
+}
+
+function commitMaterial(u, catId) {
+  var catName = '';
+  if (catId) { var c = categoryData.find(function (x) { return x.id === catId; }); catName = c ? c.name : ''; }
+  var base = u.name.replace(/\.[^.]+$/, '');
+  MATERIALS.unshift({ name: base, cat: catName, fmt: u.fmt, time: nowStr() });
+  renderMaterialTable();
+}
+
+function nowStr() {
+  var d = new Date();
+  function p(n) { return (n < 10 ? '0' : '') + n; }
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+
+// 素材管理仅保留「列表 + 删除 + 批量上传」，不臆测单条新增/编辑/状态切换功能（需求未要求）
+// 新增/编辑表单、状态切换、栏目下拉填充等相关函数已移除
+
+// ===== 素材栏目管理（CRUD，运营可配；预置占位栏目便于演示分栏） =====
+var categoryData = [
+  { id: 'cat_demo_1', name: '营销海报', sort: 1, status: 'on' },
+  { id: 'cat_demo_2', name: '产品素材', sort: 2, status: 'on' },
+  { id: 'cat_demo_3', name: '活动物料', sort: 3, status: 'on' },
+  { id: 'cat_demo_4', name: '会员权益', sort: 4, status: 'on' }
+];   // 占位演示栏目；运营可在后台自由增删改，真实上线以配置为准
+var catEditId = null;
+var catStatus = 'on';
+
+function renderCategoryTable() {
+  var tbody = document.getElementById('categoryTbody');
+  if (!tbody) return;
+  if (!categoryData.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="padding:18px 12px;text-align:center;color:var(--text-tertiary);font-size:13px;">当前暂无栏目（运营可配初始为空）。点击右上角「+ 新增栏目」添加分类。</td></tr>';
+    return;
+  }
+  var list = categoryData.slice().sort(function (a, b) { return a.sort - b.sort; });
+  var html = '';
+  list.forEach(function (c) {
+    html += '<tr style="border-bottom:1px solid var(--border-light);">' +
+      '<td style="padding:10px 12px;font-size:13px;">' + c.name + '</td>' +
+      '<td style="padding:10px 12px;font-size:13px;">' + c.sort + '</td>' +
+      '<td style="padding:10px 12px;">' + (c.status === 'off' ? '<span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#fff1f0;color:#ff4d4f;border:1px solid #ffa39e;">停用</span>' : '<span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f;">启用</span>') + '</td>' +
+      '<td style="padding:10px 12px;text-align:center;">' +
+        '<span class="btn-link" onclick="openCategoryForm(\'' + c.id + '\')">编辑</span>' +
+        '<span style="color:var(--border);margin:0 6px;">|</span>' +
+        '<span class="btn-link" style="color:var(--red);" onclick="deleteCategory(\'' + c.id + '\')">删除</span>' +
+      '</td></tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+function openCategoryForm(id) {
+  catEditId = id || null;
+  document.getElementById('catFormTitle').textContent = id ? '编辑栏目' : '新增栏目';
+  var c = id ? categoryData.find(function (x) { return x.id === id; }) : null;
+  document.getElementById('catName').value = c ? c.name : '';
+  document.getElementById('catSort').value = c ? c.sort : 5;
+  switchCatStatus(document.getElementById('catStatusOn'), c ? c.status : 'on');
+  go('categoryForm');
+}
+
+function switchCatStatus(el, mode) {
+  catStatus = mode;
+  if (!el) return;
+  var items = el.parentElement.querySelectorAll('.tab-switch-item');
+  for (var i = 0; i < items.length; i++) items[i].classList.remove('active');
+  el.classList.add('active');
+}
+
+function submitCategoryForm() {
+  var name = document.getElementById('catName').value.trim();
+  var sort = parseInt(document.getElementById('catSort').value, 10) || 99;
+  if (!name) { alert('请填写栏目名称'); return; }
+  if (catEditId) {
+    var c = categoryData.find(function (x) { return x.id === catEditId; });
+    if (c) { c.name = name; c.sort = sort; c.status = catStatus; }
+    toast('已保存栏目「' + name + '」');
+  } else {
+    categoryData.push({ id: 'cat_' + Date.now(), name: name, sort: sort, status: catStatus });
+    toast('已新增栏目「' + name + '」');
+  }
+  setTimeout(function () { go('materialCategory'); }, 700);
+}
+
+function deleteCategory(id) {
+  var c = categoryData.find(function (x) { return x.id === id; });
+  confirmAction('删除栏目', '确定要删除栏目「' + (c ? c.name : '') + '」吗？删除后 C 端该栏目 Tab 将移除，已绑定素材回退「未分类」。', function () {
+    categoryData = categoryData.filter(function (x) { return x.id !== id; });
+    renderCategoryTable();
+    toast('已删除栏目');
+  });
+}
+
+// ===== 通用删除二次确认弹窗（所有删除操作统一复用：先确认再执行，杜绝误删） =====
+var __confirmCb = null;
+function confirmAction(title, text, onOk) {
+  document.getElementById('confirmTitle').textContent = title || '确认删除';
+  document.getElementById('confirmText').textContent = text || '此操作不可恢复，确定要删除吗？';
+  __confirmCb = onOk;
+  document.getElementById('confirmModal').style.display = 'flex';
+}
+function closeConfirm() {
+  document.getElementById('confirmModal').style.display = 'none';
+  __confirmCb = null;
+}
+function runConfirm() {
+  var cb = __confirmCb;
+  closeConfirm();
+  if (typeof cb === 'function') cb();
+}
+
+// ===== 辅助提示词配置（运维中心 · AI 板块；与 C 端生图页同源下发） =====
+var PROMPT_CONFIG = [
+  { group: 'style', title: '风格', tags: ['写实照片','动漫插画','水彩手绘','蜡笔涂鸦','国风山水'] },
+  { group: 'scene', title: '场景', tags: ['室内居家','城市街景','自然风光','梦幻星空'] },
+  { group: 'light', title: '光线 / 氛围', tags: ['柔光','逆光','暖色调','电影感'] }
+];
+
+function renderPromptConfigAdmin() {
+  var box = document.getElementById('promptConfigAdmin');
+  if (!box) return;
+  var html = '<div style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;line-height:1.6;">以下板块与词条将下发到 C 端「AI 生图 / AI 生视频」页的「辅助提示词」区域；每个板块需指定「适用类型」（生图 / 生视频），C 端对应页面仅展示匹配类型的词条。新增 / 编辑词条后点击对应板块「保存」即生效（原型为前端占位，真实由后端持久化）。</div>';
+  PROMPT_CONFIG.forEach(function (g, gi) {
+    html += '<div style="border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;background:#fff;">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">' +
+        '<div style="font-size:15px;font-weight:600;">' + (gi + 1) + '、' + g.title + '</div>' +
+        '<div style="font-size:13px;color:var(--text-secondary);">板块标识：<code style="background:#f5f5f5;padding:2px 6px;border-radius:4px;">' + g.group + '</code></div>' +
+      '</div>' +
+      '<div id="pcTags_' + g.group + '" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">';
+    g.tags.forEach(function (t, ti) {
+      html += '<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:16px;background:#f5f5f5;font-size:13px;">' + t +
+        '<span style="color:var(--red);cursor:pointer;" onclick="removePromptTag(\'' + g.group + '\',' + ti + ')">✕</span></span>';
+    });
+    html += '</div>' +
+      '<div style="display:flex;gap:8px;align-items:center;">' +
+        '<input id="pcInput_' + g.group + '" placeholder="输入新词条后回车" style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;">' +
+        '<button class="btn btn-default" style="height:34px;padding:0 16px;" onclick="addPromptTag(\'' + g.group + '\')">添加词条</button>' +
+        '<button class="btn btn-primary" style="height:34px;padding:0 16px;" onclick="toast(\'已保存「' + g.title + '」配置（原型占位）\')">保存</button>' +
+      '</div>' +
+    '</div>';
+  });
+  box.innerHTML = html;
+  PROMPT_CONFIG.forEach(function (g) {
+    var input = document.getElementById('pcInput_' + g.group);
+    if (input) input.addEventListener('keydown', function (e) { if (e.key === 'Enter') addPromptTag(g.group); });
+  });
+}
+
+function addPromptTag(group) {
+  var g = PROMPT_CONFIG.find(function (x) { return x.group === group; });
+  if (!g) return;
+  var input = document.getElementById('pcInput_' + group);
+  var val = input ? input.value.trim() : '';
+  if (!val) return;
+  g.tags.push(val);
+  if (input) input.value = '';
+  renderPromptConfigAdmin();
+}
+
+function removePromptTag(group, idx) {
+  var g = PROMPT_CONFIG.find(function (x) { return x.group === group; });
+  if (!g || idx < 0 || idx >= g.tags.length) return;
+  g.tags.splice(idx, 1);
+  renderPromptConfigAdmin();
+}
+
+// 生视频成本配置保存（原型占位）
+function saveVideoCostConfig() {
+  toast('已保存生视频成本配置（原型占位）');
+}
+
+// 辅助提示词适用类型切换（原型占位）
+function setPromptApplyType(group, val) {
+  var g = PROMPT_CONFIG.find(function (x) { return x.group === group; });
+  if (g) g.applyType = val;
+  toast('已更新「' + group + '」适用类型为 ' + (val === 'video' ? '生视频' : '生图') + '（原型占位）');
+}
+
+// 初始进入会员管理
+go('member');
+</script>
+
+<!-- ==================== 通用删除二次确认弹窗（所有删除操作统一复用） ==================== -->
+<div id="confirmModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.45);align-items:center;justify-content:center;">
+  <div style="width:300px;max-width:86%;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.18);">
+    <div style="padding:22px 20px 6px;font-size:16px;font-weight:600;color:#1f2329;text-align:center;" id="confirmTitle">确认删除</div>
+    <div style="padding:4px 20px 18px;font-size:14px;color:#646a73;line-height:1.6;text-align:center;" id="confirmText">此操作不可恢复，确定要删除吗？</div>
+    <div style="display:flex;border-top:1px solid #eef0f2;">
+      <div style="flex:1;padding:13px 0;text-align:center;font-size:15px;color:#646a73;cursor:pointer;" id="confirmCancel" onclick="closeConfirm()">取消</div>
+      <div style="flex:1;padding:13px 0;text-align:center;font-size:15px;color:#ff4d4f;font-weight:500;cursor:pointer;border-left:1px solid #eef0f2;" id="confirmOk" onclick="runConfirm()">删除</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
