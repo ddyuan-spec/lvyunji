@@ -911,12 +911,12 @@
     }
 
     // ===== V0.6：素材库（分类 Tab 由后台「素材栏目管理」下发，运营可配初始为空） =====
-    const MATERIAL_CATEGORIES = [];   // 占位：后台配置后填充，如 ['营销海报','产品素材','活动物料']
+    const MATERIAL_CATEGORIES = ['营销海报', '产品素材', '活动物料', '会员权益'];   // 占位演示栏目（真实由后台「素材栏目管理」下发）
     const MATERIALS = [
-      { name: '秋季促销海报模板 v2', type: 'image', fmt: 'JPG', cat: '' },
-      { name: '新品上市主视觉', type: 'image', fmt: 'PNG', cat: '' },
-      { name: '门店探店短视频', type: 'video', fmt: 'MP4', cat: '' },
-      { name: '产品手册', type: 'doc', fmt: 'PDF', cat: '' }
+      { name: '秋季促销海报模板 v2', type: 'image', fmt: 'JPG', cat: '营销海报' },
+      { name: '新品上市主视觉', type: 'image', fmt: 'PNG', cat: '产品素材' },
+      { name: '门店探店短视频', type: 'video', fmt: 'MP4', cat: '活动物料' },
+      { name: '产品手册', type: 'doc', fmt: 'PDF', cat: '会员权益' }
     ];
     function renderMaterialTabs() {
       const tabs = document.getElementById('materialTabs');
