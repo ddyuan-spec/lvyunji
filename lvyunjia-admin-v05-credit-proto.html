@@ -1455,9 +1455,11 @@ function renderMaterialTable() {
 
 function deleteMaterial(idx) {
   if (idx < 0 || idx >= MATERIALS.length) return;
-  MATERIALS.splice(idx, 1);
-  renderMaterialTable();
-  toast('已删除素材');
+  confirmAction('删除素材', '确定要删除「' + MATERIALS[idx].name + '」吗？删除后不可恢复。', function () {
+    MATERIALS.splice(idx, 1);
+    renderMaterialTable();
+    toast('已删除素材');
+  });
 }
 
 // 素材管理仅保留「列表 + 删除」，不臆测新增/编辑/状态切换功能（需求未要求）
@@ -1530,9 +1532,30 @@ function submitCategoryForm() {
 }
 
 function deleteCategory(id) {
-  categoryData = categoryData.filter(function (x) { return x.id !== id; });
-  renderCategoryTable();
-  toast('已删除栏目');
+  var c = categoryData.find(function (x) { return x.id === id; });
+  confirmAction('删除栏目', '确定要删除栏目「' + (c ? c.name : '') + '」吗？删除后 C 端该栏目 Tab 将移除，已绑定素材回退「未分类」。', function () {
+    categoryData = categoryData.filter(function (x) { return x.id !== id; });
+    renderCategoryTable();
+    toast('已删除栏目');
+  });
+}
+
+// ===== 通用删除二次确认弹窗（所有删除操作统一复用：先确认再执行，杜绝误删） =====
+var __confirmCb = null;
+function confirmAction(title, text, onOk) {
+  document.getElementById('confirmTitle').textContent = title || '确认删除';
+  document.getElementById('confirmText').textContent = text || '此操作不可恢复，确定要删除吗？';
+  __confirmCb = onOk;
+  document.getElementById('confirmModal').style.display = 'flex';
+}
+function closeConfirm() {
+  document.getElementById('confirmModal').style.display = 'none';
+  __confirmCb = null;
+}
+function runConfirm() {
+  var cb = __confirmCb;
+  closeConfirm();
+  if (typeof cb === 'function') cb();
 }
 
 // ===== 辅助提示词配置（运维中心 · AI 板块；与 C 端生图页同源下发） =====
@@ -1593,6 +1616,18 @@ function removePromptTag(group, idx) {
 // 初始进入会员管理
 go('member');
 </script>
+
+<!-- ==================== 通用删除二次确认弹窗（所有删除操作统一复用） ==================== -->
+<div id="confirmModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.45);align-items:center;justify-content:center;">
+  <div style="width:300px;max-width:86%;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.18);">
+    <div style="padding:22px 20px 6px;font-size:16px;font-weight:600;color:#1f2329;text-align:center;" id="confirmTitle">确认删除</div>
+    <div style="padding:4px 20px 18px;font-size:14px;color:#646a73;line-height:1.6;text-align:center;" id="confirmText">此操作不可恢复，确定要删除吗？</div>
+    <div style="display:flex;border-top:1px solid #eef0f2;">
+      <div style="flex:1;padding:13px 0;text-align:center;font-size:15px;color:#646a73;cursor:pointer;" id="confirmCancel" onclick="closeConfirm()">取消</div>
+      <div style="flex:1;padding:13px 0;text-align:center;font-size:15px;color:#ff4d4f;font-weight:500;cursor:pointer;border-left:1px solid #eef0f2;" id="confirmOk" onclick="runConfirm()">删除</div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
