@@ -995,7 +995,7 @@
 <section class="view admin-page" id="viewMaterial">
   <div class="page-header">
     <div class="page-title">素材管理</div>
-    <div><button class="btn btn-primary" onclick="go('materialForm')">+ 新增素材</button></div>
+    <div><button class="btn btn-primary" onclick="openMaterialForm()">+ 新增素材</button></div>
   </div>
   <div class="page-body">
     <div style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6;">
@@ -1492,9 +1492,9 @@ function renderMaterialTable() {
       '<td style="padding:10px 12px;font-size:13px;">' + (m.cat || '—') + '</td>' +
       '<td style="padding:10px 12px;font-size:13px;">' + m.fmt + '</td>' +
       '<td style="padding:10px 12px;font-size:13px;color:var(--text-secondary);">' + m.time + '</td>' +
-      '<td style="padding:10px 12px;">' + (m.status === 'off' ? '<span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#fff1f0;color:#ff4d4f;border:1px solid #ffa39e;">停用</span>' : '<span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f;">启用</span>') + '</td>' +
+      '<td style="padding:10px 12px;cursor:pointer;" onclick="toggleMaterialStatus(' + i + ')" title="点击切换启用/停用">' + (m.status === 'off' ? '<span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#fff1f0;color:#ff4d4f;border:1px solid #ffa39e;">停用</span>' : '<span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f;">启用</span>') + '</td>' +
       '<td style="padding:10px 12px;text-align:center;">' +
-        '<span class="btn-link" onclick="toast(\'打开编辑（原型占位）\')">编辑</span>' +
+        '<span class="btn-link" onclick="editMaterial(' + i + ')">编辑</span>' +
         '<span style="color:var(--border);margin:0 6px;">|</span>' +
         '<span class="btn-link" style="color:var(--red);" onclick="deleteMaterial(' + i + ')">删除</span>' +
       '</td></tr>';
@@ -1509,17 +1509,60 @@ function deleteMaterial(idx) {
   toast('已删除素材');
 }
 
+// ===== 状态切换（启用 <-> 停用） =====
+function toggleMaterialStatus(idx) {
+  if (idx < 0 || idx >= MATERIALS.length) return;
+  MATERIALS[idx].status = MATERIALS[idx].status === 'off' ? 'on' : 'off';
+  renderMaterialTable();
+  toast('素材已' + (MATERIALS[idx].status === 'on' ? '启用' : '停用'));
+}
+
+// ===== 编辑素材（复用新增表单，回填字段） =====
+var matEditIdx = null;
+
+function openMaterialForm() {
+  matEditIdx = null;
+  document.getElementById('materialFormTitle').textContent = '新增素材';
+  document.getElementById('matName').value = '';
+  document.getElementById('matFmt').value = 'JPG';
+  document.getElementById('matRemark').value = '';
+  populateCategorySelect();
+  document.getElementById('matCategory').value = '';
+  go('materialForm');
+}
+
+function editMaterial(idx) {
+  if (idx < 0 || idx >= MATERIALS.length) return;
+  var m = MATERIALS[idx];
+  matEditIdx = idx;
+  document.getElementById('materialFormTitle').textContent = '编辑素材';
+  populateCategorySelect();
+  document.getElementById('matName').value = m.name || '';
+  document.getElementById('matCategory').value = m.cat || '';
+  document.getElementById('matFmt').value = m.fmt || 'JPG';
+  document.getElementById('matRemark').value = m.remark || '';
+  go('materialForm');
+}
+
 function submitMaterialForm() {
   var name = document.getElementById('matName').value.trim();
   var cat = document.getElementById('matCategory').value;
   var fmt = document.getElementById('matFmt').value;
   var remark = document.getElementById('matRemark').value.trim();
   if (!name) { alert('请填写素材名称'); return; }
-  function p(n){ return (n < 10 ? '0' : '') + n; }
-  var now = new Date();
-  var time = now.getFullYear() + '-' + p(now.getMonth() + 1) + '-' + p(now.getDate()) + ' ' + p(now.getHours()) + ':' + p(now.getMinutes());
-  MATERIALS.push({ name: name, cat: cat, fmt: fmt, time: time, status: 'on', remark: remark });
-  toast('已新增素材「' + name + '」' + (cat ? '（栏目：' + cat + '）' : ''));
+  if (matEditIdx !== null && matEditIdx >= 0 && matEditIdx < MATERIALS.length) {
+    var m = MATERIALS[matEditIdx];
+    m.name = name; m.cat = cat; m.fmt = fmt; m.remark = remark;
+    matEditIdx = null;
+    document.getElementById('materialFormTitle').textContent = '新增素材';
+    toast('已保存素材「' + name + '」');
+  } else {
+    function p(n){ return (n < 10 ? '0' : '') + n; }
+    var now = new Date();
+    var time = now.getFullYear() + '-' + p(now.getMonth() + 1) + '-' + p(now.getDate()) + ' ' + p(now.getHours()) + ':' + p(now.getMinutes());
+    MATERIALS.push({ name: name, cat: cat, fmt: fmt, time: time, status: 'on', remark: remark });
+    toast('已新增素材「' + name + '」' + (cat ? '（栏目：' + cat + '）' : ''));
+  }
   setTimeout(function () { go('material'); }, 700);
 }
 
