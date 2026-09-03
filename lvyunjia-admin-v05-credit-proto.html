@@ -991,15 +991,14 @@
   </div>
 </section>
 
-<!-- ==================== 视图：素材管理（列表 + 新增素材，含栏目选择） ==================== -->
+<!-- ==================== 视图：素材管理（列表 + 删除，按栏目归类） ==================== -->
 <section class="view admin-page" id="viewMaterial">
   <div class="page-header">
     <div class="page-title">素材管理</div>
-    <div><button class="btn btn-primary" onclick="openMaterialForm()">+ 新增素材</button></div>
   </div>
   <div class="page-body">
     <div style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6;">
-      管理可下发的营销素材（图片 / 视频 / PDF）。新增素材需选择所属栏目，栏目在「素材栏目管理」中配置。
+      管理可下发的营销素材（图片 / 视频 / PDF），支持按栏目归类与删除。栏目在「素材栏目管理」中配置。
     </div>
     <table class="data-table" style="width:100%;border-collapse:collapse;">
       <thead>
@@ -1008,7 +1007,6 @@
           <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">栏目</th>
           <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">格式</th>
           <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">上传时间</th>
-          <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">状态</th>
           <th style="padding:10px 12px;text-align:center;font-size:13px;border-bottom:1px solid var(--border);">操作</th>
         </tr>
       </thead>
@@ -1017,50 +1015,7 @@
   </div>
 </section>
 
-<!-- ==================== 视图：新增 / 编辑素材（独立页，含栏目选择） ==================== -->
-<section class="view admin-page" id="viewMaterialForm">
-  <div class="page-header">
-    <div class="adjust-header">
-      <div class="adjust-back" onclick="go('material')">← 返回素材列表</div>
-      <div class="page-title" style="margin:0;" id="materialFormTitle">新增素材</div>
-    </div>
-  </div>
-  <div class="page-body">
-    <div class="form-row">
-      <label class="form-label">素材名称</label>
-      <input class="form-input" type="text" id="matName" placeholder="如：秋季促销海报模板 v2" style="width:280px;">
-      <span style="font-size:13px;color:var(--red);">*</span>
-    </div>
-    <div class="form-row">
-      <label class="form-label">所属栏目</label>
-      <select class="filter-select" id="matCategory" style="width:280px;height:36px;"></select>
-      <span style="font-size:13px;color:var(--text-secondary);">栏目在「素材栏目管理」配置</span>
-    </div>
-    <div class="form-row">
-      <label class="form-label">格式</label>
-      <select class="filter-select" id="matFmt" style="width:160px;height:36px;">
-        <option value="JPG">JPG 图片</option>
-        <option value="PNG">PNG 图片</option>
-        <option value="MP4">MP4 视频</option>
-        <option value="AVI">AVI 视频</option>
-        <option value="PDF">PDF 文档</option>
-      </select>
-    </div>
-    <div class="form-row">
-      <label class="form-label">上传文件</label>
-      <div style="width:180px;height:120px;border:1px dashed #ddd;border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--text-tertiary);font-size:13px;cursor:pointer;" onclick="toast('打开文件选择器（原型占位）')">点击上传</div>
-    </div>
-    <div class="form-row">
-      <label class="form-label">备注</label>
-      <input class="form-input" type="text" id="matRemark" placeholder="选填" style="width:280px;">
-    </div>
-    <div class="form-row">
-      <label class="form-label"></label>
-      <button class="btn btn-primary" style="height:36px;padding:0 24px;" onclick="submitMaterialForm()">确定</button>
-      <button class="btn btn-default" style="height:36px;padding:0 24px;margin-left:8px;" onclick="go('material')">取消</button>
-    </div>
-  </div>
-</section>
+<!-- 新增/编辑素材表单页已移除：按需求素材管理仅保留「列表 + 删除」，不做新增/编辑/状态切换（避免臆测功能） -->
 
 <!-- ==================== 视图：素材栏目管理（CRUD，运营可配初始为空） ==================== -->
 <section class="view admin-page" id="viewMaterialCategory">
@@ -1154,7 +1109,6 @@ function go(key) {
   if (key === 'firstOrder') renderFirstOrder();
   if (key === 'material') renderMaterialTable();
   if (key === 'materialCategory') renderCategoryTable();
-  if (key === 'materialForm') populateCategorySelect();
   if (key === 'promptConfig') renderPromptConfigAdmin();
 }
 
@@ -1472,17 +1426,17 @@ function togglePackageStatus(name) {
 // ===== 素材管理（后台，运营可配） =====
 // 数据源：MATERIALS（样例，真实由后端下发）；栏目来自 categoryData（素材栏目管理）
 var MATERIALS = [
-  { name: '秋季促销主视觉海报', cat: '营销海报', fmt: 'JPG', time: '2026-08-28 14:22', status: 'on' },
-  { name: '产品卖点九宫格', cat: '产品素材', fmt: 'PNG', time: '2026-08-27 09:11', status: 'on' },
-  { name: '门店活动宣传短片', cat: '活动物料', fmt: 'MP4', time: '2026-08-25 16:40', status: 'off' },
-  { name: '会员权益说明手册', cat: '产品素材', fmt: 'PDF', time: '2026-08-20 11:05', status: 'on' }
+  { name: '秋季促销主视觉海报', cat: '营销海报', fmt: 'JPG', time: '2026-08-28 14:22' },
+  { name: '产品卖点九宫格', cat: '产品素材', fmt: 'PNG', time: '2026-08-27 09:11' },
+  { name: '门店活动宣传短片', cat: '活动物料', fmt: 'MP4', time: '2026-08-25 16:40' },
+  { name: '会员权益说明手册', cat: '产品素材', fmt: 'PDF', time: '2026-08-20 11:05' }
 ];
 
 function renderMaterialTable() {
   var tbody = document.getElementById('materialTbody');
   if (!tbody) return;
   if (!MATERIALS.length) {
-    tbody.innerHTML = '<tr><td colspan="6" style="padding:18px 12px;text-align:center;color:var(--text-tertiary);font-size:13px;">暂无素材，点击右上角「+ 新增素材」上传。</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" style="padding:18px 12px;text-align:center;color:var(--text-tertiary);font-size:13px;">暂无素材。素材在「素材栏目管理」配置后展示。</td></tr>';
     return;
   }
   var html = '';
@@ -1492,10 +1446,7 @@ function renderMaterialTable() {
       '<td style="padding:10px 12px;font-size:13px;">' + (m.cat || '—') + '</td>' +
       '<td style="padding:10px 12px;font-size:13px;">' + m.fmt + '</td>' +
       '<td style="padding:10px 12px;font-size:13px;color:var(--text-secondary);">' + m.time + '</td>' +
-      '<td style="padding:10px 12px;cursor:pointer;" onclick="toggleMaterialStatus(' + i + ')" title="点击切换启用/停用">' + (m.status === 'off' ? '<span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#fff1f0;color:#ff4d4f;border:1px solid #ffa39e;">停用</span>' : '<span class="tag" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f;">启用</span>') + '</td>' +
       '<td style="padding:10px 12px;text-align:center;">' +
-        '<span class="btn-link" onclick="editMaterial(' + i + ')">编辑</span>' +
-        '<span style="color:var(--border);margin:0 6px;">|</span>' +
         '<span class="btn-link" style="color:var(--red);" onclick="deleteMaterial(' + i + ')">删除</span>' +
       '</td></tr>';
   });
@@ -1509,76 +1460,8 @@ function deleteMaterial(idx) {
   toast('已删除素材');
 }
 
-// ===== 状态切换（启用 <-> 停用） =====
-function toggleMaterialStatus(idx) {
-  if (idx < 0 || idx >= MATERIALS.length) return;
-  MATERIALS[idx].status = MATERIALS[idx].status === 'off' ? 'on' : 'off';
-  renderMaterialTable();
-  toast('素材已' + (MATERIALS[idx].status === 'on' ? '启用' : '停用'));
-}
-
-// ===== 编辑素材（复用新增表单，回填字段） =====
-var matEditIdx = null;
-
-function openMaterialForm() {
-  matEditIdx = null;
-  document.getElementById('materialFormTitle').textContent = '新增素材';
-  document.getElementById('matName').value = '';
-  document.getElementById('matFmt').value = 'JPG';
-  document.getElementById('matRemark').value = '';
-  populateCategorySelect();
-  document.getElementById('matCategory').value = '';
-  go('materialForm');
-}
-
-function editMaterial(idx) {
-  if (idx < 0 || idx >= MATERIALS.length) return;
-  var m = MATERIALS[idx];
-  matEditIdx = idx;
-  document.getElementById('materialFormTitle').textContent = '编辑素材';
-  populateCategorySelect();
-  document.getElementById('matName').value = m.name || '';
-  document.getElementById('matCategory').value = m.cat || '';
-  document.getElementById('matFmt').value = m.fmt || 'JPG';
-  document.getElementById('matRemark').value = m.remark || '';
-  go('materialForm');
-}
-
-function submitMaterialForm() {
-  var name = document.getElementById('matName').value.trim();
-  var cat = document.getElementById('matCategory').value;
-  var fmt = document.getElementById('matFmt').value;
-  var remark = document.getElementById('matRemark').value.trim();
-  if (!name) { alert('请填写素材名称'); return; }
-  if (matEditIdx !== null && matEditIdx >= 0 && matEditIdx < MATERIALS.length) {
-    var m = MATERIALS[matEditIdx];
-    m.name = name; m.cat = cat; m.fmt = fmt; m.remark = remark;
-    matEditIdx = null;
-    document.getElementById('materialFormTitle').textContent = '新增素材';
-    toast('已保存素材「' + name + '」');
-  } else {
-    function p(n){ return (n < 10 ? '0' : '') + n; }
-    var now = new Date();
-    var time = now.getFullYear() + '-' + p(now.getMonth() + 1) + '-' + p(now.getDate()) + ' ' + p(now.getHours()) + ':' + p(now.getMinutes());
-    MATERIALS.push({ name: name, cat: cat, fmt: fmt, time: time, status: 'on', remark: remark });
-    toast('已新增素材「' + name + '」' + (cat ? '（栏目：' + cat + '）' : ''));
-  }
-  setTimeout(function () { go('material'); }, 700);
-}
-
-function populateCategorySelect() {
-  var sel = document.getElementById('matCategory');
-  if (!sel) return;
-  if (!categoryData.length) {
-    sel.innerHTML = '<option value="">（暂无栏目，请先在「素材栏目管理」配置）</option>';
-    return;
-  }
-  var html = '';
-  categoryData.filter(function (c) { return c.status === 'on'; }).forEach(function (c) {
-    html += '<option value="' + c.name + '">' + c.name + '</option>';
-  });
-  sel.innerHTML = html || '<option value="">（无启用栏目）</option>';
-}
+// 素材管理仅保留「列表 + 删除」，不臆测新增/编辑/状态切换功能（需求未要求）
+// 新增/编辑表单、状态切换、栏目下拉填充等相关函数已移除
 
 // ===== 素材栏目管理（CRUD，运营可配；预置占位栏目便于演示分栏） =====
 var categoryData = [
