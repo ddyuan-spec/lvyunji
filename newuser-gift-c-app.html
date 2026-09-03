@@ -963,8 +963,53 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
       分享邀请码给新人，新人在「绿韵家」新人礼包页输入邀请码即可下单领取礼包（益齿健套装 + 5L 饮用水×7 袋）。每个邀请码仅可使用一次。
     </div>
     <div style="padding:0 12px;margin-top:16px">
-      <button class="btn-primary" onclick="go('p_my_codes')">查看我的邀请码</button>
+      <button class="btn-primary" onclick="goInviteOrderDetail()">查看我的订单</button>
+      <button class="btn-outline" style="width:100%;height:44px;border-radius:22px;margin-top:10px;background:#fff;font-size:14px;cursor:pointer;border:1px solid var(--c-primary);color:var(--c-primary)" onclick="go('p_my_codes')">查看我的邀请码</button>
       <button class="btn-outline-grey" style="width:100%;height:44px;border-radius:22px;margin-top:10px;background:#fff;font-size:14px;cursor:pointer" onclick="go('p_home')">返回首页</button>
+    </div>
+  </div>
+
+  <!-- ===== p_invite_order_detail 邀请码订单详情（已完成） ===== -->
+  <div class="page orders" id="p_invite_order_detail">
+    <div class="nav">
+      <div class="back" onclick="go('p_my_orders')">‹</div>
+      订单详情
+    </div>
+
+    <div style="background:var(--c-primary);color:#fff;padding:18px 16px">
+      <div style="font-size:12px;opacity:.9">订单状态</div>
+      <div style="font-size:20px;font-weight:700;margin-top:4px">已完成</div>
+    </div>
+
+    <div class="order-list" style="padding-top:10px">
+      <div class="order-card">
+        <div class="och">
+          <div class="oid">订单号：<span id="inv_od_id">-</span> <span class="otype-tag member">邀请码订单</span></div>
+          <div class="ostatus green">已完成</div>
+        </div>
+        <div class="ogoods">
+          <div class="othumb">🎁</div>
+          <div class="oinfo">
+            <div class="name">新人激活码礼包</div>
+            <div class="desc">购买即自动生成邀请码，已存入「我的邀请码」</div>
+            <div class="badges"><div class="b member">会员专享</div></div>
+            <div class="pricerow"><span class="amt" id="inv_od_price">¥0.00</span><span class="qty" id="inv_od_qty">x1</span></div>
+          </div>
+        </div>
+        <div class="ofoot">
+          <div class="ptime" id="inv_od_time"></div>
+          <div class="psum">共 <span id="inv_od_cnt">1</span> 个邀请码，实付：<span class="paid" id="inv_od_paid">¥0.00</span></div>
+          <div class="pactions">
+            <div class="btn" onclick="toast('正在为您接入客服...')">联系客服</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin:0 12px;background:#fff;border-radius:10px;padding:12px 14px;font-size:12px;color:var(--c-text-2);line-height:1.9;box-shadow:0 1px 4px rgba(0,0,0,.04)">
+        <div><span style="display:inline-block;width:72px;color:var(--c-text-3)">下单时间</span><span id="inv_od_time2"></span></div>
+        <div><span style="display:inline-block;width:72px;color:var(--c-text-3)">支付方式</span>微信支付</div>
+        <div><span style="display:inline-block;width:72px;color:var(--c-text-3)">订单编号</span><span id="inv_od_id2">-</span></div>
+      </div>
     </div>
   </div>
 
@@ -994,7 +1039,7 @@ var _codesCache = [];
 */
 window._orderTypeMap = {
   normal:   { label: '常规订单', badgeCls: 'normal' },
-  member:   { label: '会员订单', badgeCls: 'member' },
+  member:   { label: '邀请码订单', badgeCls: 'member' },
   exchange: { label: '兑换订单', badgeCls: 'exchange' }
 };
 window._orderStatusMap = {
@@ -1256,14 +1301,21 @@ function renderOrderList(){
     var s = window._orderStatusMap[o.status] || window._orderStatusMap.done;
     var paidCls = o.paid === 0 ? 'zero' : '';
     var paidAmt = o.paid === 0 ? '¥0.00' : '¥' + o.paid.toFixed(2);
-    var orderBtn = o.status === 'done' ? '<div class="btn solid" onclick="toast(\'评价订单 '+o.id+'\')">评价</div>' : '';
-    var contactBtn = '<div class="btn" onclick="toast(\'联系客服 /订单 '+o.id+'\')">联系客服</div>';
-    var actionsHtml = '<div class="pactions">' + contactBtn + orderBtn + '</div>';
+    var isInvite = (o.type === 'member' && o.isInvite);
+    var cardClick = isInvite ? ' onclick="goInviteOrderDetail()"' : '';
+    var actionsHtml;
+    if(isInvite){
+      actionsHtml = '';
+    } else {
+      var orderBtn = o.status === 'done' ? '<div class="btn solid" onclick="toast(\'评价订单 '+o.id+'\')">评价</div>' : '';
+      var contactBtn = '<div class="btn" onclick="toast(\'联系客服 /订单 '+o.id+'\')">联系客服</div>';
+      actionsHtml = '<div class="pactions">' + contactBtn + orderBtn + '</div>';
+    }
     var discountBadge = o.type === 'member'   ? '<div class="b member">会员专享</div>'
                       : o.type === 'exchange' ? '<div class="b exchange">邀请码抵扣</div>'
                       : (o.goods.discount ? '<div class="b discount">'+o.goods.discount+'</div>' : '');
     var ptimeHtml = o.payTime ? '<div class="ptime">支付时间: '+o.payTime+'</div>' : '';
-    html += '<div class="order-card" data-type="'+o.type+'" data-status="'+o.status+'">'
+    html += '<div class="order-card" data-type="'+o.type+'" data-status="'+o.status+'"'+cardClick+'>'
       + '<div class="och">'
       +   '<div class="oid">订单号：'+o.id+' <span class="otype-tag '+t.badgeCls+'">'+t.label+'</span></div>'
       +   '<div class="ostatus '+(s.color||'')+'">'+s.label+'</div>'
@@ -1294,7 +1346,8 @@ function addMemberOrder(qty){
   window._orders.unshift({
     id: id,
     type: 'member',
-    status: 'toship',
+    status: 'done',
+    isInvite: true,
     goods: { name: '新人激活码礼包', desc: '激活码 × '+qty+'（购买即自动发到「我的邀请码」）', thumb: '🎁', price: 35.00, qty: qty, discount: '会员专享' },
     paid: price,
     payTime: formatNow()
@@ -1429,6 +1482,32 @@ function doInvitePay(){
   toast('支付成功');
   setTimeout(function(){ go('p_invite_buy_success'); }, 300);
 }
+
+/* ========== 邀请码订单详情（已完成） ========== */
+function goInviteOrderDetail(){
+  var ord = null;
+  for(var i=window._orders.length-1;i>=0;i--){
+    if(window._orders[i].type==='member' && window._orders[i].isInvite){ ord = window._orders[i]; break; }
+  }
+  if(!ord){
+    for(var i=window._orders.length-1;i>=0;i--){ if(window._orders[i].type==='member'){ ord=window._orders[i]; break; } }
+  }
+  if(!ord){ toast('暂无邀请码订单'); return; }
+  renderInviteOrderDetail(ord);
+  go('p_invite_order_detail');
+}
+function renderInviteOrderDetail(o){
+  var qty = o.goods.qty;
+  setTxt('inv_od_id', o.id);
+  setTxt('inv_od_id2', o.id);
+  setTxt('inv_od_price', '¥'+o.goods.price.toFixed(2));
+  setTxt('inv_od_qty', 'x'+qty);
+  setTxt('inv_od_cnt', qty);
+  setTxt('inv_od_paid', '¥'+(o.paid||0).toFixed(2));
+  setTxt('inv_od_time', '下单时间: '+(o.payTime||''));
+  setTxt('inv_od_time2', o.payTime||'');
+}
+function setTxt(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; }
 
 /* ========== 入口态 ========== */
 window._detailPage = false;
