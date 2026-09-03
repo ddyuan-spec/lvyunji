@@ -112,9 +112,21 @@
 <h2 id="s4">四、功能需求详情</h2>
 
 <h3 id="s41">4.1 后台 · 商品管理（新增「兑换券」商品类型）</h3>
+<div class="img-wrap">
+  <img src="newuser-gift-prd-assets/admin_product_list.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="后台·商品管理-列表（含「兑换券」类型标签）"/>
+  <div class="img-cap">后台·商品管理-列表（含「兑换券」类型标签）</div>
+</div>
 <h4>4.1.1 功能说明</h4>
 <p>在现有「商品管理」中，<strong>商品类型</strong>新增「兑换券」选项（其余类型：实体商品 / 团购商品 / 淘客 / 跨店保持不变）。当商品类型选择「兑换券」时，表单下方展开「兑换商品 SKU 设置」区块。</p>
 <h4>4.1.2 兑换商品 SKU 设置</h4>
+<div class="img-wrap">
+  <img src="newuser-gift-prd-assets/admin_product_create.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="后台·新增商品-选中「兑换券」后展开「兑换商品 SKU 设置」"/>
+  <div class="img-cap">后台·新增商品-选中「兑换券」后展开「兑换商品 SKU 设置」</div>
+</div>
+<div class="img-wrap">
+  <img src="newuser-gift-prd-assets/admin_product_sku_picker.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="后台·兑换券 SKU 选择器（多选实体商品 SKU + 数量）"/>
+  <div class="img-cap">后台·兑换券 SKU 选择器（多选实体商品 SKU + 数量）</div>
+</div>
 <table>
 <thead><tr><th>要素</th><th>说明</th><th>备注</th></tr></thead>
 <tbody>
@@ -130,6 +142,10 @@
 <div class="note">📎 原型参照：<code>lvyunjia-admin-merchant-product.html</code>（「商品类型」含「兑换券」选项；选中后展开「兑换商品 SKU 设置」多选区块）。</div>
 
 <h3 id="s42">4.2 后台 · 订单管理（会员订单 / 兑换订单）</h3>
+<div class="img-wrap">
+  <img src="newuser-gift-prd-assets/admin_orders.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="后台·订单管理（会员订单 / 兑换订单筛选与样例）"/>
+  <div class="img-cap">后台·订单管理（会员订单 / 兑换订单筛选与样例）</div>
+</div>
 <h4>4.2.1 订单类型筛选</h4>
 <p>订单管理列表在一/二级筛选区新增「订单类型」维度，取值：<strong>全部 / 常规订单 / 会员订单 / 兑换订单</strong>。对应表格新增「订单类型」列，以标签区分（会员订单=橙色 <span class="tag y">会员订单</span>，兑换订单=蓝色 <span class="tag b">兑换订单</span>）。</p>
 <h4>4.2.2 主状态 Tab</h4>
@@ -145,6 +161,10 @@
 <div class="note">📎 <strong>沿用当前既有订单详情页，不新建独立页</strong>。新人 / 会员 / 兑换订单在「全部」Tab 点击「查看详情」时复用同一详情页，订单类型以头部标签展示；兑换订单详情额外展示「邀请码编号」「绑定上级」「上下级绑定记录」。</div>
 
 <h3 id="s43">4.3 后台 · 邀请码管理（沿用既有）</h3>
+<div class="img-wrap">
+  <img src="newuser-gift-prd-assets/admin_invite_codes.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="后台·邀请码管理列表（沿用既有）"/>
+  <div class="img-cap">后台·邀请码管理列表（沿用既有）</div>
+</div>
 <h4>4.3.1 邀请码管理表（字段与操作）</h4>
 <p>菜单位置：店铺 → 商品中心 → 邀请码管理（与商品分类 / 商品管理 / 商品评价 / 商品上架审核 / 品牌管理平级）。</p>
 <table>
@@ -205,7 +225,19 @@
 <div class="note">原因：原「用户激活邀请码」动作已被「C 端用户输入邀请码后直接生成待发货订单」替代，<strong>激活即下单</strong>，无需单独记录激活状态。</div>
 
 <h3 id="s44">4.4 C 端 · 买邀请码流程（Flow A · 会员订单）</h3>
+<div class="img-wrap">
+  <img src="newuser-gift-prd-assets/c_home.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="C端·首页（「邀请码」「新人礼包」双 FAB 入口）"/>
+  <div class="img-cap">C端·首页（「邀请码」「新人礼包」双 FAB 入口）</div>
+</div>
 <h4>4.4.1 流程</h4>
+<div class="img-wrap">
+  <img src="newuser-gift-prd-assets/c_invite_detail.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="C端·新人激活码礼包商品详情（Flow A）"/>
+  <div class="img-cap">C端·新人激活码礼包商品详情（Flow A）</div>
+</div>
+<div class="img-wrap">
+  <img src="newuser-gift-prd-assets/c_invite_confirm.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="C端·确认订单（Flow A，无收货地址）"/>
+  <div class="img-cap">C端·确认订单（Flow A，无收货地址）</div>
+</div>
 <div class="flow">首页「邀请码」FAB（仅初级会员及以上可见）<br/>→ p_invite_detail（新人激活码礼包 商品详情页）<br/>→ p_invite_confirm（确认订单，<strong>不填收货地址</strong>）<br/>→ p_invite_cashier（收银台，实付 ¥35 × N）<br/>→ p_invite_buy_success（购买成功）<br/>→ 系统按数量生成 N 个邀请码，自动进入「我的邀请码」</div>
 <h4>4.4.2 权限 / 前置条件</h4>
 <ul>
@@ -213,6 +245,14 @@
 <li>前置条件：用户已登录且等级 ≥ 初级会员。</li>
 </ul>
 <h4>4.4.3 价格与数量规则（V3 定稿）</h4>
+<div class="img-wrap">
+  <img src="newuser-gift-prd-assets/c_invite_cashier.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="C端·收银台（Flow A，实付 ¥35×N）"/>
+  <div class="img-cap">C端·收银台（Flow A，实付 ¥35×N）</div>
+</div>
+<div class="img-wrap">
+  <img src="newuser-gift-prd-assets/c_invite_buy_success.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="C端·购买成功（生成 N 个邀请码）"/>
+  <div class="img-cap">C端·购买成功（生成 N 个邀请码）</div>
+</div>
 <table>
 <thead><tr><th>项目</th><th>规则</th></tr></thead>
 <tbody>
@@ -225,7 +265,23 @@
 <div class="note">📎 购买成功后生成的 N 个邀请码自动进入会员「我的邀请码」列表，列表每条标注「邀请码 · 新人礼包-益齿健套装」。</div>
 
 <h3 id="s45">4.5 C 端 · 用邀请码兑换流程（Flow B · 兑换订单）</h3>
+<div class="img-wrap">
+  <img src="newuser-gift-prd-assets/c_gift_intro.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="C端·新人礼包页（Flow B，含 💧 水权益，按钮「立即激活」）"/>
+  <div class="img-cap">C端·新人礼包页（Flow B，含 💧 水权益，按钮「立即激活」）</div>
+</div>
 <h4>4.5.1 流程</h4>
+<div class="img-wrap">
+  <img src="newuser-gift-prd-assets/c_confirm.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="C端·确认订单（Flow B，实付 ¥0）"/>
+  <div class="img-cap">C端·确认订单（Flow B，实付 ¥0）</div>
+</div>
+<div class="img-wrap">
+  <img src="newuser-gift-prd-assets/c_code_modal.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="C端·输入邀请码弹窗（Flow B）"/>
+  <div class="img-cap">C端·输入邀请码弹窗（Flow B）</div>
+</div>
+<div class="img-wrap">
+  <img src="newuser-gift-prd-assets/c_order.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="C端·兑换订单生成成功（Flow B）"/>
+  <div class="img-cap">C端·兑换订单生成成功（Flow B）</div>
+</div>
 <div class="flow">首页「新人礼包」FAB（任何人均可见）<br/>→ p_gift_intro（新人礼包页：展示礼包内容，含 💧 5L 饮用水 ×7 袋；按钮「立即激活」）<br/>→ p_address（填写收货地址）<br/>→ p_confirm（确认订单：商品总价 ¥49.9，邀请码抵扣 −¥49.9，<strong>实付 ¥0.00</strong>）<br/>→ code_modal（输入邀请码）<br/>→ p_order（兑换订单生成成功）</div>
 <h4>4.5.2 关键规则</h4>
 <ul>
@@ -236,6 +292,14 @@
 <div class="warn">⚠️ <strong>赠水规则不在此页原型展示</strong>：确认订单页不展示「权益赠水」明细段落，水袋权益规则仅在本文档 §4.7 写明，避免原型冗余。</div>
 
 <h3 id="s46">4.6 C 端 · 我的邀请码 / 我的订单</h3>
+<div class="img-wrap">
+  <img src="newuser-gift-prd-assets/c_my_codes.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="C端·我的邀请码（仅复制，无分享）"/>
+  <div class="img-cap">C端·我的邀请码（仅复制，无分享）</div>
+</div>
+<div class="img-wrap">
+  <img src="newuser-gift-prd-assets/c_my_orders.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="C端·我的订单（会员订单 / 兑换订单标签）"/>
+  <div class="img-cap">C端·我的订单（会员订单 / 兑换订单标签）</div>
+</div>
 <h4>4.6.1 我的邀请码</h4>
 <ul>
 <li>入口：我的服务卡片「🔑 我的邀请码」，<strong>仅当用户 has_codes = true（有码）时显示</strong>。</li>
