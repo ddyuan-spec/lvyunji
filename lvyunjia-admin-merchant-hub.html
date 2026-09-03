@@ -194,7 +194,8 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
 .link:hover{color:var(--link-hover);text-decoration:underline}
 .link.danger{color:var(--primary)}
 .tag{display:inline-block;padding:2px 8px;border-radius:3px;font-size:11px;background:#f0f2f5;color:var(--text-2)}
-.tag.exchange{background:#fff8e1;color:#e6a23c;border:1px solid #f5d996}
+.tag.newuser{background:#fff7e6;color:#d46b08;border:1px solid #ffd591}
+.tag.exchange{background:#e6f4ff;color:#1677ff;border:1px solid #91caff}
 .muted{color:var(--text-3)}
 .amount{color:var(--text);font-weight:500}
 .goods-cell{display:flex;gap:8px;align-items:center}
@@ -829,7 +830,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
             <div class="actions">
               <button class="btn btn-sm">查询</button>
               <button class="btn btn-sm">重置</button>
-              <button class="btn btn-sm btn-primary">导出当前筛选订单(1)</button>
+              <button class="btn btn-sm btn-primary">导出当前筛选订单(4)</button>
               <button class="btn btn-sm" style="background:var(--ok);color:#fff;border-color:var(--ok)">导出发货订单</button>
             </div>
           </div>
@@ -870,12 +871,13 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
             </div>
           </div>
 
-          <!-- 二级筛选：订单类型（按用户最新裁定，改为 常规/会员/兑换） -->
+          <!-- 二级筛选：订单类型（PRD §4.2.1：全部 / 常规订单 / 会员订单(新人) / 兑换订单） -->
           <div class="sub-filters">
             <span class="lbl">订单类型：</span>
-            <span class="opt active" id="opt_all">全部<span class="num">(1)</span></span>
+            <span class="opt active" id="opt_all">全部<span class="num">(4)</span></span>
             <span class="opt" id="opt_normal">常规订单<span class="num">(0)</span></span>
             <span class="opt" id="opt_newuser">新人订单<span class="num">(1)</span></span>
+            <span class="opt" id="opt_exchange">兑换订单<span class="num">(3)</span></span>
           </div>
 
           <!-- 表格 -->
@@ -944,13 +946,156 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                     </div>
                   </td>
                 </tr>
+
+                <!-- 兑换订单样例（新人凭邀请码兑换实体商品，实付 ¥0，邀请码全额抵扣 ¥49.9，含收货地址） -->
+                <tr data-type="exchange">
+                  <td>
+                    <a class="link">主订单编号:1260001676203400981<br>子订单编号:605894</a>
+                  </td>
+                  <td>
+                    <a class="link">支付单号:--<br>微信支付单号:--</a>
+                  </td>
+                  <td><span class="tag exchange">兑换订单</span></td>
+                  <td>下单时间:2026-09-02 10:18</td>
+                  <td>
+                    <div class="amount">总金额: ¥49.90</div>
+                    <div class="muted">邀请码抵扣: -¥49.90</div>
+                    <div class="muted">实付: ¥0.00</div>
+                  </td>
+                  <td>
+                    <div>昵称: 李小红</div>
+                    <div>昵称ID: <a class="link">5521</a></div>
+                    <div>手机号: 13901234568</div>
+                  </td>
+                  <td>
+                    <div>昵称: 李小红</div>
+                    <div>昵称ID: <a class="link">5521</a></div>
+                    <div>手机号: 13901234568</div>
+                  </td>
+                  <td>
+                    <div>收货人: 李小红</div>
+                    <div>手机: 13901234568</div>
+                    <div class="muted">北京市朝阳区建国路 88 号</div>
+                  </td>
+                  <td>
+                    <div class="goods-cell">
+                      <div class="goods-thumb">🎁</div>
+                      <div>
+                        <div class="goods-name">新人礼包（实体商品组合）</div>
+                        <div class="goods-id">3562542486</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="op-list">
+                      <span class="op">查看详情</span>
+                      <span class="dot">·</span>
+                      <span class="op">备注</span>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr data-type="exchange">
+                  <td>
+                    <a class="link">主订单编号:1260001676203501023<br>子订单编号:605895</a>
+                  </td>
+                  <td>
+                    <a class="link">支付单号:--<br>微信支付单号:--</a>
+                  </td>
+                  <td><span class="tag exchange">兑换订单</span></td>
+                  <td>下单时间:2026-09-02 14:35</td>
+                  <td>
+                    <div class="amount">总金额: ¥49.90</div>
+                    <div class="muted">邀请码抵扣: -¥49.90</div>
+                    <div class="muted">实付: ¥0.00</div>
+                  </td>
+                  <td>
+                    <div>昵称: 张伟</div>
+                    <div>昵称ID: <a class="link">5602</a></div>
+                    <div>手机号: 13701234569</div>
+                  </td>
+                  <td>
+                    <div>昵称: 张伟</div>
+                    <div>昵称ID: <a class="link">5602</a></div>
+                    <div>手机号: 13701234569</div>
+                  </td>
+                  <td>
+                    <div>收货人: 张伟</div>
+                    <div>手机: 13701234569</div>
+                    <div class="muted">上海市浦东新区世纪大道 100 号</div>
+                  </td>
+                  <td>
+                    <div class="goods-cell">
+                      <div class="goods-thumb">🎁</div>
+                      <div>
+                        <div class="goods-name">新人礼包（实体商品组合）</div>
+                        <div class="goods-id">3562542487</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="op-list">
+                      <span class="op">查看详情</span>
+                      <span class="dot">·</span>
+                      <span class="op">备注</span>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr data-type="exchange">
+                  <td>
+                    <a class="link">主订单编号:1260001676203601157<br>子订单编号:605896</a>
+                  </td>
+                  <td>
+                    <a class="link">支付单号:--<br>微信支付单号:--</a>
+                  </td>
+                  <td><span class="tag exchange">兑换订单</span></td>
+                  <td>下单时间:2026-09-03 09:02</td>
+                  <td>
+                    <div class="amount">总金额: ¥49.90</div>
+                    <div class="muted">邀请码抵扣: -¥49.90</div>
+                    <div class="muted">实付: ¥0.00</div>
+                  </td>
+                  <td>
+                    <div>昵称: 陈芳</div>
+                    <div>昵称ID: <a class="link">5710</a></div>
+                    <div>手机号: 13601234570</div>
+                  </td>
+                  <td>
+                    <div>昵称: 陈芳</div>
+                    <div>昵称ID: <a class="link">5710</a></div>
+                    <div>手机号: 13601234570</div>
+                  </td>
+                  <td>
+                    <div>收货人: 陈芳</div>
+                    <div>手机: 13601234570</div>
+                    <div class="muted">广州市天河区天河路 200 号</div>
+                  </td>
+                  <td>
+                    <div class="goods-cell">
+                      <div class="goods-thumb">🎁</div>
+                      <div>
+                        <div class="goods-name">新人礼包（实体商品组合）</div>
+                        <div class="goods-id">3562542488</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="op-list">
+                      <span class="op">查看详情</span>
+                      <span class="dot">·</span>
+                      <span class="op">备注</span>
+                    </div>
+                  </td>
+                </tr>
+
               </tbody>
             </table>
           </div>
 
           <!-- 分页 -->
           <div class="pager">
-            <span class="total">共 1 条</span>
+            <span class="total">共 4 条</span>
             <select class="size-select"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>
             <div class="pages">
               <span class="pg">‹</span>
@@ -1023,19 +1168,26 @@ function step(id, n){
 /* ============== 商品类型切换 → SKU 区块启用/禁用 ============== */
 /* ============== 列表筛选（商品类型过滤） ============== */
 (function(){
-  var sel = document.getElementById('filter_type');
-  if(!sel) return;
-  sel.addEventListener('change', function(){
-    var v = sel.value;
-    var rows = document.querySelectorAll('#list_tbody tr');
-    var n = 0;
-    rows.forEach(function(r){
-      var t = r.getAttribute('data-type');
-      var ok = !v || t===v;
-      r.style.display = ok ? '' : 'none';
-      if (ok) n++;
+  /* 订单类型二级筛选：全部 / 常规订单 / 新人订单 / 兑换订单（按 data-type 过滤） */
+  var opts = document.querySelectorAll('.sub-filters .opt');
+  var tbody = document.getElementById('order_tbody');
+  if(tbody){
+    opts.forEach(function(o){
+      o.addEventListener('click', function(){
+        opts.forEach(function(x){ x.classList.remove('active'); });
+        o.classList.add('active');
+        var id = o.id;
+        tbody.querySelectorAll('tr').forEach(function(r){
+          var t = r.getAttribute('data-type');
+          var show = true;
+          if(id==='opt_normal') show = (t==='entity');
+          else if(id==='opt_newuser') show = (t==='member');
+          else if(id==='opt_exchange') show = (t==='exchange');
+          r.style.display = show ? '' : 'none';
+        });
+      });
     });
-  });
+  }
 })();
 
 /* ============== toast ============== */
