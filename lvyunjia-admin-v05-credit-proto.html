@@ -995,10 +995,27 @@
 <section class="view admin-page" id="viewMaterial">
   <div class="page-header">
     <div class="page-title">素材管理</div>
+    <div><button class="btn btn-primary" onclick="toggleUploadPanel()">批量上传</button></div>
   </div>
   <div class="page-body">
     <div style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6;">
       管理可下发的营销素材（图片 / 视频 / PDF），支持按栏目归类与删除。栏目在「素材栏目管理」中配置。
+    </div>
+    <div id="uploadPanel" style="display:none;margin-bottom:18px;padding:16px;border:1px solid var(--border);border-radius:8px;background:#fafafa;">
+      <div style="font-size:13px;font-weight:600;margin-bottom:8px;">批量上传素材</div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;line-height:1.6;">
+        支持 JPG / PNG / MP4 / PDF；单次最多 20 个，单个 ≤ 50MB；整批可指定归属栏目。
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+        <label class="btn btn-default" style="height:34px;line-height:34px;padding:0 16px;cursor:pointer;margin:0;">
+          选择文件
+          <input id="uploadInput" type="file" multiple accept=".jpg,.jpeg,.png,.mp4,.pdf" style="display:none;" onchange="handleUploadFiles(this)">
+        </label>
+        <select id="uploadCat" class="form-input" style="width:200px;height:34px;"></select>
+        <button id="startUploadBtn" class="btn btn-primary" style="height:34px;padding:0 18px;" onclick="startUpload()" disabled>开始上传</button>
+        <button class="btn btn-default" style="height:34px;padding:0 18px;" onclick="toggleUploadPanel()">收起</button>
+      </div>
+      <div id="uploadList" style="display:none;"></div>
     </div>
     <table class="data-table" style="width:100%;border-collapse:collapse;">
       <thead>
@@ -1462,7 +1479,145 @@ function deleteMaterial(idx) {
   });
 }
 
-// 素材管理仅保留「列表 + 删除」，不臆测新增/编辑/状态切换功能（需求未要求）
+// ===== 素材批量上传（后台，V0.5.1 新增；内联面板，非 Modal） =====
+var UPLOAD_MAX_COUNT = 20;
+var UPLOAD_MAX_SIZE = 50 * 1024 * 1024; // 50MB
+var UPLOAD_FMT = { jpg: 'JPG', jpeg: 'JPG', png: 'PNG', mp4: 'MP4', pdf: 'PDF' };
+var pendingUploads = []; // {file,name,fmt,size,status,reason,progress}
+
+function toggleUploadPanel() {
+  var p = document.getElementById('uploadPanel');
+  if (!p) return;
+  if (p.style.display === 'none' || !p.style.display) {
+    p.style.display = 'block';
+    populateUploadCat();
+    document.getElementById('uploadList').style.display = 'none';
+    document.getElementById('uploadList').innerHTML = '';
+    pendingUploads = [];
+    updateStartBtn();
+  } else {
+    p.style.display = 'none';
+  }
+}
+
+function populateUploadCat() {
+  var sel = document.getElementById('uploadCat');
+  if (!sel) return;
+  var html = '<option value="">未分类</option>';
+  categoryData.filter(function (c) { return c.status === 'on'; }).forEach(function (c) {
+    html += '<option value="' + c.id + '">' + c.name + '</option>';
+  });
+  sel.innerHTML = html;
+}
+
+function handleUploadFiles(input) {
+  var files = Array.prototype.slice.call(input.files || []);
+  var list = document.getElementById('uploadList');
+  list.style.display = 'block';
+  pendingUploads = [];
+  files.forEach(function (f) {
+    var ext = (f.name.split('.').pop() || '').toLowerCase();
+    var fmt = UPLOAD_FMT[ext];
+    var reasons = [];
+    if (!fmt) reasons.push('不支持的格式');
+    if (f.size === 0) reasons.push('空文件');
+    if (f.size > UPLOAD_MAX_SIZE) reasons.push('超过 50MB');
+    pendingUploads.push({
+      file: f, name: f.name, fmt: fmt || ext.toUpperCase(),
+      size: f.size, status: reasons.length ? 'invalid' : 'pending',
+      reason: reasons.join('，'), progress: 0
+    });
+  });
+  if (pendingUploads.length > UPLOAD_MAX_COUNT) {
+    toast('单次最多 20 个，已忽略超出部分');
+    pendingUploads = pendingUploads.slice(0, UPLOAD_MAX_COUNT);
+  }
+  renderUploadList();
+  updateStartBtn();
+  input.value = '';
+}
+
+function renderUploadList() {
+  var list = document.getElementById('uploadList');
+  if (!list) return;
+  var html = '';
+  pendingUploads.forEach(function (u, i) {
+    var statusTxt;
+    if (u.status === 'invalid') {
+      statusTxt = '<span style="color:var(--red);">排除：' + u.reason + '</span>';
+    } else if (u.status === 'pending') {
+      statusTxt = '待上传';
+    } else if (u.status === 'uploading') {
+      statusTxt = '上传中 ' + u.progress + '%';
+    } else if (u.status === 'success') {
+      statusTxt = '<span style="color:#52c41a;">成功</span>';
+    } else if (u.status === 'fail') {
+      statusTxt = '<span style="color:var(--red);">失败</span> <span class="btn-link" onclick="retryUpload(' + i + ')">重试</span>';
+    }
+    var pct = (u.status === 'success') ? 100 : (u.status === 'uploading' ? u.progress : 0);
+    html += '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border-light);font-size:13px;">' +
+      '<div style="width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + u.name + '</div>' +
+      '<div style="width:48px;">' + (u.fmt || '-') + '</div>' +
+      '<div style="flex:1;height:6px;background:var(--border-light);border-radius:3px;overflow:hidden;"><div style="width:' + pct + '%;height:100%;background:#52c41a;"></div></div>' +
+      '<div style="width:150px;text-align:right;">' + statusTxt + '</div>' +
+      '</div>';
+  });
+  list.innerHTML = html;
+}
+
+function updateStartBtn() {
+  var btn = document.getElementById('startUploadBtn');
+  if (!btn) return;
+  btn.disabled = !pendingUploads.some(function (u) { return u.status === 'pending'; });
+}
+
+function startUpload() {
+  var catId = document.getElementById('uploadCat').value;
+  pendingUploads.forEach(function (u, i) {
+    if (u.status === 'pending') uploadOne(u, i, catId);
+  });
+}
+
+function uploadOne(u, i, catId) {
+  u.status = 'uploading'; u.progress = 0; renderUploadList();
+  var timer = setInterval(function () {
+    u.progress += Math.floor(Math.random() * 20) + 10;
+    if (u.progress >= 100) {
+      u.progress = 100; clearInterval(timer);
+      if (Math.random() < 0.15) { // 原型演示：模拟偶发失败，可重试
+        u.status = 'fail'; renderUploadList();
+      } else {
+        u.status = 'success'; renderUploadList();
+        commitMaterial(u, catId);
+      }
+    } else {
+      renderUploadList();
+    }
+  }, 200);
+}
+
+function retryUpload(i) {
+  var u = pendingUploads[i];
+  if (!u) return;
+  u.status = 'pending';
+  uploadOne(u, i, document.getElementById('uploadCat').value);
+}
+
+function commitMaterial(u, catId) {
+  var catName = '';
+  if (catId) { var c = categoryData.find(function (x) { return x.id === catId; }); catName = c ? c.name : ''; }
+  var base = u.name.replace(/\.[^.]+$/, '');
+  MATERIALS.unshift({ name: base, cat: catName, fmt: u.fmt, time: nowStr() });
+  renderMaterialTable();
+}
+
+function nowStr() {
+  var d = new Date();
+  function p(n) { return (n < 10 ? '0' : '') + n; }
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+
+// 素材管理仅保留「列表 + 删除 + 批量上传」，不臆测单条新增/编辑/状态切换功能（需求未要求）
 // 新增/编辑表单、状态切换、栏目下拉填充等相关函数已移除
 
 // ===== 素材栏目管理（CRUD，运营可配；预置占位栏目便于演示分栏） =====
