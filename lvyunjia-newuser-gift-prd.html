@@ -151,7 +151,7 @@
 <h3>3.2 信息架构</h3>
 <ul>
 <li><strong>C 端（App / 小程序 / H5）</strong>：首页（双 FAB：邀请码 / 新人礼包）→ 买邀请码流（商品详情 → 确认订单(无地址) → 收银台 → 购买成功）→ 兑换流（新人礼包页 → 收货地址 → 确认订单(¥0) → 邀请码弹窗 → 兑换订单成功）→ 我的（我的邀请码 / 我的订单）。</li>
-<li><strong>后台（PC 管理端）</strong>：商品管理（商品类型=兑换券 + 兑换商品 SKU 设置）/ 订单管理（会员订单 / 兑换订单）/ 邀请码管理（列表 / 生成 / 详情，沿用既有）。</li>
+<li><strong>后台（PC 管理端）</strong>：商品管理（商品类型=兑换券 + 兑换商品 SKU 设置）/ 订单管理（会员订单 / 兑换订单）</li>
 </ul>
 
 <h3>3.3 术语与定义</h3>
@@ -164,7 +164,7 @@
 <tr><td>会员订单</td><td>订单类型之一。会员购买邀请码礼包产生的订单，实付 = 会员价 ¥35 × 数量 N，无收货地址。</td></tr>
 <tr><td>兑换订单</td><td>订单类型之一。新人用邀请码兑换实体商品产生的订单，实付 ¥0（商品总价 ¥49.9 由邀请码全额抵扣），含收货人地址。</td></tr>
 <tr><td>兑换券商品</td><td>商品管理中「商品类型 = 兑换券」的商品。选中后可配置「兑换商品 SKU 设置」（多选已有 SKU + 各自数量），即新人兑换时可领取的实体商品组合。</td></tr>
-<tr><td>水袋权益</td><td>新人礼包内含的 5L 饮用水 ×7 袋，需到店自提，时效三段式（详见 §4.7）。</td></tr>
+<tr><td>水袋权益</td><td>新人礼包内含的 5L 饮用水 ×7 袋，需到店自提，时效三段式（详见 §4.6）。</td></tr>
 </tbody></table>
 <h2 id="s4">四、功能需求详情</h2>
 
@@ -217,76 +217,12 @@
 <h4>4.2.4 订单详情页</h4>
 <div class="note">📎 <strong>沿用当前既有订单详情页，不新建独立页</strong>。新人 / 会员 / 兑换订单在「全部」Tab 点击「查看详情」时复用同一详情页，订单类型以头部标签展示；兑换订单详情额外展示「邀请码编号」「绑定上级」「上下级绑定记录」。</div>
 
-<h3 id="s43">4.3 后台 · 邀请码管理（沿用既有）</h3>
-<div class="img-wrap">
-  <img src="newuser-gift-prd-assets/admin_invite_codes.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="后台·邀请码管理列表（沿用既有）"/>
-  <div class="img-cap">后台·邀请码管理列表（沿用既有）</div>
-</div>
-<h4>4.3.1 邀请码管理表（字段与操作）</h4>
-<p>菜单位置：店铺 → 商品中心 → 邀请码管理（与商品分类 / 商品管理 / 商品评价 / 商品上架审核 / 品牌管理平级）。</p>
-<table>
-<thead><tr><th>列名</th><th>含义</th><th>取值</th></tr></thead>
-<tbody>
-<tr><td>邀请码</td><td>系统生成的随机码（长度 ≥ 8，含特殊符号大小写）</td><td>字符串</td></tr>
-<tr><td>生成途径</td><td>邀请码的产生方式</td><td><code>购买生成</code>（会员购买） / <code>系统生成</code>（后台手动）</td></tr>
-<tr><td>生成时间</td><td>邀请码生成时间戳</td><td>YYYY-MM-DD HH:mm:ss</td></tr>
-<tr><td>购买人 / 生成人</td><td>关联的会员（购买生成）或操作人（系统生成）</td><td>昵称 + 账号（手机号原文，内部运营视图不脱敏）</td></tr>
-<tr><td>下单状态</td><td>该邀请码是否已被用于下单</td><td><code>已下单</code> / <code>未下单</code></td></tr>
-<tr><td>关联订单编号</td><td>已下单时关联的订单号</td><td>字符串（未下单显示 —）</td></tr>
-<tr><td>操作</td><td>可执行操作</td><td><code>查看详情</code>；仅未下单行有 <code>禁用</code></td></tr>
-</tbody></table>
-<h4>4.3.2 生成途径两条数据产生路径</h4>
-<ol>
-<li><strong>购买生成</strong>：会员在会员端下单购买邀请码礼包并完成支付后自动产生；生成时间 = 支付成功时间；购买人 = 购买会员（昵称 + 账号）；生成人 = —。</li>
-<li><strong>系统生成</strong>：后台运营通过「+ 生成邀请码」手动新增（独立页 <code>admin-invite-code-generate.html</code>）；生成时间 = 提交时间；生成人 = 当前后台账号；购买人 = —。</li>
-</ol>
-<h4>4.3.3 操作规则</h4>
-<ul>
-<li><code>查看详情</code>：跳转邀请码详情独立页（<code>admin-invite-code-detail.html</code>），所有行可点。</li>
-<li><code>禁用</code>：<strong>仅未下单的邀请码可禁用</strong>；已下单邀请码不允许禁用。禁用在详情页对应按钮置灰。</li>
-<li><code>批量导出</code>：导出当前筛选条件下的邀请码列表（CSV/Excel）。</li>
-</ul>
-<h4>4.3.4 主筛选 / 二级筛选</h4>
-<ul>
-<li>主筛选：生成时间（日期范围）/ 邀请码（精确·模糊）/ 购买人·生成人（昵称或账号模糊）/ 关联订单编号（精确）/ 查询 / 重置。</li>
-<li>二级筛选：生成途径（全部 / 购买生成 / 系统生成）；下单状态（全部 / 未下单 / 已下单）。</li>
-</ul>
-<h4>4.3.5 邀请码详情页（字段与时间线）</h4>
-<table>
-<thead><tr><th>信息块</th><th>字段</th></tr></thead>
-<tbody>
-<tr><td>邀请码信息</td><td>邀请码 / 生成途径（购买生成 | 系统生成）/ 生成时间 / 下单状态</td></tr>
-<tr><td>购买人 / 生成人信息</td><td>购买生成：昵称 / 账号 / 会员 ID / 会员等级 / 购买时间 / 会员来源；系统生成：昵称（生成人）/ 账号（生成人）/ 生成时间</td></tr>
-<tr><td>关联订单（已下单时）</td><td>关联订单编号（可跳转沿用详情页）/ 下单状态 / 下单时间 / 下单用户（被邀请人）/ 订单类型（兑换订单）/ 订单实付（¥0.00 邀请码抵扣）</td></tr>
-<tr><td>生命周期时间线</td><td>仅 <code>邀请码生成</code> → <code>下单成功</code> 两个节点（无激活节点）</td></tr>
-</tbody></table>
-<p>顶部操作：<code>复制邀请码</code> / <code>禁用邀请码</code>（<strong>已下单的邀请码「禁用邀请码」按钮置灰不可点</strong>）。</p>
-<h4>4.3.6 生成邀请码页（系统生成）</h4>
-<p>入口：邀请码管理列表页右上角「+ 生成邀请码」按钮 → 独立页 <code>admin-invite-code-generate.html</code>。</p>
-<table>
-<thead><tr><th>表单字段</th><th>规则</th></tr></thead>
-<tbody>
-<tr><td>生成途径</td><td>固定「系统生成」（不可改）</td></tr>
-<tr><td>生成数量</td><td>stepper，默认 1，最小 1，最大 99</td></tr>
-<tr><td>备注</td><td>选填，记录本次生成用途（线下活动赠码 / 地推补发等）</td></tr>
-</tbody></table>
-<p>生成规则：每个邀请码随机生成，长度 ≥ 8，含特殊符号大小写；提交后直接跳转列表页。</p>
-<h4>4.3.7 旧字段下线（写 PRD 时同步清理）</h4>
-<p>下列字段/概念已从原型与 PRD 移除，避免新旧口径并存：</p>
-<ul>
-<li>邀请码的「激活状态」（已激活 / 未激活）；</li>
-<li>邀请码的「激活时间」「激活 IP」「激活设备」；</li>
-<li>邀请码详情页的「激活时间线节点」；</li>
-<li>二级筛选中的「激活状态」筛选项。</li>
-</ul>
-<div class="note">原因：原「用户激活邀请码」动作已被「C 端用户输入邀请码后直接生成待发货订单」替代，<strong>激活即下单</strong>，无需单独记录激活状态。</div>
-
-<h3 id="s44">4.4 C 端 · 买邀请码流程（Flow A · 会员订单）</h3>
+<h3 id="s43">4.3 C 端 · 买邀请码流程（Flow A · 会员订单）</h3>
 <div class="img-wrap">
   <img src="newuser-gift-prd-assets/c_home.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="C端·首页（「邀请码」「新人礼包」双 FAB 入口）"/>
   <div class="img-cap">C端·首页（「邀请码」「新人礼包」双 FAB 入口）</div>
 </div>
-<h4>4.4.1 流程</h4>
+<h4>4.3.1 流程</h4>
 <div class="img-wrap">
   <img src="newuser-gift-prd-assets/c_invite_detail.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="C端·新人激活码礼包商品详情（Flow A）"/>
   <div class="img-cap">C端·新人激活码礼包商品详情（Flow A）</div>
@@ -296,12 +232,12 @@
   <div class="img-cap">C端·确认订单（Flow A，无收货地址）</div>
 </div>
 <div class="flow">首页「邀请码」FAB（仅初级会员及以上可见）<br/>→ p_invite_detail（新人激活码礼包 商品详情页）<br/>→ p_invite_confirm（确认订单，<strong>不填收货地址</strong>）<br/>→ p_invite_cashier（收银台，实付 ¥35 × N）<br/>→ p_invite_buy_success（购买成功）<br/>→ 系统按数量生成 N 个邀请码，自动进入「我的邀请码」</div>
-<h4>4.4.2 权限 / 前置条件</h4>
+<h4>4.3.2 权限 / 前置条件</h4>
 <ul>
 <li>入口 FAB 仅「初级会员及以上」等级可见；游客 / 无等级用户不展示。</li>
 <li>前置条件：用户已登录且等级 ≥ 初级会员。</li>
 </ul>
-<h4>4.4.3 价格与数量规则（V3 定稿）</h4>
+<h4>4.3.3 价格与数量规则（V3 定稿）</h4>
 <div class="img-wrap">
   <img src="newuser-gift-prd-assets/c_invite_cashier.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="C端·收银台（Flow A，实付 ¥35×N）"/>
   <div class="img-cap">C端·收银台（Flow A，实付 ¥35×N）</div>
@@ -321,12 +257,12 @@
 </tbody></table>
 <div class="note">📎 购买成功后生成的 N 个邀请码自动进入会员「我的邀请码」列表，列表每条标注「邀请码 · 新人礼包-益齿健套装」。</div>
 
-<h3 id="s45">4.5 C 端 · 用邀请码兑换流程（Flow B · 兑换订单）</h3>
+<h3 id="s44">4.4 C 端 · 用邀请码兑换流程（Flow B · 兑换订单）</h3>
 <div class="img-wrap">
   <img src="newuser-gift-prd-assets/c_gift_intro.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="C端·新人礼包页（Flow B，含 💧 水权益，按钮「立即激活」）"/>
   <div class="img-cap">C端·新人礼包页（Flow B，含 💧 水权益，按钮「立即激活」）</div>
 </div>
-<h4>4.5.1 流程</h4>
+<h4>4.4.1 流程</h4>
 <div class="img-wrap">
   <img src="newuser-gift-prd-assets/c_confirm.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="C端·确认订单（Flow B，实付 ¥0）"/>
   <div class="img-cap">C端·确认订单（Flow B，实付 ¥0）</div>
@@ -340,15 +276,15 @@
   <div class="img-cap">C端·兑换订单生成成功（Flow B）</div>
 </div>
 <div class="flow">首页「新人礼包」FAB（任何人均可见）<br/>→ p_gift_intro（新人礼包页：展示礼包内容，含 💧 5L 饮用水 ×7 袋；按钮「立即激活」）<br/>→ p_address（填写收货地址）<br/>→ p_confirm（确认订单：商品总价 ¥49.9，邀请码抵扣 −¥49.9，<strong>实付 ¥0.00</strong>）<br/>→ code_modal（输入邀请码）<br/>→ p_order（兑换订单生成成功）</div>
-<h4>4.5.2 关键规则</h4>
+<h4>4.4.2 关键规则</h4>
 <ul>
 <li>兑换订单实付 ¥0，由邀请码全额抵扣商品总价 ¥49.9。</li>
 <li>邀请码校验：长度 ≥ 8，含大小写字母与特殊符号；每个邀请码仅可使用一次。</li>
 <li><strong>激活后入口消失</strong>：用户完成一次兑换（核销成功）后，首页「新人礼包」FAB 自动消失（一辈子只能领一次）。</li>
 </ul>
-<div class="warn">⚠️ <strong>赠水规则不在此页原型展示</strong>：确认订单页不展示「权益赠水」明细段落，水袋权益规则仅在本文档 §4.7 写明，避免原型冗余。</div>
+<div class="warn">⚠️ <strong>赠水规则不在此页原型展示</strong>：确认订单页不展示「权益赠水」明细段落，水袋权益规则仅在本文档 §4.6 写明，避免原型冗余。</div>
 
-<h3 id="s46">4.6 C 端 · 我的邀请码 / 我的订单</h3>
+<h3 id="s45">4.5 C 端 · 我的邀请码 / 我的订单</h3>
 <div class="img-wrap">
   <img src="newuser-gift-prd-assets/c_my_codes.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="C端·我的邀请码（仅复制，无分享）"/>
   <div class="img-cap">C端·我的邀请码（仅复制，无分享）</div>
@@ -357,12 +293,12 @@
   <img src="newuser-gift-prd-assets/c_my_orders.png" style="max-width:100%;max-height:800px;border:1px solid #e0e0e0;border-radius:8px;object-fit:contain;" alt="C端·我的订单（会员订单 / 兑换订单标签）"/>
   <div class="img-cap">C端·我的订单（会员订单 / 兑换订单标签）</div>
 </div>
-<h4>4.6.1 我的邀请码</h4>
+<h4>4.5.1 我的邀请码</h4>
 <ul>
 <li>入口：我的服务卡片「🔑 我的邀请码」，<strong>仅当用户 has_codes = true（有码）时显示</strong>。</li>
 <li>列表每条码标注「邀请码 · 新人礼包-益齿健套装」，提供「复制」按钮（<strong>无分享按钮</strong>）。</li>
 </ul>
-<h4>4.6.2 我的订单</h4>
+<h4>4.5.2 我的订单</h4>
 <ul>
 <li>入口：我的服务卡片首格「📋 我的订单」。</li>
 <li>状态 Tab：全部 / 代付订单 / 待付款 / 待发货·待核销 / 待收货 / 已完成。</li>
@@ -370,7 +306,7 @@
 </ul>
 <div class="note">📎 两条流自动落库：Flow A 购买成功 → 写入一条「会员订单」；Flow B 核销成功 → 写入一条「兑换订单」。</div>
 
-<h3 id="s47">4.7 水袋权益规则（已定稿）</h3>
+<h3 id="s46">4.6 水袋权益规则（已定稿）</h3>
 <p>新人礼包内含 <strong>5L 饮用水 ×7 袋</strong>，到店自提，<strong>需自备水袋</strong>。</p>
 <table>
 <thead><tr><th>阶段</th><th>时效规则</th></tr></thead>
@@ -383,7 +319,7 @@
 <p>C 端订单详情 / 会员端邀请码列表展示三要素：<code>已取 X/7 袋 · 剩余 Y 袋 · 有效期至 YYYY-MM-DD</code>。</p>
 <div class="warn">⚠️ <strong>待确认 @袁中天</strong>：①「每次限取 1 袋」是否 = 每天最多 1 袋；②过期清零后是否可重购及次数上限；③是否做 T0+23 到期提醒推送。</div>
 
-<h3 id="s48">4.8 上下级自动绑定规则</h3>
+<h3 id="s47">4.7 上下级自动绑定规则</h3>
 <p><strong>结论</strong>：用户激活（兑换）邀请码时，若该用户当前<strong>没有上级</strong>，系统自动将其上级绑定到<strong>邀请码购买人的上级</strong>；<strong>后台手动生成的邀请码（系统生成）激活后不绑定任何上下级关系</strong>。</p>
 <p><strong>触发时机</strong>：C 端用户输入邀请码点击「立即激活」生成兑换订单时同步执行（激活即下单，绑定为伴随操作）。</p>
 <ol>
@@ -426,7 +362,7 @@
 <li>✅ 订单双类型：会员订单（买邀请码）/ 兑换订单（用邀请码兑换）在后台与 C 端「我的订单」均正确体现。</li>
 <li>✅ 兑换后 FAB 消失：Flow B 核销成功后「新人礼包」FAB 自动隐藏（一辈子一次）。</li>
 <li>✅ 移除分享按钮：我的邀请码页仅保留「复制」，无「分享」。</li>
-<li>✅ 赠水规则不进原型：确认订单页不展示赠水明细，仅在 §4.7 写明。</li>
+<li>✅ 赠水规则不进原型：确认订单页不展示赠水明细，仅在 §4.6 写明。</li>
 <li>✅ 兑换券商品类型：商品管理新增类型 + SKU 多选配置。</li>
 <li>✅ 订单详情沿用：不新建独立详情页，复用既有模板。</li>
 </ul>
