@@ -584,7 +584,7 @@
     <div style="margin-bottom:20px;padding:16px;background:#fafafa;border-radius:6px;border:1px solid var(--border);">
       <div style="font-size:14px;font-weight:600;margin-bottom:14px;">新建/修改配置</div>
       <div class="form-row">
-        <label class="form-label">灵感值值</label>
+        <label class="form-label">灵感值</label>
         <input class="form-input" type="number" value="5" min="0" max="99999" style="width:120px;">
         <span style="font-size:13px;color:var(--text-tertiary);">新用户注册时一次性发放的灵感值数</span>
       </div>
@@ -607,7 +607,7 @@
     <table class="snapshot-table">
       <thead>
         <tr>
-          <th>灵感值值</th>
+          <th>灵感值</th>
           <th>生效日期</th>
           <th>设置人</th>
           <th>备注</th>
@@ -995,27 +995,31 @@
 <section class="view admin-page" id="viewMaterial">
   <div class="page-header">
     <div class="page-title">素材管理</div>
-    <div><button class="btn btn-primary" onclick="toggleUploadPanel()">批量上传</button></div>
+    <div><button class="btn btn-primary" onclick="openUploadModal()">批量上传</button></div>
   </div>
   <div class="page-body">
     <div style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6;">
       管理可下发的营销素材（图片 / 视频 / PDF），支持按栏目归类与删除。栏目在「素材栏目管理」中配置。
     </div>
-    <div id="uploadPanel" style="display:none;margin-bottom:18px;padding:16px;border:1px solid var(--border);border-radius:8px;background:#fafafa;">
-      <div style="font-size:13px;font-weight:600;margin-bottom:8px;">批量上传素材</div>
-      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;line-height:1.6;">
-        支持 JPG / PNG / MP4 / PDF；单次最多 20 个，单个 ≤ 50MB；整批可指定归属栏目。
+    <div id="uploadModal" class="modal-mask" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center;">
+      <div style="background:#fff;border-radius:10px;width:560px;max-width:calc(100vw - 40px);max-height:80vh;overflow:auto;padding:24px;box-shadow:0 12px 32px rgba(0,0,0,.18);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div style="font-size:16px;font-weight:600;">批量上传素材</div>
+          <div style="cursor:pointer;font-size:20px;color:var(--text-secondary);" onclick="closeUploadModal()">×</div>
+        </div>
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;line-height:1.6;">
+          支持 JPG / PNG / MP4 / PDF；单次最多 20 个，单个 ≤ 50MB；整批可指定归属栏目。
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+          <label class="btn btn-default" style="height:34px;line-height:34px;padding:0 16px;cursor:pointer;margin:0;">
+            选择文件
+            <input id="uploadInput" type="file" multiple accept=".jpg,.jpeg,.png,.mp4,.pdf" style="display:none;" onchange="handleUploadFiles(this)">
+          </label>
+          <select id="uploadCat" class="form-input" style="width:200px;height:34px;"></select>
+          <button id="startUploadBtn" class="btn btn-primary" style="height:34px;padding:0 18px;" onclick="startUpload()" disabled>开始上传</button>
+        </div>
+        <div id="uploadList" style="display:none;margin-top:8px;"></div>
       </div>
-      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
-        <label class="btn btn-default" style="height:34px;line-height:34px;padding:0 16px;cursor:pointer;margin:0;">
-          选择文件
-          <input id="uploadInput" type="file" multiple accept=".jpg,.jpeg,.png,.mp4,.pdf" style="display:none;" onchange="handleUploadFiles(this)">
-        </label>
-        <select id="uploadCat" class="form-input" style="width:200px;height:34px;"></select>
-        <button id="startUploadBtn" class="btn btn-primary" style="height:34px;padding:0 18px;" onclick="startUpload()" disabled>开始上传</button>
-        <button class="btn btn-default" style="height:34px;padding:0 18px;" onclick="toggleUploadPanel()">收起</button>
-      </div>
-      <div id="uploadList" style="display:none;"></div>
     </div>
     <table class="data-table" style="width:100%;border-collapse:collapse;">
       <thead>
@@ -1479,25 +1483,27 @@ function deleteMaterial(idx) {
   });
 }
 
-// ===== 素材批量上传（后台，V0.5.1 新增；内联面板，非 Modal） =====
+// ===== 素材批量上传（后台，V0.5.1 新增；Modal 弹窗，用户 2026-09-03 确认改自原内联面板） =====
 var UPLOAD_MAX_COUNT = 20;
 var UPLOAD_MAX_SIZE = 50 * 1024 * 1024; // 50MB
 var UPLOAD_FMT = { jpg: 'JPG', jpeg: 'JPG', png: 'PNG', mp4: 'MP4', pdf: 'PDF' };
 var pendingUploads = []; // {file,name,fmt,size,status,reason,progress}
 
-function toggleUploadPanel() {
-  var p = document.getElementById('uploadPanel');
-  if (!p) return;
-  if (p.style.display === 'none' || !p.style.display) {
-    p.style.display = 'block';
-    populateUploadCat();
-    document.getElementById('uploadList').style.display = 'none';
-    document.getElementById('uploadList').innerHTML = '';
-    pendingUploads = [];
-    updateStartBtn();
-  } else {
-    p.style.display = 'none';
-  }
+function openUploadModal() {
+  var m = document.getElementById('uploadModal');
+  if (!m) return;
+  m.style.display = 'flex';
+  populateUploadCat();
+  document.getElementById('uploadList').style.display = 'none';
+  document.getElementById('uploadList').innerHTML = '';
+  pendingUploads = [];
+  updateStartBtn();
+}
+
+function closeUploadModal() {
+  var m = document.getElementById('uploadModal');
+  if (!m) return;
+  m.style.display = 'none';
 }
 
 function populateUploadCat() {
