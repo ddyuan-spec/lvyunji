@@ -1313,27 +1313,50 @@ function addExchangeOrder(code){
   });
 }
 
-/* ========== 复制源码工具（顶部 copy-bar） ========== */
+/* ========== 复制源码工具（顶部 copy-bar · proto-c 标准组件 PROTO-SMK-011） ========== */
+function __protoGetStyle(){ var s=document.querySelector('head style'); return s?s.innerHTML:''; }
+function __protoActivePage(){
+  return document.querySelector('.phone .page.active, .phone .view.active')
+      || document.querySelector('.page.active, .view.active')
+      || document.querySelector('.page, .view')
+      || document.querySelector('.phone > *');
+}
+/* 把单个页面包成独立可运行 HTML：继承完整 <style> + .phone 外壳，粘墨刀单屏可直接运行 */
+function __protoBuildStandalone(pageEl, title){
+  var style = __protoGetStyle();
+  var phoneCls = (pageEl && pageEl.closest && pageEl.closest('.phone')) ? ' class="phone"' : '';
+  var inner = pageEl ? pageEl.outerHTML : document.body.innerHTML;
+  return '<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n<meta charset="utf-8">\n<title>'
+       + (title||'原型单页') + '</title>\n<style>\n' + style + '\n</style>\n</head>\n<body>\n<div'
+       + phoneCls + '>\n' + inner + '\n</div>\n</body>\n</html>';
+}
+function __protoCopy(text, btnId, okMsg){
+  function toast(msg){ var t=document.getElementById('copyToast'); if(t){ t.textContent=msg; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},1800); } }
+  function done(ok){
+    var b=document.getElementById(btnId);
+    if(ok){ if(b){ b.textContent='✓ 已复制'; b.classList.add('copied'); setTimeout(function(){ b.textContent=b.getAttribute('data-label')||'复制'; b.classList.remove('copied'); },1800); } toast(okMsg); }
+    else { toast('复制失败，请手动复制源码'); }
+  }
+  function fb(t){ try{ var ta=document.createElement('textarea'); ta.value=t; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.top='-9999px'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); var ok=document.execCommand('copy'); document.body.removeChild(ta); return ok; }catch(e){ return false; } }
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(function(){done(true);}).catch(function(){done(fb(text));}); }
+  else { done(fb(text)); }
+}
+/* 复制当前页：所见即所得，抓取当前屏幕这一页的实时内容，包成独立可运行 HTML（挑页复制用） */
 function copyCurrentPage(){
-  var active = document.querySelector('.page.active');
-  if(!active) return;
-  var html = active.outerHTML;
-  copyText(html, '当前页源码已复制');
-  markCopied(document.getElementById('copyCurrentPage'));
+  var page = __protoActivePage();
+  var title = (page && page.getAttribute('data-title'))
+           || (page && page.querySelector && page.querySelector('.nav') && page.querySelector('.nav').textContent)
+           || document.title || '原型单页';
+  var html = __protoBuildStandalone(page, title);
+  __protoCopy(html, 'copyCurrentPage', '已复制当前页，粘贴到墨刀即可');
 }
+/* 复制全部源码：初始纯净态整份文件（从首屏运行用） */
 function copyAllSource(){
-  var phone = document.querySelector('.phone');
-  if(!phone) return;
-  copyText(phone.outerHTML, '全部源码已复制');
-  markCopied(document.getElementById('copyAllSource'));
+  var src = window.__PROTO_SOURCE__ || ('<!DOCTYPE html>\n' + document.documentElement.outerHTML);
+  __protoCopy(src, 'copyAllSource', '已复制整份源码，粘贴到墨刀即可运行');
 }
-function markCopied(btn){
-  if(!btn) return;
-  var old = btn.textContent;
-  btn.textContent = '已复制 ✓';
-  btn.classList.add('copied');
-  setTimeout(function(){btn.textContent=old;btn.classList.remove('copied');},1600);
-}
+/* 记录初始纯净源码（首屏态），供「复制全部源码」粘贴墨刀 */
+window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
 
 /* ========== Flow A：购买邀请码（会员订单，无地址） ========== */
 window._inviteQty = 1;
