@@ -45,7 +45,7 @@
 <strong>目录</strong><br/>
 <a href="#s1">一、文档基本信息</a> ·
   <a href="#s2">二、项目背景与目标</a> ·
-  <a href="#s3">三、术语与定义</a> ·
+  <a href="#s3">三、业务流程与架构</a> ·
   <a href="#s4">四、功能需求详情</a> ·
   <a href="#s5">五、非功能性需求</a> ·
   <a href="#s6">六、验收标准</a> ·
@@ -96,7 +96,65 @@
 <tr><td>新人兑换完成率</td><td>⚠️ 待确认 @产品负责人</td><td>兑换订单支付成功数 / 进入新人礼包页人数</td></tr>
 </tbody></table>
 
-<h2 id="s3">三、术语与定义</h2>
+<h2 id="s3">三、业务流程与架构（流程图 + 信息架构 + 状态机）</h2>
+
+<h3>3.1 业务流程图（横向泳道）</h3>
+<p>覆盖「买邀请码 → 分享 → 新人兑换 → 上下级绑定 → 两类订单」全链路，四个角色泳道：</p>
+<svg viewBox="0 0 920 440" style="width:100%;max-width:920px;border:1px solid #e0e0e0;border-radius:8px;background:#fff;">
+  <rect x="0" y="0" width="920" height="110" fill="#fafafa"/>
+  <rect x="0" y="110" width="920" height="110" fill="#fff"/>
+  <rect x="0" y="220" width="920" height="110" fill="#fafafa"/>
+  <rect x="0" y="330" width="920" height="110" fill="#fff"/>
+  <text x="14" y="58" font-size="14" font-weight="bold" fill="#333">会员（购买方）</text>
+  <text x="14" y="168" font-size="14" font-weight="bold" fill="#333">新人（被邀请方）</text>
+  <text x="14" y="278" font-size="14" font-weight="bold" fill="#333">系统</text>
+  <text x="14" y="388" font-size="14" font-weight="bold" fill="#333">后台运营</text>
+  <line x1="0" y1="110" x2="920" y2="110" stroke="#eee"/>
+  <line x1="0" y1="220" x2="920" y2="220" stroke="#eee"/>
+  <line x1="0" y1="330" x2="920" y2="330" stroke="#eee"/>
+  <defs><marker id="ar" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#999"/></marker></defs>
+
+  <rect x="120" y="34" width="150" height="42" rx="6" fill="#E6F7FF" stroke="#91D5FF"/>
+  <text x="195" y="59" font-size="12" text-anchor="middle" fill="#096DD9">购买「新人激活码礼包」</text>
+  <rect x="300" y="34" width="120" height="42" rx="6" fill="#E6F7FF" stroke="#91D5FF"/>
+  <text x="360" y="59" font-size="12" text-anchor="middle" fill="#096DD9">支付 ¥35×N</text>
+  <rect x="450" y="34" width="140" height="42" rx="6" fill="#E6F7FF" stroke="#91D5FF"/>
+  <text x="520" y="59" font-size="12" text-anchor="middle" fill="#096DD9">分享邀请码</text>
+
+  <rect x="450" y="144" width="130" height="42" rx="6" fill="#FFF7E6" stroke="#FFD591"/>
+  <text x="515" y="169" font-size="12" text-anchor="middle" fill="#FA8C16">输入邀请码</text>
+  <rect x="610" y="144" width="170" height="42" rx="6" fill="#FFF7E6" stroke="#FFD591"/>
+  <text x="695" y="169" font-size="12" text-anchor="middle" fill="#FA8C16">填地址·确认(¥0)</text>
+
+  <rect x="120" y="254" width="160" height="42" rx="6" fill="#F6FFED" stroke="#B7EB8F"/>
+  <text x="200" y="279" font-size="12" text-anchor="middle" fill="#389E0D">生成 N 个邀请码</text>
+  <rect x="610" y="254" width="155" height="42" rx="6" fill="#F6FFED" stroke="#B7EB8F"/>
+  <text x="687" y="279" font-size="12" text-anchor="middle" fill="#389E0D">核销·生成兑换订单</text>
+  <rect x="785" y="254" width="120" height="42" rx="6" fill="#F6FFED" stroke="#B7EB8F"/>
+  <text x="845" y="279" font-size="12" text-anchor="middle" fill="#389E0D">绑定上级</text>
+
+  <rect x="120" y="364" width="190" height="42" rx="6" fill="#F9F0FF" stroke="#D3ADF7"/>
+  <text x="215" y="389" font-size="12" text-anchor="middle" fill="#722ED1">配置兑换券商品+SKU</text>
+  <rect x="450" y="364" width="190" height="42" rx="6" fill="#F9F0FF" stroke="#D3ADF7"/>
+  <text x="545" y="389" font-size="12" text-anchor="middle" fill="#722ED1">管理会员/兑换订单</text>
+
+  <line x1="270" y1="55" x2="298" y2="55" stroke="#999" marker-end="url(#ar)"/>
+  <line x1="420" y1="55" x2="448" y2="55" stroke="#999" marker-end="url(#ar)"/>
+  <line x1="520" y1="76" x2="515" y2="142" stroke="#999" marker-end="url(#ar)"/>
+  <line x1="580" y1="165" x2="608" y2="165" stroke="#999" marker-end="url(#ar)"/>
+  <line x1="695" y1="186" x2="687" y2="252" stroke="#999" marker-end="url(#ar)"/>
+  <line x1="765" y1="275" x2="783" y2="275" stroke="#999" marker-end="url(#ar)"/>
+  <line x1="280" y1="76" x2="200" y2="252" stroke="#999" stroke-dasharray="4" marker-end="url(#ar)"/>
+</svg>
+<div class="img-cap">本图依据本期需求梳理绘制（非引用外部权威源），待评审确认后定稿。</div>
+
+<h3>3.2 信息架构</h3>
+<ul>
+<li><strong>C 端（App / 小程序 / H5）</strong>：首页（双 FAB：邀请码 / 新人礼包）→ 买邀请码流（商品详情 → 确认订单(无地址) → 收银台 → 购买成功）→ 兑换流（新人礼包页 → 收货地址 → 确认订单(¥0) → 邀请码弹窗 → 兑换订单成功）→ 我的（我的邀请码 / 我的订单）。</li>
+<li><strong>后台（PC 管理端）</strong>：商品管理（商品类型=兑换券 + 兑换商品 SKU 设置）/ 订单管理（会员订单 / 兑换订单）/ 邀请码管理（列表 / 生成 / 详情，沿用既有）。</li>
+</ul>
+
+<h3>3.3 术语与定义</h3>
 <table>
 <thead><tr><th style="width:18%">术语</th><th>定义</th></tr></thead>
 <tbody>
@@ -108,7 +166,6 @@
 <tr><td>兑换券商品</td><td>商品管理中「商品类型 = 兑换券」的商品。选中后可配置「兑换商品 SKU 设置」（多选已有 SKU + 各自数量），即新人兑换时可领取的实体商品组合。</td></tr>
 <tr><td>水袋权益</td><td>新人礼包内含的 5L 饮用水 ×7 袋，需到店自提，时效三段式（详见 §4.7）。</td></tr>
 </tbody></table>
-
 <h2 id="s4">四、功能需求详情</h2>
 
 <h3 id="s41">4.1 后台 · 商品管理（新增「兑换券」商品类型）</h3>
