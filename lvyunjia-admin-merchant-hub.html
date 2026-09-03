@@ -297,7 +297,6 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
       <div class="group-title" onclick="toggleGroup(this)">会员中心 <span class="arrow">▾</span></div>
       <div class="sub">
         <div class="menu-item">会员管理</div>
-        <div class="menu-item">邀请码</div>
       </div>
     </div>
     <div class="group">
@@ -382,7 +381,6 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                 <option value="group">团购商品</option>
                 <option value="haitao">海淘</option>
                 <option value="cross">跨境</option>
-                <option value="exchange">兑换券</option>
               </select>
             </div>
             <div class="item">
@@ -495,41 +493,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                     <span class="op">复制商品</span>
                     </div>
                 </td>
-              </tr>
-              <tr data-type="exchange">
-                <td><input type="checkbox"></td>
-                <td>699</td>
-                <td>
-                  <div class="goods-cell">
-                    <div class="goods-thumb">🎁</div>
-                    <div>
-                      <div class="goods-name">新人礼包礼包包（兑换券）</div>
-                      <div class="goods-id">3562542501 · 兑换商品</div>
-                    </div>
-                  </div>
-                </td>
-                <td>已通过</td>
-                <td><div>品牌: 自营</div><div class="muted">分类: 食品饮料/保健食品/增强免疫</div></td>
-                <td>否</td>
-                <td>常规</td>
-                <td>已上架</td>
-                <td>—</td>
-                <td><div>绿韵家家·官方</div><div class="muted">自营</div></td>
-                <td><span class="tag exchange">兑换券</span></td>
-                <td><div>99999</div><div class="muted">约 2250</div></td>
-                <td>
-                  <div class="op-list">
-                    <span class="op">查看</span>
-                    <span class="dot">·</span>
-                    <span class="op">编辑</span>
-                    <span class="dot">·</span>
-                    <span class="op">下架</span>
-                    <span class="dot">·</span>
-                    <span class="op">兑换记录</span>
-                  </div>
-                </td>
-              </tr>
-              <tr data-type="entity">
+              </tr><tr data-type="entity">
                 <td><input type="checkbox"></td>
                 <td>660</td>
                 <td>
@@ -661,11 +625,6 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
             <button class="btn btn-sm btn-primary">保存</button>
           </div>
         </div>
-        <!-- 顶部提示：让用户能看到下方的兑换商品 SKU 交互 -->
-        <div style="margin:12px 32px 0;padding:10px 14px;background:#fff8e6;border:1px solid #ffd591;border-radius:4px;color:#874d00;font-size:13px;display:flex;align-items:center;gap:8px">
-          <span style="font-size:16px">👇</span>
-          <span><b>往下滚动到「兑换商品」</b>，可点 <b>+ 添加一个 SKU</b> → 弹窗里<b>搜 SKU</b>（输入名称/编号过滤）+ <b>多选</b>（点行打勾）+ 确认 → 已选 SKU 渲染到下方列表。</span>
-        </div>
         <div class="form-section">
           <div class="form-grid">
             <div class="lbl">分类</div>
@@ -690,7 +649,6 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                 <label class="radio"><input type="radio" name="gtype" value="group"> 团购商品</label>
                 <label class="radio"><input type="radio" name="gtype" value="taoke"> 淘客</label>
                 <label class="radio"><input type="radio" name="gtype" value="cross"> 跨店</label>
-                <label class="radio primary"><input type="radio" name="gtype" value="exchange"> 兑换券</label>
               </div>
             </div>
 
@@ -769,31 +727,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- ★★ 本次新增：兑换商品区块 ★★ -->
-      <div class="card" id="sku_card">
-        <div class="card-head">
-          <div class="title" style="display:flex;align-items:center;gap:10px">
-            兑换商品
-            <span class="chip" id="sku_state_chip" style="background:#f5f5f5;color:#9aa0a6;border:1px solid #e5e7eb;border-radius:3px;padding:1px 8px;font-size:11px">未启用</span>
-          </div>
-          <div class="actions">
-            <span class="muted" style="font-size:12px" id="sku_count_hint">已选 0 个 SKU</span>
-          </div>
-        </div>
-        <div class="form-section">
-          <div class="sku-selector">
-            <div id="sku_list" class="sku-list">
-              <div class="sku-empty">📦 暂未选择兑换商品 SKU，点击下方按钮添加</div>
-            </div>
-            <button class="btn btn-primary" id="sku_add_btn" onclick="openSkuPicker()">+ 添加一个 SKU</button>
-            <div style="margin-top:10px;color:var(--text-3);font-size:11px;line-height:1.6" id="sku_hint">
-              💡 该兑换券商品可多选现有实体商品 SKU 作为可兑换的内容；用户成功买到兑换券后，可凭激活码兑换这些 SKU。弹窗支持按名称/编号<b>搜索</b> + <b>多选</b>（点行打勾），确认后下方列表可调整单 SKU 兑换数量 + 单独移除。
-            </div>
-          </div>
-        </div>
-      </div>
+      </div></div>
 
       <!-- 卡片：商品规格 -->
       <div class="card">
@@ -940,7 +874,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
         <span class="lbl">订单类型：</span>
         <span class="opt active" id="opt_all">全部<span class="num">(152907)</span></span>
         <span class="opt" id="opt_normal">常规订单<span class="num">(152901)</span></span>
-        <span class="opt" id="opt_member">会员订单<span class="num">(2)</span></span>
+        <span class="opt" id="opt_newuser">新人订单<span class="num">(2)</span></span>
         <span class="opt" id="opt_exchange">兑换订单<span class="num">(4)</span></span>
       </div>
 
@@ -962,7 +896,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
             </tr>
           </thead>
           <tbody id="order_tbody">
-            <!-- 会员订单样例（用户购买邀请码，2026-09-02 改名：新人订单 → 会员订单） -->
+            <!-- 新人订单样例（实物商家后台订单列表第一个订单） -->
             <tr data-type="member">
               <td>
                 <a class="link">主订单编号:1260001676152770753<br>子订单编号:605893</a>
@@ -970,7 +904,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
               <td>
                 <a class="link">支付单号:C2102609016761527707<br>微信支付单号:4200000262026090112345678</a>
               </td>
-              <td><span class="tag member">会员订单</span></td>
+              <td><span class="tag newuser">新人订单</span></td>
               <td>下单时间:2026-09-01 15:42</td>
               <td>
                 <div class="amount">总金额: ¥35.00</div>
@@ -995,7 +929,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                 <div class="goods-cell">
                   <div class="goods-thumb">🎁</div>
                   <div>
-                    <div class="goods-name">新人邀请码礼包</div>
+                    <div class="goods-name">套装购物礼包</div>
                     <div class="goods-id">3562542485</div>
                   </div>
                 </div>
@@ -1009,62 +943,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                   <span class="op">备注</span>
                 </div>
               </td>
-            </tr>
-
-            <!-- 兑换订单样例（用户用邀请码兑换实物，2026-09-02 新增订单类型） -->
-            <tr data-type="exchange">
-              <td>
-                <a class="link">主订单编号:1260001676152771189<br>子订单编号:605911</a>
-              </td>
-              <td>
-                <span class="muted">—</span>
-                <div class="muted" style="font-size:11px">邀请码抵扣</div>
-              </td>
-              <td><span class="tag exchange">兑换订单</span></td>
-              <td>下单时间:2026-09-02 10:18</td>
-              <td>
-                <div class="amount zero">总金额: ¥49.90</div>
-                <div class="muted">邀请码抵扣: -¥49.90</div>
-                <div class="muted">运费: ¥0</div>
-                <div class="amount zero">实付: ¥0.00</div>
-              </td>
-              <td>
-                <div>昵称: 李晓琳</div>
-                <div>昵称ID: <a class="link">8821</a></div>
-                <div>手机号: 13812345678</div>
-              </td>
-              <td>
-                <div class="muted">-- 邀请码支付</div>
-                <div class="muted">--</div>
-              </td>
-              <td>
-                <div>昵称: 李晓琳</div>
-                <div>手机号: 13812345678</div>
-                <div class="muted">湖南省长沙市雨花区</div>
-              </td>
-              <td>
-                <div class="goods-cell">
-                  <div class="goods-thumb">🧴</div>
-                  <div>
-                    <div class="goods-name">惠民补贴套餐包（益齿健套装）</div>
-                    <div class="goods-id">益齿健牙膏 ×1 + Q10 ×1 + 5L水×7</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="op-list">
-                  <span class="op">发货</span>
-                  <span class="dot">·</span>
-                  <span class="op">查看详情</span>
-                  <span class="dot">·</span>
-                  <span class="op">取消订单</span>
-                  <br>
-                  <span class="op">备注</span>
-                </div>
-              </td>
-            </tr>
-
-            <!-- 常规订单样例 1 -->
+            </tr><!-- 常规订单样例 1 -->
             <tr data-type="normal">
               <td>
                 <a class="link">主订单编号:1260001676152768999<br>子订单编号:605894</a>
@@ -1287,134 +1166,7 @@ function step(id, n){
 }
 
 /* ============== 商品类型切换 → SKU 区块启用/禁用 ============== */
-(function(){
-  var radios = document.querySelectorAll('#type_radios input[name="gtype"]');
-  var card = document.getElementById('sku_card');
-  var chip = document.getElementById('sku_state_chip');
-  var btn  = document.getElementById('sku_add_btn');
-  function refreshSkuCard(){
-    // 兑换商品 SKU 区块永远可交互（不再依赖商品类型）
-    chip.textContent = '可设置';
-    chip.style.cssText = 'background:#f0f9ff;color:#1890ff;border:1px solid #91d5ff;border-radius:3px;padding:1px 8px;font-size:11px';
-    btn.disabled = false;
-    btn.style.opacity = '';
-    card.style.opacity = '';
-    card.classList.remove('sku-disabled');
-  }
-  radios.forEach(function(r){ r.addEventListener('change', refreshSkuCard); });
-  refreshSkuCard();
-})();
-
-/* ============== SKU 多选 picker ============== */
-// 模拟商品库（实际生产环境走后端）
-var SKU_LIBRARY = [
-  {id:'SKU-A001', name:'益齿健牙膏(120g)',     meta:'编号 A001 · 实物质保 · 库存 2300', thumb:'🪥'},
-  {id:'SKU-A002', name:'辅酶 Q10 体验装(10粒)', meta:'编号 A002 · 实物质保 · 库存 1800', thumb:'💊'},
-  {id:'SKU-A003', name:'5L 饮用水(袋装)',        meta:'编号 A003 · 实物质保 · 库存 9999', thumb:'💧'},
-  {id:'SKU-A004', name:'5L 饮用水(袋装)×7 套装', meta:'编号 A004 · 实物质保 · 库存 5000', thumb:'💧'},
-  {id:'SKU-A005', name:'绿韵家健康茶包(30袋)',   meta:'编号 A005 · 实物质保 · 库存 1200', thumb:'🍵'},
-  {id:'SKU-A006', name:'一次性水卡(储值)',       meta:'编号 A006 · 虚拟商品 · 储值类型', thumb:'💳'},
-  {id:'SKU-A007', name:'维 C 泡腾片(20片)',     meta:'编号 A007 · 实物质保 · 库存 960',   thumb:'🥤'},
-  {id:'SKU-A008', name:'一次性优惠券 5元',       meta:'编号 A008 · 优惠券类型',           thumb:'🎟️'}
-];
-
-// 当前已选 SKU（带兑换数量）
-var pickedSkus = [];     // [{id,name,meta,thumb,qty}]
-var modalPending = [];   // picker 暂存
-
-function openSkuPicker(){
-  modalPending = pickedSkus.map(function(s){ return Object.assign({},s); });
-  renderSkuPickerList(SKU_LIBRARY);
-  updatePickedHint();
-  document.getElementById('sku_modal').classList.add('show');
-}
-
-function closeSkuPicker(){
-  document.getElementById('sku_modal').classList.remove('show');
-}
-
-function renderSkuPickerList(arr){
-  var html = '';
-  arr.forEach(function(s){
-    var p = modalPending.find(function(x){ return x.id===s.id; });
-    var sel = !!p;
-    html += '<div class="sku-item'+ (sel?' selected':'') +'" onclick="toggleSkuPick(\''+ s.id +'\')">'
-         +  '<div class="thumb">'+ (s.thumb||'📦') +'</div>'
-         +  '<div class="info"><div class="name">'+ s.name +'</div>'
-         +  '<div class="meta">'+ (s.meta||'') +'</div></div>'
-         +  '<div class="check">'+ (sel ? '✓':'') +'</div>'
-         +  '</div>';
-  });
-  document.getElementById('sku_picker_list').innerHTML = html || '<div style="padding:30px;text-align:center;color:var(--text-3)">没有匹配的 SKU</div>';
-}
-
-function toggleSkuPick(id){
-  var s = SKU_LIBRARY.find(function(x){ return x.id===id; });
-  if(!s) return;
-  var idx = modalPending.findIndex(function(x){ return x.id===id; });
-  if (idx>=0){
-    modalPending.splice(idx,1);
-  } else {
-    modalPending.push(Object.assign({qty:1},s));
-  }
-  // 重新渲染
-  var q = document.getElementById('sku_search_input').value||'';
-  filterSku();
-  updatePickedHint();
-}
-
-function filterSku(){
-  var q = (document.getElementById('sku_search_input').value||'').trim().toLowerCase();
-  var arr = SKU_LIBRARY.filter(function(s){
-    if(!q) return true;
-    return s.name.toLowerCase().indexOf(q)>=0 || s.id.toLowerCase().indexOf(q)>=0;
-  });
-  renderSkuPickerList(arr);
-}
-
-function updatePickedHint(){
-  document.getElementById('sku_picked_hint').textContent = '已选 '+ modalPending.length +' 个';
-}
-
-function confirmSkuPicker(){
-  pickedSkus = modalPending.map(function(s){ return Object.assign({},s); });
-  renderPickedList();
-  closeSkuPicker();
-  toast('已添加 '+ pickedSkus.length +' 个兑换 SKU');
-}
-
-function renderPickedList(){
-  var html = '';
-  pickedSkus.forEach(function(s){
-    html += '<div class="sku-row">'
-         +  '<div class="thumb">'+ (s.thumb||'📦') +'</div>'
-         +  '<div class="info"><div class="name">'+ s.name +'</div><div class="meta">'+ (s.meta||'') +'</div></div>'
-         +  '<div class="qty">兑换数量 <div class="stepper"><button class="ctrl" onclick="changeQty(\''+ s.id +'\',-1)">−</button><input class="num" value="'+ (s.qty||1) +'"><button class="ctrl" onclick="changeQty(\''+ s.id +'\',1)">+</button></div></div>'
-         +  '<div class="del" onclick="delPickedSku(\''+ s.id +'\')" title="移除">×</div>'
-         +  '</div>';
-  });
-  if (pickedSkus.length===0){
-    html = '<div class="sku-empty">📦 暂未选择兑换商品 SKU，点击下方按钮添加</div>';
-  }
-  document.getElementById('sku_list').innerHTML = html;
-  document.getElementById('sku_count_hint').textContent = '已选 '+ pickedSkus.length +' 个 SKU';
-}
-
-function changeQty(id, n){
-  var s = pickedSkus.find(function(x){ return x.id===id; });
-  if(!s) return;
-  s.qty = (s.qty||1) + n;
-  if (s.qty < 1) s.qty = 1;
-  if (s.qty > 99) s.qty = 99;
-  renderPickedList();
-}
-
-function delPickedSku(id){
-  pickedSkus = pickedSkus.filter(function(x){ return x.id!==id; });
-  renderPickedList();
-}
-
-/* ============== 列表筛选（兑换券过滤） ============== */
+/* ============== 列表筛选（商品类型过滤） ============== */
 (function(){
   var sel = document.getElementById('filter_type');
   if(!sel) return;
