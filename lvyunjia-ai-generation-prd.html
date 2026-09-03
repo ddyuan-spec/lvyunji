@@ -150,5 +150,73 @@
 5. 不添加用户未提及的敏感人物特征。
 输出 JSON：{"final_prompt":"...", "style":"...", "blocked":false}</pre><p><b>③ 敏感词合规校验（子工作流A 节点5，复用泰小虎「清洗 OCR 内容」范式）</b></p><pre># 黑名单 + 正则过滤违规/侵权词；命中则降级替换并返回 blocked=true
 # 命中记录写合规日志到业务库（不写记忆库）</pre><h3>10.9 Coze 工作流导出文件</h3><p>工作流配置文件见同目录 <code>lvyunjia-ai-coze-workflow.json</code>，含主工作流 + 4 子工作流的节点与连线定义，可直接导入 Coze 平台做二次调整。<b>注意</b>：plugin_id（图像/视频生成、语音识别、缩略图插件）与 memory 节点精确 schema 为占位，需在 Coze 平台绑定实际插件并校准记忆节点类型后生效。</p>
+
+<!-- ===== 原型截图总览（15 张，内联） ===== -->
+<section id="proto-shots">
+  <h2>附录：原型截图总览（15 张）</h2>
+  <p>以下为图生图商业化及 AI 工具规划 PRD 各核心页面的原型截图，按 C 端 / 后台顺序排列。</p>
+  <div class="prd-shots">
+      <div class="prd-shot">
+        <img src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_v051/c_myworks.png" alt="图：C 端 · 我的作品页（灵感值账户卡片 + 购买/明细按钮）" style="max-width:100%;border:1px solid #e5e5e5;border-radius:8px;margin:8px 0;">
+        <p class="prd-shot-cap" style="color:#666;font-size:13px;margin:4px 0 18px;">图：C 端 · 我的作品页（灵感值账户卡片 + 购买/明细按钮）</p>
+      </div>
+      <div class="prd-shot">
+        <img src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_v051/c_recharge.png" alt="图：C 端 · 灵感值购买页（套餐选择 + 协议勾选 + 不支持退款小字，默认未选状态）" style="max-width:100%;border:1px solid #e5e5e5;border-radius:8px;margin:8px 0;">
+        <p class="prd-shot-cap" style="color:#666;font-size:13px;margin:4px 0 18px;">图：C 端 · 灵感值购买页（套餐选择 + 协议勾选 + 不支持退款小字，默认未选状态）</p>
+      </div>
+      <div class="prd-shot">
+        <img src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_v051/c_recharge_order.png" alt="图：C 端 · 确认订单页（含新人首单优惠 + 去收银台，无「不能退款」文案）" style="max-width:100%;border:1px solid #e5e5e5;border-radius:8px;margin:8px 0;">
+        <p class="prd-shot-cap" style="color:#666;font-size:13px;margin:4px 0 18px;">图：C 端 · 确认订单页（含新人首单优惠 + 去收银台，无「不能退款」文案）</p>
+      </div>
+      <div class="prd-shot">
+        <img src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_v051/c_credit_detail.png" alt="图：C 端 · 灵感值明细（账户三列 + Tab + 流水列表）" style="max-width:100%;border:1px solid #e5e5e5;border-radius:8px;margin:8px 0;">
+        <p class="prd-shot-cap" style="color:#666;font-size:13px;margin:4px 0 18px;">图：C 端 · 灵感值明细（账户三列 + Tab + 流水列表）</p>
+      </div>
+      <div class="prd-shot">
+        <img src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_v051/c_aigen.png" alt="图：C 端 · AI 生图页（灵感值消耗提示三处联动）" style="max-width:100%;border:1px solid #e5e5e5;border-radius:8px;margin:8px 0;">
+        <p class="prd-shot-cap" style="color:#666;font-size:13px;margin:4px 0 18px;">图：C 端 · AI 生图页（灵感值消耗提示三处联动）</p>
+      </div>
+      <div class="prd-shot">
+        <img src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_v051/c_insufficient.png" alt="图：C 端 · 灵感值不足拦截弹窗（双按钮：立即充值 / 取消）" style="max-width:100%;border:1px solid #e5e5e5;border-radius:8px;margin:8px 0;">
+        <p class="prd-shot-cap" style="color:#666;font-size:13px;margin:4px 0 18px;">图：C 端 · 灵感值不足拦截弹窗（双按钮：立即充值 / 取消）</p>
+      </div>
+      <div class="prd-shot">
+        <img src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_v051/admin_member.png" alt="图：后台 · 会员管理列表（灵感值余额列 + 筛选 + 调整灵感值操作）" style="max-width:100%;border:1px solid #e5e5e5;border-radius:8px;margin:8px 0;">
+        <p class="prd-shot-cap" style="color:#666;font-size:13px;margin:4px 0 18px;">图：后台 · 会员管理列表（灵感值余额列 + 筛选 + 调整灵感值操作）</p>
+      </div>
+      <div class="prd-shot">
+        <img src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_v051/admin_adjust.png" alt="图：后台 · 调整灵感值独立页（赠送/扣除 + 数值 + 备注）" style="max-width:100%;border:1px solid #e5e5e5;border-radius:8px;margin:8px 0;">
+        <p class="prd-shot-cap" style="color:#666;font-size:13px;margin:4px 0 18px;">图：后台 · 调整灵感值独立页（赠送/扣除 + 数值 + 备注）</p>
+      </div>
+      <div class="prd-shot">
+        <img src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_v051/admin_log.png" alt="图：后台 · 用户生成日志（筛选 + 列表 + 状态/消耗灵感值）" style="max-width:100%;border:1px solid #e5e5e5;border-radius:8px;margin:8px 0;">
+        <p class="prd-shot-cap" style="color:#666;font-size:13px;margin:4px 0 18px;">图：后台 · 用户生成日志（筛选 + 列表 + 状态/消耗灵感值）</p>
+      </div>
+      <div class="prd-shot">
+        <img src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_v051/admin_init.png" alt="图：后台 · 初始用户灵感值配置（当前生效卡片 + 设置表单 + 历史快照）" style="max-width:100%;border:1px solid #e5e5e5;border-radius:8px;margin:8px 0;">
+        <p class="prd-shot-cap" style="color:#666;font-size:13px;margin:4px 0 18px;">图：后台 · 初始用户灵感值配置（当前生效卡片 + 设置表单 + 历史快照）</p>
+      </div>
+      <div class="prd-shot">
+        <img src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_v051/admin_cost.png" alt="图：后台 · 生图成本配置（当前生效 + 设置 + 历史快照）" style="max-width:100%;border:1px solid #e5e5e5;border-radius:8px;margin:8px 0;">
+        <p class="prd-shot-cap" style="color:#666;font-size:13px;margin:4px 0 18px;">图：后台 · 生图成本配置（当前生效 + 设置 + 历史快照）</p>
+      </div>
+      <div class="prd-shot">
+        <img src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_v051/c_material.png" alt="图：C 端 · 素材库（栏目分栏 + 格式筛选 + 卡片，仅查看/预览/下载）" style="max-width:100%;border:1px solid #e5e5e5;border-radius:8px;margin:8px 0;">
+        <p class="prd-shot-cap" style="color:#666;font-size:13px;margin:4px 0 18px;">图：C 端 · 素材库（栏目分栏 + 格式筛选 + 卡片，仅查看/预览/下载）</p>
+      </div>
+      <div class="prd-shot">
+        <img src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_v051/admin_material_category.png" alt="图：后台 · 素材栏目管理（栏目列表 + 新增/编辑/删除）" style="max-width:100%;border:1px solid #e5e5e5;border-radius:8px;margin:8px 0;">
+        <p class="prd-shot-cap" style="color:#666;font-size:13px;margin:4px 0 18px;">图：后台 · 素材栏目管理（栏目列表 + 新增/编辑/删除）</p>
+      </div>
+      <div class="prd-shot">
+        <img src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_v051/admin_material_upload.png" alt="图：后台 · 素材管理 · 批量上传面板展开（多选 + 进度 + 栏目归属 + 格式/大小限制）" style="max-width:100%;border:1px solid #e5e5e5;border-radius:8px;margin:8px 0;">
+        <p class="prd-shot-cap" style="color:#666;font-size:13px;margin:4px 0 18px;">图：后台 · 素材管理 · 批量上传面板展开（多选 + 进度 + 栏目归属 + 格式/大小限制）</p>
+      </div>
+      <div class="prd-shot">
+        <img src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_v051/admin_prompt_config.png" alt="图：后台 · 辅助提示词配置（风格/场景/光线 3 板块）" style="max-width:100%;border:1px solid #e5e5e5;border-radius:8px;margin:8px 0;">
+        <p class="prd-shot-cap" style="color:#666;font-size:13px;margin:4px 0 18px;">图：后台 · 辅助提示词配置（风格/场景/光线 3 板块）</p>
+      </div>
+  </div>
+</section>
 </body>
 </html>
