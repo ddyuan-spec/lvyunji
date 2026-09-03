@@ -281,7 +281,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
           <div class="menu-item">全部商家</div>
           <div class="menu-item">待审核商家</div>
           <div class="menu-item">商家审核记录</div>
-          <div class="menu-item active" onclick="go('list')">商品管理</div>
+          <div class="menu-item active" data-view="list" onclick="go('list')">商品管理</div>
           <div class="menu-item">商家素材管理</div>
         </div>
       </div>
@@ -289,7 +289,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
     <div class="group">
       <div class="group-title" onclick="toggleGroup(this)">交易 <span class="arrow">▾</span></div>
       <div class="sub">
-        <div class="menu-item" onclick="go('orders')">订单管理</div>
+        <div class="menu-item" data-view="orders" onclick="go('orders')">订单管理</div>
         <div class="menu-item">订单源设置</div>
       </div>
     </div>
@@ -334,7 +334,8 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
       <a>专题管理</a><span class="divider">/</span>
       <a>商品评价</a><span class="divider">/</span>
       <a id="nav_list" class="active" onclick="go('list')">商家商品管理</a><span class="divider">/</span>
-      <a id="nav_create" onclick="go('create')">新增商品</a>
+      <a id="nav_create" onclick="go('create')">新增商品</a><span class="divider">/</span>
+      <a id="nav_orders" onclick="go('orders')">订单管理</a>
     </div>
 
     <!-- ============================================ -->
@@ -828,7 +829,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
         <div class="actions">
           <button class="btn btn-sm">查询</button>
           <button class="btn btn-sm">重置</button>
-          <button class="btn btn-sm btn-primary">导出当前筛选订单(11)</button>
+          <button class="btn btn-sm btn-primary">导出当前筛选订单(1)</button>
           <button class="btn btn-sm" style="background:var(--ok);color:#fff;border-color:var(--ok)">导出发货订单</button>
         </div>
       </div>
@@ -872,10 +873,9 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
       <!-- 二级筛选：订单类型（按用户最新裁定，改为 常规/会员/兑换） -->
       <div class="sub-filters">
         <span class="lbl">订单类型：</span>
-        <span class="opt active" id="opt_all">全部<span class="num">(152907)</span></span>
-        <span class="opt" id="opt_normal">常规订单<span class="num">(152901)</span></span>
-        <span class="opt" id="opt_newuser">新人订单<span class="num">(2)</span></span>
-        <span class="opt" id="opt_exchange">兑换订单<span class="num">(4)</span></span>
+        <span class="opt active" id="opt_all">全部<span class="num">(1)</span></span>
+        <span class="opt" id="opt_normal">常规订单<span class="num">(0)</span></span>
+        <span class="opt" id="opt_newuser">新人订单<span class="num">(1)</span></span>
       </div>
 
       <!-- 表格 -->
@@ -943,164 +943,13 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                   <span class="op">备注</span>
                 </div>
               </td>
-            </tr><!-- 常规订单样例 1 -->
-            <tr data-type="normal">
-              <td>
-                <a class="link">主订单编号:1260001676152768999<br>子订单编号:605894</a>
-              </td>
-              <td>
-                <a class="link">支付单号:C2102609016762768999<br>微信支付单号:C2102609016762768999</a>
-              </td>
-              <td><span class="tag">常规订单</span></td>
-              <td>下单时间:2026-09-01 14:04</td>
-              <td>
-                <div class="amount">总金额: ¥50</div>
-                <div class="muted">优惠折扣: ¥0</div>
-                <div class="muted">运费: ¥0</div>
-              </td>
-              <td>
-                <div>昵称: 雀巢用户</div>
-                <div>昵称ID: <a class="link">A5432</a></div>
-                <div>手机号: 13574051887</div>
-              </td>
-              <td>
-                <div>昵称: 雀巢用户</div>
-                <div>昵称ID: <a class="link">A5432</a></div>
-                <div>手机号: 13574051887</div>
-              </td>
-              <td>
-                <div>昵称: 雀巢用户</div>
-                <div>手机号: 13574051887</div>
-                <div class="muted">--</div>
-              </td>
-              <td>
-                <div class="goods-cell">
-                  <div class="goods-thumb">📦</div>
-                  <div>
-                    <div class="goods-name">成翔城</div>
-                    <div class="goods-id">3562542485</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="op-list">
-                  <span class="op">修改发货信息</span>
-                  <span class="dot">·</span>
-                  <span class="op">查看详情</span>
-                  <br>
-                  <span class="op">备注</span>
-                </div>
-              </td>
-            </tr>
-
-            <!-- 常规订单样例 2 -->
-            <tr data-type="normal">
-              <td>
-                <a class="link">主订单编号:1260001676152740708<br>子订单编号:605883</a>
-              </td>
-              <td>
-                <a class="link">支付单号:C2102609016761527407<br>微信支付单号:C2102609016761527407</a>
-              </td>
-              <td><span class="tag">常规订单</span></td>
-              <td>下单时间:2026-09-01 14:04</td>
-              <td>
-                <div class="amount">总金额: ¥42.00</div>
-                <div class="muted">优惠折扣: ¥0</div>
-                <div class="muted">运费: ¥0</div>
-              </td>
-              <td>
-                <div>昵称: 中命会员</div>
-                <div>昵称ID: <a class="link">派uuu</a></div>
-                <div>手机号: 13574051886</div>
-              </td>
-              <td>
-                <div>昵称: 中命会员</div>
-                <div>昵称ID: <a class="link">派uuu</a></div>
-                <div>手机号: 13574051886</div>
-              </td>
-              <td>
-                <div>昵称: 派uuu</div>
-                <div>手机号: 13574051886</div>
-                <div class="muted">--</div>
-              </td>
-              <td>
-                <div class="goods-cell">
-                  <div class="goods-thumb">📦</div>
-                  <div>
-                    <div class="goods-name">成翔城</div>
-                    <div class="goods-id">35674051886</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="op-list">
-                  <span class="op">发货</span>
-                  <span class="dot">·</span>
-                  <span class="op">查看详情</span>
-                  <span class="dot">·</span>
-                  <span class="op">取消订单</span>
-                  <br>
-                  <span class="op">备注</span>
-                </div>
-              </td>
-            </tr>
-
-            <!-- 常规订单样例 3 -->
-            <tr data-type="normal">
-              <td>
-                <a class="link">主订单编号:1260001676152703822<br>子订单编号:605882</a>
-              </td>
-              <td>
-                <a class="link">支付单号:C2102609016767490349<br>微信支付单号:C2102609016767490349</a>
-              </td>
-              <td><span class="tag">常规订单</span></td>
-              <td>下单时间:2026-09-01 13:48</td>
-              <td>
-                <div class="amount">总金额: ¥37.29</div>
-                <div class="muted">优惠折扣: ¥0</div>
-                <div class="muted">运费: ¥0</div>
-              </td>
-              <td>
-                <div>昵称: 体验达人</div>
-                <div>昵称ID: <a class="link">成米志1</a></div>
-                <div>手机号: 15673235969</div>
-              </td>
-              <td>
-                <div>昵称: 体验达人</div>
-                <div>昵称ID: <a class="link">成米志1</a></div>
-                <div>手机号: 15673235969</div>
-              </td>
-              <td>
-                <div>昵称: 体验达人</div>
-                <div>手机号: 15673235969</div>
-                <div class="muted">--</div>
-              </td>
-              <td>
-                <div class="goods-cell">
-                  <div class="goods-thumb">🧪</div>
-                  <div>
-                    <div class="goods-name">50ml TEST 串品<br>酒葡萄酒液体 200ml</div>
-                    <div class="goods-id">38301786971 · 3838035563</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="op-list">
-                  <span class="op">修改发货信息</span>
-                  <span class="dot">·</span>
-                  <span class="op">查看详情</span>
-                  <br>
-                  <span class="op">备注</span>
-                </div>
-              </td>
-            </tr>
-          </tbody>
+            </tbody>
         </table>
       </div>
 
       <!-- 分页 -->
       <div class="pager">
-        <span class="total">共 3 条</span>
+        <span class="total">共 1 条</span>
         <select class="size-select"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>
         <div class="pages">
           <span class="pg">‹</span>
@@ -1149,6 +998,11 @@ function go(key){
   var t=document.getElementById(id);if(t)t.classList.add('active');
   var ns=document.querySelectorAll('.page-nav a');ns.forEach(a=>a.classList.remove('active'));
   var na=document.getElementById('nav_'+key);if(na)na.classList.add('active');
+  /* 侧栏 active 同步：清掉旧 active，按 data-view 重新设置 */
+  var ss=document.querySelectorAll('.sidebar .menu-item.active');
+  ss.forEach(a=>a.classList.remove('active'));
+  var s=document.querySelector('.sidebar .menu-item[data-view="'+key+'"]');
+  if(s) s.classList.add('active');
 }
 
 /* ============== 侧栏折叠 ============== */
