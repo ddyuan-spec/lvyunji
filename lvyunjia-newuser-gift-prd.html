@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>绿韵家App新人激活码礼包（邀请码）功能 PRD</title>
+<style>
+    :root { --primary: #FF4D4F; --green: #52C41A; --orange: #FAAD14; --blue: #1890FF; --text: #333; --sub: #666; --hint: #999; --bg: #f5f5f5; --border: #e0e0e0; }
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; line-height: 1.7; color: var(--text); max-width: 1100px; margin: 0 auto; padding: 32px 24px; background: #fff; }
+    h1 { font-size: 28px; border-bottom: 2px solid var(--primary); padding-bottom: 12px; margin-bottom: 24px; }
+    h2 { font-size: 22px; margin-top: 40px; padding-left: 12px; border-left: 4px solid var(--primary); }
+    h3 { font-size: 18px; margin-top: 32px; color: #222; }
+    h4 { font-size: 16px; margin-top: 26px; color: #333; }
+    h5 { font-size: 14px; margin-top: 20px; color: #444; }
+    p { margin: 10px 0; }
+    table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; table-layout: fixed; }
+    th, td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; word-break: break-all; overflow-wrap: break-word; }
+    th { background: #fafafa; font-weight: 600; color: var(--sub); }
+    tr:nth-child(even) td { background: #fafafa; }
+    ul, ol { margin: 10px 0; padding-left: 24px; }
+    li { margin: 6px 0; }
+    code { background: #f2f2f2; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px; }
+    .tag.y { background: #FFF7E6; color: #FAAD14; border: 1px solid #FFD591; }
+    .tag.g { background: #F6FFED; color: #389E0D; border: 1px solid #B7EB8F; }
+    .tag.r { background: #FFF1F0; color: #CF1322; border: 1px solid #FFA39E; }
+    .tag.b { background: #E6F7FF; color: #096DD9; border: 1px solid #91D5FF; }
+    .warn { background: #FFFBE6; border: 1px solid #FFE58F; padding: 12px 16px; border-radius: 4px; margin: 14px 0; }
+    .note { background: #F6FFED; border: 1px solid #B7EB8F; padding: 12px 16px; border-radius: 4px; margin: 14px 0; }
+    .img-wrap { margin: 16px 0; }
+    .img-wrap img { max-width: 100%; max-height: 760px; border: 1px solid var(--border); border-radius: 8px; object-fit: contain; }
+    .img-cap { font-size: 13px; color: var(--sub); margin-top: 6px; }
+    .toc { background: #fafafa; border: 1px solid var(--border); padding: 16px 20px; border-radius: 6px; margin-bottom: 24px; }
+    .toc a { color: #1890FF; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .page-meta { color: var(--sub); font-size: 13px; margin: 8px 0 16px; }
+    .flow { background: #fbfbfb; border: 1px dashed var(--border); border-radius: 6px; padding: 14px 16px; margin: 14px 0; font-family: "SFMono-Regular", Consolas, monospace; font-size: 13px; line-height: 1.9; }
+  </style>
+</head>
+<body>
+<h1 id="top">绿韵家App新人激活码礼包（邀请码）功能 PRD</h1>
+<div class="toc">
+<strong>目录</strong><br/>
+<a href="#s1">一、文档基本信息</a> ·
+  <a href="#s2">二、项目背景与目标</a> ·
+  <a href="#s3">三、术语与定义</a> ·
+  <a href="#s4">四、功能需求详情</a> ·
+  <a href="#s5">五、非功能性需求</a> ·
+  <a href="#s6">六、验收标准</a> ·
+  <a href="#s7">七、关键边界设计检查清单</a> ·
+  <a href="#s8">八、文档维护与变更规范</a> ·
+  <a href="#s9">九、待确认项汇总</a>
+</div>
+
+<h2 id="s1">一、文档基本信息</h2>
+<table>
+<thead><tr><th style="width:20%">项目</th><th>内容</th></tr></thead>
+<tbody>
+<tr><td>项目名称</td><td>绿韵家App新人激活码礼包（邀请码）功能</td></tr>
+<tr><td>创建时间</td><td>2026-09-02</td></tr>
+<tr><td>负责人（PM）</td><td>袁中天</td></tr>
+<tr><td>技术 Owner</td><td>⚠️ 待确认 @研发负责人</td></tr>
+<tr><td>测试负责人</td><td>⚠️ 待确认 @测试负责人</td></tr>
+<tr><td>文档状态</td><td>评审中</td></tr>
+</tbody></table>
+<h3>历史修订记录</h3>
+<table>
+<thead><tr><th>版本</th><th>日期</th><th>修改人</th><th>修订内容简述</th><th>状态</th></tr></thead>
+<tbody>
+<tr><td>V1.0</td><td>2026-09-02</td><td>袁中天</td><td>初版：整合原型（C 端 / 后台商品管理 / 后台订单管理）+ PRD 待补项 + 已定稿规则（水袋权益 / 价格数量 V3 / 上下级绑定 / 兑换券商品类型 / 会员订单·兑换订单），并完成「激活码→邀请码」全量改名</td><td>评审中</td></tr>
+</tbody></table>
+
+<h2 id="s2">二、项目背景与目标</h2>
+<h3>2.1 业务背景</h3>
+<p>绿韵家通过「会员购买邀请码 → 分享给新人 → 新人用邀请码兑换新人礼包」的方式完成拉新与上下级绑定。本期将原有散落在多处的「激活码」能力收口为统一的「邀请码」体系，并明确两类订单口径：</p>
+<ul>
+<li><strong>会员购买邀请码</strong>：会员在会员端下单购买「新人激活码礼包」，支付成功后系统按购买数量生成对应数量的邀请码，自动进入会员「我的邀请码」。此类订单类型为 <span class="tag b">会员订单</span>。</li>
+<li><strong>新人用邀请码兑换</strong>：被邀请的新人在 C 端「新人礼包」页输入邀请码，订单实付 ¥0（邀请码抵扣），生成实体商品订单（快递配送）+ 水袋权益（到店自提）。此类订单类型为 <span class="tag b">兑换订单</span>。</li>
+</ul>
+<div class="warn">⚠️ <strong>命名收口（2026-09 裁定）</strong>：原「激活码」一律更名为「邀请码」；原「新人礼包兑换券」不再使用。购买侧商品正式名为「<strong>新人激活码礼包</strong>」，兑换侧入口页名为「<strong>新人礼包</strong>」。</div>
+
+<h3>2.2 项目目标</h3>
+<ul>
+<li><strong>业务目标</strong>：打通「买邀请码 → 分享 → 新人兑换 → 上下级绑定」闭环；统一订单口径（会员订单 / 兑换订单）；商品管理新增「兑换券」类型以支撑兑换商品的灵活配置。</li>
+<li><strong>用户目标</strong>：会员可一键购买并分享邀请码；新人凭邀请码无障碍兑换新人礼包（实体商品 + 水袋权益）；运营可在后台清晰区分并管理两类订单与邀请码。</li>
+</ul>
+
+<h3>2.3 衡量指标（KPI）</h3>
+<table>
+<thead><tr><th>指标</th><th>目标值</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>邀请码购买转化率</td><td>⚠️ 待确认 @产品负责人</td><td>购买邀请码支付成功人数 / 进入邀请码商品详情页人数</td></tr>
+<tr><td>邀请码核销率</td><td>⚠️ 待确认 @产品负责人</td><td>已下单邀请码数 / 已生成邀请码数</td></tr>
+<tr><td>新人兑换完成率</td><td>⚠️ 待确认 @产品负责人</td><td>兑换订单支付成功数 / 进入新人礼包页人数</td></tr>
+</tbody></table>
+
+<h2 id="s3">三、术语与定义</h2>
+<table>
+<thead><tr><th style="width:18%">术语</th><th>定义</th></tr></thead>
+<tbody>
+<tr><td>邀请码</td><td>系统生成的随机码（长度 ≥ 8，含特殊符号、大写与小写字母）。原「激活码」，2026-09 起统一更名。用于新人兑换新人礼包。由「购买生成」（会员购买）或「系统生成」（后台手动）两条途径产生。</td></tr>
+<tr><td>新人激活码礼包</td><td><strong>购买侧</strong>商品正式名（Flow A）。会员端购买的「邀请码礼包」商品即此名，购买后生成对应数量的邀请码。</td></tr>
+<tr><td>新人礼包</td><td><strong>兑换侧</strong>入口页名称（Flow B）。C 端新人兑换页名为「新人礼包」，页内按钮为「立即激活」。</td></tr>
+<tr><td>会员订单</td><td>订单类型之一。会员购买邀请码礼包产生的订单，实付 = 会员价 ¥35 × 数量 N，无收货地址。</td></tr>
+<tr><td>兑换订单</td><td>订单类型之一。新人用邀请码兑换实体商品产生的订单，实付 ¥0（商品总价 ¥49.9 由邀请码全额抵扣），含收货人地址。</td></tr>
+<tr><td>兑换券商品</td><td>商品管理中「商品类型 = 兑换券」的商品。选中后可配置「兑换商品 SKU 设置」（多选已有 SKU + 各自数量），即新人兑换时可领取的实体商品组合。</td></tr>
+<tr><td>水袋权益</td><td>新人礼包内含的 5L 饮用水 ×7 袋，需到店自提，时效三段式（详见 §4.7）。</td></tr>
+</tbody></table>
+
+<h2 id="s4">四、功能需求详情</h2>
+
+<h3 id="s41">4.1 后台 · 商品管理（新增「兑换券」商品类型）</h3>
+<h4>4.1.1 功能说明</h4>
+<p>在现有「商品管理」中，<strong>商品类型</strong>新增「兑换券」选项（其余类型：实体商品 / 团购商品 / 淘客 / 跨店保持不变）。当商品类型选择「兑换券」时，表单下方展开「兑换商品 SKU 设置」区块。</p>
+<h4>4.1.2 兑换商品 SKU 设置</h4>
+<table>
+<thead><tr><th>要素</th><th>说明</th><th>备注</th></tr></thead>
+<tbody>
+<tr><td>SKU 选择</td><td>多选，从已有商品 SKU 库中选择可兑换的实体商品（如益齿健牙膏、辅酶 Q10、5L 饮用水等）</td><td>支持搜索；与「商品管理」现有 SKU 库复用，不另建</td></tr>
+<tr><td>数量配置</td><td>每个被选中的 SKU 可单独配置兑换数量（如 5L 饮用水 ×7 袋）</td><td>数量输入框，最小 1</td></tr>
+<tr><td>预览</td><td>已选 SKU 以列表形式展示（名称 + 数量 + 删除），并实时提示已选 SKU 数</td><td>—</td></tr>
+</tbody></table>
+<h4>4.1.3 显示位置 / 权限</h4>
+<ul>
+<li>显示位置：后台 → 商品中心 → 商品管理 → 新增商品 / 编辑商品表单。</li>
+<li>权限：商品运营岗（与现有商品管理权限一致）。</li>
+</ul>
+<div class="note">📎 原型参照：<code>lvyunjia-admin-merchant-product.html</code>（「商品类型」含「兑换券」选项；选中后展开「兑换商品 SKU 设置」多选区块）。</div>
+
+<h3 id="s42">4.2 后台 · 订单管理（会员订单 / 兑换订单）</h3>
+<h4>4.2.1 订单类型筛选</h4>
+<p>订单管理列表在一/二级筛选区新增「订单类型」维度，取值：<strong>全部 / 常规订单 / 会员订单 / 兑换订单</strong>。对应表格新增「订单类型」列，以标签区分（会员订单=橙色 <span class="tag y">会员订单</span>，兑换订单=蓝色 <span class="tag b">兑换订单</span>）。</p>
+<h4>4.2.2 主状态 Tab</h4>
+<p>主状态 Tab：全部 / 拼团中 / 待发货 / 即将逾期发货 / 已逾期 / 备货中 / 已发货 / 已完成（各带计数）。子导航：订单列表（默认）/ 批量发货 / 导出虚拟订单。</p>
+<h4>4.2.3 样例数据</h4>
+<table>
+<thead><tr><th>订单类型</th><th>实付</th><th>收货地址</th><th>关键操作 / 说明</th></tr></thead>
+<tbody>
+<tr><td><span class="tag y">会员订单</span></td><td>¥35 × N</td><td>无（虚拟商品）</td><td>支付成功后系统生成 N 个邀请码，进入会员「我的邀请码」</td></tr>
+<tr><td><span class="tag b">兑换订单</span></td><td>¥0（邀请码抵扣 ¥49.9）</td><td>有（收货人姓名/手机/地址）</td><td>新人凭邀请码兑换实体商品；订单详情展示邀请码与绑定上级</td></tr>
+</tbody></table>
+<h4>4.2.4 订单详情页</h4>
+<div class="note">📎 <strong>沿用当前既有订单详情页，不新建独立页</strong>。新人 / 会员 / 兑换订单在「全部」Tab 点击「查看详情」时复用同一详情页，订单类型以头部标签展示；兑换订单详情额外展示「邀请码编号」「绑定上级」「上下级绑定记录」。</div>
+
+<h3 id="s43">4.3 后台 · 邀请码管理（沿用既有）</h3>
+<h4>4.3.1 邀请码管理表（字段与操作）</h4>
+<p>菜单位置：店铺 → 商品中心 → 邀请码管理（与商品分类 / 商品管理 / 商品评价 / 商品上架审核 / 品牌管理平级）。</p>
+<table>
+<thead><tr><th>列名</th><th>含义</th><th>取值</th></tr></thead>
+<tbody>
+<tr><td>邀请码</td><td>系统生成的随机码（长度 ≥ 8，含特殊符号大小写）</td><td>字符串</td></tr>
+<tr><td>生成途径</td><td>邀请码的产生方式</td><td><code>购买生成</code>（会员购买） / <code>系统生成</code>（后台手动）</td></tr>
+<tr><td>生成时间</td><td>邀请码生成时间戳</td><td>YYYY-MM-DD HH:mm:ss</td></tr>
+<tr><td>购买人 / 生成人</td><td>关联的会员（购买生成）或操作人（系统生成）</td><td>昵称 + 账号（手机号原文，内部运营视图不脱敏）</td></tr>
+<tr><td>下单状态</td><td>该邀请码是否已被用于下单</td><td><code>已下单</code> / <code>未下单</code></td></tr>
+<tr><td>关联订单编号</td><td>已下单时关联的订单号</td><td>字符串（未下单显示 —）</td></tr>
+<tr><td>操作</td><td>可执行操作</td><td><code>查看详情</code>；仅未下单行有 <code>禁用</code></td></tr>
+</tbody></table>
+<h4>4.3.2 生成途径两条数据产生路径</h4>
+<ol>
+<li><strong>购买生成</strong>：会员在会员端下单购买邀请码礼包并完成支付后自动产生；生成时间 = 支付成功时间；购买人 = 购买会员（昵称 + 账号）；生成人 = —。</li>
+<li><strong>系统生成</strong>：后台运营通过「+ 生成邀请码」手动新增（独立页 <code>admin-invite-code-generate.html</code>）；生成时间 = 提交时间；生成人 = 当前后台账号；购买人 = —。</li>
+</ol>
+<h4>4.3.3 操作规则</h4>
+<ul>
+<li><code>查看详情</code>：跳转邀请码详情独立页（<code>admin-invite-code-detail.html</code>），所有行可点。</li>
+<li><code>禁用</code>：<strong>仅未下单的邀请码可禁用</strong>；已下单邀请码不允许禁用。禁用在详情页对应按钮置灰。</li>
+<li><code>批量导出</code>：导出当前筛选条件下的邀请码列表（CSV/Excel）。</li>
+</ul>
+<h4>4.3.4 主筛选 / 二级筛选</h4>
+<ul>
+<li>主筛选：生成时间（日期范围）/ 邀请码（精确·模糊）/ 购买人·生成人（昵称或账号模糊）/ 关联订单编号（精确）/ 查询 / 重置。</li>
+<li>二级筛选：生成途径（全部 / 购买生成 / 系统生成）；下单状态（全部 / 未下单 / 已下单）。</li>
+</ul>
+<h4>4.3.5 邀请码详情页（字段与时间线）</h4>
+<table>
+<thead><tr><th>信息块</th><th>字段</th></tr></thead>
+<tbody>
+<tr><td>邀请码信息</td><td>邀请码 / 生成途径（购买生成 | 系统生成）/ 生成时间 / 下单状态</td></tr>
+<tr><td>购买人 / 生成人信息</td><td>购买生成：昵称 / 账号 / 会员 ID / 会员等级 / 购买时间 / 会员来源；系统生成：昵称（生成人）/ 账号（生成人）/ 生成时间</td></tr>
+<tr><td>关联订单（已下单时）</td><td>关联订单编号（可跳转沿用详情页）/ 下单状态 / 下单时间 / 下单用户（被邀请人）/ 订单类型（兑换订单）/ 订单实付（¥0.00 邀请码抵扣）</td></tr>
+<tr><td>生命周期时间线</td><td>仅 <code>邀请码生成</code> → <code>下单成功</code> 两个节点（无激活节点）</td></tr>
+</tbody></table>
+<p>顶部操作：<code>复制邀请码</code> / <code>禁用邀请码</code>（<strong>已下单的邀请码「禁用邀请码」按钮置灰不可点</strong>）。</p>
+<h4>4.3.6 生成邀请码页（系统生成）</h4>
+<p>入口：邀请码管理列表页右上角「+ 生成邀请码」按钮 → 独立页 <code>admin-invite-code-generate.html</code>。</p>
+<table>
+<thead><tr><th>表单字段</th><th>规则</th></tr></thead>
+<tbody>
+<tr><td>生成途径</td><td>固定「系统生成」（不可改）</td></tr>
+<tr><td>生成数量</td><td>stepper，默认 1，最小 1，最大 99</td></tr>
+<tr><td>备注</td><td>选填，记录本次生成用途（线下活动赠码 / 地推补发等）</td></tr>
+</tbody></table>
+<p>生成规则：每个邀请码随机生成，长度 ≥ 8，含特殊符号大小写；提交后直接跳转列表页。</p>
+<h4>4.3.7 旧字段下线（写 PRD 时同步清理）</h4>
+<p>下列字段/概念已从原型与 PRD 移除，避免新旧口径并存：</p>
+<ul>
+<li>邀请码的「激活状态」（已激活 / 未激活）；</li>
+<li>邀请码的「激活时间」「激活 IP」「激活设备」；</li>
+<li>邀请码详情页的「激活时间线节点」；</li>
+<li>二级筛选中的「激活状态」筛选项。</li>
+</ul>
+<div class="note">原因：原「用户激活邀请码」动作已被「C 端用户输入邀请码后直接生成待发货订单」替代，<strong>激活即下单</strong>，无需单独记录激活状态。</div>
+
+<h3 id="s44">4.4 C 端 · 买邀请码流程（Flow A · 会员订单）</h3>
+<h4>4.4.1 流程</h4>
+<div class="flow">首页「邀请码」FAB（仅初级会员及以上可见）<br/>→ p_invite_detail（新人激活码礼包 商品详情页）<br/>→ p_invite_confirm（确认订单，<strong>不填收货地址</strong>）<br/>→ p_invite_cashier（收银台，实付 ¥35 × N）<br/>→ p_invite_buy_success（购买成功）<br/>→ 系统按数量生成 N 个邀请码，自动进入「我的邀请码」</div>
+<h4>4.4.2 权限 / 前置条件</h4>
+<ul>
+<li>入口 FAB 仅「初级会员及以上」等级可见；游客 / 无等级用户不展示。</li>
+<li>前置条件：用户已登录且等级 ≥ 初级会员。</li>
+</ul>
+<h4>4.4.3 价格与数量规则（V3 定稿）</h4>
+<table>
+<thead><tr><th>项目</th><th>规则</th></tr></thead>
+<tbody>
+<tr><td>销售价</td><td>¥49.9（C 端展示用；实际由会员价购买）</td></tr>
+<tr><td>会员价</td><td>¥35 / 个（自动减 ¥14.9，无服务达人叠加优惠）</td></tr>
+<tr><td>数量 stepper</td><td>默认 1，最小 1，最大 99</td></tr>
+<tr><td>计算公式</td><td>总价 = 49.9 × N；专享 = −14.9 × N；<strong>实付 = 35 × N</strong></td></tr>
+<tr><td>邀请码生成</td><td>购买即按数量生成 N 个邀请码（含特殊符号大小写，长度 ≥ 8）</td></tr>
+</tbody></table>
+<div class="note">📎 购买成功后生成的 N 个邀请码自动进入会员「我的邀请码」列表，列表每条标注「邀请码 · 新人礼包-益齿健套装」。</div>
+
+<h3 id="s45">4.5 C 端 · 用邀请码兑换流程（Flow B · 兑换订单）</h3>
+<h4>4.5.1 流程</h4>
+<div class="flow">首页「新人礼包」FAB（任何人均可见）<br/>→ p_gift_intro（新人礼包页：展示礼包内容，含 💧 5L 饮用水 ×7 袋；按钮「立即激活」）<br/>→ p_address（填写收货地址）<br/>→ p_confirm（确认订单：商品总价 ¥49.9，邀请码抵扣 −¥49.9，<strong>实付 ¥0.00</strong>）<br/>→ code_modal（输入邀请码）<br/>→ p_order（兑换订单生成成功）</div>
+<h4>4.5.2 关键规则</h4>
+<ul>
+<li>兑换订单实付 ¥0，由邀请码全额抵扣商品总价 ¥49.9。</li>
+<li>邀请码校验：长度 ≥ 8，含大小写字母与特殊符号；每个邀请码仅可使用一次。</li>
+<li><strong>激活后入口消失</strong>：用户完成一次兑换（核销成功）后，首页「新人礼包」FAB 自动消失（一辈子只能领一次）。</li>
+</ul>
+<div class="warn">⚠️ <strong>赠水规则不在此页原型展示</strong>：确认订单页不展示「权益赠水」明细段落，水袋权益规则仅在本文档 §4.7 写明，避免原型冗余。</div>
+
+<h3 id="s46">4.6 C 端 · 我的邀请码 / 我的订单</h3>
+<h4>4.6.1 我的邀请码</h4>
+<ul>
+<li>入口：我的服务卡片「🔑 我的邀请码」，<strong>仅当用户 has_codes = true（有码）时显示</strong>。</li>
+<li>列表每条码标注「邀请码 · 新人礼包-益齿健套装」，提供「复制」按钮（<strong>无分享按钮</strong>）。</li>
+</ul>
+<h4>4.6.2 我的订单</h4>
+<ul>
+<li>入口：我的服务卡片首格「📋 我的订单」。</li>
+<li>状态 Tab：全部 / 代付订单 / 待付款 / 待发货·待核销 / 待收货 / 已完成。</li>
+<li>订单卡：订单号 + <strong>订单类型标签</strong>（常规订单 / 会员订单 / 兑换订单）+ 状态 + 商品缩略图 + 名 / 规格 + 价格 × 数量 + 实付 + 操作按钮。</li>
+</ul>
+<div class="note">📎 两条流自动落库：Flow A 购买成功 → 写入一条「会员订单」；Flow B 核销成功 → 写入一条「兑换订单」。</div>
+
+<h3 id="s47">4.7 水袋权益规则（已定稿）</h3>
+<p>新人礼包内含 <strong>5L 饮用水 ×7 袋</strong>，到店自提，<strong>需自备水袋</strong>。</p>
+<table>
+<thead><tr><th>阶段</th><th>时效规则</th></tr></thead>
+<tbody>
+<tr><td>① 未取水前</td><td>7 袋长期保留，不计时。</td></tr>
+<tr><td>② 首次取水后</td><td>触发 30 天有效期（T0 起算，统一窗口）。</td></tr>
+<tr><td>③ 有效期内</td><td>每次限取 1 袋。</td></tr>
+<tr><td>④ 超期清零</td><td>30 天内未取完的剩余水权益自动清零。</td></tr>
+</tbody></table>
+<p>C 端订单详情 / 会员端邀请码列表展示三要素：<code>已取 X/7 袋 · 剩余 Y 袋 · 有效期至 YYYY-MM-DD</code>。</p>
+<div class="warn">⚠️ <strong>待确认 @袁中天</strong>：①「每次限取 1 袋」是否 = 每天最多 1 袋；②过期清零后是否可重购及次数上限；③是否做 T0+23 到期提醒推送。</div>
+
+<h3 id="s48">4.8 上下级自动绑定规则</h3>
+<p><strong>结论</strong>：用户激活（兑换）邀请码时，若该用户当前<strong>没有上级</strong>，系统自动将其上级绑定到<strong>邀请码购买人的上级</strong>；<strong>后台手动生成的邀请码（系统生成）激活后不绑定任何上下级关系</strong>。</p>
+<p><strong>触发时机</strong>：C 端用户输入邀请码点击「立即激活」生成兑换订单时同步执行（激活即下单，绑定为伴随操作）。</p>
+<ol>
+<li>查询激活用户的会员档案，若「上级」字段为空 → 进入绑定分支；已存在上级 → 跳过（避免覆盖）。</li>
+<li>取该邀请码的<strong>生成途径</strong>：
+<ul>
+<li><strong>购买生成</strong>：取购买人会员档案的「上级」作为新用户上级。</li>
+<li><strong>系统生成</strong>：跳过绑定，激活后用户上级保持为空。</li>
+</ul>
+</li>
+<li>写入新用户「上级」字段，记录绑定时间、邀请码编码、来源购买人。</li>
+</ol>
+<p><strong>业务影响范围</strong>：C 端兑换接口新增「上级绑定」分支；后台订单详情页（沿用）新增「上下级绑定记录」模块；后台会员档案新增「上级」字段；未来分销/分润自动接入。</p>
+
+<h2 id="s5">五、非功能性需求</h2>
+<table>
+<thead><tr><th>类别</th><th>要求</th></tr></thead>
+<tbody>
+<tr><td>端口兼容</td><td>C 端覆盖 App / 小程序 / H5；后台为 PC 管理端。</td></tr>
+<tr><td>邀请码安全</td><td>邀请码随机生成，长度 ≥ 8，含特殊符号大小写，保证不可猜测；每个邀请码仅可使用一次。</td></tr>
+<tr><td>一致性</td><td>订单类型口径（会员订单 / 兑换订单）、邀请码状态（已下单 / 未下单）在 C 端、后台、数据表三处保持一致。</td></tr>
+<tr><td>埋点</td><td>⚠️ 待确认 @数据负责人：邀请码曝光 / 购买 / 核销等关键事件，引用《泰小虎埋点表 v2.3》既有事件目录，禁止凭空编造。</td></tr>
+</tbody></table>
+
+<h2 id="s6">六、验收标准</h2>
+<table>
+<thead><tr><th>模块</th><th>验收点</th></tr></thead>
+<tbody>
+<tr><td>商品管理</td><td>商品类型可选「兑换券」；选中后展开 SKU 设置；可多选 SKU 并配置数量；保存后列表/详情正确展示。</td></tr>
+<tr><td>订单管理</td><td>可按「会员订单 / 兑换订单」筛选；会员订单无收货地址、实付 ¥35×N；兑换订单含收货地址、实付 ¥0；详情页沿用既有且不新建。</td></tr>
+<tr><td>Flow A 买邀请码</td><td>仅初级会员以上见 FAB；流程无地址；支付成功生成 N 个邀请码并进入「我的邀请码」；我的订单出现「会员订单」。</td></tr>
+<tr><td>Flow B 兑换</td><td>任何人均见「新人礼包」FAB；填地址→确认（实付¥0）→输邀请码→兑换订单生成；兑换后 FAB 消失；我的订单出现「兑换订单」。</td></tr>
+<tr><td>水袋权益</td><td>订单详情/邀请码列表展示「已取 X/7 · 剩余 Y · 有效期至」；超期清零逻辑正确。</td></tr>
+<tr><td>上下级绑定</td><td>无上级新人用「购买生成」邀请码兑换后自动绑定购买人上级；「系统生成」邀请码不绑定；已有上级不被覆盖。</td></tr>
+</tbody></table>
+
+<h2 id="s7">七、关键边界设计检查清单</h2>
+<ul>
+<li>✅ 全量改名：激活码 → 邀请码；「新人礼包兑换券」不再出现；购买商品名=「新人激活码礼包」，兑换入口页=「新人礼包」。</li>
+<li>✅ 订单双类型：会员订单（买邀请码）/ 兑换订单（用邀请码兑换）在后台与 C 端「我的订单」均正确体现。</li>
+<li>✅ 兑换后 FAB 消失：Flow B 核销成功后「新人礼包」FAB 自动隐藏（一辈子一次）。</li>
+<li>✅ 移除分享按钮：我的邀请码页仅保留「复制」，无「分享」。</li>
+<li>✅ 赠水规则不进原型：确认订单页不展示赠水明细，仅在 §4.7 写明。</li>
+<li>✅ 兑换券商品类型：商品管理新增类型 + SKU 多选配置。</li>
+<li>✅ 订单详情沿用：不新建独立详情页，复用既有模板。</li>
+</ul>
+
+<h2 id="s8">八、文档维护与变更规范</h2>
+<ul>
+<li>本地草稿 → GitHub Pages（已确认版）→ 钉钉文档（派生镜像，绝不直接从本地草稿推钉钉）。</li>
+<li>变更须同步更新 GitHub 短链与钉钉镜像，并在「历史修订记录」登记。</li>
+<li>关联原型（GitHub Pages 短链）：
+  <ul>
+    <li>C 端（买/兑换邀请码 + 我的订单）：<code>https://ddyuan-spec.github.io/lvyunji/newuser-gift-c-app.html</code></li>
+    <li>后台商品管理（兑换券类型 + SKU）：<code>https://ddyuan-spec.github.io/lvyunji/lvyunjia-admin-merchant-product.html</code></li>
+    <li>后台订单管理（会员订单 / 兑换订单）：<code>https://ddyuan-spec.github.io/lvyunji/newuser-gift-admin-orders.html</code></li>
+  </ul>
+</li>
+</ul>
+
+<h2 id="s9">九、待确认项汇总</h2>
+<table>
+<thead><tr><th>#</th><th>待确认项</th><th>责任方</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>水袋权益「每次限取 1 袋」是否 = 每天最多 1 袋</td><td>@袁中天</td></tr>
+<tr><td>2</td><td>过期清零后是否可重购及次数上限</td><td>@袁中天</td></tr>
+<tr><td>3</td><td>是否做 T0+23 到期提醒推送</td><td>@袁中天</td></tr>
+<tr><td>4</td><td>技术 Owner / 测试负责人</td><td>@研发负责人 / @测试负责人</td></tr>
+<tr><td>5</td><td>KPI 目标值</td><td>@产品负责人</td></tr>
+<tr><td>6</td><td>埋点事件清单（引用既有埋点规范）</td><td>@数据负责人</td></tr>
+</tbody></table>
+
+</body>
+</html>
