@@ -1537,8 +1537,13 @@ function populateCategorySelect() {
   sel.innerHTML = html || '<option value="">（无启用栏目）</option>';
 }
 
-// ===== 素材栏目管理（CRUD，运营可配初始为空） =====
-var categoryData = [];   // 运营配置；初始为空占位，待用户提供具体栏目
+// ===== 素材栏目管理（CRUD，运营可配；预置占位栏目便于演示分栏） =====
+var categoryData = [
+  { id: 'cat_demo_1', name: '营销海报', sort: 1, status: 'on' },
+  { id: 'cat_demo_2', name: '产品素材', sort: 2, status: 'on' },
+  { id: 'cat_demo_3', name: '活动物料', sort: 3, status: 'on' },
+  { id: 'cat_demo_4', name: '会员权益', sort: 4, status: 'on' }
+];   // 占位演示栏目；运营可在后台自由增删改，真实上线以配置为准
 var catEditId = null;
 var catStatus = 'on';
 
