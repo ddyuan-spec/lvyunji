@@ -783,8 +783,15 @@
       </div>
     </div>
 
+    <!-- 图片生成 / 视频生成 切换 -->
+    <div class="tab-switch" style="margin-bottom:16px;">
+      <div class="tab-switch-item active" id="tabCostImage" onclick="switchCostTab('image')">图片生成</div>
+      <div class="tab-switch-item" id="tabCostVideo" onclick="switchCostTab('video')">视频生成</div>
+    </div>
+
+    <div id="costTabImage" class="cost-tab-panel">
     <!-- 图片生成 - 配置表单与历史 -->
-    <div style="font-size:14px;font-weight:600;margin-bottom:10px;">图片生成 · 消耗配置</div>
+    <div style="font-size:14px;font-weight:600;margin-bottom:10px;">消耗配置</div>
     <div style="margin-bottom:20px;padding:16px;background:#fafafa;border-radius:6px;border:1px solid var(--border);">
       <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text-secondary);">修改消耗</div>
       <div class="form-row">
@@ -838,9 +845,11 @@
         </tr>
       </tbody>
     </table>
+    </div>
 
+    <div id="costTabVideo" class="cost-tab-panel" style="display:none;">
     <!-- 视频生成 - 消耗与参数配置（与生图同页合并） -->
-    <div style="font-size:14px;font-weight:600;margin:28px 0 10px;">视频生成 · 消耗与参数配置</div>
+    <div style="font-size:14px;font-weight:600;margin-bottom:10px;">消耗与参数配置</div>
     <div style="margin-bottom:20px;padding:16px;background:#fafafa;border-radius:6px;border:1px solid var(--border);">
       <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text-secondary);">修改消耗与参数</div>
       <div class="form-row">
@@ -886,7 +895,7 @@
     </div>
 
     <!-- 视频生成 - 历史快照 -->
-    <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text-secondary);">视频生成 · 历史配置记录</div>
+    <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text-secondary);">历史配置记录</div>
     <table class="snapshot-table">
       <thead>
         <tr>
@@ -911,6 +920,8 @@
         </tr>
       </tbody>
     </table>
+    </div>
+
   </div>
 
 </section>
@@ -1900,6 +1911,14 @@ function removePromptTag(group, idx) {
 function saveVideoCostConfig() {
   toast('已保存生视频成本配置（原型占位）');
 }
+
+function switchCostTab(mode) {
+  document.getElementById('costTabImage').style.display = mode === 'image' ? 'block' : 'none';
+  document.getElementById('costTabVideo').style.display = mode === 'video' ? 'block' : 'none';
+  document.getElementById('tabCostImage').classList.toggle('active', mode === 'image');
+  document.getElementById('tabCostVideo').classList.toggle('active', mode === 'video');
+}
+
 
 // 辅助提示词适用类型切换（原型占位）
 function setPromptApplyType(group, val) {
