@@ -568,80 +568,82 @@
 </section>
 
 
-<!-- ==================== 视图：初始用户灵感值配置 ==================== -->
+<!-- ==================== 视图：初始用户灵感值配置（列表页 + 独立编辑页） ==================== -->
 <section class="view admin-page" id="viewInit">
   <div class="page-header">
     <div class="page-title">初始用户灵感值配置</div>
+    <button class="btn btn-primary" onclick="openInitEdit()">+ 新增配置</button>
   </div>
   <div class="page-body">
-    <!-- 当前生效卡片 -->
+    <!-- 当前生效概览 -->
     <div class="config-card">
       <div class="config-label">当前生效配置</div>
       <div class="config-value" id="initCurrentValue">5 灵感值</div>
       <div class="config-meta" id="initCurrentMeta">生效日期：2026-09-01 &nbsp;|&nbsp; 设置人：产品小王 &nbsp;|&nbsp; 备注：V0.5 上线调整</div>
     </div>
-    <!-- 设置表单 -->
-    <div style="margin-bottom:20px;padding:16px;background:#fafafa;border-radius:6px;border:1px solid var(--border);">
-      <div style="font-size:14px;font-weight:600;margin-bottom:14px;">新建/修改配置</div>
-      <div class="form-row">
-        <label class="form-label">灵感值</label>
-        <input class="form-input" type="number" value="5" min="0" max="99999" style="width:120px;">
-        <span style="font-size:13px;color:var(--text-tertiary);">新用户注册时一次性发放的灵感值数</span>
-      </div>
-      <div class="form-row">
-        <label class="form-label">生效日期</label>
-        <input class="form-input" type="date" value="2026-09-01" style="width:160px;">
-        <span style="font-size:13px;color:var(--text-tertiary);">该日期及之后注册的新用户将按此值发放</span>
-      </div>
-      <div class="form-row">
-        <label class="form-label">备注</label>
-        <textarea class="form-textarea" placeholder="填写变更原因或说明（选填，最多 200 字）"></textarea>
-      </div>
-      <div class="form-row">
-        <label class="form-label"></label>
-        <button class="btn btn-primary" style="height:36px;padding:0 24px;" onclick="saveInitConfig()">保存配置</button>
-      </div>
+    <!-- 筛选行 -->
+    <div class="filter-row">
+      <input class="filter-input" id="initSearchInput" placeholder="灵感值 / 备注" style="width:200px;">
+      <select class="filter-select" id="initOperatorFilter">
+        <option value="">全部设置人</option>
+        <option value="产品小王">产品小王</option>
+        <option value="运营小李">运营小李</option>
+      </select>
+      <select class="filter-select" id="initStatusFilter">
+        <option value="">全部状态</option>
+        <option value="active">生效中</option>
+        <option value="inactive">已失效</option>
+      </select>
+      <button class="btn btn-primary" onclick="renderInitList()">查询</button>
+      <button class="btn btn-default" onclick="resetInitFilter()">重置</button>
     </div>
-    <!-- 历史快照 -->
-    <div style="font-size:14px;font-weight:600;margin-bottom:10px;">历史配置记录</div>
-    <table class="snapshot-table">
+    <table class="data-table">
       <thead>
         <tr>
-          <th>灵感值</th>
-          <th>生效日期</th>
+          <th style="width:90px;">灵感值</th>
+          <th style="width:120px;">生效日期</th>
           <th>设置人</th>
           <th>备注</th>
-          <th>状态</th>
-          <th>操作</th>
+          <th style="width:90px;">状态</th>
+          <th style="width:120px;">操作</th>
         </tr>
       </thead>
-      <tbody id="initHistoryTbody">
-        <tr>
-          <td><b>5</b></td>
-          <td>2026-09-01</td>
-          <td>产品小王</td>
-          <td>V0.5 上线调整</td>
-          <td><span class="badge badge-success">生效中</span></td>
-          <td><span class="action-link" onclick="toast('作废 5 灵感值配置')">作废</span></td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td>2026-08-21</td>
-          <td>产品小王</td>
-          <td>上线首发版本</td>
-          <td><span class="badge badge-default">已失效</span></td>
-          <td>-</td>
-        </tr>
-        <tr>
-          <td>10</td>
-          <td>2026-07-01</td>
-          <td>运营小李</td>
-          <td>内测版本</td>
-          <td><span class="badge badge-default">已失效</span></td>
-          <td>-</td>
-        </tr>
-      </tbody>
+      <tbody id="initListTbody"></tbody>
     </table>
+    <div class="pagination">
+      <span>共 <b id="initListTotal">0</b> 条</span>
+      <div class="page-btn active">1</div>
+      <span>跳至</span>
+      <input class="page-input" value="1">
+      <span>页</span>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 视图：初始灵感值配置编辑（独立页，非 Modal） ==================== -->
+<section class="view admin-page" id="viewInitEdit">
+  <div class="page-header">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span class="action-link" onclick="go('init')">← 返回列表</span>
+      <div class="page-title" id="initEditTitle">新增初始灵感值配置</div>
+    </div>
+    <button class="btn btn-primary" id="initEditSaveBtn" onclick="saveInitConfig()">保存</button>
+  </div>
+  <div class="page-body">
+    <div class="form-row">
+      <label class="form-label"><span style="color:var(--red);">*</span> 灵感值</label>
+      <input class="form-input" type="number" id="initEditCredits" value="5" min="0" max="99999" style="width:120px;">
+      <span style="font-size:13px;color:var(--text-tertiary);">新用户注册时一次性发放的灵感值数</span>
+    </div>
+    <div class="form-row">
+      <label class="form-label"><span style="color:var(--red);">*</span> 生效日期</label>
+      <input class="form-input" type="date" id="initEditEffDate" value="2026-09-01" style="width:160px;">
+      <span style="font-size:13px;color:var(--text-tertiary);">该日期及之后注册的新用户将按此值发放</span>
+    </div>
+    <div class="form-row">
+      <label class="form-label">备注</label>
+      <textarea class="form-textarea" id="initEditRemark" placeholder="填写变更原因或说明（选填，最多 200 字）"></textarea>
+    </div>
   </div>
 </section>
 
@@ -1215,6 +1217,7 @@ function go(key) {
   if (key === 'material') renderMaterialTable();
   if (key === 'materialCategory') renderCategoryTable();
   if (key === 'promptConfig') renderPromptConfigList();
+  if (key === 'init') renderInitList();
 }
 
 // ===== 调整灵感值独立页逻辑（替代原 Modal） =====
@@ -1482,18 +1485,113 @@ function _markHistoryObsolete(tbody) {
     if (b) { b.className = 'badge badge-default'; b.textContent = '已失效'; }
   }
 }
+var INIT_CONFIGS = [
+  { key:'init_20260901', credits:5,  effDate:'2026-09-01', operator:'产品小王', remark:'V0.5 上线调整', status:'active' },
+  { key:'init_20260821', credits:3,  effDate:'2026-08-21', operator:'产品小王', remark:'上线首发版本', status:'inactive' },
+  { key:'init_20260701', credits:10, effDate:'2026-07-01', operator:'运营小李', remark:'内测版本',   status:'inactive' }
+];
+
+function _getActiveInit() {
+  for (var i = 0; i < INIT_CONFIGS.length; i++) if (INIT_CONFIGS[i].status === 'active') return INIT_CONFIGS[i];
+  return null;
+}
+
+function renderInitSummary() {
+  var box = document.getElementById('initCurrentValue');
+  var meta = document.getElementById('initCurrentMeta');
+  if (!box) return;
+  var cur = _getActiveInit();
+  if (cur) {
+    box.textContent = cur.credits + ' 灵感值';
+    meta.textContent = '生效日期：' + cur.effDate + ' | 设置人：' + cur.operator + ' | 备注：' + cur.remark;
+  } else {
+    box.textContent = '未配置';
+    meta.textContent = '暂无可生效的初始灵感值配置';
+  }
+}
+
+function renderInitList() {
+  var tbody = document.getElementById('initListTbody');
+  if (!tbody) return;
+  renderInitSummary();
+  var kw = (document.getElementById('initSearchInput') ? document.getElementById('initSearchInput').value : '').trim().toLowerCase();
+  var opFilter = document.getElementById('initOperatorFilter') ? document.getElementById('initOperatorFilter').value : '';
+  var stFilter = document.getElementById('initStatusFilter') ? document.getElementById('initStatusFilter').value : '';
+  var list = INIT_CONFIGS.filter(function(r){
+    if (kw && (String(r.credits).indexOf(kw) === -1) && (r.remark||'').toLowerCase().indexOf(kw) === -1) return false;
+    if (opFilter && r.operator !== opFilter) return false;
+    if (stFilter && r.status !== stFilter) return false;
+    return true;
+  });
+  document.getElementById('initListTotal').textContent = list.length;
+  var html = '';
+  if (!list.length) {
+    html = '<tr><td colspan="6" style="text-align:center;color:var(--text-tertiary);padding:40px 0;">暂无数据</td></tr>';
+  } else {
+    list.forEach(function(r){
+      html += '<tr>' +
+        '<td><b>' + r.credits + '</b></td>' +
+        '<td>' + r.effDate + '</td>' +
+        '<td>' + r.operator + '</td>' +
+        '<td>' + (r.remark || '-') + '</td>' +
+        '<td>' + (r.status === 'active' ? '<span class="badge badge-success">生效中</span>' : '<span class="badge badge-default">已失效</span>') + '</td>' +
+        '<td>' +
+          '<div class="action-links">' +
+            '<span class="action-link" onclick="openInitEdit(\'' + r.key + '\')">查看</span>' +
+            (r.status === 'active' ? '<span class="action-link danger" onclick="voidInitConfig(\'' + r.key + '\')">作废</span>' : '<span style="color:var(--text-tertiary);">-</span>') +
+          '</div>' +
+        '</td>' +
+      '</tr>';
+    });
+  }
+  tbody.innerHTML = html;
+}
+
+function openInitEdit(key) {
+  var r = null;
+  for (var i = 0; i < INIT_CONFIGS.length; i++) if (INIT_CONFIGS[i].key === key) r = INIT_CONFIGS[i];
+  document.getElementById('initEditTitle').textContent = r ? '配置详情' : '新增初始灵感值配置';
+  document.getElementById('initEditCredits').value = r ? r.credits : 5;
+  document.getElementById('initEditEffDate').value = r ? r.effDate : '2026-09-01';
+  document.getElementById('initEditRemark').value = r ? (r.remark || '') : '';
+  var readonly = !!r;
+  document.getElementById('initEditCredits').disabled = readonly;
+  document.getElementById('initEditEffDate').disabled = readonly;
+  document.getElementById('initEditRemark').disabled = readonly;
+  document.getElementById('initEditSaveBtn').style.display = readonly ? 'none' : '';
+  go('initEdit');
+}
+
 function saveInitConfig() {
-  var v = parseInt(document.querySelector('#viewInit input[type=number]').value, 10) || 0;
-  var date = document.querySelector('#viewInit input[type=date]').value || '2026-09-01';
-  var remark = document.querySelector('#viewInit textarea').value.trim() || '手动调整';
-  document.getElementById('initCurrentValue').textContent = v + ' 灵感值';
-  document.getElementById('initCurrentMeta').textContent = '生效日期：' + date + ' | 设置人：产品小王 | 备注：' + remark;
-  var tb = document.getElementById('initHistoryTbody');
-  var tr = document.createElement('tr');
-  tr.innerHTML = '<td><b>' + v + '</b></td><td>' + date + '</td><td>产品小王</td><td>' + remark + '</td><td><span class="badge badge-success">生效中</span></td><td><span class="action-link" onclick="toast(\'作废 ' + v + ' 灵感值配置\')">作废</span></td>';
-  tb.insertBefore(tr, tb.firstChild);
-  _markHistoryObsolete(tb);
+  var v = parseInt(document.getElementById('initEditCredits').value, 10);
+  if (isNaN(v) || v < 0) { toast('请填写正确的灵感值'); return; }
+  var date = document.getElementById('initEditEffDate').value || '2026-09-01';
+  var remark = document.getElementById('initEditRemark').value.trim() || '手动调整';
+  INIT_CONFIGS.forEach(function(x){ if (x.status === 'active') x.status = 'inactive'; });
+  INIT_CONFIGS.unshift({ key: 'init_' + Date.now(), credits: v, effDate: date, operator: '产品小王', remark: remark, status: 'active' });
+  renderInitSummary();
   toast('初始灵感值配置已保存：新用户注册发放 ' + v + ' 灵感值');
+  go('init');
+  renderInitList();
+}
+
+function voidInitConfig(key) {
+  var r = null;
+  for (var i = 0; i < INIT_CONFIGS.length; i++) if (INIT_CONFIGS[i].key === key) r = INIT_CONFIGS[i];
+  if (!r) return;
+  confirmAction('作废配置', '确定作废当前生效的初始灵感值配置（' + r.credits + ' 灵感值）吗？作废后新用户注册将不自动发放灵感值。', function () {
+    r.status = 'inactive';
+    renderInitSummary();
+    renderInitList();
+    toast('已作废 ' + r.credits + ' 灵感值配置');
+  });
+}
+
+function resetInitFilter() {
+  document.getElementById('initSearchInput').value = '';
+  document.getElementById('initOperatorFilter').value = '';
+  document.getElementById('initStatusFilter').value = '';
+  renderInitList();
 }
 function savePricing() {
   var v = parseFloat(document.querySelector('#viewPricing input[type=number]').value) || 0;
