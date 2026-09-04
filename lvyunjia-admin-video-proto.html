@@ -203,7 +203,6 @@
       <div class="sidebar-item nav" data-view="init" onclick="go('init')">初始灵感值配置</div>
       <div class="sidebar-item nav" data-view="pricing" onclick="go('pricing')">灵感值定价管理</div>
       <div class="sidebar-item nav" data-view="cost" onclick="go('cost')">工具消耗配置</div>
-      <div class="sidebar-item nav" data-view="videoCost" onclick="go('videoCost')">生视频成本配置</div>
       <div class="sidebar-item nav" data-view="package" onclick="go('package')">套餐管理</div>
       <div class="sidebar-item nav" data-view="firstOrder" onclick="go('firstOrder')">首单优惠配置</div>
       <div class="sidebar-item nav" data-view="material" onclick="go('material')">素材管理</div>
@@ -764,14 +763,14 @@
         <div class="config-value" id="costImageValue">每次消耗 <b style="color:var(--primary);">1</b> 灵感值</div>
         <div class="config-meta">生效：2026-09-01 &nbsp;|&nbsp; 运营小李</div>
       </div>
-      <div class="config-card" style="padding:14px;opacity:0.6;">
+      <div class="config-card" style="padding:14px;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
           <span style="font-size:24px;">🎬</span>
           <div style="font-size:15px;font-weight:600;">视频生成</div>
-          <span class="badge badge-default" style="margin-left:auto;">V0.7</span>
+          <span class="badge badge-success" style="margin-left:auto;">生效中</span>
         </div>
-        <div class="config-value" style="color:#999;">待配置</div>
-        <div class="config-meta">预计 V0.7 上线</div>
+        <div class="config-value">每次消耗 <b style="color:var(--primary);">10</b> 灵感值</div>
+        <div class="config-meta">生效：2026-09-03 &nbsp;|&nbsp; 运营小李</div>
       </div>
       <div class="config-card" style="padding:14px;opacity:0.6;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
@@ -839,7 +838,81 @@
         </tr>
       </tbody>
     </table>
+
+    <!-- 视频生成 - 消耗与参数配置（与生图同页合并） -->
+    <div style="font-size:14px;font-weight:600;margin:28px 0 10px;">视频生成 · 消耗与参数配置</div>
+    <div style="margin-bottom:20px;padding:16px;background:#fafafa;border-radius:6px;border:1px solid var(--border);">
+      <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text-secondary);">修改消耗与参数</div>
+      <div class="form-row">
+        <label class="form-label">每次消耗</label>
+        <input class="form-input" type="number" value="10" min="1" max="999" style="width:100px;">
+        <span style="font-size:13px;color:var(--text-tertiary);">灵感值 / 次</span>
+      </div>
+      <div class="form-row">
+        <label class="form-label">默认时长</label>
+        <select class="filter-select" style="min-width:120px;">
+          <option>3 秒</option>
+          <option selected>5 秒</option>
+          <option>10 秒</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">可用时长</label>
+        <div class="tag-list">
+          <span class="tag active">3 秒</span>
+          <span class="tag active">5 秒</span>
+          <span class="tag active">10 秒</span>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">画面比例</label>
+        <div class="tag-list">
+          <span class="tag active">9:16</span>
+          <span class="tag active">16:9</span>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">生效日期</label>
+        <input class="form-input" type="date" value="2026-09-03" style="width:160px;">
+      </div>
+      <div class="form-row">
+        <label class="form-label">备注</label>
+        <textarea class="form-textarea" placeholder="填写变更原因（选填）"></textarea>
+      </div>
+      <div class="form-row">
+        <label class="form-label"></label>
+        <button class="btn btn-primary" style="height:36px;padding:0 24px;" onclick="saveVideoCostConfig()">保存</button>
+      </div>
+    </div>
+
+    <!-- 视频生成 - 历史快照 -->
+    <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text-secondary);">视频生成 · 历史配置记录</div>
+    <table class="snapshot-table">
+      <thead>
+        <tr>
+          <th>消耗灵感值</th>
+          <th>默认时长</th>
+          <th>比例</th>
+          <th>生效日期</th>
+          <th>设置人</th>
+          <th>状态</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="videoCostHistoryTbody">
+        <tr>
+          <td><b>10 灵感值/次</b></td>
+          <td>5 秒</td>
+          <td>9:16 / 16:9</td>
+          <td>2026-09-03</td>
+          <td>运营小李</td>
+          <td><span class="badge badge-success">生效中</span></td>
+          <td><span class="action-link" onclick="toast('作废 10 灵感值/次 视频配置')">作废</span></td>
+        </tr>
+      </tbody>
+    </table>
   </div>
+
 </section>
 
 
@@ -1124,110 +1197,6 @@
   </div>
   <div class="page-body" id="promptConfigAdmin"></div>
 </section>
-
-  <!-- ==================== 视图：生视频成本配置（复制「工具消耗配置」并增加视频参数） ==================== -->
-  <section class="view admin-page" id="viewVideoCost">
-    <div class="page-header">
-      <div class="page-title">生视频成本配置</div>
-    </div>
-    <div class="page-body">
-      <div style="font-size:14px;font-weight:600;margin-bottom:12px;">当前视频生成消耗</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:20px;">
-        <div class="config-card" style="padding:14px;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-            <span style="font-size:24px;">🎬</span>
-            <div style="font-size:15px;font-weight:600;">视频生成</div>
-            <span class="badge badge-success" style="margin-left:auto;">生效中</span>
-          </div>
-          <div class="config-value" id="costVideoValue2">每次消耗 <b style="color:var(--primary);">10</b> 灵感值</div>
-          <div class="config-meta">生效：2026-09-03 &nbsp;|&nbsp; 运营小李</div>
-        </div>
-      </div>
-
-      <!-- 视频生成 - 配置表单 -->
-      <div style="font-size:14px;font-weight:600;margin-bottom:10px;">视频生成 · 消耗与参数配置</div>
-      <div style="margin-bottom:20px;padding:16px;background:#fafafa;border-radius:6px;border:1px solid var(--border);">
-        <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text-secondary);">修改消耗与参数</div>
-        <div class="form-row">
-          <label class="form-label">每次消耗</label>
-          <input class="form-input" type="number" value="10" min="1" max="999" style="width:100px;">
-          <span style="font-size:13px;color:var(--text-tertiary);">灵感值 / 次</span>
-        </div>
-        <div class="form-row">
-          <label class="form-label">默认时长</label>
-          <select class="filter-select" style="min-width:120px;">
-            <option>3 秒</option>
-            <option selected>5 秒</option>
-            <option>10 秒</option>
-          </select>
-          <span style="font-size:13px;color:var(--text-tertiary);">C 端可选时长见下方</span>
-        </div>
-        <div class="form-row">
-          <label class="form-label">可用时长</label>
-          <div class="tag-list">
-            <span class="tag active">3 秒</span>
-            <span class="tag active">5 秒</span>
-            <span class="tag active">10 秒</span>
-          </div>
-        </div>
-        <div class="form-row">
-          <label class="form-label">画面比例</label>
-          <div class="tag-list">
-            <span class="tag active">9:16</span>
-            <span class="tag active">16:9</span>
-          </div>
-        </div>
-        <div class="form-row">
-          <label class="form-label">视频模型</label>
-          <select class="filter-select" style="min-width:180px;">
-            <option>视频生成模型 A（默认）</option>
-            <option>视频生成模型 B（高质）</option>
-          </select>
-        </div>
-        <div class="form-row">
-          <label class="form-label">生效日期</label>
-          <input class="form-input" type="date" value="2026-09-03" style="width:160px;">
-        </div>
-        <div class="form-row">
-          <label class="form-label">备注</label>
-          <textarea class="form-textarea" placeholder="填写变更原因（选填）"></textarea>
-        </div>
-        <div class="form-row">
-          <label class="form-label"></label>
-          <button class="btn btn-primary" style="height:36px;padding:0 24px;" onclick="saveVideoCostConfig()">保存</button>
-        </div>
-      </div>
-
-      <!-- 视频生成 - 历史快照 -->
-      <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text-secondary);">历史配置记录</div>
-      <table class="snapshot-table">
-        <thead>
-          <tr>
-            <th>消耗灵感值</th>
-            <th>默认时长</th>
-            <th>比例</th>
-            <th>模型</th>
-            <th>生效日期</th>
-            <th>设置人</th>
-            <th>状态</th>
-            <th>操作</th>
-          </tr>
-        </thead>
-        <tbody id="videoCostHistoryTbody">
-          <tr>
-            <td><b>10 灵感值/次</b></td>
-            <td>5 秒</td>
-            <td>9:16 / 16:9</td>
-            <td>视频生成模型 A</td>
-            <td>2026-09-03</td>
-            <td>运营小李</td>
-            <td><span class="badge badge-success">生效中</span></td>
-            <td><span class="action-link" onclick="toast('作废 10 灵感值/次 视频配置')">作废</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
 
 </div><!-- /main-content -->
 
@@ -1844,41 +1813,69 @@ function runConfirm() {
   if (typeof cb === 'function') cb();
 }
 
-// ===== 辅助提示词配置（运维中心 · AI 板块；与 C 端生图页同源下发） =====
+// ===== 辅助提示词配置（运维中心 · AI 板块；与 C 端「AI 创作」页同源下发） =====
 var PROMPT_CONFIG = [
-  { group: 'style', title: '风格', tags: ['写实照片','动漫插画','水彩手绘','蜡笔涂鸦','国风山水'] },
-  { group: 'scene', title: '场景', tags: ['室内居家','城市街景','自然风光','梦幻星空'] },
-  { group: 'light', title: '光线 / 氛围', tags: ['柔光','逆光','暖色调','电影感'] }
+  { group: 'style', title: '风格', applyType: 'image', tags: ['写实照片','动漫插画','水彩手绘','蜡笔涂鸦','国风山水'] },
+  { group: 'scene', title: '场景', applyType: 'image', tags: ['室内居家','城市街景','自然风光','梦幻星空'] },
+  { group: 'light', title: '光线 / 氛围', applyType: 'image', tags: ['柔光','逆光','暖色调','电影感'] },
+  { group: 'vmotion', title: '运镜 / 动态', applyType: 'video', tags: ['缓慢推近','镜头环绕','人物走动','物体旋转','光影流动'] },
+  { group: 'vmood', title: '视频氛围', applyType: 'video', tags: ['电影感','梦幻','活力','治愈','悬疑'] }
 ];
 
 function renderPromptConfigAdmin() {
   var box = document.getElementById('promptConfigAdmin');
   if (!box) return;
-  var html = '<div style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;line-height:1.6;">以下板块与词条将下发到 C 端「AI 生图 / AI 生视频」页的「辅助提示词」区域；每个板块需指定「适用类型」（生图 / 生视频），C 端对应页面仅展示匹配类型的词条。新增 / 编辑词条后点击对应板块「保存」即生效（原型为前端占位，真实由后端持久化）。</div>';
-  PROMPT_CONFIG.forEach(function (g, gi) {
-    html += '<div style="border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;background:#fff;">' +
-      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">' +
-        '<div style="font-size:15px;font-weight:600;">' + (gi + 1) + '、' + g.title + '</div>' +
-        '<div style="font-size:13px;color:var(--text-secondary);">板块标识：<code style="background:#f5f5f5;padding:2px 6px;border-radius:4px;">' + g.group + '</code></div>' +
-      '</div>' +
-      '<div id="pcTags_' + g.group + '" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">';
-    g.tags.forEach(function (t, ti) {
+  var imageGroups = PROMPT_CONFIG.filter(function(g){ return g.applyType === 'image'; });
+  var videoGroups = PROMPT_CONFIG.filter(function(g){ return g.applyType === 'video'; });
+  var html = '<div style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;line-height:1.6;">以下板块与词条将下发到 C 端「AI 创作」页；每个板块需指定「适用类型」（生图 / 生视频），C 端仅展示匹配当前模式的词条。</div>';
+  html += renderPromptTypeSection('生图类辅助提示词', imageGroups);
+  html += renderPromptTypeSection('生视频类辅助提示词', videoGroups);
+  box.innerHTML = html;
+  PROMPT_CONFIG.forEach(function(g){
+    var input = document.getElementById('pcInput_' + g.group);
+    if (input) input.addEventListener('keydown', function(e){ if(e.key === 'Enter') addPromptTag(g.group); });
+  });
+}
+
+function renderPromptTypeSection(title, groups) {
+  if (!groups.length) return '';
+  var html = '<div style="margin-bottom:24px;">' +
+    '<div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--primary);">' + title + '</div>' +
+    '<table style="width:100%;border-collapse:collapse;font-size:13px;background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;">' +
+    '<thead><tr style="background:#f7f8fa;">' +
+    '<th style="width:120px;padding:12px 16px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);">分类</th>' +
+    '<th style="width:100px;padding:12px 16px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);">适用类型</th>' +
+    '<th style="padding:12px 16px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);">词条</th>' +
+    '<th style="width:120px;padding:12px 16px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);">操作</th>' +
+    '</tr></thead><tbody>';
+  groups.forEach(function(g){
+    html += '<tr style="border-bottom:1px solid var(--border-light);">' +
+      '<td style="padding:12px 16px;vertical-align:top;"><b>' + g.title + '</b><br><code style="background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:11px;">' + g.group + '</code></td>' +
+      '<td style="padding:12px 16px;vertical-align:top;">' +
+        '<select onchange="setPromptApplyType(\'' + g.group + '\',this.value)" style="padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px;">' +
+          '<option value="image"' + (g.applyType === 'image' ? ' selected' : '') + '>生图</option>' +
+          '<option value="video"' + (g.applyType === 'video' ? ' selected' : '') + '>生视频</option>' +
+        '</select>' +
+      '</td>' +
+      '<td style="padding:12px 16px;vertical-align:top;">' +
+        '<div id="pcTags_' + g.group + '" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;">';
+    g.tags.forEach(function(t, ti){
       html += '<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:16px;background:#f5f5f5;font-size:13px;">' + t +
         '<span style="color:var(--red);cursor:pointer;" onclick="removePromptTag(\'' + g.group + '\',' + ti + ')">✕</span></span>';
     });
     html += '</div>' +
       '<div style="display:flex;gap:8px;align-items:center;">' +
-        '<input id="pcInput_' + g.group + '" placeholder="输入新词条后回车" style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;">' +
-        '<button class="btn btn-default" style="height:34px;padding:0 16px;" onclick="addPromptTag(\'' + g.group + '\')">添加词条</button>' +
-        '<button class="btn btn-primary" style="height:34px;padding:0 16px;" onclick="toast(\'已保存「' + g.title + '」配置（原型占位）\')">保存</button>' +
+        '<input id="pcInput_' + g.group + '" placeholder="输入新词条后回车" style="flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;">' +
+        '<button class="btn btn-default" style="height:32px;padding:0 14px;" onclick="addPromptTag(\'' + g.group + '\')">添加</button>' +
       '</div>' +
-    '</div>';
+      '</td>' +
+      '<td style="padding:12px 16px;vertical-align:top;">' +
+        '<button class="btn btn-primary" style="height:32px;padding:0 16px;" onclick="toast(\'已保存「' + g.title + '」配置（原型占位）\')">保存</button>' +
+      '</td>' +
+      '</tr>';
   });
-  box.innerHTML = html;
-  PROMPT_CONFIG.forEach(function (g) {
-    var input = document.getElementById('pcInput_' + g.group);
-    if (input) input.addEventListener('keydown', function (e) { if (e.key === 'Enter') addPromptTag(g.group); });
-  });
+  html += '</tbody></table></div>';
+  return html;
 }
 
 function addPromptTag(group) {
