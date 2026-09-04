@@ -649,73 +649,28 @@
 
 
 
-<!-- ==================== 视图：AI 工具消耗配置 ==================== -->
+<!-- ==================== 视图：AI 工具消耗配置（列表页+独立编辑页） ==================== -->
 <section class="view admin-page" id="viewCost">
   <div class="page-header">
     <div class="page-title">AI 工具消耗配置</div>
+    <div><button class="btn btn-primary" onclick="openCostEdit(null)">+ 新增配置</button></div>
   </div>
   <div class="page-body">
-    <!-- 当前各工具消耗 -->
-    <div style="font-size:14px;font-weight:600;margin-bottom:12px;">当前各工具消耗</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:20px;">
-      <div class="config-card" style="padding:14px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-          <span style="font-size:24px;">🖼️</span>
-          <div style="font-size:15px;font-weight:600;">图片生成</div>
-          <span class="badge badge-success" style="margin-left:auto;">生效中</span>
-        </div>
-        <div class="config-value" id="costImageValue">每次消耗 <b style="color:var(--primary);">1</b> 灵感值</div>
-        <div class="config-meta">生效：2026-09-01 &nbsp;|&nbsp; 运营小李</div>
-      </div>
-      <div class="config-card" style="padding:14px;opacity:0.6;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-          <span style="font-size:24px;">🎬</span>
-          <div style="font-size:15px;font-weight:600;">视频生成</div>
-          <span class="badge badge-default" style="margin-left:auto;">V0.7</span>
-        </div>
-        <div class="config-value" style="color:#999;">待配置</div>
-        <div class="config-meta">预计 V0.7 上线</div>
-      </div>
-      <div class="config-card" style="padding:14px;opacity:0.6;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-          <span style="font-size:24px;">🧑‍💼</span>
-          <div style="font-size:15px;font-weight:600;">数字人分身</div>
-          <span class="badge badge-default" style="margin-left:auto;">V0.8</span>
-        </div>
-        <div class="config-value" style="color:#999;">待配置</div>
-        <div class="config-meta">预计 V0.8 上线</div>
-      </div>
+    <!-- 工具分类筛选（紧凑 tab，售后单风格） -->
+    <div class="filter-tabs" id="costToolTabs"></div>
+    <!-- 搜索/筛选 -->
+    <div class="filter-row">
+      <input class="filter-input" id="costSearchInput" placeholder="按备注关键词搜索">
+      <select class="filter-select" id="costOperatorFilter"><option value="">全部设置人</option><option>产品小王</option><option>运营小李</option></select>
+      <select class="filter-select" id="costStatusFilter"><option value="">全部状态</option><option>生效中</option><option>已失效</option></select>
+      <button class="btn btn-primary" onclick="renderCostList()">查询</button>
+      <button class="btn btn-default" onclick="resetCostFilter()">重置</button>
     </div>
-
-    <!-- 图片生成 - 配置表单与历史 -->
-    <div style="font-size:14px;font-weight:600;margin-bottom:10px;">图片生成 · 消耗配置</div>
-    <div style="margin-bottom:20px;padding:16px;background:#fafafa;border-radius:6px;border:1px solid var(--border);">
-      <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text-secondary);">修改消耗</div>
-      <div class="form-row">
-        <label class="form-label">每次消耗</label>
-        <input class="form-input" type="number" value="1" min="1" max="999" style="width:100px;">
-        <span style="font-size:13px;color:var(--text-tertiary);">灵感值 / 次</span>
-      </div>
-      <div class="form-row">
-        <label class="form-label">生效日期</label>
-        <input class="form-input" type="date" value="2026-09-01" style="width:160px;">
-      </div>
-      <div class="form-row">
-        <label class="form-label">备注</label>
-        <textarea class="form-textarea" placeholder="填写变更原因（选填）"></textarea>
-      </div>
-      <div class="form-row">
-        <label class="form-label"></label>
-        <button class="btn btn-primary" style="height:36px;padding:0 24px;" onclick="saveCostConfig()">保存</button>
-      </div>
-    </div>
-
-    <!-- 图片生成 - 历史快照 -->
-    <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text-secondary);">历史配置记录</div>
-    <table class="snapshot-table">
+    <!-- 列表 -->
+    <table class="data-table">
       <thead>
         <tr>
-          <th>消耗灵感值</th>
+          <th>每次消耗</th>
           <th>生效日期</th>
           <th>设置人</th>
           <th>备注</th>
@@ -723,25 +678,47 @@
           <th>操作</th>
         </tr>
       </thead>
-      <tbody id="costHistoryTbody">
-        <tr>
-          <td><b>1 灵感值/次</b></td>
-          <td>2026-09-01</td>
-          <td>运营小李</td>
-          <td>默认值</td>
-          <td><span class="badge badge-success">生效中</span></td>
-          <td><span class="action-link" onclick="toast('作废 1 灵感值/次 配置')">作废</span></td>
-        </tr>
-        <tr>
-          <td>2 灵感值/次</td>
-          <td>2026-08-21</td>
-          <td>产品小王</td>
-          <td>测试期高耗量</td>
-          <td><span class="badge badge-default">已失效</span></td>
-          <td>-</td>
-        </tr>
-      </tbody>
+      <tbody id="costListTbody"></tbody>
     </table>
+    <!-- 分页 -->
+    <div class="pagination" id="costPagination"></div>
+  </div>
+</section>
+
+<!-- ==================== 视图：新增 / 查看 / 编辑 工具消耗配置（独立页） ==================== -->
+<section class="view admin-page" id="viewCostEdit">
+  <div class="page-header">
+    <div class="adjust-header">
+      <div class="adjust-back" onclick="go('cost')">← 返回工具消耗列表</div>
+      <div class="page-title" style="margin:0;" id="costFormTitle">新增消耗配置</div>
+    </div>
+  </div>
+  <div class="page-body">
+    <div class="form-row">
+      <label class="form-label">工具</label>
+      <select class="form-input" id="costFormTool" style="width:200px;"></select>
+      <span style="font-size:13px;color:var(--red);">*</span>
+    </div>
+    <div class="form-row">
+      <label class="form-label">每次消耗</label>
+      <input class="form-input" type="number" id="costFormCredits" min="1" max="999" value="1" style="width:120px;">
+      <span style="font-size:13px;color:var(--text-tertiary);">灵感值 / 次</span>
+      <span style="font-size:13px;color:var(--red);">*</span>
+    </div>
+    <div class="form-row">
+      <label class="form-label">生效日期</label>
+      <input class="form-input" type="date" id="costFormDate" value="2026-09-04" style="width:180px;">
+      <span style="font-size:13px;color:var(--red);">*</span>
+    </div>
+    <div class="form-row">
+      <label class="form-label">备注</label>
+      <textarea class="form-textarea" id="costFormRemark" placeholder="填写变更原因（选填，最多 200 字）"></textarea>
+    </div>
+    <div class="form-row">
+      <label class="form-label"></label>
+      <button class="btn btn-primary" style="height:36px;padding:0 24px;" id="costFormSaveBtn" onclick="saveCostConfig()">保存</button>
+      <button class="btn btn-default" style="height:36px;padding:0 24px;margin-left:8px;" onclick="go('cost')">取消</button>
+    </div>
   </div>
 </section>
 
@@ -1140,6 +1117,7 @@ function go(key) {
   if (key === 'materialCategory') renderCategoryTable();
   if (key === 'promptConfig') renderPromptConfigList();
   if (key === 'init') renderInitList();
+  if (key === 'cost') renderCostList();
 }
 
 // ===== 调整灵感值独立页逻辑（替代原 Modal） =====
@@ -1515,17 +1493,155 @@ function resetInitFilter() {
   document.getElementById('initStatusFilter').value = '';
   renderInitList();
 }
+
+// ===== AI 工具消耗配置（运维中心 · AI 工具管理；多工具紧凑 tab + 列表 + 独立编辑页） =====
+// 工具分类（图片生成已上线；视频生成/数字人分身分别预计 V0.7 / V0.8 上线，作为占位 tab）
+var COST_TOOLS = [
+  { key: 'image',  name: '图片生成',   planVersion: '',    plannedNote: '' },
+  { key: 'video',  name: '视频生成',   planVersion: 'V0.7', plannedNote: '预计 V0.7 上线' },
+  { key: 'avatar', name: '数字人分身', planVersion: 'V0.8', plannedNote: '预计 V0.8 上线' }
+];
+var COST_ACTIVE_TOOL = 'image';
+// 历史快照（每条记录按 tool 分组；同组仅一条生效中）
+var COST_CONFIGS = [
+  { id: 'c1', tool: 'image', credits: 1, effDate: '2026-09-01', operator: '运营小李', remark: '默认值',       status: '生效中' },
+  { id: 'c2', tool: 'image', credits: 2, effDate: '2026-08-21', operator: '产品小王', remark: '测试期高耗量', status: '已失效' }
+];
+
+function _costToolLabel(t) {
+  var tool = COST_TOOLS.find(function (x) { return x.key === t; });
+  return tool ? tool.name : t;
+}
+
+function renderCostToolTabs() {
+  var box = document.getElementById('costToolTabs');
+  if (!box) return;
+  var html = '';
+  COST_TOOLS.forEach(function (t) {
+    var cnt = COST_CONFIGS.filter(function (c) { return c.tool === t.key; }).length;
+    var active = (t.key === COST_ACTIVE_TOOL);
+    var label = t.name + '(' + cnt + ')';
+    html += '<div class="filter-tab' + (active ? ' active' : '') + '" onclick="switchCostTab(\'' + t.key + '\')">' + label + '</div>';
+  });
+  box.innerHTML = html;
+}
+
+function switchCostTab(key) {
+  COST_ACTIVE_TOOL = key;
+  renderCostToolTabs();
+  renderCostList();
+}
+
+function renderCostList() {
+  renderCostToolTabs();
+  var tb = document.getElementById('costListTbody');
+  if (!tb) return;
+  var kw   = (document.getElementById('costSearchInput').value || '').trim();
+  var op   = document.getElementById('costOperatorFilter').value;
+  var stat = document.getElementById('costStatusFilter').value;
+  var rows = COST_CONFIGS.filter(function (c) {
+    if (c.tool !== COST_ACTIVE_TOOL) return false;
+    if (kw   && (c.remark + ' ' + c.credits).indexOf(kw) === -1) return false;
+    if (op   && c.operator !== op)   return false;
+    if (stat && c.status !== stat)   return false;
+    return true;
+  });
+  if (!rows.length) {
+    var tool = COST_TOOLS.find(function (x) { return x.key === COST_ACTIVE_TOOL; });
+    var tip = tool && tool.planVersion ? '「' + tool.name + '」预计 ' + tool.planVersion + ' 上线后启用' : '暂无配置，点击右上「+ 新增配置」开始';
+    tb.innerHTML = '<tr><td colspan="6" style="padding:18px 12px;text-align:center;color:var(--text-tertiary);font-size:13px;">' + tip + '</td></tr>';
+    document.getElementById('costPagination').innerHTML = '';
+    return;
+  }
+  var html = '';
+  rows.forEach(function (r) {
+    var badgeCls = r.status === '生效中' ? 'badge-success' : 'badge-default';
+    var actCell  = r.status === '生效中'
+      ? '<span class="action-link" onclick="voidCostConfig(\'' + r.id + '\')">作废</span>'
+      : '-';
+    html += '<tr>' +
+      '<td><b>' + r.credits + ' 灵感值/次</b></td>' +
+      '<td>' + r.effDate + '</td>' +
+      '<td>' + r.operator + '</td>' +
+      '<td>' + r.remark + '</td>' +
+      '<td><span class="badge ' + badgeCls + '">' + r.status + '</span></td>' +
+      '<td class="action-links"><span class="action-link" onclick="openCostEdit(\'' + r.id + '\')">查看</span>' + actCell + '</td>' +
+      '</tr>';
+  });
+  tb.innerHTML = html;
+  document.getElementById('costPagination').innerHTML =
+    '<div style="font-size:13px;color:var(--text-tertiary);">共 ' + rows.length + ' 条</div>';
+}
+
+function resetCostFilter() {
+  document.getElementById('costSearchInput').value = '';
+  document.getElementById('costOperatorFilter').value = '';
+  document.getElementById('costStatusFilter').value = '';
+  renderCostList();
+}
+
+function openCostEdit(id) {
+  var toolSel = document.getElementById('costFormTool');
+  toolSel.innerHTML = '';
+  COST_TOOLS.forEach(function (t) {
+    var opt = document.createElement('option');
+    opt.value = t.key;
+    opt.textContent = t.name + (t.planVersion ? '（' + t.planVersion + ' 待上线）' : '');
+    toolSel.appendChild(opt);
+  });
+  document.getElementById('costFormCredits').value = 1;
+  document.getElementById('costFormDate').value    = '2026-09-04';
+  document.getElementById('costFormRemark').value  = '';
+  document.getElementById('costFormSaveBtn').style.display = '';
+  document.getElementById('costFormTool').disabled      = false;
+  document.getElementById('costFormCredits').disabled   = false;
+  document.getElementById('costFormDate').disabled      = false;
+  document.getElementById('costFormRemark').disabled    = false;
+  document.getElementById('costFormTitle').textContent  = '新增消耗配置';
+  if (id) {
+    var r = COST_CONFIGS.find(function (x) { return x.id === id; });
+    if (r) {
+      toolSel.value = r.tool;
+      document.getElementById('costFormCredits').value = r.credits;
+      document.getElementById('costFormDate').value    = r.effDate;
+      document.getElementById('costFormRemark').value  = r.remark;
+      document.getElementById('costFormTitle').textContent = '查看消耗配置';
+      document.getElementById('costFormSaveBtn').style.display = 'none';
+      document.getElementById('costFormTool').disabled      = true;
+      document.getElementById('costFormCredits').disabled   = true;
+      document.getElementById('costFormDate').disabled      = true;
+      document.getElementById('costFormRemark').disabled    = true;
+    }
+  }
+  go('costEdit');
+}
+
 function saveCostConfig() {
-  var v = parseInt(document.querySelector('#viewCost input[type=number]').value, 10) || 1;
-  var date = document.querySelector('#viewCost input[type=date]').value || '2026-09-01';
-  var remark = document.querySelector('#viewCost textarea').value.trim() || '调整';
-  document.getElementById('costImageValue').innerHTML = '每次消耗 <b style="color:var(--primary);">' + v + '</b> 灵感值';
-  var tb = document.getElementById('costHistoryTbody');
-  var tr = document.createElement('tr');
-  tr.innerHTML = '<td><b>' + v + ' 灵感值/次</b></td><td>' + date + '</td><td>运营小李</td><td>' + remark + '</td><td><span class="badge badge-success">生效中</span></td><td><span class="action-link" onclick="toast(\'作废 ' + v + ' 灵感值/次 配置\')">作废</span></td>';
-  tb.insertBefore(tr, tb.firstChild);
-  _markHistoryObsolete(tb);
-  toast('图片生成消耗已保存：每次 ' + v + ' 灵感值');
+  var tool = document.getElementById('costFormTool').value;
+  var v    = parseInt(document.getElementById('costFormCredits').value, 10);
+  var date = document.getElementById('costFormDate').value;
+  var remark = document.getElementById('costFormRemark').value.trim() || '调整';
+  if (!v || v < 1) { toast('请输入有效的每次消耗'); return; }
+  if (!date)       { toast('请选择生效日期'); return; }
+  COST_CONFIGS.forEach(function (c) { if (c.tool === tool && c.status === '生效中') c.status = '已失效'; });
+  COST_CONFIGS.unshift({
+    id: 'c' + Date.now(),
+    tool: tool, credits: v, effDate: date,
+    operator: '产品小王', remark: remark, status: '生效中'
+  });
+  renderCostList();
+  go('cost');
+  toast('已保存：' + _costToolLabel(tool) + ' 每次消耗 ' + v + ' 灵感值');
+}
+
+function voidCostConfig(id) {
+  var r = COST_CONFIGS.find(function (x) { return x.id === id; });
+  if (!r) return;
+  confirmAction('作废消耗配置', '确定作废「' + _costToolLabel(r.tool) + ' · ' + r.credits + ' 灵感值/次」配置？', function () {
+    r.status = '已失效';
+    renderCostList();
+    toast('已作废该配置');
+  });
 }
 function togglePackageStatus(name) {
   var d = pkgData[name];
