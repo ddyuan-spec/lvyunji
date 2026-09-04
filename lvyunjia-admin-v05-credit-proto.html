@@ -201,7 +201,6 @@
     <div class="sidebar-sub">
       <div class="sidebar-item nav" data-view="log" onclick="go('log')">用户生成日志</div>
       <div class="sidebar-item nav" data-view="init" onclick="go('init')">初始灵感值配置</div>
-      <div class="sidebar-item nav" data-view="pricing" onclick="go('pricing')">灵感值定价管理</div>
       <div class="sidebar-item nav" data-view="cost" onclick="go('cost')">工具消耗配置</div>
       <div class="sidebar-item nav" data-view="package" onclick="go('package')">套餐管理</div>
       <div class="sidebar-item nav" data-view="firstOrder" onclick="go('firstOrder')">首单优惠配置</div>
@@ -648,83 +647,6 @@
 </section>
 
 
-<!-- ==================== 视图：灵感值定价管理 ==================== -->
-<section class="view admin-page" id="viewPricing">
-  <div class="page-header">
-    <div class="page-title">灵感值定价管理</div>
-  </div>
-  <div class="page-body">
-    <!-- 当前生效卡片 -->
-    <div class="config-card">
-      <div class="config-label">当前生效定价</div>
-      <div class="config-value" id="pricingCurrentValue">1 灵感值 = <b style="color:var(--primary);font-size:22px;">¥0.10</b></div>
-      <div class="config-meta" id="pricingCurrentMeta">生效日期：2026-09-01 &nbsp;|&nbsp; 设置人：运营小李 &nbsp;|&nbsp; 备注：上线首发定价</div>
-    </div>
-    <!-- 设置表单 -->
-    <div style="margin-bottom:20px;padding:16px;background:#fafafa;border-radius:6px;border:1px solid var(--border);">
-      <div style="font-size:14px;font-weight:600;margin-bottom:14px;">新建定价</div>
-      <div class="form-row">
-        <label class="form-label">灵感值单价</label>
-        <input class="form-input" type="number" value="0.10" min="0.01" max="99.99" step="0.01" style="width:100px;">
-        <span style="font-size:13px;color:var(--text-tertiary);">元 / 灵感值</span>
-        <span style="font-size:13px;color:var(--text-tertiary);">用户购买灵感值时的计价标准，改后新订单按新价结算</span>
-      </div>
-      <div class="form-row">
-        <label class="form-label">生效日期</label>
-        <input class="form-input" type="date" value="2026-09-01" style="width:160px;">
-        <span style="font-size:13px;color:var(--text-tertiary);">该日期及之后的购买按此定价计算</span>
-      </div>
-      <div class="form-row">
-        <label class="form-label">备注</label>
-        <textarea class="form-textarea" placeholder="填写调价原因（选填，最多 200 字）"></textarea>
-      </div>
-      <div class="form-row">
-        <label class="form-label"></label>
-        <button class="btn btn-primary" style="height:36px;padding:0 24px;" onclick="savePricing()">保存定价</button>
-      </div>
-    </div>
-    <!-- 历史定价时间线 -->
-    <div style="font-size:14px;font-weight:600;margin-bottom:10px;">历史定价记录</div>
-    <table class="snapshot-table">
-      <thead>
-        <tr>
-          <th>单价（元/灵感值）</th>
-          <th>生效日期</th>
-          <th>设置人</th>
-          <th>备注</th>
-          <th>状态</th>
-          <th>操作</th>
-        </tr>
-      </thead>
-      <tbody id="pricingHistoryTbody">
-        <tr>
-          <td><b>¥0.10</b></td>
-          <td>2026-09-01</td>
-          <td>运营小李</td>
-          <td>上线首发定价</td>
-          <td><span class="badge badge-success">生效中</span></td>
-          <td><span class="action-link" onclick="toast('作废 ¥0.10 定价')">作废</span></td>
-        </tr>
-        <tr>
-          <td>¥0.15</td>
-          <td>2026-08-21</td>
-          <td>产品小王</td>
-          <td>测试期定价</td>
-          <td><span class="badge badge-default">已失效</span></td>
-          <td>-</td>
-        </tr>
-        <tr>
-          <td>¥0.20</td>
-          <td>2026-08-01</td>
-          <td>产品小王</td>
-          <td>初始定价</td>
-          <td><span class="badge badge-default">已失效</span></td>
-          <td>-</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</section>
 
 
 <!-- ==================== 视图：AI 工具消耗配置 ==================== -->
@@ -1280,7 +1202,7 @@ var pkgData = {
 };
 var pkgEditKey = null;   // null = 新增模式
 var pkgStatus = 'on';
-var PRICE_PER_CREDIT_ADMIN = 0.10;   // 取后台「灵感值定价管理」当前定价
+var PRICE_PER_CREDIT_ADMIN = 0.10;   // 灵感值单价（套餐价格计算基准；原「灵感值定价管理」页已移除，单价作为常量保留，由套餐充值承载）
 
 function openPackageForm(name) {
   pkgEditKey = name || null;
@@ -1592,19 +1514,6 @@ function resetInitFilter() {
   document.getElementById('initOperatorFilter').value = '';
   document.getElementById('initStatusFilter').value = '';
   renderInitList();
-}
-function savePricing() {
-  var v = parseFloat(document.querySelector('#viewPricing input[type=number]').value) || 0;
-  var date = document.querySelector('#viewPricing input[type=date]').value || '2026-09-01';
-  var remark = document.querySelector('#viewPricing textarea').value.trim() || '调价';
-  document.getElementById('pricingCurrentValue').innerHTML = '1 灵感值 = <b style="color:var(--primary);font-size:22px;">¥' + v.toFixed(2) + '</b>';
-  document.getElementById('pricingCurrentMeta').textContent = '生效日期：' + date + ' | 设置人：运营小李 | 备注：' + remark;
-  var tb = document.getElementById('pricingHistoryTbody');
-  var tr = document.createElement('tr');
-  tr.innerHTML = '<td><b>¥' + v.toFixed(2) + '</b></td><td>' + date + '</td><td>运营小李</td><td>' + remark + '</td><td><span class="badge badge-success">生效中</span></td><td><span class="action-link" onclick="toast(\'作废 ¥' + v.toFixed(2) + ' 定价\')">作废</span></td>';
-  tb.insertBefore(tr, tb.firstChild);
-  _markHistoryObsolete(tb);
-  toast('灵感值定价已保存：1 灵感值 = ¥' + v.toFixed(2));
 }
 function saveCostConfig() {
   var v = parseInt(document.querySelector('#viewCost input[type=number]').value, 10) || 1;
