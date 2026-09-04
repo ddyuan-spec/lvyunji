@@ -1200,13 +1200,102 @@
   </div>
 </section>
 
-<!-- ==================== 视图：辅助提示词配置（3 板块，运维中心 AI 板块） ==================== -->
+<!-- ==================== 视图：辅助提示词配置列表（参考菜单管理列表页） ==================== -->
 <section class="view admin-page" id="viewPromptConfig">
   <div class="page-header">
     <div class="page-title">辅助提示词配置</div>
-    <div style="font-size:13px;color:var(--text-secondary);">C 端生图页「辅助提示词」按以下板块与词条下发</div>
+    <button class="btn btn-primary" onclick="openPromptGroupEdit()">+ 新增分类</button>
   </div>
-  <div class="page-body" id="promptConfigAdmin"></div>
+  <div class="page-body">
+    <div class="filter-row">
+      <input class="filter-input" id="promptSearchInput" placeholder="分类名称 / 编码" style="width:220px;">
+      <select class="filter-select" id="promptTypeFilter">
+        <option value="">全部类型</option>
+        <option value="image">生图</option>
+        <option value="video">生视频</option>
+      </select>
+      <select class="filter-select" id="promptStatusFilter">
+        <option value="">全部状态</option>
+        <option value="1">启用</option>
+        <option value="0">停用</option>
+      </select>
+      <button class="btn btn-primary" onclick="renderPromptConfigList()">查询</button>
+      <button class="btn btn-default" onclick="document.getElementById('promptSearchInput').value='';document.getElementById('promptTypeFilter').value='';document.getElementById('promptStatusFilter').value='';renderPromptConfigList()">重置</button>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width:80px;">排序</th>
+          <th>分类名称</th>
+          <th style="width:120px;">分类编码</th>
+          <th style="width:100px;">适用类型</th>
+          <th style="width:90px;">词条数量</th>
+          <th style="width:80px;">状态</th>
+          <th style="width:120px;">操作</th>
+        </tr>
+      </thead>
+      <tbody id="promptConfigListTbody"></tbody>
+    </table>
+    <div class="pagination">
+      <span>共 <b id="promptListTotal">0</b> 条</span>
+      <div class="page-btn active">1</div>
+      <div class="page-btn">2</div>
+      <div class="page-btn">3</div>
+      <span>跳至</span>
+      <input class="page-input" value="1">
+      <span>页</span>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 视图：辅助提示词分类编辑（独立页，非 Modal） ==================== -->
+<section class="view admin-page" id="viewPromptGroupEdit">
+  <div class="page-header">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span class="action-link" onclick="go('promptConfig')">← 返回列表</span>
+      <div class="page-title" id="promptEditTitle">新增分类</div>
+    </div>
+    <button class="btn btn-primary" onclick="savePromptGroup()">保存</button>
+  </div>
+  <div class="page-body">
+    <input type="hidden" id="promptEditGroupKey">
+    <div class="form-row">
+      <label class="form-label"><span style="color:var(--red);">*</span> 分类名称</label>
+      <input class="form-input" id="promptEditTitleInput" placeholder="如：风格、场景" style="width:260px;">
+    </div>
+    <div class="form-row">
+      <label class="form-label"><span style="color:var(--red);">*</span> 分类编码</label>
+      <input class="form-input" id="promptEditGroupInput" placeholder="如：style" style="width:260px;">
+    </div>
+    <div class="form-row">
+      <label class="form-label">适用类型</label>
+      <select class="filter-select" id="promptEditApplyType" style="width:120px;">
+        <option value="image">生图</option>
+        <option value="video">生视频</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">排序</label>
+      <input class="form-input" id="promptEditSort" type="number" value="0" style="width:100px;">
+    </div>
+    <div class="form-row">
+      <label class="form-label">状态</label>
+      <div class="toggle-switch on" id="promptEditEnabled" onclick="this.classList.toggle('on');toggleEnabledText()">
+        <span class="knob"></span>
+      </div>
+      <span style="font-size:13px;color:var(--text-secondary);margin-left:8px;" id="promptEditEnabledText">启用</span>
+    </div>
+    <div class="form-row" style="align-items:flex-start;">
+      <label class="form-label">词条</label>
+      <div style="flex:1;max-width:600px;">
+        <div id="promptEditTags" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;"></div>
+        <div style="display:flex;gap:8px;">
+          <input class="form-input" id="promptEditTagInput" placeholder="输入词条后回车" style="flex:1;min-width:180px;" onkeydown="if(event.key==='Enter') addPromptEditTag()">
+          <button class="btn btn-default" onclick="addPromptEditTag()">添加</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
 </div><!-- /main-content -->
@@ -1235,7 +1324,7 @@ function go(key) {
   if (key === 'firstOrder') renderFirstOrder();
   if (key === 'material') renderMaterialTable();
   if (key === 'materialCategory') renderCategoryTable();
-  if (key === 'promptConfig') renderPromptConfigAdmin();
+  if (key === 'promptConfig') renderPromptConfigList();
 }
 
 // ===== 调整灵感值独立页逻辑（替代原 Modal） =====
@@ -1826,85 +1915,129 @@ function runConfirm() {
 
 // ===== 辅助提示词配置（运维中心 · AI 板块；与 C 端「AI 创作」页同源下发） =====
 var PROMPT_CONFIG = [
-  { group: 'style', title: '风格', applyType: 'image', tags: ['写实照片','动漫插画','水彩手绘','蜡笔涂鸦','国风山水'] },
-  { group: 'scene', title: '场景', applyType: 'image', tags: ['室内居家','城市街景','自然风光','梦幻星空'] },
-  { group: 'light', title: '光线 / 氛围', applyType: 'image', tags: ['柔光','逆光','暖色调','电影感'] },
-  { group: 'vmotion', title: '运镜 / 动态', applyType: 'video', tags: ['缓慢推近','镜头环绕','人物走动','物体旋转','光影流动'] },
-  { group: 'vmood', title: '视频氛围', applyType: 'video', tags: ['电影感','梦幻','活力','治愈','悬疑'] }
+  { group: 'style', title: '风格', applyType: 'image', sort: 1, enabled: true, tags: ['写实照片','动漫插画','水彩手绘','蜡笔涂鸦','国风山水'] },
+  { group: 'scene', title: '场景', applyType: 'image', sort: 2, enabled: true, tags: ['室内居家','城市街景','自然风光','梦幻星空'] },
+  { group: 'light', title: '光线 / 氛围', applyType: 'image', sort: 3, enabled: true, tags: ['柔光','逆光','暖色调','电影感'] },
+  { group: 'vmotion', title: '运镜 / 动态', applyType: 'video', sort: 4, enabled: true, tags: ['缓慢推近','镜头环绕','人物走动','物体旋转','光影流动'] },
+  { group: 'vmood', title: '视频氛围', applyType: 'video', sort: 5, enabled: true, tags: ['电影感','梦幻','活力','治愈','悬疑'] }
 ];
 
-function renderPromptConfigAdmin() {
-  var box = document.getElementById('promptConfigAdmin');
-  if (!box) return;
-  var imageGroups = PROMPT_CONFIG.filter(function(g){ return g.applyType === 'image'; });
-  var videoGroups = PROMPT_CONFIG.filter(function(g){ return g.applyType === 'video'; });
-  var html = '<div style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;line-height:1.6;">以下板块与词条将下发到 C 端「AI 创作」页；每个板块需指定「适用类型」（生图 / 生视频），C 端仅展示匹配当前模式的词条。</div>';
-  html += renderPromptTypeSection('生图类辅助提示词', imageGroups);
-  html += renderPromptTypeSection('生视频类辅助提示词', videoGroups);
-  box.innerHTML = html;
-  PROMPT_CONFIG.forEach(function(g){
-    var input = document.getElementById('pcInput_' + g.group);
-    if (input) input.addEventListener('keydown', function(e){ if(e.key === 'Enter') addPromptTag(g.group); });
-  });
-}
+function renderPromptConfigList() {
+  var tbody = document.getElementById('promptConfigListTbody');
+  if (!tbody) return;
+  var kw = (document.getElementById('promptSearchInput') ? document.getElementById('promptSearchInput').value : '').trim().toLowerCase();
+  var typeFilter = document.getElementById('promptTypeFilter') ? document.getElementById('promptTypeFilter').value : '';
+  var statusFilter = document.getElementById('promptStatusFilter') ? document.getElementById('promptStatusFilter').value : '';
 
-function renderPromptTypeSection(title, groups) {
-  if (!groups.length) return '';
-  var html = '<div style="margin-bottom:24px;">' +
-    '<div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--primary);">' + title + '</div>' +
-    '<table style="width:100%;border-collapse:collapse;font-size:13px;background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;">' +
-    '<thead><tr style="background:#f7f8fa;">' +
-    '<th style="width:120px;padding:12px 16px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);">分类</th>' +
-    '<th style="width:100px;padding:12px 16px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);">适用类型</th>' +
-    '<th style="padding:12px 16px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);">词条</th>' +
-    '<th style="width:120px;padding:12px 16px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);">操作</th>' +
-    '</tr></thead><tbody>';
-  groups.forEach(function(g){
-    html += '<tr style="border-bottom:1px solid var(--border-light);">' +
-      '<td style="padding:12px 16px;vertical-align:top;"><b>' + g.title + '</b><br><code style="background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:11px;">' + g.group + '</code></td>' +
-      '<td style="padding:12px 16px;vertical-align:top;">' +
-        '<select onchange="setPromptApplyType(\'' + g.group + '\',this.value)" style="padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px;">' +
-          '<option value="image"' + (g.applyType === 'image' ? ' selected' : '') + '>生图</option>' +
-          '<option value="video"' + (g.applyType === 'video' ? ' selected' : '') + '>生视频</option>' +
-        '</select>' +
-      '</td>' +
-      '<td style="padding:12px 16px;vertical-align:top;">' +
-        '<div id="pcTags_' + g.group + '" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;">';
-    g.tags.forEach(function(t, ti){
-      html += '<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:16px;background:#f5f5f5;font-size:13px;">' + t +
-        '<span style="color:var(--red);cursor:pointer;" onclick="removePromptTag(\'' + g.group + '\',' + ti + ')">✕</span></span>';
-    });
-    html += '</div>' +
-      '<div style="display:flex;gap:8px;align-items:center;">' +
-        '<input id="pcInput_' + g.group + '" placeholder="输入新词条后回车" style="flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;">' +
-        '<button class="btn btn-default" style="height:32px;padding:0 14px;" onclick="addPromptTag(\'' + g.group + '\')">添加</button>' +
-      '</div>' +
-      '</td>' +
-      '<td style="padding:12px 16px;vertical-align:top;">' +
-        '<button class="btn btn-primary" style="height:32px;padding:0 16px;" onclick="toast(\'已保存「' + g.title + '」配置（原型占位）\')">保存</button>' +
-      '</td>' +
+  var list = PROMPT_CONFIG.filter(function(g){
+    if (kw && g.title.indexOf(kw) === -1 && g.group.indexOf(kw) === -1) return false;
+    if (typeFilter && g.applyType !== typeFilter) return false;
+    if (statusFilter === '1' && !g.enabled) return false;
+    if (statusFilter === '0' && g.enabled) return false;
+    return true;
+  }).sort(function(a,b){ return a.sort - b.sort; });
+
+  document.getElementById('promptListTotal').textContent = list.length;
+  var html = '';
+  if (!list.length) {
+    html = '<tr><td colspan="7" style="text-align:center;color:var(--text-tertiary);padding:40px 0;">暂无数据</td></tr>';
+  } else {
+    list.forEach(function(g){
+      html += '<tr>' +
+        '<td>' + (g.sort || 0) + '</td>' +
+        '<td><b>' + g.title + '</b></td>' +
+        '<td><code style="background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:12px;">' + g.group + '</code></td>' +
+        '<td>' + (g.applyType === 'video' ? '生视频' : '生图') + '</td>' +
+        '<td>' + g.tags.length + '</td>' +
+        '<td>' + (g.enabled ? '<span class="badge badge-success">启用</span>' : '<span class="badge badge-default">停用</span>') + '</td>' +
+        '<td>' +
+          '<div class="action-links">' +
+            '<span class="action-link" onclick="openPromptGroupEdit(\'' + g.group + '\')">编辑</span>' +
+            '<span class="action-link danger" onclick="deletePromptGroup(\'' + g.group + '\')">删除</span>' +
+          '</div>' +
+        '</td>' +
       '</tr>';
-  });
-  html += '</tbody></table></div>';
-  return html;
+    });
+  }
+  tbody.innerHTML = html;
 }
 
-function addPromptTag(group) {
-  var g = PROMPT_CONFIG.find(function (x) { return x.group === group; });
-  if (!g) return;
-  var input = document.getElementById('pcInput_' + group);
+function openPromptGroupEdit(group) {
+  var g = group ? PROMPT_CONFIG.find(function(x){ return x.group === group; }) : null;
+  document.getElementById('promptEditGroupKey').value = g ? g.group : '';
+  document.getElementById('promptEditTitle').textContent = g ? '编辑分类：' + g.title : '新增分类';
+  document.getElementById('promptEditTitleInput').value = g ? g.title : '';
+  document.getElementById('promptEditGroupInput').value = g ? g.group : '';
+  document.getElementById('promptEditGroupInput').disabled = !!g;
+  document.getElementById('promptEditApplyType').value = g ? g.applyType : 'image';
+  document.getElementById('promptEditSort').value = g ? (g.sort || 0) : 0;
+  var sw = document.getElementById('promptEditEnabled');
+  sw.classList.toggle('on', g ? g.enabled : true);
+  document.getElementById('promptEditEnabledText').textContent = (g ? g.enabled : true) ? '启用' : '停用';
+  renderPromptEditTags(g ? g.tags.slice() : []);
+  go('promptGroupEdit');
+}
+
+var _promptEditTags = [];
+function renderPromptEditTags(tags) {
+  _promptEditTags = tags || [];
+  var box = document.getElementById('promptEditTags');
+  if (!box) return;
+  var html = '';
+  _promptEditTags.forEach(function(t, i){
+    html += '<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:16px;background:#f5f5f5;font-size:13px;">' + t +
+      '<span style="color:var(--red);cursor:pointer;" onclick="removePromptEditTag(' + i + ')">✕</span></span>';
+  });
+  box.innerHTML = html;
+}
+function addPromptEditTag() {
+  var input = document.getElementById('promptEditTagInput');
   var val = input ? input.value.trim() : '';
   if (!val) return;
-  g.tags.push(val);
-  if (input) input.value = '';
-  renderPromptConfigAdmin();
+  if (_promptEditTags.indexOf(val) !== -1) { toast('词条已存在'); return; }
+  _promptEditTags.push(val);
+  input.value = '';
+  renderPromptEditTags(_promptEditTags);
+}
+function removePromptEditTag(idx) {
+  if (idx < 0 || idx >= _promptEditTags.length) return;
+  _promptEditTags.splice(idx, 1);
+  renderPromptEditTags(_promptEditTags);
 }
 
-function removePromptTag(group, idx) {
-  var g = PROMPT_CONFIG.find(function (x) { return x.group === group; });
-  if (!g || idx < 0 || idx >= g.tags.length) return;
-  g.tags.splice(idx, 1);
-  renderPromptConfigAdmin();
+function savePromptGroup() {
+  var key = document.getElementById('promptEditGroupKey').value;
+  var title = document.getElementById('promptEditTitleInput').value.trim();
+  var group = document.getElementById('promptEditGroupInput').value.trim();
+  var applyType = document.getElementById('promptEditApplyType').value;
+  var sort = parseInt(document.getElementById('promptEditSort').value || '0', 10);
+  var enabled = document.getElementById('promptEditEnabled').classList.contains('on');
+  if (!title || !group) { toast('请填写分类名称和编码'); return; }
+  var existing = PROMPT_CONFIG.find(function(x){ return x.group === group; });
+  if (key) {
+    if (existing) {
+      existing.title = title;
+      existing.applyType = applyType;
+      existing.sort = sort;
+      existing.enabled = enabled;
+      existing.tags = _promptEditTags.slice();
+    }
+  } else {
+    if (existing) { toast('分类编码已存在'); return; }
+    PROMPT_CONFIG.push({ group: group, title: title, applyType: applyType, sort: sort, enabled: enabled, tags: _promptEditTags.slice() });
+  }
+  toast('已保存「' + title + '」分类');
+  go('promptConfig');
+  renderPromptConfigList();
+}
+
+function deletePromptGroup(group) {
+  var g = PROMPT_CONFIG.find(function(x){ return x.group === group; });
+  if (!g) return;
+  if (confirm('确定删除分类「' + g.title + '」？该分类下的 ' + g.tags.length + ' 个词条将一并删除。')) {
+    PROMPT_CONFIG = PROMPT_CONFIG.filter(function(x){ return x.group !== group; });
+    renderPromptConfigList();
+  }
 }
 
 // 生视频成本配置保存（原型占位）
@@ -1919,14 +2052,12 @@ function switchCostTab(mode) {
   document.getElementById('tabCostVideo').classList.toggle('active', mode === 'video');
 }
 
-
-// 辅助提示词适用类型切换（原型占位）
-function setPromptApplyType(group, val) {
-  var g = PROMPT_CONFIG.find(function (x) { return x.group === group; });
-  if (g) g.applyType = val;
-  toast('已更新「' + group + '」适用类型为 ' + (val === 'video' ? '生视频' : '生图') + '（原型占位）');
+// 切换开关文案同步
+function toggleEnabledText() {
+  var sw = document.getElementById('promptEditEnabled');
+  var txt = document.getElementById('promptEditEnabledText');
+  if (sw && txt) txt.textContent = sw.classList.contains('on') ? '启用' : '停用';
 }
-
 // 初始进入会员管理
 go('member');
 </script>
