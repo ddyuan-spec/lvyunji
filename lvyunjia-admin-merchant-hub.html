@@ -383,6 +383,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                 <option value="group">团购商品</option>
                 <option value="haitao">海淘</option>
                 <option value="cross">跨境</option>
+                <option value="exchange">兑换券</option>
               </select>
             </div>
             <div class="item">
@@ -651,6 +652,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                 <label class="radio"><input type="radio" name="gtype" value="group"> 团购商品</label>
                 <label class="radio"><input type="radio" name="gtype" value="taoke"> 淘客</label>
                 <label class="radio"><input type="radio" name="gtype" value="cross"> 跨店</label>
+                <label class="radio"><input type="radio" name="gtype" value="exchange"> 兑换券</label>
               </div>
             </div>
 
@@ -726,6 +728,27 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
             <div class="field column">
               <textarea class="textarea w-xl" rows="3" maxlength="60" placeholder="突出产品亮点，60字以内"></textarea>
               <span class="muted" style="font-size:11px;align-self:flex-end">0/60</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ★★ 本次还原：兑换商品 SKU 设置区块（合并 hub 时遗漏，依 backup 还原） ★★ -->
+      <div class="card" id="sku_card" style="display:none">
+        <div class="card-head">
+          <div class="title">兑换商品 SKU 设置</div>
+          <div class="actions">
+            <span class="muted" style="font-size:12px" id="sku_count_hint">已选 0 个 SKU</span>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="sku-selector">
+            <div id="sku_list" class="sku-list">
+              <div class="sku-empty">📦 暂未选择兑换商品 SKU，点击下方按钮添加</div>
+            </div>
+            <button class="btn btn-primary" onclick="openSkuPicker()">+ 添加一个 SKU</button>
+            <div style="margin-top:10px;color:var(--text-3);font-size:11px;line-height:1.6">
+              💡 仅"商品类型=兑换券"时显示本区块。可多选现有实体商品 SKU 作为该兑换券可兑换的内容；用户成功买到兑换券后，可凭激活码兑换这些 SKU。
             </div>
           </div>
         </div>
@@ -1188,6 +1211,137 @@ function step(id, n){
       });
     });
   }
+})();
+
+/* ============== 商品类型切换 → SKU 区块显示（依 backup 还原） ============== */
+(function(){
+  var radios = document.querySelectorAll('#type_radios input[name="gtype"]');
+  function refreshSkuCard(){
+    var v = document.querySelector('#type_radios input[name="gtype"]:checked').value;
+    document.getElementById('sku_card').style.display = (v === 'exchange') ? '' : 'none';
+  }
+  radios.forEach(function(r){ r.addEventListener('change', refreshSkuCard); });
+  refreshSkuCard();
+})();
+
+/* ============== SKU 多选 picker（依 backup 还原） ============== */
+var SKU_LIBRARY = [
+  {id:'SKU-A001', name:'益齿健牙膏(120g)',     meta:'编号 A001 · 实物质保 · 库存 2300', thumb:'🪥'},
+  {id:'SKU-A002', name:'辅酶 Q10 体验装(10粒)', meta:'编号 A002 · 实物质保 · 库存 1800', thumb:'💊'},
+  {id:'SKU-A003', name:'5L 饮用水(袋装)',        meta:'编号 A003 · 实物质保 · 库存 9999', thumb:'💧'},
+  {id:'SKU-A004', name:'5L 饮用水(袋装)×7 套装', meta:'编号 A004 · 实物质保 · 库存 5000', thumb:'💧'},
+  {id:'SKU-A005', name:'绿韵家健康茶包(30袋)',   meta:'编号 A005 · 实物质保 · 库存 1200', thumb:'🍵'},
+  {id:'SKU-A006', name:'一次性水卡(储值)',       meta:'编号 A006 · 虚拟商品 · 储值类型', thumb:'💳'},
+  {id:'SKU-A007', name:'维 C 泡腾片(20片)',     meta:'编号 A007 · 实物质保 · 库存 960',   thumb:'🥤'},
+  {id:'SKU-A008', name:'一次性优惠券 5元',       meta:'编号 A008 · 优惠券类型',           thumb:'🎟️'}
+];
+
+var pickedSkus = [];
+var modalPending = [];
+
+function openSkuPicker(){
+  modalPending = pickedSkus.map(function(s){ return Object.assign({},s); });
+  renderSkuPickerList(SKU_LIBRARY);
+  updatePickedHint();
+  document.getElementById('sku_modal').classList.add('show');
+}
+
+function closeSkuPicker(){
+  document.getElementById('sku_modal').classList.remove('show');
+}
+
+function renderSkuPickerList(arr){
+  var html = '';
+  arr.forEach(function(s){
+    var p = modalPending.find(function(x){ return x.id===s.id; });
+    var sel = !!p;
+    html += '<div class="sku-item'+ (sel?' selected':'') +'" onclick="toggleSkuPick(\''+ s.id +'\')">'
+         +  '<div class="thumb">'+ (s.thumb||'📦') +'</div>'
+         +  '<div class="info"><div class="name">'+ s.name +'</div>'
+         +  '<div class="meta">'+ (s.meta||'') +'</div></div>'
+         +  '<div class="check">'+ (sel ? '✓':'') +'</div>'
+         +  '</div>';
+  });
+  document.getElementById('sku_picker_list').innerHTML = html || '<div style="padding:30px;text-align:center;color:var(--text-3)">没有匹配的 SKU</div>';
+}
+
+function toggleSkuPick(id){
+  var s = SKU_LIBRARY.find(function(x){ return x.id===id; });
+  if(!s) return;
+  var idx = modalPending.findIndex(function(x){ return x.id===id; });
+  if (idx>=0){
+    modalPending.splice(idx,1);
+  } else {
+    modalPending.push(Object.assign({qty:1},s));
+  }
+  filterSku();
+  updatePickedHint();
+}
+
+function filterSku(){
+  var q = (document.getElementById('sku_search_input').value||'').trim().toLowerCase();
+  var arr = SKU_LIBRARY.filter(function(s){
+    if(!q) return true;
+    return s.name.toLowerCase().indexOf(q)>=0 || s.id.toLowerCase().indexOf(q)>=0;
+  });
+  renderSkuPickerList(arr);
+}
+
+function updatePickedHint(){
+  document.getElementById('sku_picked_hint').textContent = '已选 '+ modalPending.length +' 个';
+}
+
+function confirmSkuPicker(){
+  pickedSkus = modalPending.map(function(s){ return Object.assign({},s); });
+  renderPickedList();
+  closeSkuPicker();
+  toast('已添加 '+ pickedSkus.length +' 个兑换 SKU');
+}
+
+function renderPickedList(){
+  var html = '';
+  pickedSkus.forEach(function(s){
+    html += '<div class="sku-row">'
+         +  '<div class="thumb">'+ (s.thumb||'📦') +'</div>'
+         +  '<div class="info"><div class="name">'+ s.name +'</div><div class="meta">'+ (s.meta||'') +'</div></div>'
+         +  '<div class="qty">兑换数量 <div class="stepper"><button class="ctrl" onclick="changeQty(\''+ s.id +'\',-1)">−</button><input class="num" value="'+ (s.qty||1) +'"><button class="ctrl" onclick="changeQty(\''+ s.id +'\',1)">+</button></div></div>'
+         +  '<div class="del" onclick="delPickedSku(\''+ s.id +'\')" title="移除">×</div>'
+         +  '</div>';
+  });
+  if (pickedSkus.length===0){
+    html = '<div class="sku-empty">📦 暂未选择兑换商品 SKU，点击下方按钮添加</div>';
+  }
+  document.getElementById('sku_list').innerHTML = html;
+  document.getElementById('sku_count_hint').textContent = '已选 '+ pickedSkus.length +' 个 SKU';
+}
+
+function changeQty(id, n){
+  var s = pickedSkus.find(function(x){ return x.id===id; });
+  if(!s) return;
+  s.qty = (s.qty||1) + n;
+  if (s.qty < 1) s.qty = 1;
+  if (s.qty > 99) s.qty = 99;
+  renderPickedList();
+}
+
+function delPickedSku(id){
+  pickedSkus = pickedSkus.filter(function(x){ return x.id!==id; });
+  renderPickedList();
+}
+
+/* ============== 列表筛选（兑换券过滤，依 backup 还原） ============== */
+(function(){
+  var sel = document.getElementById('filter_type');
+  if(!sel) return;
+  sel.addEventListener('change', function(){
+    var v = sel.value;
+    var rows = document.querySelectorAll('#list_tbody tr');
+    rows.forEach(function(r){
+      var t = r.getAttribute('data-type');
+      var ok = !v || t===v;
+      r.style.display = ok ? '' : 'none';
+    });
+  });
 })();
 
 /* ============== toast ============== */
