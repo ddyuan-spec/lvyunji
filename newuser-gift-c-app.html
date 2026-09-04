@@ -106,8 +106,16 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 .copy-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1f1f2e;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.25);opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999}
 .copy-toast.show{opacity:1;}
 
-/* ===== 礼包介绍页（p_gift_intro，原 p_activate 改造） ===== */
-.gift-int{padding-bottom:80px}
+/* ===== 新人礼包聚合页（p_gift_intro） ===== */
+.gift-int{padding-bottom:0}
+.gift-tabs{display:flex;align-items:center;background:#fff;border-bottom:1px solid var(--c-line)}
+.gift-tabs .gift-tab{flex:1;text-align:center;padding:12px 10px;font-size:14px;color:var(--c-text-2);position:relative;cursor:pointer}
+.gift-tabs .gift-tab.on{color:var(--c-primary);font-weight:600}
+.gift-tabs .gift-tab.on::after{content:"";position:absolute;left:50%;bottom:0;width:28px;height:2px;background:var(--c-primary);transform:translateX(-50%);border-radius:1px}
+.gift-panels{position:relative}
+.gift-panel{display:block}
+.gift-panel.hidden{display:none}
+
 .gift-int .hero{padding:24px 16px 16px;background:linear-gradient(135deg,#E9F8F1,#D4F1E2);text-align:center}
 .gift-int .hero .bag-icon{width:64px;height:64px;border-radius:50%;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:10px;box-shadow:0 4px 12px rgba(26,173,124,.15)}
 .gift-int .hero .ttl{font-size:18px;font-weight:700;color:var(--c-text)}
@@ -126,16 +134,12 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 
 .gift-int .submit-wrap{padding:16px 14px}
 .gift-int .foot-tip{padding:0 14px 20px;font-size:11px;color:var(--c-text-3);text-align:center}
-.gift-int .switch-link{display:block;text-align:center;padding:0 14px 22px;font-size:13px;color:var(--c-primary);cursor:pointer}
-.gift-int .switch-link.hidden{display:none}
-.gift-detail .switch-back{display:flex;align-items:center;justify-content:center;gap:4px;padding:10px;font-size:13px;color:var(--c-primary);cursor:pointer;background:#fff}
 
-/* ===== 邀请码商品详情页（p_invite_detail） ===== */
+/* ===== 邀请码商品详情（聚合页-购买激活码面板） ===== */
 .gift-detail{padding-bottom:64px}
-.gift-detail .top-bar{position:sticky;top:0;left:0;right:0;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:#fff;border-bottom:1px solid var(--c-line);z-index:5}
-.gift-detail .top-bar .ico{font-size:18px;color:var(--c-text);cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center}
-.gift-detail .top-bar .fav{font-size:20px;color:var(--c-text-3)}
-.gift-detail .top-bar .fav.on{color:var(--c-red)}
+.gift-detail .ship-bar{display:flex;align-items:center;gap:6px;padding:8px 12px;background:#fff;font-size:11px;color:var(--c-text-2);border-bottom:1px solid var(--c-line)}
+.gift-detail .ship-bar .lbl{display:flex;align-items:center;gap:4px;color:var(--c-text-2)}
+.gift-detail .ship-bar .arr{margin-left:auto;color:var(--c-text-3);font-size:14px}
 
 .gift-detail .ship-bar{display:flex;align-items:center;gap:6px;padding:8px 12px;background:#fff;font-size:11px;color:var(--c-text-2);border-bottom:1px solid var(--c-line)}
 .gift-detail .ship-bar .lbl{display:flex;align-items:center;gap:4px;color:var(--c-text-2)}
@@ -468,106 +472,110 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
     <button class="fab" id="fab_gift" onclick="go('p_gift_intro')"><div class="em">礼</div>新人礼包</button>
   </div>
 
-  <!-- ===== p_gift_intro 礼包介绍页（新人活动入口，按钮改为立即购买） ===== -->
+  <!-- ===== p_gift_intro 新人礼包聚合页 ===== -->
   <div class="page gift-int" id="p_gift_intro">
     <div class="nav">
       <div class="back" onclick="go('p_home')">‹</div>
       新人礼包
     </div>
 
-    <div class="hero">
-      <div class="bag-icon">🎁</div>
-      <div class="ttl">新人礼包</div>
-      <div class="sub">输入会员朋友分享的邀请码即可领取</div>
+    <div class="gift-tabs">
+      <div class="gift-tab on" id="tab_buy" onclick="switchGiftTab('buy')">购买激活码</div>
+      <div class="gift-tab" id="tab_activate" onclick="switchGiftTab('activate')">激活领礼包</div>
     </div>
 
-    <div class="card">
-      <div class="hd">
-        <div>礼包内容</div>
-        <div class="price">¥49.9<small style="font-size:11px;color:var(--c-text-3);text-decoration:line-through;margin-left:4px">实付¥0</small></div>
-      </div>
-      <div class="item">
-        <div class="thumb">🪥</div>
-        <div class="meta"><div class="name">益齿健牙膏</div><div class="desc">120g · 快递配送</div></div>
-        <div class="qty">×1</div>
-      </div>
-      <div class="item">
-        <div class="thumb">💊</div>
-        <div class="meta"><div class="name">辅酶 Q10 体验装</div><div class="desc">10 粒装 · 快递配送</div></div>
-        <div class="qty">×1</div>
-      </div>
-      <div class="item">
-        <div class="thumb">💧</div>
-        <div class="meta"><div class="name">5L 饮用水</div><div class="desc">兑换后到店自提 · 共 7 袋，30 天有效</div></div>
-        <div class="qty">×7</div>
-      </div>
-    </div>
+    <div class="gift-panels">
+      <!-- 购买激活码面板 -->
+      <div class="gift-panel" id="panel_buy">
+        <div class="gift-detail">
+          <div class="ship-bar">
+            <span class="lbl">📍 运费</span>
+            <span>虚拟商品，无需物流，购买后自动生成邀请码</span>
+            <span class="arr">›</span>
+          </div>
+          <div class="param" onclick="toast('参数说明')">
+            <span>参数</span>
+            <span style="display:flex;align-items:center;gap:4px">暂无参数 <span class="arr">›</span></span>
+          </div>
 
-    <div class="submit-wrap">
-      <button class="btn-primary" id="btn_intro_buy" onclick="go('p_address')">立即激活</button>
-    </div>
-    <div class="foot-tip">激活即视为同意礼包配送安排</div>
-    <div class="switch-link" id="btn_to_buy" onclick="go('p_invite_detail')">我是会员，去购买邀请码 ›</div>
-  </div>
+          <div class="merchant">
+            <div class="logo">绿</div>
+            <div class="info">
+              <div class="name">绿韵家官方自营</div>
+              <div class="addr">湖南省长沙市雨花区万博汇云谷</div>
+            </div>
+            <div class="nav-btn">导航 ›</div>
+          </div>
 
-  <!-- ===== p_invite_detail 邀请码商品详情页（Flow A） ===== -->
-  <div class="page gift-detail" id="p_invite_detail">
-    <div class="top-bar">
-      <div class="ico" onclick="go('p_gift_intro')">‹</div>
-      <div style="font-size:14px;font-weight:600">新人激活码礼包</div>
-      <div class="fav" id="fav_btn" onclick="toggleFav()">♡</div>
-    </div>
-    <div class="switch-back" onclick="go('p_gift_intro')">‹ 返回激活领礼包</div>
+          <div class="detail-block">
+            <div class="ttl">商品详情</div>
+            <div class="pic">🎁 新人激活码礼包<br><small style="font-size:11px;font-weight:400;opacity:.9">购买即生成激活码 · 分享新人可兑换礼包</small></div>
+          </div>
 
-    <div class="ship-bar">
-      <span class="lbl">📍 运费</span>
-      <span>虚拟商品，无需物流，购买后自动生成邀请码</span>
-      <span class="arr">›</span>
-    </div>
-    <div class="param" onclick="toast('参数说明')">
-      <span>参数</span>
-      <span style="display:flex;align-items:center;gap:4px">暂无参数 <span class="arr">›</span></span>
-    </div>
+          <div style="height:160px"></div>
 
-    <div class="merchant">
-      <div class="logo">绿</div>
-      <div class="info">
-        <div class="name">绿韵家官方自营</div>
-        <div class="addr">湖南省长沙市雨花区万博汇云谷</div>
-      </div>
-      <div class="nav-btn">导航 ›</div>
-    </div>
-
-    <div class="detail-block">
-      <div class="ttl">商品详情</div>
-      <div class="pic">🎁 新人激活码礼包<br><small style="font-size:11px;font-weight:400;opacity:.9">购买即生成激活码 · 分享新人可兑换礼包</small></div>
-    </div>
-
-    <div style="height:160px"></div>
-
-    <div class="sheet">
-      <div class="goods">
-        <div class="thumb"></div>
-        <div class="info">
-          <div><span class="tag">自营</span><span style="font-size:13px;color:var(--c-text);font-weight:600">新人激活码礼包</span></div>
-          <div class="sku-no">商品编号: 由后台配置</div>
-          <div class="price-row">
-            <span class="ptag">🔥 热销</span>
-            <span class="amt">¥49.9</span>
+          <div class="sheet">
+            <div class="goods">
+              <div class="thumb"></div>
+              <div class="info">
+                <div><span class="tag">自营</span><span style="font-size:13px;color:var(--c-text);font-weight:600">新人激活码礼包</span></div>
+                <div class="sku-no">商品编号: 由后台配置</div>
+                <div class="price-row">
+                  <span class="ptag">🔥 热销</span>
+                  <span class="amt">¥49.9</span>
+                </div>
+              </div>
+              <div class="qty">
+                <button onclick="changeInviteQty(-1)">−</button>
+                <span class="n" id="invite_qty">1</span>
+                <button onclick="changeInviteQty(1)">+</button>
+              </div>
+            </div>
+            <div class="spec-label">权益说明</div>
+            <div class="spec-row">
+              <div class="sp">购买即按数量生成邀请码，自动存入「我的邀请码」</div>
+              <div class="sp off">每个邀请码可被 1 位新人使用，兑换新人礼包（益齿健套装 + 5L 饮用水×7 袋）</div>
+            </div>
+            <button class="buy-btn" onclick="go('p_invite_confirm')">立即购买</button>
           </div>
         </div>
-        <div class="qty">
-          <button onclick="changeInviteQty(-1)">−</button>
-          <span class="n" id="invite_qty">1</span>
-          <button onclick="changeInviteQty(1)">+</button>
+      </div>
+
+      <!-- 激活领礼包面板 -->
+      <div class="gift-panel hidden" id="panel_activate">
+        <div class="hero">
+          <div class="bag-icon">🎁</div>
+          <div class="ttl">新人礼包</div>
+          <div class="sub">输入会员朋友分享的邀请码即可领取</div>
         </div>
+
+        <div class="card">
+          <div class="hd">
+            <div>礼包内容</div>
+            <div class="price">¥49.9<small style="font-size:11px;color:var(--c-text-3);text-decoration:line-through;margin-left:4px">实付¥0</small></div>
+          </div>
+          <div class="item">
+            <div class="thumb">🪥</div>
+            <div class="meta"><div class="name">益齿健牙膏</div><div class="desc">120g · 快递配送</div></div>
+            <div class="qty">×1</div>
+          </div>
+          <div class="item">
+            <div class="thumb">💊</div>
+            <div class="meta"><div class="name">辅酶 Q10 体验装</div><div class="desc">10 粒装 · 快递配送</div></div>
+            <div class="qty">×1</div>
+          </div>
+          <div class="item">
+            <div class="thumb">💧</div>
+            <div class="meta"><div class="name">5L 饮用水</div><div class="desc">兑换后到店自提 · 共 7 袋，30 天有效</div></div>
+            <div class="qty">×7</div>
+          </div>
+        </div>
+
+        <div class="submit-wrap">
+          <button class="btn-primary" id="btn_intro_buy" onclick="go('p_address')">立即激活</button>
+        </div>
+        <div class="foot-tip">激活即视为同意礼包配送安排</div>
       </div>
-      <div class="spec-label">权益说明</div>
-      <div class="spec-row">
-        <div class="sp">购买即按数量生成邀请码，自动存入「我的邀请码」</div>
-        <div class="sp off">每个邀请码可被 1 位新人使用，兑换新人礼包（益齿健套装 + 5L 饮用水×7 袋）</div>
-      </div>
-      <button class="buy-btn" onclick="go('p_invite_confirm')">立即购买</button>
     </div>
   </div>
 
@@ -893,7 +901,7 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
   <!-- ===== p_invite_confirm 购买邀请码·确认订单（无地址，Flow A） ===== -->
   <div class="page confirm" id="p_invite_confirm">
     <div class="nav">
-      <div class="back" onclick="go('p_invite_detail')">‹</div>
+      <div class="back" onclick="go('p_gift_intro')">‹</div>
       确认订单
     </div>
 
@@ -1076,10 +1084,25 @@ function go(id){
   if(id === 'p_me') renderMe();
   if(id === 'p_invite_confirm') renderInviteConfirm();
   if(id === 'p_my_orders') renderOrderList();
-  if(id === 'p_gift_intro') updateGiftIntroToggle();
+  if(id === 'p_gift_intro') switchGiftTab('activate');
 }
 function goBackFromAddress(){
   go('p_gift_intro');
+}
+
+/* ========== 新人礼包聚合页 Tab 切换 ========== */
+function switchGiftTab(tab){
+  var tabs = document.querySelectorAll('.gift-tabs .gift-tab');
+  var panels = document.querySelectorAll('.gift-panels .gift-panel');
+  tabs.forEach(function(t){ t.classList.remove('on'); });
+  panels.forEach(function(p){ p.classList.add('hidden'); });
+  if(tab === 'buy'){
+    document.getElementById('tab_buy').classList.add('on');
+    document.getElementById('panel_buy').classList.remove('hidden');
+  }else{
+    document.getElementById('tab_activate').classList.add('on');
+    document.getElementById('panel_activate').classList.remove('hidden');
+  }
 }
 
 /* ========== FAB / 悬浮窗可见性 ========== */
@@ -1087,14 +1110,6 @@ function updateFab(){
   // 新人礼包 FAB（已激活后隐藏，未激活时常显）
   var fabGift = document.getElementById('fab_gift');
   if(fabGift) fabGift.classList.toggle('hidden', !!window._user.activated);
-}
-/* 激活页「去购买邀请码」文字按钮：仅初级会员及以上显示 */
-function updateGiftIntroToggle(){
-  var el = document.getElementById('btn_to_buy');
-  if(el){
-    var isPrimaryPlus = (window._user.level === 'primary' || window._user.level === 'svip' || window._user.level === 'master');
-    el.classList.toggle('hidden', !isPrimaryPlus);
-  }
 }
 
 /* ========== 我的页渲染 ========== */
