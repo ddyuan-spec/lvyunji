@@ -194,6 +194,9 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
 .link:hover{color:var(--link-hover);text-decoration:underline}
 .link.danger{color:var(--primary)}
 .tag{display:inline-block;padding:2px 8px;border-radius:3px;font-size:11px;background:#f0f2f5;color:var(--text-2)}
+.tag.purchase,.tag.ordered{background:#e6f4ff;color:#1677ff;border:1px solid #91caff}
+.tag.system{background:#f0f2f5;color:#5f6368;border:1px solid #d9dbe0}
+.tag.no-order{background:#fff7e6;color:#d46b08;border:1px solid #ffd591}
 .tag.newuser{background:#fff7e6;color:#d46b08;border:1px solid #ffd591}
 .tag.exchange{background:#e6f4ff;color:#1677ff;border:1px solid #91caff}
 .muted{color:var(--text-3)}
@@ -291,7 +294,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
       <div class="group-title" onclick="toggleGroup(this)">交易 <span class="arrow">▾</span></div>
       <div class="sub">
         <div class="menu-item" data-view="orders" onclick="go('orders')">订单管理</div>
-        <a class="menu-item" href="https://ddyuan-spec.github.io/lvyunji/newuser-gift-admin-invite-codes.html" target="_blank" rel="noopener">邀请码管理</a>
+        <div class="menu-item" data-view="inviteCodes" onclick="go('inviteCodes')">邀请码管理</div>
         <div class="menu-item">订单源设置</div>
       </div>
     </div>
@@ -1129,6 +1132,143 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
         </div>
 
       </section>
+
+    <!-- 视图：邀请码管理（搬入 hub，复用侧栏，不跳独立页） -->
+    <section id="viewInviteCodes" class="view">
+      <div class="card">
+        <div class="card-head">
+          <div class="title">邀请码管理</div>
+          <div class="actions">
+            <button class="btn" onclick="showToast('已导出邀请码列表')">批量导出</button>
+            <button class="btn btn-primary" onclick="showToast('生成邀请码功能待补')">+ 生成邀请码</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="filters">
+          <div class="filter-row">
+            <div class="item">
+              <span class="lbl">生成时间</span>
+              <input class="input" value="2026-08-25 00:00:00">
+              <span>至</span>
+              <input class="input" value="2026-09-01 23:59:59">
+            </div>
+            <div class="item"><input class="input" placeholder="邀请码"></div>
+            <div class="item"><input class="input" placeholder="购买人/生成人（昵称或账号）"></div>
+            <div class="item"><input class="input" placeholder="关联订单编号"></div>
+            <button class="btn btn-primary">查询</button>
+            <button class="btn">重置</button>
+          </div>
+        </div>
+        <div class="sub-filters">
+          <span class="lbl">生成途径：</span>
+          <span class="opt active" id="src_all" onclick="setSrc('src_all')">全部</span>
+          <span class="opt" id="src_purchase" onclick="setSrc('src_purchase')">购买生成</span>
+          <span class="opt" id="src_system" onclick="setSrc('src_system')">系统生成</span>
+          <span style="width:1px;height:14px;background:var(--line-strong);margin:0 6px"></span>
+          <span class="lbl">下单状态：</span>
+          <span class="opt active" id="ord_all" onclick="setOrd('ord_all')">全部</span>
+          <span class="opt" id="ord_no" onclick="setOrd('ord_no')">未下单</span>
+          <span class="opt" id="ord_yes" onclick="setOrd('ord_yes')">已下单</span>
+        </div>
+        <div class="table-wrap">
+          <table class="lvyunji-table">
+            <thead>
+              <tr>
+                <th>邀请码</th>
+                <th>生成途径</th>
+                <th>生成时间</th>
+                <th>购买人 / 生成人</th>
+                <th>下单状态</th>
+                <th>关联订单编号</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="invite_tbody">
+              <tr data-src="purchase" data-ord="yes">
+                <td>A8$kL9#mN2@</td>
+                <td><span class="tag purchase">购买生成</span></td>
+                <td>2026-08-31 14:22:07</td>
+                <td>昵称：服务达人-李<br>账号：13812345678</td>
+                <td><span class="tag ordered">已下单</span></td>
+                <td>605893</td>
+                <td><div class="op-list"><a class="op" onclick="showToast('查看邀请码详情：A8$kL9#mN2@')">查看详情</a></div></td>
+              </tr>
+              <tr data-src="purchase" data-ord="yes">
+                <td>Dg3SUy3@Wq</td>
+                <td><span class="tag purchase">购买生成</span></td>
+                <td>2026-08-31 11:08:45</td>
+                <td>昵称：会员小小<br>账号：13987654321</td>
+                <td><span class="tag ordered">已下单</span></td>
+                <td>605880</td>
+                <td><div class="op-list"><a class="op" onclick="showToast('查看邀请码详情：Dg3SUy3@Wq')">查看详情</a></div></td>
+              </tr>
+              <tr data-src="purchase" data-ord="yes">
+                <td>Hy7*Pz@8Qr</td>
+                <td><span class="tag purchase">购买生成</span></td>
+                <td>2026-08-30 16:55:12</td>
+                <td>昵称：王小妹<br>账号：13645217896</td>
+                <td><span class="tag ordered">已下单</span></td>
+                <td>605875</td>
+                <td><div class="op-list"><a class="op" onclick="showToast('查看邀请码详情：Hy7*Pz@8Qr')">查看详情</a></div></td>
+              </tr>
+              <tr data-src="purchase" data-ord="yes">
+                <td>Bm4@Tn5$Kp</td>
+                <td><span class="tag purchase">购买生成</span></td>
+                <td>2026-08-30 10:31:23</td>
+                <td>昵称：体验达人-赵<br>账号：13578963214</td>
+                <td><span class="tag ordered">已下单</span></td>
+                <td>605868</td>
+                <td><div class="op-list"><a class="op" onclick="showToast('查看邀请码详情：Bm4@Tn5$Kp')">查看详情</a></div></td>
+              </tr>
+              <tr data-src="purchase" data-ord="yes">
+                <td>Wp2#Xc6lYq</td>
+                <td><span class="tag purchase">购买生成</span></td>
+                <td>2026-08-29 19:14:56</td>
+                <td>昵称：老顾客-周<br>账号：13854789632</td>
+                <td><span class="tag ordered">已下单</span></td>
+                <td>605852</td>
+                <td><div class="op-list"><a class="op" onclick="showToast('查看邀请码详情：Wp2#Xc6lYq')">查看详情</a></div></td>
+              </tr>
+              <tr data-src="purchase" data-ord="no">
+                <td>Qt9kFn1!Zd</td>
+                <td><span class="tag purchase">购买生成</span></td>
+                <td>2026-09-01 13:45:30</td>
+                <td>昵称：新用户-陈<br>账号：13820314567</td>
+                <td><span class="tag no-order">未下单</span></td>
+                <td class="muted">—</td>
+                <td><div class="op-list"><a class="op" onclick="showToast('查看邀请码详情：Qt9kFn1!Zd')">查看详情</a><span class="dot">·</span><button class="op danger" onclick="showToast('已禁用该邀请码')">禁用</button></div></td>
+              </tr>
+              <tr data-src="system" data-ord="no">
+                <td>Gc1@Hp9#Rz</td>
+                <td><span class="tag system">系统生成</span></td>
+                <td>2026-09-01 10:02:11</td>
+                <td>生成人：后台运营-袁<br>账号：13800001234<br>购买人：—</td>
+                <td><span class="tag no-order">未下单</span></td>
+                <td class="muted">—</td>
+                <td><div class="op-list"><a class="op" onclick="showToast('查看邀请码详情：Gc1@Hp9#Rz')">查看详情</a><span class="dot">·</span><button class="op danger" onclick="showToast('已禁用该邀请码')">禁用</button></div></td>
+              </tr>
+              <tr data-src="system" data-ord="no">
+                <td>Yt6#Kv2$Lm</td>
+                <td><span class="tag system">系统生成</span></td>
+                <td>2026-08-31 17:36:48</td>
+                <td>生成人：后台运营-袁<br>账号：13800001234<br>购买人：—</td>
+                <td><span class="tag no-order">未下单</span></td>
+                <td class="muted">—</td>
+                <td><div class="op-list"><a class="op" onclick="showToast('查看邀请码详情：Yt6#Kv2$Lm')">查看详情</a><span class="dot">·</span><button class="op danger" onclick="showToast('已禁用该邀请码')">禁用</button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pager">
+          <span class="total">共 8 条</span>
+          <select class="size-select"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>
+          <div class="pages"><button class="pg">&lt;</button><button class="pg active">1</button><button class="pg">&gt;</button></div>
+          <div class="jump"><span>跳转</span><input class="input" value="1"><span>页</span></div>
+        </div>
+      </div>
+    </section>
   </main>
 </div>
 
@@ -1350,6 +1490,33 @@ function toast(msg){
   t.classList.add('show');
   clearTimeout(window.__toastT);
   window.__toastT = setTimeout(function(){ t.classList.remove('show'); }, 1600);
+}
+/* ============== 邀请码管理视图（搬入 hub，复用侧栏） ============== */
+let currentSrc='all', currentOrd='all';
+function setSrc(id){
+  document.querySelectorAll('[id^="src_"]').forEach(function(el){ el.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  currentSrc = id.replace('src_','');
+  applyInviteFilter();
+}
+function setOrd(id){
+  document.querySelectorAll('[id^="ord_"]').forEach(function(el){ el.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  currentOrd = id.replace('ord_','');
+  applyInviteFilter();
+}
+function applyInviteFilter(){
+  var tb = document.getElementById('invite_tbody'); if(!tb) return;
+  tb.querySelectorAll('tr').forEach(function(tr){
+    var src = tr.getAttribute('data-src'), ord = tr.getAttribute('data-ord');
+    var ok = (currentSrc==='all' || src===currentSrc) && (currentOrd==='all' || ord===currentOrd);
+    tr.style.display = ok ? '' : 'none';
+  });
+}
+function showToast(msg){
+  var t = document.getElementById('toast'); if(!t) return;
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 1800);
 }
 </script>
 </body>
