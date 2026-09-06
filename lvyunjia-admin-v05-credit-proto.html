@@ -874,21 +874,82 @@
       <div style="padding:14px 18px;border-bottom:1px solid var(--border);">
         <div style="font-size:14px;font-weight:600;color:var(--text);">按套餐配置赠送规则</div>
       </div>
-      <table style="width:100%;border-collapse:collapse;">
+      <div class="filter-row" style="padding:12px 18px;">
+        <input class="filter-input" id="foSearchInput" placeholder="套餐名称" style="width:200px;">
+        <select class="filter-select" id="foStatusFilter">
+          <option value="">全部参与状态</option>
+          <option value="on">参与</option>
+          <option value="off">不参与</option>
+        </select>
+        <button class="btn btn-primary" onclick="renderFirstOrderList()">查询</button>
+        <button class="btn btn-default" onclick="resetFoFilter()">重置</button>
+      </div>
+      <table class="data-table" style="width:100%;border-collapse:collapse;">
         <thead>
-          <tr style="background:var(--table-header);">
-            <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">套餐</th>
-            <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">参与首单优惠</th>
-            <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">赠送方式</th>
-            <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">赠送数量</th>
-            <th style="padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--border);">C端展示文案</th>
-            <th style="padding:10px 12px;text-align:center;font-size:13px;border-bottom:1px solid var(--border);">操作</th>
+          <tr>
+            <th>套餐</th>
+            <th style="width:120px;">参与首单优惠</th>
+            <th style="width:120px;">赠送方式</th>
+            <th style="width:160px;">赠送数量</th>
+            <th>C端展示文案</th>
+            <th style="width:100px;">操作</th>
           </tr>
         </thead>
         <tbody id="firstOrderTbody"></tbody>
       </table>
+      <div class="pagination">
+        <span>共 <b id="foListTotal">0</b> 条</span>
+        <div class="page-btn active">1</div>
+        <span>跳至</span>
+        <input class="page-input" value="1">
+        <span>页</span>
+      </div>
     </div>
     <div id="foSummary" style="margin-top:16px;padding:12px 16px;background:#f6ffed;border:1px solid #b7eb8f;border-radius:6px;font-size:13px;color:var(--text-secondary);"></div>
+  </div>
+</section>
+
+<!-- ==================== 视图：编辑首单优惠（独立页，非 Modal） ==================== -->
+<section class="view admin-page" id="viewFirstOrderEdit">
+  <div class="page-header">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span class="action-link" onclick="go('firstOrder')">← 返回列表</span>
+      <div class="page-title" id="foEditTitle">编辑首单优惠</div>
+    </div>
+    <button class="btn btn-primary" onclick="saveFirstOrderEdit()">保存</button>
+  </div>
+  <div class="page-body">
+    <div class="form-row">
+      <label class="form-label">套餐名称</label>
+      <div id="foEditPkg" style="width:240px;height:36px;line-height:36px;padding:0 10px;background:#f5f5f5;color:var(--text-secondary);border:1px solid var(--border);border-radius:4px;font-size:13px;">-</div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">参与首单优惠</label>
+      <div class="toggle-switch lg on" id="foEditToggle" onclick="toggleFoEditEnabled()"><div class="knob"></div></div>
+      <span id="foEditEnabledText" style="font-size:13px;color:var(--text-tertiary);">参与</span>
+    </div>
+    <div class="form-row">
+      <label class="form-label">赠送方式</label>
+      <select class="filter-select" id="foEditMethod" onchange="switchFoEditMethod()" style="width:240px;height:36px;">
+        <option value="equal">等额赠送</option>
+        <option value="percent">比例赠送</option>
+        <option value="fixed">固定赠送</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">赠送数量</label>
+      <input class="form-input" type="number" id="foEditAmount" min="0" style="width:240px;">
+      <span id="foEditAmountHint" style="font-size:13px;color:var(--text-tertiary);">（灵感值）</span>
+    </div>
+    <div class="form-row">
+      <label class="form-label">C端展示文案</label>
+      <input class="form-input" type="text" id="foEditCopy" placeholder="如：新人首单立赠等额灵感值" style="width:320px;">
+    </div>
+    <div class="form-row">
+      <label class="form-label"></label>
+      <button class="btn btn-primary" style="height:36px;padding:0 24px;" onclick="saveFirstOrderEdit()">保存</button>
+      <button class="btn btn-default" style="height:36px;padding:0 24px;margin-left:8px;" onclick="go('firstOrder')">取消</button>
+    </div>
   </div>
 </section>
 
@@ -1112,7 +1173,7 @@ function go(key) {
   }
   window.scrollTo(0, 0);
   if (key === 'package') renderPackageTable();
-  if (key === 'firstOrder') renderFirstOrder();
+  if (key === 'firstOrder') renderFirstOrderList();
   if (key === 'material') renderMaterialTable();
   if (key === 'materialCategory') renderCategoryTable();
   if (key === 'promptConfig') renderPromptConfigList();
@@ -1271,87 +1332,126 @@ var firstOrderData = {
 
 function toggleGlobalFirstOrder() {
   firstOrderGlobal = !firstOrderGlobal;
-  renderFirstOrder();
+  renderFirstOrderList();
   toast('首单优惠总开关已' + (firstOrderGlobal ? '开启' : '关闭'));
 }
 
-function toggleRowFirstOrder(pkgName) {
-  if (!firstOrderGlobal) return;          // 总开关关闭时不允许单独配置
-  var d = firstOrderData[pkgName];
-  if (!d) return;
-  d.enabled = !d.enabled;
-  renderFirstOrder();
-}
-
-function onFoMethodChange(pkgName, val) {
-  if (!firstOrderGlobal) return;
-  var d = firstOrderData[pkgName];
-  if (!d) return;
-  d.method = val;
-  renderFirstOrder();
-}
-
-function saveFirstOrderRow(pkgName) {
-  if (!firstOrderGlobal) { toast('请先开启首单优惠总开关'); return; }
-  var d = firstOrderData[pkgName];
-  if (!d) return;
-  var amtEl = document.getElementById('foAmount_' + pkgName);
-  var copyEl = document.getElementById('foCopy_' + pkgName);
-  if (!amtEl && !copyEl) return;   // 极端竞态（元素已被重渲染）安全退出
-  if (d.method === 'equal') {
-    d.amount = pkgData[pkgName].credits;   // 等额赠送 = 购买灵感值数（修复原存 0 的 bug）
-  } else {
-    d.amount = parseInt((amtEl ? amtEl.value : '0'), 10) || 0;
-  }
-  d.copy = copyEl ? (copyEl.value.trim() || '新人首单赠送') : (d.copy || '新人首单赠送');
-  // 保存反馈：链接短暂变「已保存 ✓」
-  var link = document.getElementById('foSave_' + pkgName);
-  if (link) {
-    var oldTxt = link.textContent;
-    link.textContent = '已保存 ✓';
-    link.style.color = '#52c41a';
-    setTimeout(function () { link.textContent = oldTxt; link.style.color = ''; }, 1500);
-  }
-  renderFirstOrder();   // 刷新摘要
-  toast('已保存「' + pkgName + '」首单优惠配置');
-}
-
-function renderFirstOrder() {
+function renderFirstOrderList() {
   var tbody = document.getElementById('firstOrderTbody');
   if (!tbody) return;
   // 同步全局开关视觉
   var g = document.getElementById('foGlobalToggle');
   if (g) g.classList.toggle('on', firstOrderGlobal);
+  var kwEl = document.getElementById('foSearchInput');
+  var stEl = document.getElementById('foStatusFilter');
+  var kw = kwEl ? kwEl.value.trim() : '';
+  var stFilter = stEl ? stEl.value : '';
   var keys = Object.keys(pkgData).sort(function (a, b) { return pkgData[a].sort - pkgData[b].sort; });
   var methodLabel = { equal: '等额赠送', percent: '比例赠送', fixed: '固定赠送' };
+  var list = keys.filter(function (k) {
+    var d = firstOrderData[k] || { enabled: false };
+    if (kw && k.indexOf(kw) === -1) return false;
+    if (stFilter === 'on' && !d.enabled) return false;
+    if (stFilter === 'off' && d.enabled) return false;
+    return true;
+  });
   var html = '';
-  // 总开关关闭：保留配置行但整体禁用，并提示（不删除元素，避免交互失效/竞态崩溃）
+  // 总开关关闭：保留提示行（不删除元素，避免交互失效/竞态崩溃）
   if (!firstOrderGlobal) {
     html += '<tr><td colspan="6" style="padding:14px 12px;background:#fff1f0;color:#ff4d4f;font-size:13px;border-bottom:1px solid var(--border-light);">首单优惠总开关已关闭：所有新用户首次购买均不享受赠送。开启总开关后即可配置各套餐规则（下方配置暂不可编辑）。</td></tr>';
   }
-  keys.forEach(function (k) {
-    var d = firstOrderData[k] || { enabled: false, method: 'fixed', amount: 0, copy: '新人首单赠送' };
-    var credits = pkgData[k].credits;
-    var toggleCls = d.enabled ? 'toggle-switch lg on' : 'toggle-switch lg';
-    var toggleStyle = firstOrderGlobal ? '' : ' style="opacity:.45;pointer-events:none;"';
-    var dis = firstOrderGlobal ? '' : ' disabled';
-    var amountDisabled = (d.method === 'equal' || !firstOrderGlobal) ? 'disabled style="background:#f5f5f5;color:#999;"' : '';
-    var amountVal = d.method === 'equal' ? credits : d.amount;
-    var amountHint = d.method === 'equal' ? '（=购买灵感值' + credits + '）' : (d.method === 'percent' ? '（%）' : '（灵感值）');
-    var opts = ['equal', 'percent', 'fixed'].map(function (m) {
-      return '<option value="' + m + '"' + (d.method === m ? ' selected' : '') + '>' + methodLabel[m] + '</option>';
-    }).join('');
-    html += '<tr style="border-bottom:1px solid var(--border-light);' + (firstOrderGlobal ? '' : 'opacity:.6;') + '">' +
-      '<td style="padding:10px 12px;font-size:13px;">' + k + '</td>' +
-      '<td style="padding:10px 12px;"><div class="' + toggleCls + '"' + toggleStyle + ' onclick="toggleRowFirstOrder(\'' + k + '\')"><div class="knob"></div></div><div style="font-size:11px;color:var(--text-tertiary);margin-top:4px;">' + (d.enabled ? '参与' : '不参与') + '</div></td>' +
-      '<td style="padding:10px 12px;"><select' + dis + ' onchange="onFoMethodChange(\'' + k + '\', this.value)" style="padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;">' + opts + '</select></td>' +
-      '<td style="padding:10px 12px;"><input id="foAmount_' + k + '" value="' + amountVal + '" ' + amountDisabled + ' style="width:64px;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;"> <span style="font-size:11px;color:var(--text-tertiary);">' + amountHint + '</span></td>' +
-      '<td style="padding:10px 12px;"><input id="foCopy_' + k + '" value="' + d.copy + '"' + dis + ' style="width:160px;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;"></td>' +
-      '<td style="padding:10px 12px;text-align:center;"><span class="btn-link" id="foSave_' + k + '" onclick="saveFirstOrderRow(\'' + k + '\')">保存</span></td>' +
-    '</tr>';
-  });
+  if (!list.length) {
+    html += '<tr><td colspan="6" style="text-align:center;color:var(--text-tertiary);padding:40px 0;">暂无数据</td></tr>';
+  } else {
+    list.forEach(function (k) {
+      var d = firstOrderData[k] || { enabled: false, method: 'fixed', amount: 0, copy: '新人首单赠送' };
+      var credits = pkgData[k].credits;
+      var amountTxt = d.method === 'equal' ? (credits + '（=购买灵感值）') : (d.method === 'percent' ? (d.amount + '%') : (d.amount + ' 灵感值'));
+      html += '<tr>' +
+        '<td>' + k + '</td>' +
+        '<td>' + (d.enabled ? '参与' : '不参与') + '</td>' +
+        '<td>' + methodLabel[d.method] + '</td>' +
+        '<td>' + amountTxt + '</td>' +
+        '<td>' + d.copy + '</td>' +
+        '<td><div class="action-links"><span class="action-link" onclick="openFirstOrderEdit(\'' + k + '\')">编辑</span></div></td>' +
+      '</tr>';
+    });
+  }
   tbody.innerHTML = html;
+  var totalEl = document.getElementById('foListTotal');
+  if (totalEl) totalEl.textContent = list.length;
   renderFoSummary();
+}
+
+function resetFoFilter() {
+  var kwEl = document.getElementById('foSearchInput');
+  var stEl = document.getElementById('foStatusFilter');
+  if (kwEl) kwEl.value = '';
+  if (stEl) stEl.value = '';
+  renderFirstOrderList();
+}
+
+var foEditPkg = '';
+var foEditEnabled = true;
+
+function openFirstOrderEdit(pkgName) {
+  if (!firstOrderGlobal) { toast('请先开启首单优惠总开关'); return; }
+  var d = firstOrderData[pkgName] || { enabled: false, method: 'fixed', amount: 0, copy: '新人首单赠送' };
+  foEditPkg = pkgName;
+  foEditEnabled = d.enabled;
+  document.getElementById('foEditTitle').textContent = '编辑首单优惠 - ' + pkgName;
+  document.getElementById('foEditPkg').textContent = pkgName;
+  document.getElementById('foEditMethod').value = d.method;
+  document.getElementById('foEditCopy').value = d.copy;
+  syncFoEditToggle();
+  switchFoEditMethod();
+  go('firstOrderEdit');
+}
+
+function toggleFoEditEnabled() {
+  foEditEnabled = !foEditEnabled;
+  syncFoEditToggle();
+}
+
+function syncFoEditToggle() {
+  var t = document.getElementById('foEditToggle');
+  if (t) t.className = 'toggle-switch lg' + (foEditEnabled ? ' on' : '');
+  var txt = document.getElementById('foEditEnabledText');
+  if (txt) txt.textContent = foEditEnabled ? '参与' : '不参与';
+}
+
+function switchFoEditMethod() {
+  var m = document.getElementById('foEditMethod').value;
+  var amt = document.getElementById('foEditAmount');
+  var hint = document.getElementById('foEditAmountHint');
+  var d = firstOrderData[foEditPkg] || { amount: 0 };
+  if (m === 'equal') {
+    amt.value = pkgData[foEditPkg] ? pkgData[foEditPkg].credits : 0;
+    amt.disabled = true;
+    amt.style.background = '#f5f5f5';
+    amt.style.color = '#999';
+    hint.textContent = '（=购买灵感值，随套餐自动计算）';
+  } else {
+    amt.value = d.amount || 0;
+    amt.disabled = false;
+    amt.style.background = '';
+    amt.style.color = '';
+    hint.textContent = m === 'percent' ? '（%，按购买灵感值计算）' : '（灵感值）';
+  }
+}
+
+function saveFirstOrderEdit() {
+  if (!firstOrderGlobal) { toast('请先开启首单优惠总开关'); return; }
+  var d = firstOrderData[foEditPkg];
+  if (!d) return;
+  var m = document.getElementById('foEditMethod').value;
+  d.enabled = foEditEnabled;
+  d.method = m;
+  d.amount = (m === 'equal') ? pkgData[foEditPkg].credits : (parseInt(document.getElementById('foEditAmount').value, 10) || 0);
+  d.copy = document.getElementById('foEditCopy').value.trim() || '新人首单赠送';
+  toast('已保存「' + foEditPkg + '」首单优惠配置');
+  go('firstOrder');
+  renderFirstOrderList();
 }
 
 function renderFoSummary() {
