@@ -82,7 +82,6 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <li><a href="#s3">业务流程与架构</a></li>
 <li><a href="#s4">功能需求详情</a>
   <ol>
-    <li><a href="#p1">C 端 - 首页（FAB 入口）</a></li>
     <li><a href="#p2">C 端 - 新人礼包聚合页（双Tab：购买激活码 / 激活领礼包）</a></li>
         <li><a href="#p4">C 端 - 邀请码 · 确认订单</a></li>
     <li><a href="#p5">C 端 - 收银台（微信/支付宝/银行卡）</a></li>
@@ -165,10 +164,9 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 
 <h3>3.1 业务流程图（双主流程 + 异常分支）</h3>
 
-<p><b>依据与基线说明</b>：本图<b>依据</b> C 端原型 <code>newuser-gift-c-app.html</code>（15 屏）与商家后台原型 <code>lvyunjia-admin-merchant-hub.html</code>（3 屏）<b>逐屏梳理</b>绘制，覆盖「会员购买邀请码」与「新人兑换礼包」两条全链路主流程及失败分支；图中每个节点均可在 §四 对应页面小节中追溯。
-⚠️ 本图为本次需求梳理阶段新产出，<b>尚未与业务方完成基线确认</b>；<b>禁止</b>在后续 PRD 修订中自行简化 / 重绘 / 修改本流程图，任何差异须报用户确认后再改。</p>
+<p><b>依据与基线说明</b>：本图<b>依据</b> C 端原型 <code>newuser-gift-c-app.html</code>（<b>V4 · 14 页</b>）<b>逐页梳理</b>绘制，覆盖「会员购买邀请码」（Flow A）与「新人兑换礼包」（Flow B）两条全链路主流程及失败分支；图中每个节点均可在 §四 对应页面小节中追溯。Flow A/B 在聚合页 p_gift_intro 的双 Tab 处分叉，由用户切换 Tab 选择走哪条。</p>
 
-<svg viewBox="0 0 960 770" xmlns="http://www.w3.org/2000/svg"
+<svg viewBox="0 0 1280 750" xmlns="http://www.w3.org/2000/svg"
      style="width:100%;height:auto;border:1px solid #eee;border-radius:8px;background:#fff;margin:6px 0 14px"
      font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif">
   <defs>
@@ -180,146 +178,166 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
     </marker>
   </defs>
 
-  <text x="20"  y="30" font-size="14" font-weight="700" fill="#0050b3">Flow A · 会员购买邀请码并分享</text>
-  <text x="500" y="30" font-size="14" font-weight="700" fill="#7a4f00">Flow B · 凭邀请码兑换新人礼包</text>
-  <line x1="470" y1="46" x2="470" y2="756" stroke="#eee" stroke-width="1"/>
+  <!-- 公共前置入口（单 FAB → 双 Tab 聚合页） -->
+  <text x="640" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#333">统一入口：单 FAB → 双 Tab 聚合页 → 双流分叉</text>
 
-  <rect x="20" y="70"  width="420" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
-  <text x="230" y="91" font-size="12" fill="#333" text-anchor="middle">会员打开首页</text>
+  <rect x="430" y="46" width="420" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
+  <text x="640" y="67" text-anchor="middle" font-size="12" fill="#333">1. 用户打开首页（任意状态）</text>
 
-  <rect x="20" y="128" width="420" height="46" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
-  <text x="230" y="147" font-size="12" fill="#333" text-anchor="middle">点击悬浮「邀请码」FAB</text>
-  <text x="230" y="165" font-size="11" fill="#8c8c8c" text-anchor="middle">（仅初级会员及以上可见）</text>
+  <rect x="430" y="98" width="420" height="48" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
+  <text x="640" y="119" text-anchor="middle" font-size="12" fill="#333">2. 点悬浮「新人礼包」FAB</text>
+  <text x="640" y="137" text-anchor="middle" font-size="11" fill="#8c8c8c">仅当 _user.activated=false 时显示（updateFab 控制）</text>
 
-  <rect x="20" y="200" width="420" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
-  <text x="230" y="221" font-size="12" fill="#333" text-anchor="middle">购买激活码 Tab（p_gift_intro）</text>
+  <rect x="430" y="166" width="420" height="48" rx="5" fill="#e6f7ff" stroke="#91d5ff"/>
+  <text x="640" y="187" text-anchor="middle" font-size="12" fill="#0050b3">3. 进 p_gift_intro 双 Tab 聚合页</text>
+  <text x="640" y="205" text-anchor="middle" font-size="11" fill="#0050b3">Tab1「购买激活码」（默认选中）｜ Tab2「激活领礼包」</text>
 
-  <rect x="20" y="258" width="420" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
-  <text x="230" y="279" font-size="12" fill="#333" text-anchor="middle">选数量（stepper 1-99）</text>
-
-  <rect x="20" y="316" width="420" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
-  <text x="230" y="337" font-size="12" fill="#333" text-anchor="middle">点「立即购买」</text>
-
-  <rect x="20" y="374" width="420" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
-  <text x="230" y="395" font-size="12" fill="#333" text-anchor="middle">邀请码·确认订单（无收货地址）</text>
-
-  <rect x="20" y="432" width="420" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
-  <text x="230" y="453" font-size="12" fill="#333" text-anchor="middle">收银台（选支付方式）</text>
-
-  <rect x="20" y="490" width="420" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
-  <text x="230" y="511" font-size="12" fill="#333" text-anchor="middle">确认支付</text>
-
-  <rect x="20" y="548" width="420" height="46" rx="5" fill="#f6ffed" stroke="#b7eb8f"/>
-  <text x="230" y="567" font-size="12" fill="#135200" text-anchor="middle">购买成功 → 按数量生成邀请码</text>
-  <text x="230" y="585" font-size="11" fill="#5b8c2a" text-anchor="middle">写入「我的邀请码」+ 写入会员订单</text>
-
+  <!-- 左右分流 -->
   <g stroke="#8c8c8c" stroke-width="1.4" fill="none" marker-end="url(#arA)">
-    <path d="M230,102 L230,124"/>
-    <path d="M230,174 L230,196"/>
-    <path d="M230,232 L230,254"/>
-    <path d="M230,290 L230,312"/>
-    <path d="M230,348 L230,370"/>
-    <path d="M230,406 L230,428"/>
-    <path d="M230,464 L230,486"/>
-    <path d="M230,522 L230,544"/>
+    <path d="M580,214 L160,250"/>
+    <path d="M700,214 L1120,250"/>
   </g>
 
-  <rect x="500" y="70"  width="380" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
-  <text x="690" y="91" font-size="12" fill="#333" text-anchor="middle">新用户打开首页</text>
+  <!-- Flow A 标题（左） -->
+  <text x="20" y="248" font-size="14" font-weight="700" fill="#0050b3">Flow A · 会员购买邀请码并分享</text>
+  <text x="20" y="266" font-size="11" fill="#8c8c8c">起点：聚合页 Tab1「购买激活码」（默认选中）</text>
 
-  <rect x="500" y="128" width="380" height="46" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
-  <text x="690" y="147" font-size="12" fill="#333" text-anchor="middle">点击悬浮「新人礼包」FAB</text>
-  <text x="690" y="165" font-size="11" fill="#8c8c8c" text-anchor="middle">（未激活用户可见，不限新老）</text>
+  <!-- Flow B 标题（右） -->
+  <text x="660" y="248" font-size="14" font-weight="700" fill="#7a4f00">Flow B · 凭邀请码兑换新人礼包</text>
+  <text x="660" y="266" font-size="11" fill="#8c8c8c">起点：聚合页 Tab2「激活领礼包」</text>
 
-  <rect x="500" y="200" width="380" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
-  <text x="690" y="221" font-size="12" fill="#333" text-anchor="middle">礼包介绍页 p_gift_intro</text>
+  <!-- Flow A 节点（左栏 · 7步） -->
+  <rect x="20"  y="290" width="600" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
+  <text x="320" y="311" text-anchor="middle" font-size="12" fill="#333">A4. 选数量（stepper 1-99）</text>
 
-  <rect x="500" y="258" width="380" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
-  <text x="690" y="279" font-size="12" fill="#333" text-anchor="middle">点「立即激活」</text>
+  <rect x="20"  y="340" width="600" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
+  <text x="320" y="361" text-anchor="middle" font-size="12" fill="#333">A5. 点「立即购买」→ 后端校验 _user.level ∈ {primary,svip,master}</text>
 
-  <rect x="500" y="316" width="380" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
-  <text x="690" y="337" font-size="12" fill="#333" text-anchor="middle">选择 / 新增收货地址 p_address</text>
+  <rect x="20"  y="390" width="600" height="48" rx="5" fill="#fff7e6" stroke="#ffd591"/>
+  <text x="320" y="411" text-anchor="middle" font-size="12" fill="#a8071a">⚠ A6. 校验失败 → Toast「该礼包为会员专享，请先开通会员」</text>
+  <text x="320" y="429" text-anchor="middle" font-size="11" fill="#c97478">停留在聚合页购买 Tab，不生成订单</text>
 
-  <rect x="500" y="374" width="380" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
-  <text x="690" y="395" font-size="12" fill="#333" text-anchor="middle">兑换·确认订单 p_confirm</text>
+  <rect x="20"  y="458" width="600" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
+  <text x="320" y="479" text-anchor="middle" font-size="12" fill="#333">A7. 邀请码·确认订单（p_invite_confirm，无收货地址）</text>
 
-  <rect x="500" y="432" width="380" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
-  <text x="690" y="453" font-size="12" fill="#333" text-anchor="middle">弹出邀请码输入框 code-modal</text>
+  <rect x="20"  y="508" width="600" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
+  <text x="320" y="529" text-anchor="middle" font-size="12" fill="#333">A8. 收银台（选支付方式）</text>
 
-  <rect x="500" y="490" width="380" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
-  <text x="690" y="511" font-size="12" fill="#333" text-anchor="middle">输入邀请码（≥8 位 + 大小写 + 特殊符号）</text>
+  <rect x="20"  y="558" width="600" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
+  <text x="320" y="579" text-anchor="middle" font-size="12" fill="#333">A9. 确认支付</text>
 
-  <rect x="500" y="548" width="380" height="32" rx="5" fill="#fff7e6" stroke="#ffd591"/>
-  <text x="690" y="569" font-size="12" fill="#7a4f00" text-anchor="middle">校验：存在 / 未使用 / 未过期 / 本人未兑换过</text>
-
-  <rect x="500" y="606" width="380" height="46" rx="5" fill="#f6ffed" stroke="#b7eb8f"/>
-  <text x="690" y="625" font-size="12" fill="#135200" text-anchor="middle">核销成功 → 兑换订单 + _user.activated=true</text>
-  <text x="690" y="643" font-size="11" fill="#5b8c2a" text-anchor="middle">系统生成 5L×7 袋独立水权益订单</text>
+  <rect x="20"  y="608" width="600" height="48" rx="5" fill="#f6ffed" stroke="#b7eb8f"/>
+  <text x="320" y="629" text-anchor="middle" font-size="12" fill="#135200">A10. 购买成功 → 按数量生成邀请码</text>
+  <text x="320" y="647" text-anchor="middle" font-size="11" fill="#5b8c2a">写入「我的邀请码」+ 写入邀请码订单 type=member</text>
 
   <g stroke="#8c8c8c" stroke-width="1.4" fill="none" marker-end="url(#arA)">
-    <path d="M690,102 L690,124"/>
-    <path d="M690,174 L690,196"/>
-    <path d="M690,232 L690,254"/>
-    <path d="M690,290 L690,312"/>
-    <path d="M690,348 L690,370"/>
-    <path d="M690,406 L690,428"/>
-    <path d="M690,464 L690,486"/>
-    <path d="M690,522 L690,544"/>
-    <path d="M690,580 L690,602"/>
+    <path d="M320,322 L320,336"/>
+    <path d="M320,372 L320,386"/>
+    <path d="M320,438 L320,454"/>
+    <path d="M320,490 L320,504"/>
+    <path d="M320,540 L320,554"/>
+    <path d="M320,590 L320,604"/>
   </g>
-
-  <path d="M880,564 L895,564 L895,714 L882,714" stroke="#d9363e" stroke-width="1.3"
+  <!-- A5 → A6 失败分支（红色虚线，从 A5 右侧绕到 A6） -->
+  <path d="M620,356 L660,356 L660,414 L624,414" stroke="#d9363e" stroke-width="1.3"
         fill="none" stroke-dasharray="4 3" marker-end="url(#arR)"/>
-  <rect x="500" y="692" width="380" height="44" rx="5" fill="#fff1f0" stroke="#ffa39e"/>
-  <text x="690" y="710" font-size="12" fill="#a8071a" text-anchor="middle">校验失败 → Toast 明确原因，订单不写入</text>
-  <text x="690" y="728" font-size="11" fill="#c97478" text-anchor="middle">码停留在 code-modal，可重新输入</text>
+
+  <!-- Flow B 节点（右栏 · 7步） -->
+  <rect x="660" y="290" width="600" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
+  <text x="960" y="311" text-anchor="middle" font-size="12" fill="#333">B4. 点「立即激活」</text>
+
+  <rect x="660" y="340" width="600" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
+  <text x="960" y="361" text-anchor="middle" font-size="12" fill="#333">B5. 选择 / 新增收货地址（p_address / p_address_edit）</text>
+
+  <rect x="660" y="390" width="600" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
+  <text x="960" y="411" text-anchor="middle" font-size="12" fill="#333">B6. 兑换·确认订单（p_confirm）</text>
+
+  <rect x="660" y="440" width="600" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
+  <text x="960" y="461" text-anchor="middle" font-size="12" fill="#333">B7. 点「确认购买」→ 弹出邀请码输入框（code-modal）</text>
+
+  <rect x="660" y="490" width="600" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
+  <text x="960" y="511" text-anchor="middle" font-size="12" fill="#333">B8. 输入邀请码（≥8 位 + 大小写 + 特殊符号）</text>
+
+  <rect x="660" y="540" width="600" height="48" rx="5" fill="#fff7e6" stroke="#ffd591"/>
+  <text x="960" y="561" text-anchor="middle" font-size="12" fill="#7a4f00">B9. 后端校验：码存在 / 未使用 / 未过期 / 本人未兑换过</text>
+
+  <rect x="660" y="606" width="600" height="48" rx="5" fill="#fff1f0" stroke="#ffa39e"/>
+  <text x="960" y="627" text-anchor="middle" font-size="12" fill="#a8071a">⚠ B9-bad. 校验失败 → Toast 明确原因，订单不写入</text>
+  <text x="960" y="645" text-anchor="middle" font-size="11" fill="#c97478">邀请码停留在 code-modal，可重新输入</text>
+
+  <rect x="660" y="674" width="600" height="48" rx="5" fill="#f6ffed" stroke="#b7eb8f"/>
+  <text x="960" y="695" text-anchor="middle" font-size="12" fill="#135200">B10. 核销成功 → 写兑换订单 + _user.activated=true</text>
+  <text x="960" y="713" text-anchor="middle" font-size="11" fill="#5b8c2a">系统生成 5L×7 袋水权益订单 + updateFab 隐藏 FAB</text>
+
+  <g stroke="#8c8c8c" stroke-width="1.4" fill="none" marker-end="url(#arA)">
+    <path d="M960,322 L960,336"/>
+    <path d="M960,372 L960,386"/>
+    <path d="M960,422 L960,436"/>
+    <path d="M960,472 L960,486"/>
+    <path d="M960,522 L960,536"/>
+  </g>
+  <!-- B9 → B9-bad 失败分支（红色虚线） -->
+  <path d="M960,588 L960,602"/>
+  <path d="M1260,564 L1295,564 L1295,630 L1264,630" stroke="#d9363e" stroke-width="1.3"
+        fill="none" stroke-dasharray="4 3" marker-end="url(#arR)"/>
 </svg>
+
 
 
 <h4>Flow A - 会员购买邀请码并分享</h4>
 <div class="flow">
-  <span class="node">会员打开首页</span>
+  <span class="node">1. 用户打开首页</span>
   <span class="arrow">→</span>
-  <span class="node">点击悬浮「邀请码」FAB（仅初级会员及以上可见）</span>
+  <span class="node">2. 点悬浮「新人礼包」FAB（_user.activated=false 时显示）</span>
   <span class="arrow">→</span>
-  <span class="node">进入购买激活码 Tab（p_gift_intro）</span>
+  <span class="node">3. 进 p_gift_intro 双 Tab 聚合页</span>
   <span class="arrow">→</span>
-  <span class="node">选数量（stepper 1-99）</span>
+  <span class="node">3a. Tab1「购买激活码」（默认选中）</span>
   <span class="arrow">→</span>
-  <span class="node">点立即购买</span>
+  <span class="node">4. 选数量（stepper 1-99）</span>
   <span class="arrow">→</span>
-  <span class="node">邀请码·确认订单（无地址）</span>
+  <span class="node">5. 点立即购买</span>
   <span class="arrow">→</span>
-  <span class="node">去支付</span>
+  <span class="node">后端校验 _user.level ∈ {primary,svip,master}</span>
   <span class="arrow">→</span>
-  <span class="node">收银台（选支付方式）</span>
+  <span class="node">7. 邀请码·确认订单（p_invite_confirm，无地址）</span>
   <span class="arrow">→</span>
-  <span class="node">确认支付</span>
+  <span class="node">8. 收银台（选支付方式）</span>
   <span class="arrow">→</span>
-  <span class="node end">购买成功 + 按数量生成邀请码写入「我的邀请码」+ 写入会员订单</span>
+  <span class="node">9. 确认支付</span>
+  <span class="arrow">→</span>
+  <span class="node end">10. 购买成功 + 按数量生成邀请码写入「我的邀请码」+ 写邀请码订单 type=member</span>
+</div>
+<div class="callout">
+<b>Flow A 异常分支</b>：步骤 5 校验会员等级失败（_user.level=guest）→ Toast「该礼包为会员专享，请先开通会员」，停留在购买 Tab 不生成订单；步骤 9 支付失败 → Toast「支付失败」，订单置待付款，引导「我的订单」重新支付。
 </div>
 
 <h4>Flow B - 新人/老用户凭邀请码兑换礼包</h4>
 <div class="flow">
-  <span class="node">新用户打开首页</span>
+  <span class="node">1. 用户打开首页</span>
   <span class="arrow">→</span>
-  <span class="node">点击悬浮「新人礼包」FAB（未激活时显示）</span>
+  <span class="node">2. 点悬浮「新人礼包」FAB（_user.activated=false 时显示）</span>
   <span class="arrow">→</span>
-  <span class="node">进入礼包介绍页（p_gift_intro）</span>
+  <span class="node">3. 进 p_gift_intro 双 Tab 聚合页</span>
   <span class="arrow">→</span>
-  <span class="node">点立即激活</span>
+  <span class="node">3b. 切换 Tab2「激活领礼包」</span>
   <span class="arrow">→</span>
-  <span class="node">选择/新增收货地址（p_address / p_address_edit）</span>
+  <span class="node">4. 点立即激活</span>
   <span class="arrow">→</span>
-  <span class="node">兑换·确认订单（p_confirm）</span>
+  <span class="node">5. 选择/新增收货地址（p_address / p_address_edit）</span>
   <span class="arrow">→</span>
-  <span class="node">点确认购买 → 弹出邀请码输入框（code-modal）</span>
+  <span class="node">6. 兑换·确认订单（p_confirm）</span>
   <span class="arrow">→</span>
-  <span class="node">输入邀请码（≥8 位 + 大小写 + 特殊符号）</span>
+  <span class="node">7. 点确认购买 → 弹 code-modal</span>
   <span class="arrow">→</span>
-  <span class="node judge">校验：码存在/未使用/未过期/本人未兑换过</span>
+  <span class="node">8. 输入邀请码（≥8 位 + 大小写 + 特殊符号）</span>
   <span class="arrow">→</span>
-  <span class="node end">核销成功 → 写入兑换订单 + 标记 _user.activated=true（隐藏新人礼包 FAB） + 系统按规则生成 5L×7 袋水权益订单</span>
+  <span class="node judge">9. 校验：码存在/未使用/未过期/本人未兑换过</span>
+  <span class="arrow">→</span>
+  <span class="node end">10. 核销成功 → 写兑换订单 + _user.activated=true + 系统按规则生成 5L×7 袋水权益订单 + updateFab 隐藏新人礼包 FAB</span>
+</div>
+<div class="callout">
+<b>Flow B 异常分支</b>：步骤 9 校验失败（码不存在/已使用/已过期/本人已兑换）→ Toast 明确原因，邀请码停留在 code-modal，可重输；网络异常 → Toast「网络异常，请稍后重试」，订单状态保持待提交。
 </div>
 
 <h4>异常分支</h4>
@@ -327,7 +345,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <thead><tr><th>异常</th><th>触发</th><th>产品处理</th></tr></thead>
 <tr><td>邀请码不存在</td><td>code-modal 提交时后端校验失败</td><td>Toast「邀请码无效，请核对后重新输入」</td></tr>
 <tr><td>邀请码已被使用</td><td>码状态=已使用</td><td>Toast「该邀请码已被使用」</td></tr>
-<tr><td>本人已兑换过</td><td>_user.activated=true</td><td>前置拦截：新人礼包 FAB 已隐藏，不可进入 Flow B</td></tr>
+<tr><td>本人已兑换过</td><td>_user.activated=true</td><td>前置拦截：新人礼包 FAB 已隐藏（<code>_user.activated=true</code>），用户无法通过 FAB 进入聚合页从而触发兑换</td></tr>
 <tr><td>网络异常</td><td>提交时网络失败</td><td>Toast「网络异常，请稍后重试」；订单状态保持待提交</td></tr>
 <tr><td>支付失败</td><td>收银台返回失败</td><td>Toast「支付失败」；订单状态置为待付款；引导「查看我的订单」重新支付</td></tr>
 </table>
@@ -375,7 +393,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <h3>4.0 需求影响范围</h3>
 <table>
 <thead><tr><th>影响维度</th><th>影响对象</th><th>影响类型</th><th>说明 / 约束</th></tr></thead>
-<tr><td rowspan="3">终端</td><td>绿韵家 App（iOS / Android）</td><td>新增</td><td>新增 C1-C15 共 15 个页面 / 状态；首页叠加 2 个 FAB 入口</td></tr>
+<tr><td rowspan="3">终端</td><td>绿韵家 App（iOS / Android）</td><td>新增</td><td>新增 1 个首页 FAB 入口（新人礼包）+ 1 个双 Tab 聚合页（p_gift_intro）</td></tr>
 <tr><td>小程序 / H5</td><td>新增（同源码）</td><td>与 App 共用同一套页面，入口与交互一致；本期不单独出设计</td></tr>
 <tr><td>管理后台</td><td>沿用 + 改动</td><td><b>本需求仅覆盖平台端</b>；商家后台只承担「商品维护 + 订单查询 / 导出」，不做营销配置</td></tr>
 <tr><td rowspan="4">业务模块</td><td>商品中心 → 商品管理</td><td>改动</td><td>商品类型新增「兑换商品」枚举；新增「兑换商品设置」（B16 / B17）；礼包价格、库存、上下架均在此配置</td></tr>
@@ -384,7 +402,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <tr><td>水权益（水袋）</td><td>新增</td><td>新增独立水权益订单实体与状态机（§3.4），不并进兑换订单商品行</td></tr>
 <tr><td rowspan="2">数据 / 实体</td><td>新增实体</td><td>新增</td><td>邀请码表（code）、水权益表（water_bag）</td></tr>
 <tr><td>存量实体</td><td>扩展</td><td>订单表（order）扩展订单类型；商品表（goods）扩展商品类型；用户表（user）扩展 activated</td></tr>
-<tr><td rowspan="2">权限</td><td>C 端 FAB 可见性</td><td>新增</td><td>邀请码 FAB 按会员等级；新人礼包 FAB 按 activated；游客态仅显示新人礼包 FAB</td></tr>
+<tr><td rowspan="2">权限</td><td>C 端 FAB 可见性</td><td>新增</td><td>新人礼包 FAB 按 <code>_user.activated</code> 显隐：未激活 → 显示，已激活（核销过）→ 隐藏（<code>updateFab()</code> 切换）</td></tr>
 <tr><td>后台功能权限</td><td>沿用</td><td>沿用平台端既有角色权限体系，本期不新增角色</td></tr>
 <tr><td>不涉及范围</td><td>—</td><td>排除</td><td>商家端营销活动配置、第三方 SaaS 配置、操作回放、AI 图生图商业化能力（另立 PRD）</td></tr>
 </table>
@@ -395,34 +413,6 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 
 
 <!-- ==================== C 端 ==================== -->
-
-<h3 id="p1"><span class="section-mark">C</span>1. 页面：首页（FAB 入口）</h3>
-<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_home.png" alt="首页"></div>
-
-<h4>1.1 页面原型与交互示意</h4>
-<p>首页左上为「绿韵家 / 积分商城」标识 + 搜索框 + 购物车（带角标 2），中部为 Tab 切换（推荐/图书/厨具/...）+ 金刚区（新品上市/健康专区/自营专区/vConsole）+ 双 banner（惠民补贴/每日活动）+ 「520 健康节」促销大图。底部 TabBar（首页/数智/消息/我的）。</p>
-<p>页面右下角叠加 <b>两个 FAB</b>：
-<ul>
-  <li>🎁 <b>新人礼包</b>（绿色，未激活时显示，激活后隐藏）</li>
-  <li>码 <b>邀请码</b>（橙色，仅初级会员及以上可见）</li>
-</ul>
-</p>
-
-<h4>1.2 详细逻辑规则</h4>
-<h5>1.2.1 界面与展示规则</h5>
-<table>
-<thead><tr><th>元素</th><th>展示规则</th></tr></thead>
-<tr><td>新人礼包 FAB</td><td>仅当 <code>_user.activated=false</code> 时显示；用户首次核销邀请码成功后置 <code>activated=true</code> 并隐藏</td></tr>
-<tr><td>邀请码 FAB</td><td>仅当 <code>_user.level ∈ {primary, svip, master}</code> 时显示；游客（guest）不显示</td></tr>
-<tr><td>TabBar「我的」</td><td>点击跳转 p_me；左上角同步高亮</td></tr>
-</table>
-
-<h5>1.2.2 业务逻辑与边界条件</h5>
-<ul>
-<li> 新人礼包 FAB 点击 → <code>go('p_gift_intro')</code>
-<li> 邀请码 FAB 点击 → <code>go('p_gift_intro')</code>（默认进入「购买激活码」Tab，tab_buy 默认选中）
-<li> 边界：若 <code>activated=true</code> 且用户是新会话打开 App（无登录态缓存），仍以登录态为准显示/隐藏 FAB；登录成功后回首页会强制刷新 FAB 可见性。
-</li></li></li></ul>
 
 <h3 id="p2"><span class="section-mark">C</span>2. 页面：新人礼包聚合页（p_gift_intro · 双 Tab）</h3>
 <div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_gift_intro.png" alt="新人礼包聚合页"></div>
@@ -932,19 +922,19 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 
 <table>
 <thead><tr><th>#</th><th>场景</th><th>前提（Given）</th><th>操作（When）</th><th>期望（Then）</th></tr></thead>
-<tr><td>AC-01</td><td>会员购买 1 个邀请码</td><td>初级会员 _user.level=primary，已登录</td><td>首页 → 邀请码 FAB → 详情页 → 数量保持 1 → 立即购买 → 微信支付 → 确认支付</td><td>购买成功页显示「已生成 1 个邀请码」；「我的邀请码」顶部新增 1 张码；「我的订单」顶部新增 1 条邀请码订单 type=member，实付 ¥49.90</td></tr>
+<tr><td>AC-01</td><td>会员购买 1 个邀请码</td><td>初级会员 _user.level=primary，已登录</td><td>首页 → 新人礼包 FAB → 聚合页（购买 Tab） → 数量保持 1 → 立即购买 → 微信支付 → 确认支付</td><td>购买成功页显示「已生成 1 个邀请码」；「我的邀请码」顶部新增 1 张码；「我的订单」顶部新增 1 条邀请码订单 type=member，实付 ¥49.90</td></tr>
 <tr><td>AC-02</td><td>会员购买 3 个邀请码</td><td>同上</td><td>数量 stepper +2 → 立即购买 → 支付</td><td>「我的邀请码」新增 3 张码；「我的订单」新增 1 条 type=member，实付 ¥149.70</td></tr>
 <tr><td>AC-03</td><td>新用户兑换礼包</td><td>未登录用户首次打开 App，_user.activated=false</td><td>首页 → 新人礼包 FAB → 介绍页 → 立即激活 → 新增地址 → 确认订单 → 输入合法邀请码 → 确认</td><td>「我的订单」新增 1 条 type=exchange，状态 toship，实付 ¥0.00；首页新人礼包 FAB 隐藏</td></tr>
 <tr><td>AC-04</td><td>邀请码格式校验失败</td><td>确认订单页</td><td>邀请码输入「ABC123」点确认</td><td>Toast「邀请码需包含大小写字母与特殊符号」；订单不写入</td></tr>
 <tr><td>AC-05</td><td>邀请码长度不足</td><td>同上</td><td>邀请码输入「A@b1」点确认</td><td>Toast「邀请码至少 8 位」；订单不写入</td></tr>
-<tr><td>AC-06</td><td>本人已兑换再次尝试</td><td>_user.activated=true</td><td>再次访问首页 → 新人礼包 FAB 不可见</td><td>用户无法进入 Flow B</td></tr>
+<tr><td>AC-06</td><td>本人已兑换再次尝试</td><td>_user.activated=true</td><td>再次访问首页 → 新人礼包 FAB 已隐藏（activated=true）</td><td>用户无法进入 Flow B（无法点 FAB 进聚合页）</td></tr>
 <tr><td>AC-07</td><td>已使用邀请码二次核销</td><td>码状态=used</td><td>用同一个码再次提交核销</td><td>Toast「该邀请码已被使用」；订单不写入</td></tr>
 <tr><td>AC-08</td><td>地址表单校验</td><td>新增地址页</td><td>姓名/手机号/省市区/详细地址 任一留空 → 点保存</td><td>对应 Toast 提示，地址不保存</td></tr>
 <tr><td>AC-09</td><td>手机号格式校验</td><td>同上</td><td>输入手机号「139123456」点保存</td><td>Toast「请输入 11 位手机号」</td></tr>
 <tr><td>AC-10</td><td>水权益订单创建</td><td>AC-03 成功后</td><td>检查用户水权益列表</td><td>新增 1 条水权益订单，状态=待首取，总袋数=7</td></tr>
 <tr><td>AC-11</td><td>后台新人订单「生成邀请码」</td><td>viewOrders 列表 1 条 type=member 订单</td><td>点「生成邀请码」→ 输入 5</td><td>Toast「已生成 5 个邀请码」；订单购买人「我的邀请码」+5</td></tr>
 <tr><td>AC-12</td><td>后台兑换订单筛选</td><td>viewOrders</td><td>点「兑换订单」二级筛选</td><td>只展示 data-type=exchange 的 3 条订单</td></tr>
-<tr><td>AC-13</td><td>非会员不能买邀请码</td><td>_user.level=guest</td><td>首页 → 邀请码 FAB（应不可见）</td><td>FAB 不显示，无法进入 Flow A</td></tr>
+<tr><td>AC-13</td><td>非会员不能买邀请码</td><td>_user.level=guest</td><td>首页 → 新人礼包 FAB → 聚合页（购买 Tab） → 立即购买</td><td>后端校验会员等级失败 → Toast「该礼包为会员专享，请先开通会员」</td></tr>
 <tr><td>AC-14</td><td>水袋状态机过期清零</td><td>水权益订单状态=已生效，已过 30 天</td><td>用户尝试再次取水</td><td>扫码返回「权益已过期」</td></tr>
 </table>
 
@@ -956,13 +946,13 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <tr><td rowspan="3">网络与异常状态</td><td>弱网/断网时收银台支付回调超时</td><td>前端按钮置 loading，超时 30s Toast「支付超时，请到『我的订单』查询」</td></tr>
 <tr><td>核销接口 500 错误</td><td>Toast「网络异常，请稍后重试」；订单不写入</td></tr>
 <tr><td>商品加载失败</td><td>详情页显示「商品加载失败，点击重试」+ 重试按钮</td></tr>
-<tr><td rowspan="3">登录与游客态</td><td>游客态用户访问 FAB</td><td>邀请码 FAB 不显示（仅会员可见）；新人礼包 FAB 显示（未激活用户均可兑换）</td></tr>
+<tr><td rowspan="3">登录与游客态</td><td>游客态用户访问 FAB（仅 1 个）</td><td>新人礼包 FAB 显示（未激活用户均可访问；游客态也可见）</td></tr>
 <tr><td>登录态失效（token 过期）</td><td>拦截到登录页；登录成功后回到原页面（保留返回路径）</td></tr>
 <tr><td>登录成功后是否自动恢复</td><td>回到上次访问页面；FAB 可见性按登录后 _user 重新计算</td></tr>
 <tr><td rowspan="3">极限值与空状态</td><td>邀请码长度上限</td><td>maxlength=20，超过截断</td></tr>
 <tr><td>商品名称字数上限</td><td>60 字，超过截断</td></tr>
 <tr><td>订单列表为空</td><td>显示空态「📭 暂无相关订单」</td></tr>
-<tr><td rowspan="2">版本兼容性</td><td>老版本 C 端不显示 FAB</td><td>前端按 _user 字段判断，未识别字段时默认隐藏；后台按类型显示兼容</td></tr>
+<tr><td rowspan="2">版本兼容性</td><td>老版本 C 端不显示新人礼包 FAB</td><td>前端按 _user 字段判断，未识别字段时默认隐藏；后台按类型显示兼容</td></tr>
 <tr><td>旧订单字段迁移</td><td>本期不做老数据迁移；旧订单按 type/normal 展示</td></tr>
 <tr><td>逆向流 / 退款</td><td>兑换订单退款</td><td>本期不支持退款（实物+水权益链路长）；⚠️ 待确认 @业务组</td></tr>
 <tr><td>高并发与防重</td><td>收银台支付防重</td><td>按钮 disabled 1500ms 防抖</td></tr>
