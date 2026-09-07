@@ -693,6 +693,7 @@
     <table class="data-table">
       <thead>
         <tr>
+          <th>工具</th>
           <th>每次消耗</th>
           <th>生效日期</th>
           <th>设置人</th>
@@ -1457,7 +1458,7 @@ var COST_TOOLS = [
   { key: 'video',  name: '视频生成',   planVersion: 'V0.7', plannedNote: '预计 V0.7 上线' },
   { key: 'avatar', name: '数字人分身', planVersion: 'V0.8', plannedNote: '预计 V0.8 上线' }
 ];
-var COST_ACTIVE_TOOL = 'image';
+var COST_ACTIVE_TOOL = 'all';
 // 历史快照（每条记录按 tool 分组；同组仅一条生效中）
 var COST_CONFIGS = [
   { id: 'c1', tool: 'image', credits: 1, effDate: '2026-09-01', operator: '运营小李', remark: '默认值',       status: '生效中' },
@@ -1473,6 +1474,10 @@ function renderCostToolTabs() {
   var box = document.getElementById('costToolTabs');
   if (!box) return;
   var html = '';
+  // 全部 tab
+  var allCnt = COST_CONFIGS.length;
+  var allActive = (COST_ACTIVE_TOOL === 'all');
+  html += '<div class="filter-tab' + (allActive ? ' active' : '') + '" onclick="switchCostTab(\'all\')">全部(' + allCnt + ')</div>';
   COST_TOOLS.forEach(function (t) {
     var cnt = COST_CONFIGS.filter(function (c) { return c.tool === t.key; }).length;
     var active = (t.key === COST_ACTIVE_TOOL);
@@ -1496,8 +1501,8 @@ function renderCostList() {
   var op   = document.getElementById('costOperatorFilter').value;
   var stat = document.getElementById('costStatusFilter').value;
   var rows = COST_CONFIGS.filter(function (c) {
-    if (c.tool !== COST_ACTIVE_TOOL) return false;
-    if (kw   && (c.remark + ' ' + c.credits).indexOf(kw) === -1) return false;
+    if (COST_ACTIVE_TOOL !== 'all' && c.tool !== COST_ACTIVE_TOOL) return false;
+    if (kw   && (c.remark + ' ' + c.credits + ' ' + _costToolLabel(c.tool)).indexOf(kw) === -1) return false;
     if (op   && c.operator !== op)   return false;
     if (stat && c.status !== stat)   return false;
     return true;
@@ -1505,7 +1510,7 @@ function renderCostList() {
   if (!rows.length) {
     var tool = COST_TOOLS.find(function (x) { return x.key === COST_ACTIVE_TOOL; });
     var tip = tool && tool.planVersion ? '「' + tool.name + '」预计 ' + tool.planVersion + ' 上线后启用' : '暂无配置，点击右上「+ 新增配置」开始';
-    tb.innerHTML = '<tr><td colspan="6" style="padding:18px 12px;text-align:center;color:var(--text-tertiary);font-size:13px;">' + tip + '</td></tr>';
+    tb.innerHTML = '<tr><td colspan="7" style="padding:18px 12px;text-align:center;color:var(--text-tertiary);font-size:13px;">' + tip + '</td></tr>';
     document.getElementById('costPagination').innerHTML = '';
     return;
   }
@@ -1516,6 +1521,7 @@ function renderCostList() {
       ? '<span class="action-link" onclick="voidCostConfig(\'' + r.id + '\')">作废</span>'
       : '-';
     html += '<tr>' +
+      '<td>' + _costToolLabel(r.tool) + '</td>' +
       '<td><b>' + r.credits + ' 灵感值/次</b></td>' +
       '<td>' + r.effDate + '</td>' +
       '<td>' + r.operator + '</td>' +
