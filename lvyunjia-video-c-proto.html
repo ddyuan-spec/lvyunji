@@ -217,6 +217,7 @@
     .copy-btn.copied{background:linear-gradient(135deg,#059669,#047857)}
     .copy-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1f1f2e;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.25);opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999}
     .copy-toast.show{opacity:1}
+    .mode-opt.active { background: #fff; color: var(--text); font-weight: 600; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
   </style>
 </head>
 <body>
@@ -236,61 +237,33 @@
   <div id="toast"></div>
 
   <!-- ================== AI 创作首页 ================== -->
-  <!-- ================== AI 生图页 ================== -->
+  <!-- ================== AI 创作页（生图 / 生视频切换） ================== -->
   <div class="page has-nav has-bottom" id="pageImageGen">
     <div class="nav-bar">
       <div class="back" onclick="goBack()">‹</div>
-      <div>AI 生图</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span>AI 创作</span>
+        <div class="mode-toggle" style="display:flex;background:#f0f0f0;border-radius:14px;padding:3px;">
+          <div class="mode-opt active" data-mode="image" onclick="switchCreateMode('image')" style="padding:6px 14px;border-radius:11px;font-size:13px;cursor:pointer;color:var(--text-secondary);">生图</div>
+          <div class="mode-opt" data-mode="video" onclick="switchCreateMode('video')" style="padding:6px 14px;border-radius:11px;font-size:13px;cursor:pointer;color:var(--text-secondary);">生视频</div>
+        </div>
+      </div>
     </div>
     <div class="scroll-view">
-      <div class="upload-zone" id="imgUploadZone" onclick="uploadImage()">
+      <div class="upload-zone" id="createUploadZone" onclick="uploadImage()">
         <div class="plus">+</div>
-        <div class="tip">导入图片</div>
+        <div class="tip" id="createUploadTip">导入图片</div>
       </div>
+      <div id="createRefNote" style="font-size:12px;color:var(--text-tertiary);text-align:center;margin:-6px 0 10px;display:none;">图生视频：以参考图为基础生成动态视频；留空则走文生视频</div>
 
       <div class="input-area">
-        <div class="input-hint">支持一句话改图，或输入文字生图</div>
+        <div class="input-hint" id="createInputHint">支持一句话改图，或输入文字生图</div>
         <div class="input-row">
-          <textarea class="prompt-input" id="imgPrompt" style="width:100%;min-height:70px;margin-top:10px;resize:none;border:none;outline:none;font-size:14px;" placeholder="描述你想要的画面"></textarea>
+          <textarea class="prompt-input" id="createPrompt" style="width:100%;min-height:70px;margin-top:10px;resize:none;border:none;outline:none;font-size:14px;" placeholder="描述你想要的画面"></textarea>
         </div>
       </div>
 
-      <div class="quota-hint">本次剩余 <b id="costPerImageHint">1</b> 个灵感值 · <span class="link" onclick="go('pageQuotaDetail')">查看详情</span></div>
-
-      <div class="card">
-        <div class="section-title">辅助提示词 <span class="more" style="font-size:12px;color:var(--text-tertiary);">由后台配置</span></div>
-        <div id="promptConfigBox"></div>
-      </div>
-    </div>
-    <div class="bottom-bar">
-      <div class="cost">预计消耗 <b id="costPerImageBottom">1</b> 灵感值 · <span style="color:var(--blue);cursor:pointer;font-weight:400;" onclick="go('pageHistory')">查看我的作品 ›</span></div>
-      <div class="gen-btn" onclick="generate('image')">立即生成</div>
-    </div>
-  </div>
-
-  <!-- ================== AI 生视频页（图生视频 + 文生视频） ================== -->
-  <div class="page has-nav has-bottom" id="pageVideoGen">
-    <div class="nav-bar">
-      <div class="back" onclick="goBack()">‹</div>
-      <div>AI 生视频</div>
-    </div>
-    <div class="scroll-view">
-      <!-- 参考图（图生视频） -->
-      <div class="upload-zone" id="videoRefZone" onclick="pickVideoRef()">
-        <div class="plus">+</div>
-        <div class="tip">导入参考图 / 选生图结果</div>
-      </div>
-      <div id="videoRefNote" style="font-size:12px;color:var(--text-tertiary);text-align:center;margin:-6px 0 10px;">图生视频：以参考图为基础生成动态视频；留空则走文生视频</div>
-
-      <div class="input-area">
-        <div class="input-hint">输入文字描述，或由参考图自动生成动态画面</div>
-        <div class="input-row">
-          <textarea class="prompt-input" id="videoPrompt" style="width:100%;min-height:70px;margin-top:10px;resize:none;border:none;outline:none;font-size:14px;" placeholder="描述你想要的画面与动态，如：女孩转身微笑，镜头缓慢推近"></textarea>
-        </div>
-      </div>
-
-      <!-- 视频参数 -->
-      <div class="card">
+      <div class="card" id="videoParamsCard" style="display:none;">
         <div class="section-title">视频参数</div>
         <div class="tag-group">
           <div class="tag-group-title">时长</div>
@@ -309,20 +282,20 @@
         </div>
       </div>
 
-      <div class="quota-hint">本次消耗 <b id="costPerVideoHint">10</b> 个灵感值 · <span class="link" onclick="go('pageQuotaDetail')">查看详情</span></div>
+      <div class="quota-hint">本次消耗 <b id="costPerCreateHint">1</b> 个灵感值 · <span class="link" onclick="go('pageQuotaDetail')">查看详情</span></div>
 
       <div class="card">
-        <div class="section-title">辅助提示词 <span class="more" style="font-size:12px;color:var(--text-tertiary);">由后台配置（生视频类）</span></div>
-        <div id="promptConfigBoxVideo"></div>
+        <div class="section-title">辅助提示词 <span class="more" style="font-size:12px;color:var(--text-tertiary);">由后台配置</span></div>
+        <div id="promptConfigBox"></div>
       </div>
     </div>
     <div class="bottom-bar">
-      <div class="cost">预计消耗 <b id="costPerVideoBottom">10</b> 灵感值 · <span style="color:var(--blue);cursor:pointer;font-weight:400;" onclick="go('pageHistory')">查看我的作品 ›</span></div>
-      <div class="gen-btn" onclick="generate('video')">生成视频</div>
+      <div class="cost">预计消耗 <b id="costPerCreateBottom">1</b> 灵感值 · <span style="color:var(--blue);cursor:pointer;font-weight:400;" onclick="go('pageHistory')">查看我的作品 ›</span></div>
+      <div class="gen-btn" id="createGenBtn" onclick="generate()">立即生成</div>
     </div>
   </div>
 
-  <!-- 已删除：创作广场页（评审精简） -->
+<!-- 已删除：创作广场页（评审精简） -->
 
   <!-- ================== 作品详情 / 做同款 ================== -->
   <div class="page has-nav" id="pageWorkDetail">
@@ -341,6 +314,7 @@
           <span class="tag">校园</span>
         </div>
         <div class="detail-btns">
+          <div class="db primary" onclick="goCreateFromWork('video')">🎬 生成视频</div>
           <div class="db secondary" onclick="toast('已保存到相册')">⬇️ 保存到相册</div>
           <div class="db secondary" onclick="openShare()">↗️ 分享</div>
         </div>
@@ -353,7 +327,6 @@
     <div class="nav-bar">
       <div class="back" onclick="goBack()">‹</div>
       <div>我的作品</div>
-      <div class="right" onclick="go('pageMaterial')">素材库</div>
     </div>
     <div class="scroll-view">
       <div class="create-cta" onclick="go('pageImageGen')">
@@ -676,6 +649,7 @@
   <script>
     const state = {
       quota: 12,
+      createMode: 'image',
       image: { ratio: '9:16', prompt: '', uploaded: false },
       video: { refImage: '', duration: '5s', ratio: '9:16', prompt: '', motion: '缓慢推近' },
       history: [
@@ -703,6 +677,7 @@
     // ===== V0.5：后台「生图成本配置」（§4.9）模拟 =====
     // 真实实现由后端下发：取 ai_image_cost_config 表 valid_from <= 当前时刻 的最新一条 cost_per_image
     const COST_PER_IMAGE = 1;   // 后台配置：每张图消耗 N 灵感值（运营可调，改这里即全站生效）
+    const COST_PER_VIDEO = 10;  // 后台配置：每个视频消耗 N 灵感值（运营可调，改这里即全站生效）
 
     let pageStack = ['pageHistory'];
 
@@ -729,12 +704,13 @@
     }
 
     function uploadImage() {
-      state.image.uploaded = true;
-      const z = document.getElementById('imgUploadZone');
+      const isVideo = state.createMode === 'video';
+      if (isVideo) state.video.refImage = 'set'; else state.image.uploaded = true;
+      const z = document.getElementById('createUploadZone');
       const shadowColor = 'rgba' + '(0,0,0,0.5)';
       z.innerHTML = '<img class="preview-img" src="" alt=""><div class="tip" style="position:absolute;color:#fff;text-shadow:0 1px 3px ' + shadowColor + ';">点击更换</div>';
       z.classList.add('preview');
-      toast('图片已导入');
+      toast(isVideo ? '参考图已导入' : '图片已导入');
     }
 
     function startVoice(type) {
@@ -758,9 +734,9 @@
       const activeTags = [...document.querySelectorAll('.tag.active')].map(t => t.textContent);
       if (activeTags.length === 0) return;
       const base = activeTags.join('，');
-      const imgInput = document.getElementById('imgPrompt');
+      const input = document.getElementById('createPrompt');
       if (document.querySelector('#pageImageGen.active')) {
-        if (!imgInput.value) imgInput.value = base;
+        if (!input.value) input.value = base;
       }
     }
 
@@ -768,6 +744,59 @@
       document.querySelectorAll('#pageImageGen .ratio-opt').forEach(r => r.classList.remove('active'));
       el.classList.add('active');
       state.image.ratio = ratio;
+    }
+
+    function goCreateFromWork(mode) {
+      switchCreateMode(mode);
+      go('pageImageGen');
+    }
+
+    function switchCreateMode(mode) {
+      state.createMode = mode;
+      document.querySelectorAll('.mode-opt').forEach(el => el.classList.toggle('active', el.dataset.mode === mode));
+      const isVideo = mode === 'video';
+
+      const z = document.getElementById('createUploadZone');
+      if (z && !z.classList.contains('preview')) {
+        const tip = z.querySelector('.tip');
+        if (tip) tip.textContent = isVideo ? '导入参考图（选填）' : '导入图片';
+      }
+      const note = document.getElementById('createRefNote');
+      if (note) note.style.display = isVideo ? '' : 'none';
+
+      const hint = document.getElementById('createInputHint');
+      if (hint) hint.textContent = isVideo ? '输入文字描述，或由参考图自动生成动态画面' : '支持一句话改图，或输入文字生图';
+
+      const input = document.getElementById('createPrompt');
+      if (input) input.placeholder = isVideo ? '描述你想要的画面与动态，如：女孩转身微笑，镜头缓慢推近' : '描述你想要的画面';
+
+      const vpc = document.getElementById('videoParamsCard');
+      if (vpc) vpc.style.display = isVideo ? '' : 'none';
+
+      const hintCost = document.getElementById('costPerCreateHint');
+      const bottomCost = document.getElementById('costPerCreateBottom');
+      if (hintCost) hintCost.textContent = isVideo ? COST_PER_VIDEO : COST_PER_IMAGE;
+      if (bottomCost) bottomCost.textContent = isVideo ? COST_PER_VIDEO : COST_PER_IMAGE;
+
+      const btn = document.getElementById('createGenBtn');
+      if (btn) btn.textContent = isVideo ? '生成视频' : '立即生成';
+
+      const modalCost = document.getElementById('costPerImageModal');
+      if (modalCost) modalCost.textContent = isVideo ? COST_PER_VIDEO : COST_PER_IMAGE;
+
+      renderPromptConfig();
+    }
+
+    function selectVideoDuration(el, val) {
+      document.querySelectorAll('#videoDurationRow .option').forEach(o => o.classList.remove('active'));
+      el.classList.add('active');
+      state.video.duration = val;
+    }
+
+    function selectVideoRatio(el, val) {
+      document.querySelectorAll('#videoRatioRow .ratio-opt').forEach(o => o.classList.remove('active'));
+      el.classList.add('active');
+      state.video.ratio = val;
     }
 
     function openShare() {
@@ -788,8 +817,9 @@
       });
     }
 
-    function generate(type) {
-      const cost = COST_PER_IMAGE;   // 改为读取后台生图成本配置
+    function generate() {
+      const isVideo = state.createMode === 'video';
+      const cost = isVideo ? COST_PER_VIDEO : COST_PER_IMAGE;
       if (state.quota < cost) {
         document.getElementById('modalQuota').classList.add('active');
         return;
@@ -802,10 +832,12 @@
         document.getElementById('generatingBox').classList.remove('active');
         const content = document.getElementById('resultContent');
         content.style.display = 'flex';
-        document.getElementById('resultImg').style.display = 'flex';
-        document.getElementById('resultVideo').style.display = 'none';
-        // 写入我的作品
-        state.history.unshift({ id: Date.now(), thumb: '🖼️', prompt: state.image.prompt || '我的 AI 作品', type: '生图', ratio: state.image.ratio, time: '刚刚' });
+        document.getElementById('resultImg').style.display = isVideo ? 'none' : 'flex';
+        document.getElementById('resultVideo').style.display = isVideo ? 'flex' : 'none';
+        const prompt = isVideo ? (state.video.prompt || '我的 AI 视频') : (state.image.prompt || '我的 AI 作品');
+        const ratio = isVideo ? state.video.ratio : state.image.ratio;
+        const thumb = isVideo ? '🎬' : '🖼️';
+        state.history.unshift({ id: Date.now(), thumb: thumb, prompt: prompt, type: isVideo ? '生视频' : '生图', ratio: ratio, time: '刚刚' });
         renderHistory();
         toast(`生成成功，已消耗 ${cost} 个灵感值`);
       }, 2500);
@@ -934,33 +966,33 @@
     }
 
     // 监听输入
-    document.getElementById('imgPrompt').addEventListener('input', e => state.image.prompt = e.target.value);
+    document.getElementById('createPrompt').addEventListener('input', e => {
+      if (state.createMode === 'video') state.video.prompt = e.target.value;
+      else state.image.prompt = e.target.value;
+    });
 
     // 把后台生图成本配置写入 AI 生图页三处提示（顶部 hint / 底部栏 / 灵感值不足弹窗）
     (function renderCostHints() {
-      const hint = document.getElementById('costPerImageHint');
-      const bottom = document.getElementById('costPerImageBottom');
       const modal = document.getElementById('costPerImageModal');
-      if (hint) hint.textContent = COST_PER_IMAGE;
-      if (bottom) bottom.textContent = COST_PER_IMAGE;
       if (modal) modal.textContent = COST_PER_IMAGE;
-      const vHint = document.getElementById('costPerVideoHint');
-      const vBottom = document.getElementById('costPerVideoBottom');
-      if (vHint) vHint.textContent = COST_PER_VIDEO;
-      if (vBottom) vBottom.textContent = COST_PER_VIDEO;
+      // 创作页消耗提示由 switchCreateMode 根据当前模式刷新
     })();
 
     // ===== V0.6：辅助提示词改为后台下发（运维中心「辅助提示词配置」管理） =====
     const PROMPT_CONFIG = [
-      { group: 'style', title: '风格', tags: ['写实照片','动漫插画','水彩手绘','蜡笔涂鸦','国风山水'] },
-      { group: 'scene', title: '场景', tags: ['室内居家','城市街景','自然风光','梦幻星空'] },
-      { group: 'light', title: '光线 / 氛围', tags: ['柔光','逆光','暖色调','电影感'] }
+      { group: 'style', title: '风格', applyType: 'image', tags: ['写实照片','动漫插画','水彩手绘','蜡笔涂鸦','国风山水'] },
+      { group: 'scene', title: '场景', applyType: 'image', tags: ['室内居家','城市街景','自然风光','梦幻星空'] },
+      { group: 'light', title: '光线 / 氛围', applyType: 'image', tags: ['柔光','逆光','暖色调','电影感'] },
+      { group: 'vmotion', title: '运镜 / 动态', applyType: 'video', tags: ['缓慢推近','镜头环绕','人物走动','物体旋转','光影流动'] },
+      { group: 'vmood', title: '视频氛围', applyType: 'video', tags: ['电影感','梦幻','活力','治愈','悬疑'] }
     ];
     function renderPromptConfig() {
       const box = document.getElementById('promptConfigBox');
       if (!box) return;
+      const mode = state.createMode || 'image';
+      const list = PROMPT_CONFIG.filter(g => g.applyType === mode);
       let html = '';
-      PROMPT_CONFIG.forEach(g => {
+      list.forEach(g => {
         html += '<div class="tag-group"><div class="tag-group-title">' + g.title + '</div><div class="tag-list">';
         g.tags.forEach(t => { html += '<span class="tag" data-group="' + g.group + '" onclick="toggleTag(this)">' + t + '</span>'; });
         html += '</div></div>';
@@ -1010,7 +1042,7 @@
     renderQuotaPacks();
     renderHistory();
     refreshQuotaDisplay();
-    renderPromptConfig();
+    switchCreateMode('image');
     renderMaterialTabs();
     renderMaterials('all');
 
