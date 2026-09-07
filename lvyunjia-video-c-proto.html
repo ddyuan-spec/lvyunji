@@ -247,13 +247,28 @@
     .switch.on { background: var(--primary); }
     .switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: left .2s; }
     .switch.on::after { left: 21px; }
+
+    /* 顶部浮窗通知（生成完成 / 失败 / 后台完成） */
+    .top-notify { position:absolute; top:0; left:0; right:0; z-index:300; background:rgba(38,38,46,0.97); color:#fff; padding:14px 44px 14px 44px; font-size:14px; display:flex; align-items:center; box-shadow:0 2px 12px rgba(0,0,0,.25); transform:translateY(-100%); transition:transform .3s ease; cursor:pointer; }
+    .top-notify.show { transform:translateY(0); }
+    .top-notify.fail { background:rgba(196,48,48,0.97); }
+    .top-notify .tn-icon { position:absolute; left:14px; font-size:18px; }
+    .top-notify .tn-text { flex:1; line-height:1.4; }
+    .top-notify .tn-close { position:absolute; right:12px; font-size:22px; opacity:.7; padding:0 4px; line-height:1; }
+
+    /* 演示入口（模拟退出App / 重新进入，预览时可删） */
+    .demo-pill { position:absolute; bottom:82px; right:12px; z-index:200; background:#1f1f2e; color:#fff; font-size:12px; padding:7px 13px; border-radius:16px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.2); }
+    .demo-menu { position:absolute; bottom:122px; right:12px; z-index:201; background:#fff; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,.18); width:196px; overflow:hidden; display:none; }
+    .demo-menu div { padding:13px 14px; font-size:13px; color:var(--text); border-bottom:1px solid var(--border-light); cursor:pointer; }
+    .demo-menu div:last-child { border-bottom:none; }
+    .demo-menu div:active { background:#f5f5f5; }
   </style>
 </head>
 <body>
 <!-- ===== 复制源码标准组件（proto-c · PROTO-SMK-011）：body 内、.phone 之外第一个子元素 ===== -->
 <div class="copy-bar">
   <div class="copy-bar__title">
-    <div class="copy-bar__name">📋 绿韵家 AI 工具 · C 端原型 (V0.8 · 生图/生视频)</div>
+    <div class="copy-bar__name">📋 绿韵家 AI 工具 · C 端原型 (V0.9 · 生成通知)</div>
     <div class="copy-bar__hint">单文件原型 · 可整份或逐页复制源码</div>
   </div>
   <div class="copy-bar__actions">
@@ -262,8 +277,23 @@
   </div>
 </div>
 <div class="copy-toast" id="copyToast"></div>
-<div class="phone">
-  <div id="toast"></div>
+  <div class="phone">
+    <div id="toast"></div>
+
+    <!-- 顶部浮窗通知（全局，跨页面/跨功能均可见，点击进入我的作品） -->
+    <div class="top-notify" id="topNotify" onclick="topNotifyClick()">
+      <span class="tn-icon" id="tnIcon">✅</span>
+      <span class="tn-text" id="tnText"></span>
+      <span class="tn-close" onclick="dismissTopNotify(event)">×</span>
+    </div>
+
+    <!-- 演示入口：模拟退出App / 打断 / 重新进入（预览时可删） -->
+    <div class="demo-pill" onclick="toggleDemoMenu()">🧪 演示</div>
+    <div class="demo-menu" id="demoMenu">
+      <div onclick="demoExitBackground()">退出App（后台生成）</div>
+      <div onclick="demoExitInterrupt()">退出并打断生成</div>
+      <div onclick="demoReset()">清除演示状态</div>
+    </div>
 
   <!-- ================== AI 创作页（生图 / 生视频切换，独立成行） ================== -->
   <div class="page has-nav has-bottom" id="pageImageGen">
@@ -915,12 +945,6 @@
       state.video.ratio = val;
     }
 
-    function selectVideoResolution(el, val) {
-      document.querySelectorAll('#videoResolutionRow .ratio-opt').forEach(o => o.classList.remove('active'));
-      el.classList.add('active');
-      state.video.resolution = val;
-    }
-
     function toggleVideoSwitch(which) {
       if (which === 'audio') {
         state.video.generateAudio = !state.video.generateAudio;
@@ -948,6 +972,28 @@
         });
       });
     }
+
+    // ===== 生成管理（顶部浮窗通知 + 后台生成 / 打断 / 重新进入） =====
+    const GEN_KEY = 'lyj_video_gen_v1';
+    const GEN_DURATION = 3000;
+    let _genTimer = null;
+
+    function persistGen(o) { try { localStorage.setItem(GEN_KEY, JSON.stringify(o)); } catch(e){} }
+    function loadGen() { try { return JSON.parse(localStorage.getItem(GEN_KEY) || 'null'); } catch(e){ return null; } }
+    function clearGen() { try { localStorage.removeItem(GEN_KEY); } catch(e){} }
+
+    // 顶部浮窗：success=前台完成 / bg-success=后台完成(重新进入) / failed=被打断
+    function showTopNotify(type, text) {
+      const el = document.getElementById('topNotify');
+      const ic = document.getElementById('tnIcon');
+      const tx = document.getElementById('tnText');
+      el.classList.toggle('fail', type === 'failed');
+      ic.textContent = type === 'failed' ? '⚠️' : '✅';
+      tx.textContent = text;
+      el.classList.add('show');
+    }
+    function dismissTopNotify(e) { if (e) e.stopPropagation(); document.getElementById('topNotify').classList.remove('show'); }
+    function topNotifyClick() { dismissTopNotify(); go('pageHistory'); }
 
     function generate() {
       const mode = state.createMode;
@@ -977,25 +1023,93 @@
       };
       state.history.unshift(rec);
       renderHistory();
+      // 持久化生成态：用于「退出App后台生成 / 打断 / 重新进入」判定（前端原型用 localStorage 模拟跨会话）
+      persistGen({ status: 'generating', workId: id, startedAt: Date.now(), duration: GEN_DURATION, prompt: rec.prompt, type: rec.type, ratio: ratio });
       go('pageHistory');
       toast('已加入生成队列');
-      // 模拟生成完成：完成后提示并跳转详情
-      setTimeout(() => {
-        rec.status = 'done';
-        rec.time = '刚刚';
-        renderHistory();
-        toast('🎉 生成完成');
-        goWorkDetail(id);
-      }, 3000);
+      if (_genTimer) clearTimeout(_genTimer);
+      _genTimer = setTimeout(() => finishGeneration(id, 'success'), GEN_DURATION);
     }
+
+    function finishGeneration(id, notifyType) {
+      const w = state.history.find(h => h.id === id);
+      if (w) { w.status = 'done'; w.time = '刚刚'; renderHistory(); }
+      clearGen();
+      if (notifyType) showTopNotify(notifyType, notifyType === 'bg-success' ? '视频已生成，立即查看' : '您的视频已生成完成');
+    }
+
+    function failGeneration(id) {
+      const w = state.history.find(h => h.id === id);
+      if (w) { w.status = 'failed'; w.time = '刚刚'; renderHistory(); }
+      clearGen();
+      showTopNotify('failed', '生成失败，点击查看');
+    }
+
+    // 重新进入 App：根据持久化生成态补完 / 提示（模拟后台运行或中断恢复）
+    function checkPendingGenOnLoad() {
+      const g = loadGen();
+      if (!g) return;
+      // 确保「我的作品」里存在该记录（重载后内存记录已重置为初始数据）
+      if (!state.history.find(h => h.id === g.workId)) {
+        state.history.unshift({
+          id: g.workId,
+          thumb: g.type === '生视频' ? '🎬' : '🌸',
+          prompt: g.prompt || '我的 AI 视频',
+          type: g.type, ratio: g.ratio,
+          time: '生成中',
+          status: g.status === 'failed' ? 'failed' : 'generating'
+        });
+        renderHistory();
+      }
+      if (g.status === 'success') { showTopNotify('bg-success', '视频已生成，立即查看'); }
+      else if (g.status === 'failed') { showTopNotify('failed', '生成失败，点击查看'); }
+      else if (g.status === 'generating') {
+        if (g.interrupted) { failGeneration(g.workId); }
+        else {
+          const elapsed = Date.now() - g.startedAt;
+          if (elapsed >= g.duration) finishGeneration(g.workId, 'bg-success');
+          else { if (_genTimer) clearTimeout(_genTimer); _genTimer = setTimeout(() => finishGeneration(g.workId, 'bg-success'), g.duration - elapsed); }
+        }
+      }
+    }
+
+    // ===== 演示：模拟退出App / 打断 / 重新进入（预览时可删） =====
+    function toggleDemoMenu() { const m = document.getElementById('demoMenu'); const hidden = window.getComputedStyle(m).display === 'none'; m.style.display = hidden ? 'block' : 'none'; }
+    function demoExitBackground() {
+      const g = loadGen();
+      if (!g || g.status !== 'generating') { toast('请先在创作页点一次「生成」再演示退出'); return; }
+      g.startedAt = Date.now() - g.duration - 500;  // 模拟后台已生成完成
+      persistGen(g);
+      location.reload();
+    }
+    function demoExitInterrupt() {
+      const g = loadGen();
+      if (!g || g.status !== 'generating') { toast('请先在创作页点一次「生成」再演示退出'); return; }
+      g.interrupted = true;
+      persistGen(g);
+      location.reload();
+    }
+    function demoReset() { clearGen(); dismissTopNotify(); toast('已清除演示状态'); }
 
     function goWorkDetail(id) {
       const work = state.history.find(h => h.id === id);
+      const pb = document.querySelector('#pageWorkDetail .db.primary');
       if (work) {
         currentWorkId = work.id;
-        document.getElementById('workDetailTitle').textContent = (work.type === '生视频' ? 'AI 视频' : 'AI 作品') + ' · ' + work.ratio;
-        document.getElementById('workDetailDesc').textContent = work.prompt;
-        resetWorkVideo();
+        const player = document.getElementById('workDetailPlayer');
+        if (work.status === 'failed') {
+          document.getElementById('workDetailTitle').textContent = '生成失败';
+          document.getElementById('workDetailDesc').textContent = '视频生成被打断，未成功生成。点击「重新生成」可再次尝试。';
+          if (player) player.style.opacity = '0.35';
+          if (pb) pb.textContent = '🔄 重新生成';
+          resetWorkVideo();
+        } else {
+          document.getElementById('workDetailTitle').textContent = (work.type === '生视频' ? 'AI 视频' : 'AI 作品') + ' · ' + work.ratio;
+          document.getElementById('workDetailDesc').textContent = work.prompt;
+          if (player) player.style.opacity = '1';
+          if (pb) pb.textContent = '🎬 生成视频';
+          resetWorkVideo();
+        }
       }
       go('pageWorkDetail');
     }
@@ -1057,8 +1171,11 @@
       state.history.forEach(h => {
         const icon = h.type === '生视频' ? '🎬 生视频' : '🎨 生图';
         const generating = h.status === 'generating';
-        const thumb = generating ? '⏳' : h.thumb;
-        const statusHtml = generating ? ' · <span style="color:var(--primary);">⏳ 生成中</span>' : '';
+        const failed = h.status === 'failed';
+        const thumb = generating ? '⏳' : (failed ? '⚠️' : h.thumb);
+        let statusHtml = '';
+        if (generating) statusHtml = ' · <span style="color:var(--primary);">⏳ 生成中</span>';
+        else if (failed) statusHtml = ' · <span style="color:var(--red);">⚠️ 生成失败</span>';
         list.innerHTML += `
           <div class="history-item" onclick="goWorkDetail(${h.id})">
             <div class="h-thumb">${thumb}</div>
@@ -1215,6 +1332,7 @@
     updateCostHints();
     renderMaterialTabs();
     renderMaterials('all');
+    checkPendingGenOnLoad();   // 重新进入 App：补完后台生成 / 提示失败
 
     /* ========== 复制源码到墨刀（proto-c 标准组件，函数名 __proto 前缀防撞名） ========== */
     function __protoGetStyle(){ var s=document.querySelector('head style'); return s?s.innerHTML:''; }
