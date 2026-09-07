@@ -158,6 +158,12 @@
     .tag-group { margin-bottom: 14px; }
     .tag-group-title { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
 
+    /* 生图 / 生视频 模式切换 */
+    .mode-toggle-bar { padding: 12px 12px 0; }
+    .mode-seg { display: inline-flex; background: #f0f0f0; border-radius: 16px; padding: 3px; }
+    .mode-seg-opt { padding: 7px 20px; border-radius: 13px; font-size: 14px; color: var(--text-secondary); cursor: pointer; }
+    .mode-seg-opt.active { background: #fff; color: var(--text); font-weight: 600; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
     /* 快速体验 */
     .quick-card { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; background: #fff; padding: 6px 12px; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; z-index: 10; }
     .quick-card img { width: 28px; height: 28px; border-radius: 50%; background: #f0f0f0; }
@@ -171,7 +177,12 @@
     .generating .g-text { margin-top: 16px; font-size: 14px; color: var(--text-secondary); }
 
     /* 详情页 */
-    .detail-thumb { width: 100%; aspect-ratio: 3/4; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 80px; }
+    .video-player { width: 100%; aspect-ratio: 9/16; max-height: 520px; background: #000; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; }
+    .video-player .vp-cover { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+    .video-player .vp-play { width: 64px; height: 64px; border-radius: 50%; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 26px; z-index: 2; }
+    .video-player .vp-playing { position: absolute; bottom: 12px; left: 12px; right: 12px; display: flex; align-items: center; gap: 8px; z-index: 2; }
+    .video-player .vp-progress { flex: 1; height: 3px; background: rgba(255,255,255,0.35); border-radius: 2px; }
+    .video-player .vp-progress i { display: block; height: 100%; width: 0%; background: #fff; border-radius: 2px; }
     .detail-info { padding: 16px; }
     .detail-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
     .detail-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; }
@@ -179,6 +190,17 @@
     .detail-btns .db { flex: 1; height: 44px; border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 15px; cursor: pointer; }
     .detail-btns .db.primary { background: var(--primary); color: #fff; }
     .detail-btns .db.secondary { background: #f5f5f5; color: var(--text); }
+
+    /* 分享面板 */
+    .share-panel { padding: 8px 0 24px; }
+    .share-card { background: #f7f8fa; border-radius: 12px; padding: 12px; display: flex; gap: 12px; align-items: center; margin-bottom: 20px; }
+    .share-card img { width: 80px; height: 80px; border-radius: 8px; object-fit: cover; background: #e0e0e0; }
+    .share-card .sc-text { flex: 1; }
+    .share-card .sc-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .share-card .sc-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+    .share-actions { display: flex; gap: 16px; justify-content: space-around; }
+    .share-actions .sa { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+    .share-actions .sa .sa-icon { width: 52px; height: 52px; border-radius: 50%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 24px; }
 
     /* 创建 CTA 卡片（我的作品页顶部） */
     .create-cta { display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg, #f8f9ff 0%, #fff5e6 100%); border-radius: 14px; padding: 16px; margin: 12px 12px 0; cursor: pointer; border: 1px solid #eee; }
@@ -309,7 +331,7 @@
             <div class="tag-group-title">时长</div>
             <div class="option-row" id="videoDurationRow">
               <div class="option active" onclick="selectVideoDuration(this,'5s')">5 秒</div>
-              <div class="option" onclick="selectVideoDuration(this,'10s')">10 秒（3 倍消耗）</div>
+              <div class="option" onclick="selectVideoDuration(this,'10s')">10 秒</div>
             </div>
           </div>
           <div class="tag-group">
@@ -319,14 +341,6 @@
               <div class="option" onclick="selectVideoRatio(this,'1:1')">1:1</div>
               <div class="option" onclick="selectVideoRatio(this,'3:4')">3:4</div>
               <div class="option active" onclick="selectVideoRatio(this,'9:16')">9:16</div>
-            </div>
-          </div>
-          <div class="tag-group">
-            <div class="tag-group-title">分辨率</div>
-            <div class="ratio-seg" id="videoResolutionRow" style="margin-top:4px;">
-              <div class="ratio-opt" onclick="selectVideoResolution(this,'480p')">480p</div>
-              <div class="ratio-opt" onclick="selectVideoResolution(this,'720p')">720p</div>
-              <div class="ratio-opt active" onclick="selectVideoResolution(this,'1080p')">1080p</div>
             </div>
           </div>
           <div class="switch-row">
@@ -341,9 +355,9 @@
         </div>
       </div>
 
-      <!-- 辅助提示词（可选手选，拼入描述） -->
+      <!-- 辅助提示词（每类单选，拼入描述） -->
       <div class="card">
-        <div class="section-title">辅助提示词 <span class="more">可多选，拼入描述</span></div>
+        <div class="section-title">辅助提示词 <span class="more">每种分类单选可辅助视频生成</span></div>
         <div id="promptConfigBox"></div>
       </div>
 
@@ -364,19 +378,45 @@
       <div>作品详情</div>
     </div>
     <div class="scroll-view">
-      <div class="detail-thumb" id="workDetailThumb">🌸</div>
+      <div class="video-player" id="workDetailPlayer" onclick="playWorkVideo()">
+        <img class="vp-cover" id="workDetailCover" src="https://picsum.photos/seed/workdetail/400/720" alt="">
+        <div class="vp-play" id="workDetailPlayBtn">▶️</div>
+        <div class="vp-playing" id="workDetailPlaying" style="display:none;">
+          <div class="vp-progress"><i id="workDetailProgress"></i></div>
+        </div>
+      </div>
       <div class="detail-info">
         <div class="detail-title" id="workDetailTitle">AI可爱风蜡笔涂鸦</div>
         <div class="detail-desc" id="workDetailDesc">一位穿着校服的可爱女孩站在走廊里，周围环绕着彩色糖果、爱心和星星贴纸，画面采用蜡笔涂鸦风格，色彩柔和温馨。</div>
-        <div class="tag-list" style="margin-bottom:16px;">
-          <span class="tag">蜡笔涂鸦</span>
-          <span class="tag">可爱女孩</span>
-          <span class="tag">校园</span>
-        </div>
         <div class="detail-btns">
           <div class="db primary" onclick="goCreateFromWork()">🎬 生成视频</div>
           <div class="db secondary" onclick="toast('已保存到相册')">⬇️ 保存到相册</div>
           <div class="db secondary" onclick="openShare()">↗️ 分享</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== 分享面板 ================== -->
+  <div class="modal" id="modalShare">
+    <div class="modal-backdrop" data-modal="modalShare"></div>
+    <div class="modal-panel">
+      <div class="modal-head">
+        <div class="modal-title">分享到</div>
+        <div class="modal-close" data-modal="modalShare">×</div>
+      </div>
+      <div class="share-panel">
+        <div class="share-card" onclick="shareCardEnter()">
+          <img src="https://picsum.photos/seed/sharecover/200/200" alt="封面">
+          <div class="sc-text">
+            <div class="sc-title">我的 AI 视频</div>
+            <div class="sc-desc">我在【绿韵家】创作了一幅自己的 AI 视频，快来和我一起试试吧</div>
+          </div>
+        </div>
+        <div class="share-actions">
+          <div class="sa" onclick="toast('已调起微信好友')">👤<span>微信好友</span></div>
+          <div class="sa" onclick="toast('已调起朋友圈')">📱<span>朋友圈</span></div>
+          <div class="sa" onclick="toast('已复制链接')">🔗<span>复制链接</span></div>
         </div>
       </div>
     </div>
@@ -784,10 +824,18 @@
     }
 
     function toggleTag(el) {
-      const tag = el.textContent;
-      const idx = state.promptTags.indexOf(tag);
-      if (idx >= 0) { state.promptTags.splice(idx, 1); el.classList.remove('active'); }
-      else { state.promptTags.push(tag); el.classList.add('active'); }
+      const group = el.dataset.group;
+      const wasActive = el.classList.contains('active');
+      // 每类分类单选：先取消同组其他选中
+      document.querySelectorAll('.tag[data-group="' + group + '"]').forEach(s => {
+        s.classList.remove('active');
+        const i = state.promptTags.indexOf(s.textContent);
+        if (i >= 0) state.promptTags.splice(i, 1);
+      });
+      if (!wasActive) {
+        el.classList.add('active');
+        state.promptTags.push(el.textContent);
+      }
     }
 
     function renderPromptConfig() {
@@ -800,7 +848,7 @@
         html += '<div class="tag-group"><div class="tag-group-title">' + g.title + '</div><div class="tag-list">';
         g.tags.forEach(t => {
           const on = state.promptTags.indexOf(t) >= 0 ? ' active' : '';
-          html += '<span class="tag' + on + '" onclick="toggleTag(this)">' + t + '</span>';
+          html += '<span class="tag' + on + '" data-group="' + g.group + '" onclick="toggleTag(this)">' + t + '</span>';
         });
         html += '</div></div>';
       });
@@ -814,19 +862,24 @@
       const isVideo = mode === 'video';
       document.getElementById('imageForm').style.display = isVideo ? 'none' : '';
       document.getElementById('videoForm').style.display = isVideo ? '' : 'none';
+      state.promptTags = [];
       renderPromptConfig();
       updateCostHints();
       document.getElementById('createGenBtn').textContent = isVideo ? '生成视频' : '立即生成';
     }
 
-    // 作品详情「生成视频」→ 直接以本作品做同款，进入我的作品并显示生成中
+    // 作品详情「生成视频」→ 以本作品做同款，跳转回创作页（不自动生成，由用户再点生成）
     function goCreateFromWork(id) {
+      id = id || currentWorkId;
       const work = state.history.find(h => h.id === id);
       state.createMode = 'video';
       state.video.text = work ? work.prompt : '';
       state.video.firstFrame = '';
+      state.promptTags = [];
       switchCreateMode('video');
-      generate();
+      const ta = document.getElementById('videoText');
+      if (ta) ta.value = state.video.text;
+      go('pageImageGen');
     }
 
     function calcCost() {
@@ -940,10 +993,50 @@
       const work = state.history.find(h => h.id === id);
       if (work) {
         currentWorkId = work.id;
-        document.getElementById('workDetailThumb').textContent = work.thumb;
         document.getElementById('workDetailTitle').textContent = (work.type === '生视频' ? 'AI 视频' : 'AI 作品') + ' · ' + work.ratio;
         document.getElementById('workDetailDesc').textContent = work.prompt;
+        resetWorkVideo();
       }
+      go('pageWorkDetail');
+    }
+
+    // 作品详情内视频播放（原型模拟：点击播放按钮→进度条推进，再点暂停）
+    let _playTimer = null;
+    function resetWorkVideo() {
+      if (_playTimer) { clearInterval(_playTimer); _playTimer = null; }
+      const play = document.getElementById('workDetailPlayBtn');
+      const bar = document.getElementById('workDetailPlaying');
+      const prog = document.getElementById('workDetailProgress');
+      if (play) play.style.display = '';
+      if (bar) bar.style.display = 'none';
+      if (prog) prog.style.width = '0%';
+    }
+    function playWorkVideo() {
+      const play = document.getElementById('workDetailPlayBtn');
+      const bar = document.getElementById('workDetailPlaying');
+      const prog = document.getElementById('workDetailProgress');
+      if (_playTimer) { // 暂停
+        clearInterval(_playTimer); _playTimer = null;
+        if (play) play.style.display = '';
+        if (bar) bar.style.display = 'none';
+        return;
+      }
+      if (play) play.style.display = 'none';
+      if (bar) bar.style.display = 'flex';
+      let p = 0;
+      _playTimer = setInterval(() => {
+        p += 4;
+        if (prog) prog.style.width = Math.min(p, 100) + '%';
+        if (p >= 100) { clearInterval(_playTimer); _playTimer = null; resetWorkVideo(); toast('播放结束'); }
+      }, 200);
+    }
+
+    function openShare() {
+      document.getElementById('modalShare').classList.add('active');
+    }
+    // 分享卡片点击 → 关闭面板并进入作品详情（分享卡片落地页为作品详情）
+    function shareCardEnter() {
+      document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
       go('pageWorkDetail');
     }
 
