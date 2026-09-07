@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>绿韵家App · 新人激活码礼包 PRD V2</title>
+<title>绿韵家App · 新人激活码礼包 PRD V3</title>
 <style>
 :root{
   --c-primary:#07c160;--c-primary-d:#06a052;--c-orange:#ff7800;
@@ -57,19 +57,19 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <body>
 <div class="wrap">
 
-<h1>绿韵家App · 新人激活码礼包 PRD <span class="sub">V2.0 · 2026-09-03 · 基于交付原型重写</span></h1>
+<h1>绿韵家App · 新人激活码礼包 PRD <span class="sub">V3.0 · 2026-09-07 · 基于墨刀 V4 原型更新（双 Tab 聚合页 / 会员价 / 兑换流程对齐）</span></h1>
 
 <div class="meta-grid">
   <div class="b"><div class="k">项目名称</div><div class="v">绿韵家App · 新人激活码礼包</div></div>
   <div class="b"><div class="k">文档状态</div><div class="v">评审中（V1.0 已废，本版为新基线）</div></div>
-  <div class="b"><div class="k">版本号</div><div class="v">V2.0</div></div>
+  <div class="b"><div class="k">版本号</div><div class="v">V3.0</div></div>
   <div class="b"><div class="k">产品负责人</div><div class="v">袁中天（产品）</div></div>
   <div class="b"><div class="k">技术 Owner</div><div class="v">⚠️ 待确认 @技术组</div></div>
   <div class="b"><div class="k">测试 Owner</div><div class="v">⚠️ 待确认 @测试组</div></div>
 </div>
 
 <div class="callout note">
-<b>本文档覆盖范围</b>：基于 C 端原型 <code>newuser-gift-c-app.html</code>（15 屏）与商家后台原型 <code>lvyunjia-admin-merchant-hub.html</code>（3 视图，2026-09-03 已确认版）编写。
+<b>本文档覆盖范围</b>：基于 C 端原型 <code>newuser-gift-c-app.html</code>（V4 版，14 页，双 Tab 聚合页）与商家后台原型 <code>lvyunjia-admin-merchant-hub.html</code>（3 视图，2026-09-03 已确认版）编写。
 <b>剔除图生图/AI 商业化</b> 内容（另见 <code>lvyunjia-ai-generation-prd.html</code>）。
 <b>本文不涉及</b>：商家端后台配置、第三方 SaaS 配置、回放功能——这些均属范围外能力。
 </div>
@@ -83,9 +83,8 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <li><a href="#s4">功能需求详情</a>
   <ol>
     <li><a href="#p1">C 端 - 首页（FAB 入口）</a></li>
-    <li><a href="#p2">C 端 - 新人礼包介绍页</a></li>
-    <li><a href="#p3">C 端 - 新人激活码礼包详情页（会员购买入口）</a></li>
-    <li><a href="#p4">C 端 - 邀请码 · 确认订单</a></li>
+    <li><a href="#p2">C 端 - 新人礼包聚合页（双Tab：购买激活码 / 激活领礼包）</a></li>
+        <li><a href="#p4">C 端 - 邀请码 · 确认订单</a></li>
     <li><a href="#p5">C 端 - 收银台（微信/支付宝/银行卡）</a></li>
     <li><a href="#p6">C 端 - 购买成功页</a></li>
     <li><a href="#p7">C 端 - 我的邀请码</a></li>
@@ -128,7 +127,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <table>
 <thead><tr><th>版本</th><th>日期</th><th>修订人</th><th>修订内容</th><th>状态</th></tr></thead>
 <tr><td>V1.0</td><td>2026-09-01</td><td>袁中天</td><td>旧版 PRD（仅文字，无原型截图；含图生图内容）</td><td>废</td></tr>
-<tr><td>V2.0</td><td>2026-09-03</td><td>袁中天</td><td>基于已确认的 C 端 + 商家后台双端原型重写；剔除图生图/AI 商业化内容；18 张原型截图入正文；§四按页面拆解至按钮级</td><td>评审中</td></tr>
+<tr><td>V2.0</td><td>2026-09-03</td><td>袁中天</td><td>基于已确认的 C 端 + 商家后台双端原型重写；剔除图生图/AI 商业化内容；18 张原型截图入正文；§四按页面拆解至按钮级</td><td>评审中</td></tr><tr><td>V3.0</td><td>2026-09-07</td><td>袁中天</td><td>C 端原型按墨刀 12 屏 1:1 更新为 V4（p_gift_intro 双 Tab 聚合页取代原 p_invite_detail 独立页；补会员价 ¥35；兑换流程 code-modal 对齐）；本 PRD 同步 §C2/C3 合并为聚合页、§C4 补会员价、FAB 导航修正</td><td>评审中</td></tr>
 </table>
 
 <!-- ============ 二 ============ -->
@@ -186,14 +185,14 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
   <line x1="470" y1="46" x2="470" y2="756" stroke="#eee" stroke-width="1"/>
 
   <rect x="20" y="70"  width="420" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
-  <text x="230" y="91" font-size="12" fill="#333" text-anchor="middle">会员打开 App 首页</text>
+  <text x="230" y="91" font-size="12" fill="#333" text-anchor="middle">会员打开首页</text>
 
   <rect x="20" y="128" width="420" height="46" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
   <text x="230" y="147" font-size="12" fill="#333" text-anchor="middle">点击悬浮「邀请码」FAB</text>
   <text x="230" y="165" font-size="11" fill="#8c8c8c" text-anchor="middle">（仅初级会员及以上可见）</text>
 
   <rect x="20" y="200" width="420" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
-  <text x="230" y="221" font-size="12" fill="#333" text-anchor="middle">激活码详情页 p_invite_detail</text>
+  <text x="230" y="221" font-size="12" fill="#333" text-anchor="middle">购买激活码 Tab（p_gift_intro）</text>
 
   <rect x="20" y="258" width="420" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
   <text x="230" y="279" font-size="12" fill="#333" text-anchor="middle">选数量（stepper 1-99）</text>
@@ -226,7 +225,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
   </g>
 
   <rect x="500" y="70"  width="380" height="32" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
-  <text x="690" y="91" font-size="12" fill="#333" text-anchor="middle">新用户打开 App 首页</text>
+  <text x="690" y="91" font-size="12" fill="#333" text-anchor="middle">新用户打开首页</text>
 
   <rect x="500" y="128" width="380" height="46" rx="5" fill="#f5f6f8" stroke="#d8dbe0"/>
   <text x="690" y="147" font-size="12" fill="#333" text-anchor="middle">点击悬浮「新人礼包」FAB</text>
@@ -279,11 +278,11 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 
 <h4>Flow A - 会员购买邀请码并分享</h4>
 <div class="flow">
-  <span class="node">会员打开 App 首页</span>
+  <span class="node">会员打开首页</span>
   <span class="arrow">→</span>
   <span class="node">点击悬浮「邀请码」FAB（仅初级会员及以上可见）</span>
   <span class="arrow">→</span>
-  <span class="node">进入激活码详情页（p_invite_detail）</span>
+  <span class="node">进入购买激活码 Tab（p_gift_intro）</span>
   <span class="arrow">→</span>
   <span class="node">选数量（stepper 1-99）</span>
   <span class="arrow">→</span>
@@ -302,7 +301,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 
 <h4>Flow B - 新人/老用户凭邀请码兑换礼包</h4>
 <div class="flow">
-  <span class="node">新用户打开 App 首页</span>
+  <span class="node">新用户打开首页</span>
   <span class="arrow">→</span>
   <span class="node">点击悬浮「新人礼包」FAB（未激活时显示）</span>
   <span class="arrow">→</span>
@@ -398,7 +397,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <!-- ==================== C 端 ==================== -->
 
 <h3 id="p1"><span class="section-mark">C</span>1. 页面：首页（FAB 入口）</h3>
-<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_home.png" alt="首页"><span class="cap">图 c_home · 首页（含两个悬浮 FAB）</span></div>
+<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_home.png" alt="首页"></div>
 
 <h4>1.1 页面原型与交互示意</h4>
 <p>首页左上为「绿韵家 / 积分商城」标识 + 搜索框 + 购物车（带角标 2），中部为 Tab 切换（推荐/图书/厨具/...）+ 金刚区（新品上市/健康专区/自营专区/vConsole）+ 双 banner（惠民补贴/每日活动）+ 「520 健康节」促销大图。底部 TabBar（首页/数智/消息/我的）。</p>
@@ -421,63 +420,46 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <h5>1.2.2 业务逻辑与边界条件</h5>
 <ul>
 <li> 新人礼包 FAB 点击 → <code>go('p_gift_intro')</code>
-<li> 邀请码 FAB 点击 → <code>go('p_invite_detail')</code>
+<li> 邀请码 FAB 点击 → <code>go('p_gift_intro')</code>（默认进入「购买激活码」Tab，tab_buy 默认选中）
 <li> 边界：若 <code>activated=true</code> 且用户是新会话打开 App（无登录态缓存），仍以登录态为准显示/隐藏 FAB；登录成功后回首页会强制刷新 FAB 可见性。
 </li></li></li></ul>
 
-<h3 id="p2"><span class="section-mark">C</span>2. 页面：新人礼包介绍页（p_gift_intro）</h3>
-<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_gift_intro.png" alt="新人礼包介绍"><span class="cap">图 c_gift_intro · 礼包介绍</span></div>
+<h3 id="p2"><span class="section-mark">C</span>2. 页面：新人礼包聚合页（p_gift_intro · 双 Tab）</h3>
+<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_gift_intro.png" alt="新人礼包聚合页"></div>
 
 <h4>2.1 页面原型与交互示意</h4>
-<p>顶部 nav「‹ 新人礼包」，Hero 区显示礼包图标 + 「新人礼包」标题 + 副标「输入会员朋友分享的邀请码即可领取」。下方礼包内容卡列出 3 个 SKU：
+<p>顶部 nav「‹ 新人礼包」+ 右侧 ♡ 收藏按钮（点击切换 ♡/♥，前端态）。下方为双 Tab 切换栏：<b>「购买激活码」（默认选中）</b>与<b>「激活领礼包」</b>。两个 Tab 共享同一 nav 与收藏态，切换由 <code>switchGiftTab(tab)</code> 实现（点击 Tab → 切换 on 高亮 + 对应 panel 显隐）。</p>
+
+<h4>2.2 激活领礼包 Tab（panel_activate）</h4>
+<p>礼包介绍卡列出 3 个 SKU：</p>
 <ul>
 <li>🪥 益齿健牙膏 · 120g · 快递配送 · ×1</li>
 <li>💊 辅酶 Q10 体验装 · 10 粒装 · 快递配送 · ×1</li>
 <li>💧 5L 饮用水 · 兑换后到店自提 · 共 7 袋，30 天有效 · ×7</li>
 </ul>
-</p>
-<p>价格行右侧「¥49.9」+ 删除线「实付¥0」。底部固定按钮「立即激活」+ 灰字提示「激活即视为同意礼包配送安排」。</p>
-
-<h4>2.2 详细逻辑规则</h4>
-<h5>2.2.1 界面与展示规则</h5>
+<p>价格行右侧「¥49.9」+ 删除线「实付¥0」。底部固定按钮「立即激活」+ 灰字提示「激活即视为同意礼包配送安排」→ <code>go('p_address')</code>（新人领礼包需先填收货地址）。</p>
 <table>
 <thead><tr><th>字段</th><th>需求说明</th></tr></thead>
-<tr><td>礼包总价</td><td>¥49.9（取后台商品配置价，当前业务占位）</td></tr>
+<tr><td>礼包总价</td><td>¥49.9（取后台商品配置价）</td></tr>
 <tr><td>实付金额</td><td>¥0（兑换场景由邀请码全额抵扣）</td></tr>
-<tr><td>5L 饮用水</td><td>本卡仅展示权益说明；不进入兑换订单的商品行；<b>5L×7 袋作为独立的「水权益订单」由系统按 §3.4 状态机发放</b></td></tr>
+<tr><td>5L 饮用水</td><td>本卡仅展示权益说明；不进入兑换订单商品行；<b>5L×7 袋作为独立的「水权益订单」由系统按 §3.4 状态机发放</b></td></tr>
 </table>
+<p>边界：本 Tab 文案「共 7 袋，30 天有效」与 §3.4 状态机一致；<b>每次限取 1 袋</b>与<b>超期清零后是否可重购</b>详见 §九 待确认项 ①②。</p>
 
-<h5>2.2.2 业务逻辑与边界条件</h5>
-<ul>
-<li> 「立即激活」按钮 → <code>go('p_address')</code>
-<li> 边界：本页文案「共 7 袋，30 天有效」与 §3.4 状态机一致；<b>每次限取 1 袋</b>与<b>超期清零后是否可重购</b>详见 §九 待确认项 ① ②
-</li></li></ul>
-
-<h3 id="p3"><span class="section-mark">C</span>3. 页面：新人激活码礼包详情页（p_invite_detail）</h3>
-<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_invite_detail.png" alt="激活码详情"><span class="cap">图 c_invite_detail · 激活码礼包详情</span></div>
-
-<h4>3.1 页面原型与交互示意</h4>
-<p>顶部「‹ 新人激活码礼包 ♡」+ 收藏按钮（点击切换 ♡/♥）。运费栏显示「虚拟商品，无需物流，购买后自动生成邀请码」+ 参数行「暂无参数 ›」+ 商家行「绿韵家官方自营 · 湖南省长沙市雨花区万博汇云谷」。底部 Sheet 卡显示商品缩略图 + 标签「自营」「新人激活码礼包」+ 单价 ¥49.9 + 数量 stepper（默认 1，可 1-99 调节）+ 权益说明 + 「立即购买」按钮。</p>
-
-<h4>3.2 详细逻辑规则</h4>
-<h5>3.2.1 界面与展示规则</h5>
+<h4>2.3 购买激活码 Tab（panel_buy · 会员购买入口）</h4>
+<p>商品详情卡：礼包图标 + 「新人激活码礼包」标题 + 运费栏「虚拟商品，无需物流，购买后自动生成邀请码」+ 单价 <b>销售价 ¥49.9 / 会员价 ¥35（会员自动 -¥14.9）</b> + 数量 stepper（默认 1，可 1-99 调节）+ 权益说明（两行胶囊：①「购买即按数量生成邀请码，自动存入『我的邀请码』」②「每个邀请码可被 1 位新人使用，兑换新人礼包（益齿健套装 + 5L 饮用水 ×7 袋）」）+ 底部「立即购买」按钮 → <code>go('p_invite_confirm')</code>。</p>
 <table>
 <thead><tr><th>字段</th><th>需求说明</th><th>数据来源</th></tr></thead>
 <tr><td>商品名称</td><td>「新人激活码礼包」</td><td>取后台商品管理配置</td></tr>
-<tr><td>商品编号</td><td>「由后台配置」</td><td>取商品表 goods.id</td></tr>
-<tr><td>单价</td><td>¥49.9（当前占位）</td><td>取商品表 goods.price</td></tr>
+<tr><td>销售价</td><td>¥49.9（非会员购买价）</td><td>取商品表 goods.price</td></tr>
+<tr><td>会员价</td><td>¥35（会员等级 ∈ {primary, svip, master} 下单时自动 -¥14.9）</td><td>取商品表 goods.member_price</td></tr>
+<tr><td>数量 stepper</td><td><code>changeInviteQty(±1)</code>，范围 1-99；超出 99 → Toast「已达单次购买上限」；小于 1 自动回到 1</td><td>前端 window._inviteQty</td></tr>
 <tr><td>收藏状态</td><td>点击切换 ♡/♥；不写入收藏表（仅前端态）</td><td>前端本地</td></tr>
 </table>
-
-<h5>3.2.2 业务逻辑与边界条件</h5>
-<ul>
-<li> 数量 stepper：<code>changeInviteQty(±1)</code>，范围 1-99；超出 99 → Toast「已达单次购买上限」；小于 1 自动回到 1
-<li> 「立即购买」按钮 → <code>go('p_invite_confirm')</code>
-<li> 校验：仅当 <code>_user.level ∈ {primary, svip, master}</code> 可购买；非会员点购买 → Toast「该礼包为会员专享，请先开通会员」+ 引导开通页（具体引导入口 ⚠️ 待确认）
-</li></li></li></ul>
+<p>校验：仅当 <code>_user.level ∈ {primary, svip, master}</code> 可购买；非会员点购买 → Toast「该礼包为会员专享，请先开通会员」+ 引导开通页（具体引导入口 ⚠️ 待确认）。</p>
 
 <h3 id="p4"><span class="section-mark">C</span>4. 页面：邀请码 · 确认订单（p_invite_confirm）</h3>
-<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_invite_confirm.png" alt="确认订单-邀请码"><span class="cap">图 c_invite_confirm · 邀请码确认订单（无地址）</span></div>
+<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_invite_confirm.png" alt="确认订单-邀请码"></div>
 
 <h4>4.1 页面原型与交互示意</h4>
 <p>顶部「‹ 确认订单」。无地址栏（虚拟商品）。商品卡「新人激活码礼包 🎫 虚拟商品 · 无需收货地址 · 购买后自动生成激活码」，下方单价 ¥49.9 + 数量显示「共 N 个邀请码」。价格卡含「商品总价 ¥49.90 / 运费 ¥0 / 实付金额 ¥49.90」+ 灰色说明「购买后按数量生成邀请码，自动存入『我的邀请码』，可分享给新人兑换礼包」。备注栏 + 底部「合计 ¥49.90 共 N 个」+ 按钮「去支付」。</p>
@@ -495,11 +477,11 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <h5>4.2.2 业务逻辑与边界条件</h5>
 <ul>
 <li> 「去支付」按钮 → <code>goInviteCashier()</code>，调用 <code>selectPay('wechat')</code> 默认选中微信支付
-<li> 边界：原价 ¥49.9（非会员价）；当前 PRD 不区分会员折扣，会员折扣仅对实物兑换订单生效（如有需要再扩 §四）
+<li> 边界：非会员实付 ¥49.9；会员（level ∈ {primary, svip, master}）实付 ¥35（自动 -¥14.9，取 goods.member_price）。兑换路径（§C12）由邀请码全额抵扣，始终实付 ¥0，与会员价无关。
 </li></li></ul>
 
 <h3 id="p5"><span class="section-mark">C</span>5. 页面：收银台（p_invite_cashier）</h3>
-<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_invite_cashier.png" alt="收银台"><span class="cap">图 c_invite_cashier · 收银台</span></div>
+<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_invite_cashier.png" alt="收银台"></div>
 
 <h4>5.1 页面原型与交互示意</h4>
 <p>顶部「‹ 收银台」+ 中间居中显示「需支付 ¥49.90 · 新人邀请码礼包 ×1」。下方白色卡列出三种支付方式（单选 radio）：微信支付（绿）/ 支付宝（蓝）/ 银行卡（橙）。底部固定按钮「确认支付」。</p>
@@ -520,7 +502,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 </li></li></li></ul>
 
 <h3 id="p6"><span class="section-mark">C</span>6. 页面：购买成功页（p_invite_buy_success）</h3>
-<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_invite_buy_success.png" alt="购买成功"><span class="cap">图 c_invite_buy_success · 购买成功</span></div>
+<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_invite_buy_success.png" alt="购买成功"></div>
 
 <h4>6.1 页面原型与交互示意</h4>
 <p>居中绿色对勾 + 「购买成功」+ 「已生成 N 个邀请码，已存入『我的邀请码』」。下方灰卡说明分享文案。底部三按钮：「查看我的订单」「查看我的邀请码」「返回首页」。</p>
@@ -535,7 +517,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 </li></li></li></li></ul>
 
 <h3 id="p7"><span class="section-mark">C</span>7. 页面：我的邀请码（p_my_codes）</h3>
-<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_my_codes.png" alt="我的邀请码"><span class="cap">图 c_my_codes · 我的邀请码</span></div>
+<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_my_codes.png" alt="我的邀请码"></div>
 
 <h4>7.1 页面原型与交互示意</h4>
 <p>顶部「‹ 我的邀请码」+ 顶部蓝色说明卡「🔑 我的邀请码 · 复制邀请码分享给新人…· 每个邀请码仅可使用一次」+ 三格统计：未使用 3 / 已使用 5 / 共生成 8。下方面向列表，每张码卡显示：</p>
@@ -566,7 +548,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 </li></li></li></ul>
 
 <h3 id="p8"><span class="section-mark">C</span>8. 页面：邀请码订单详情（p_invite_order_detail）</h3>
-<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_invite_order_detail.png" alt="邀请码订单详情"><span class="cap">图 c_invite_order_detail · 会员订单详情</span></div>
+<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_invite_order_detail.png" alt="邀请码订单详情"></div>
 
 <h4>8.1 页面原型与交互示意</h4>
 <p>顶部「‹ 订单详情」+ 绿色 banner「订单状态 / 已完成」。订单卡：订单号 + 「邀请码订单」橙色角标 + 状态「已完成」绿色 + 商品行 🎁「新人激活码礼包 / 购买即自动生成邀请码…」+ 会员专享角标 + 价格 + 数量。底部：「下单时间 / 支付方式: 微信支付 / 订单编号」。操作「联系客服」。</p>
@@ -587,14 +569,14 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 </li></li></ul>
 
 <h3 id="p9"><span class="section-mark">C</span>9. 页面：我的（p_me）</h3>
-<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_me.png" alt="我的"><span class="cap">图 c_me · 我的（个人中心）</span></div>
+<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_me.png" alt="我的"></div>
 
 <h4>9.1 页面原型与交互示意</h4>
 <p>顶部「‹ 我的」+ 用户卡（头像/昵称/等级/账号/右侧 chevron）。下方：</p>
 <ul>
 <li> 我的订单卡：4 个图标（待支付 1 / 待发货 2 / 待评价 / 退款售后）+ 「全部订单 ›」
 <li> 邀请好友福利 banner
-<li> 我的服务网格：我的订单/数商服务/网格水站/排行榜/优惠券/我的积分/收货地址/我的收藏/联系客服/意见反馈/<b>我的邀请码（带数字角标 33）</b>
+<li> 我的服务网格：我的订单/数商服务/网格水站/排行榜/优惠券/我的积分/收货地址/我的收藏/联系客服/意见反馈/<b>我的邀请码（带数字角标 34）</b>
 <li> 我的权益卡
 </li></li></li></li></ul>
 
@@ -615,7 +597,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 </li></li></li></ul>
 
 <h3 id="p10"><span class="section-mark">C</span>10. 页面：收货地址（p_address）</h3>
-<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_address.png" alt="收货地址"><span class="cap">图 c_address · 收货地址（已选默认地址）</span></div>
+<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_address.png" alt="收货地址"></div>
 
 <h4>10.1 页面原型与交互示意</h4>
 <p>顶部「‹ 选择收货地址」+ 地址列表（每项左侧 radio + 收件人/手机号/省市区+详细地址/默认角标）+ 「+ 新增收货地址」虚线按钮 + 底部固定绿色「使用此地址」按钮。无地址时显示「📭 暂无收货地址 / 请添加后再选择」，使用按钮变灰。</p>
@@ -638,7 +620,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 </li></li></li></li></ul>
 
 <h3 id="p11"><span class="section-mark">C</span>11. 页面：新增/编辑收货地址（p_address_edit）</h3>
-<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_address_edit.png" alt="新增收货地址"><span class="cap">图 c_address_edit · 新增收货地址</span></div>
+<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_address_edit.png" alt="新增收货地址"></div>
 
 <h4>11.1 页面原型与交互示意</h4>
 <p>顶部「‹ 新增收货地址」+ 4 行表单：收件人（文本）/ 手机号（数字 11 位 maxlength=11）/ 省/市/区（文本）/ 详细地址（文本）。第 5 行「设为默认」右侧橙色「默认地址」字样。底部绿色按钮「保存并使用」。</p>
@@ -666,7 +648,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 </li></li></ul>
 
 <h3 id="p12"><span class="section-mark">C</span>12. 页面：兑换订单 · 确认订单（p_confirm）</h3>
-<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_confirm.png" alt="确认订单-兑换"><span class="cap">图 c_confirm · 兑换订单确认（含地址）</span></div>
+<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_confirm.png" alt="确认订单-兑换"></div>
 
 <h4>12.1 页面原型与交互示意</h4>
 <p>顶部「‹ 确认订单」+ 地址栏（已选中：📍 李小红 139****4568 北京市朝阳区建国路 88 号 / 空态：+ 添加收货地址）。商品卡「新人礼包 - 益齿健套装 / 益齿健牙膏(120g)*1 + 辅酶 Q10 体验装(10 粒)*1」+ 2 个商品行 + 「运费 ¥0」。价格卡：商品总价 ¥49.9 / 运费 ¥0 / 邀请码抵扣 -¥49.9 / <b>实付金额 ¥0.00（红色）</b> + 灰字「兑换后无需再支付，订单由会员分享邀请码赠送」。备注栏 + 底部「合计 ¥0.00 共 2 件」+ 按钮「确认购买」。</p>
@@ -687,11 +669,11 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <ul>
 <li> 「确认购买」按钮 → <code>openCodeModal()</code>：弹出 §C13 邀请码输入弹窗
 <li> 校验前置：若 <code>window._address</code> 为空 → 点击地址栏跳 <code>go('p_address')</code>（前端不阻断，依赖用户主动选择地址）
-<li> 边界：商品总价 ¥49.9 = 后台商品价格；当前 PRD 不区分会员价；<b>会员折扣</b>如需扩展见 §九 待确认 ④
+<li> 边界：商品总价 ¥49.9 = 后台商品价格（兑换路径固定价，与会员价无关，始终由邀请码全额抵扣至 ¥0）；会员价 ¥35 仅作用于 §C4 自购路径。
 </li></li></li></ul>
 
 <h3 id="p13"><span class="section-mark">C</span>13. 页面：邀请码输入弹窗（code-modal）</h3>
-<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_code_modal.png" alt="邀请码弹窗"><span class="cap">图 c_code_modal · 输入邀请码弹窗</span></div>
+<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_code_modal.png" alt="邀请码弹窗"></div>
 
 <h4>13.1 页面原型与交互示意</h4>
 <p>半透明遮罩 + 底部弹窗卡：标题「输入邀请码」+ 副标「请输入您获得的兑换码，激活后将自动抵扣本次订单」+ 输入框（maxlength=20，右侧 ✕ 清空）+ 灰字「每个账号仅可使用一次邀请码」+ 双按钮「取消 / 确认」+ 灰字协议「点击『确认』即视为同意兑换规则与权益安排」。</p>
@@ -727,7 +709,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 </li></li></li></ul>
 
 <h3 id="p14"><span class="section-mark">C</span>14. 页面：兑换成功订单详情（p_order）</h3>
-<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_order.png" alt="兑换成功订单"><span class="cap">图 c_order · 兑换成功订单详情（待发货）</span></div>
+<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_order.png" alt="兑换成功订单"></div>
 
 <h4>14.1 页面原型与交互示意</h4>
 <p>顶部「‹ 我的订单」+ 6 个 Tab（全部/代付订单/待付款/<b>待发货/待核销（高亮）</b>/待收货/已完成）。订单卡：订单号 + 状态「待发货」（橙）+ 商品行（益齿健牙膏 ¥19.9 ×1 + 辅酶 Q10 ¥2.0 ×1）+ 支付时间 + 共 2 件 实付款 ¥0.00（红字）+ 灰色邀请码展示栏 + 按钮「联系客服 / 提醒发货」。</p>
@@ -750,7 +732,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 </li></li></ul>
 
 <h3 id="p15"><span class="section-mark">C</span>15. 页面：我的订单（p_my_orders）</h3>
-<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_my_orders.png" alt="我的订单"><span class="cap">图 c_my_orders · 我的订单（含 3 类订单）</span></div>
+<div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_my_orders.png" alt="我的订单"></div>
 
 <h4>15.1 页面原型与交互示意</h4>
 <p>顶部「‹ 全部订单」+ 搜索框「搜索商品名称/订单号」+ 6 Tab（全部/代付订单/待付款/待发货待核销/待收货/已完成）。订单卡列表，每张含：订单号 + 订单类型角标（常规订单/邀请码订单/兑换订单）+ 状态 + 商品行 + 折扣角标（会员专享 / 邀请码抵扣 / 7.5折）+ 价格 + 数量 + 支付时间 + 「共 N 件 实付款 ¥XX」+ 操作按钮（联系客服 / 评价）。</p>
@@ -775,7 +757,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <!-- ==================== 后台 ==================== -->
 
 <h3 id="a1"><span class="section-mark">B</span>16. 页面：商家商品管理（后台 viewList）</h3>
-<div class="screenshot admin"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/admin_goods_list.png" alt="商品管理"><span class="cap">图 admin_goods_list · 商品管理（列表视图）</span></div>
+<div class="screenshot admin"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/admin_goods_list.png" alt="商品管理"></div>
 
 <h4>16.1 页面原型与交互示意</h4>
 <p>左侧侧栏：商品中心（商品管理 / 商家素材管理）/ 交易（订单管理 / 订单源设置）/ 会员中心（会员管理）/ 数据中心 / 运维中心（广告位管理 / 新建广告 / 商品审核 / 商品举报 / 健保专区 / 专题管理 / 商品评价）。顶部水平 nav：首页 / 商家管理 / … / 商家商品管理（高亮）/ 新增商品 / 订单管理。主区：</p>
@@ -815,7 +797,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 </li></li></li></li></ul>
 
 <h3 id="a2"><span class="section-mark">B</span>17. 页面：新增商品（后台 viewCreate）</h3>
-<div class="screenshot admin"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/admin_goods_create.png" alt="新增商品"><span class="cap">图 admin_goods_create · 新增商品（4 卡片）</span></div>
+<div class="screenshot admin"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/admin_goods_create.png" alt="新增商品"></div>
 
 <h4>17.1 页面原型与交互示意</h4>
 <p>顶部水平 nav 高亮「新增商品」。主区 4 张卡：</p>
@@ -868,7 +850,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 </li></li></li></li></li></ul>
 
 <h3 id="a3"><span class="section-mark">B</span>18. 页面：订单管理（后台 viewOrders）</h3>
-<div class="screenshot admin"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/admin_orders.png" alt="订单管理"><span class="cap">图 admin_orders · 订单管理（4 条示例订单）</span></div>
+<div class="screenshot admin"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/admin_orders.png" alt="订单管理"></div>
 
 <h4>18.1 页面原型与交互示意</h4>
 <p>主区 1 张卡（订单列表）：</p>
