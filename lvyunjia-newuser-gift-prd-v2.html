@@ -57,12 +57,12 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <body>
 <div class="wrap">
 
-<h1>绿韵家App · 新人激活码礼包 PRD <span class="sub">V3.2 · 2026-09-07 · 后台简化（B16-18 仅列新增数据 / 新增 B19 邀请码管理）+ C 端 13 屏重截（内容裁切）</span></h1>
+<h1>绿韵家App · 新人激活码礼包 PRD <span class="sub">V3.3 · 2026-09-07 · 后台简化：B19 改为订单详情内展示邀请码状态、删除「生成途径」字段、删除独立邀请码管理页 + C 端 13 屏重截（内容裁切）</span></h1>
 
 <div class="meta-grid">
   <div class="b"><div class="k">项目名称</div><div class="v">绿韵家App · 新人激活码礼包</div></div>
   <div class="b"><div class="k">文档状态</div><div class="v">评审中（V1.0 已废，本版为新基线）</div></div>
-  <div class="b"><div class="k">版本号</div><div class="v">V3.2</div></div>
+  <div class="b"><div class="k">版本号</div><div class="v">V3.3</div></div>
   <div class="b"><div class="k">产品负责人</div><div class="v">袁中天（产品）</div></div>
   <div class="b"><div class="k">技术 Owner</div><div class="v">⚠️ 待确认 @技术组</div></div>
   <div class="b"><div class="k">测试 Owner</div><div class="v">⚠️ 待确认 @测试组</div></div>
@@ -98,7 +98,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
     <li><a href="#a1">后台 - 商家商品管理（viewList）</a></li>
     <li><a href="#a2">后台 - 新增商品（viewCreate）</a></li>
     <li><a href="#a3">后台 - 订单管理（viewOrders）</a></li>
-    <li><a href="#a4">后台 - 邀请码管理（新增 · viewInviteCodes）</a></li>
+    <li><a href="#a4">后台 - 订单详情 · 邀请码状态（viewOrderDetail）</a></li>
   </ol>
 </li>
 <li><a href="#s5">非功能性需求</a></li>
@@ -127,7 +127,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <table>
 <thead><tr><th>版本</th><th>日期</th><th>修订人</th><th>修订内容</th><th>状态</th></tr></thead>
 <tr><td>V1.0</td><td>2026-09-01</td><td>袁中天</td><td>旧版 PRD（仅文字，无原型截图；含图生图内容）</td><td>废</td></tr>
-<tr><td>V2.0</td><td>2026-09-03</td><td>袁中天</td><td>基于已确认的 C 端 + 商家后台双端原型重写；剔除图生图/AI 商业化内容；18 张原型截图入正文；§四按页面拆解至按钮级</td><td>评审中</td></tr><tr><td>V3.0</td><td>2026-09-07</td><td>袁中天</td><td>C 端原型按墨刀 12 屏 1:1 更新为 V4（p_gift_intro 双 Tab 聚合页取代原 p_invite_detail 独立页；补会员价 ¥35；兑换流程 code-modal 对齐）；本 PRD 同步 §C2/C3 合并为聚合页、§C4 补会员价、FAB 导航修正</td><td>评审中</td></tr><tr><td>V3.2</td><td>2026-09-07</td><td>袁中天</td><td>① 修流程图「双 FAB」错描述（实为单 FAB → 双 Tab）；② C 端 13 屏按内容尺寸重截（裁掉空白）推 GitHub；③ 后台按「沿用现有 + 仅列新增数据」重写：B16 商品管理仅加商品类型=兑换券、B17 新增商品仅加兑换商品设置+会员价、B18 订单管理仅加订单类型（9-04 裁定删订单管理「生成邀请码」按钮）；④ 新增 B19 邀请码管理页（hub 菜单 + code 表 + 退款失效异常处理）</td><td>评审中</td></tr>
+<tr><td>V2.0</td><td>2026-09-03</td><td>袁中天</td><td>基于已确认的 C 端 + 商家后台双端原型重写；剔除图生图/AI 商业化内容；18 张原型截图入正文；§四按页面拆解至按钮级</td><td>评审中</td></tr><tr><td>V3.0</td><td>2026-09-07</td><td>袁中天</td><td>C 端原型按墨刀 12 屏 1:1 更新为 V4（p_gift_intro 双 Tab 聚合页取代原 p_invite_detail 独立页；补会员价 ¥35；兑换流程 code-modal 对齐）；本 PRD 同步 §C2/C3 合并为聚合页、§C4 补会员价、FAB 导航修正</td><td>评审中</td></tr><tr><td>V3.2</td><td>2026-09-07</td><td>袁中天</td><td>① 修流程图「双 FAB」错描述（实为单 FAB → 双 Tab）；② C 端 13 屏按内容尺寸重截（裁掉空白）推 GitHub；③ 后台按「沿用现有 + 仅列新增数据」重写：B16 商品管理仅加商品类型=兑换券、B17 新增商品仅加兑换商品设置+会员价、B18 订单管理仅加订单类型（9-04 裁定删订单管理「生成邀请码」按钮）；④ 新增 B19 邀请码管理页（hub 菜单 + code 表 + 退款失效异常处理）</td><td>评审中</td></tr><tr><td>V3.3</td><td>2026-09-07</td><td>袁中天</td><td>① 后台 B19 重写：删除独立「邀请码管理」页，改为订单详情（viewOrderDetail）内嵌「邀请码状态」表格；② 删除邀请码表「生成途径」字段与 code 表 gen_way 字段；③ 删除后台「+ 生成邀请码」入口、埋点 admin_gen_invite_done、AC-11、极限值防重、待确认⑧；④ 邀请码表状态列统一为「兑换状态」（未兑换/已兑换）</td><td>评审中</td></tr>
 </table>
 
 <!-- ============ 二 ============ -->
@@ -137,7 +137,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <ul>
 <li> <b>拉新成本高、转化低</b>：绿韵家 App 当前会员单价 ¥49.9/件礼包主要靠线下门店导流，缺少会员间主动分享机制，新人首单转化率 ⚠️ 待确认 @运营组（待 BI 给基线值）。
 <li> <b>既有实物礼包无水权益</b>：原惠民补贴套餐包中已包含 5L 饮用水权益，但作为 SKU 子项不易单独追踪领取/过期状态，需独立化为水权益订单以便精细化提醒与统计。
-<li> <b>邀请码场景存在但口径混乱</b>：当前 C 端「邀请码」FAB 入口与后台「生成邀请码」操作存在，但实物订单页面无邀请码字段、兑换订单与会员订单混合展示，导致运营难以区分「会员自己买的」与「会员分享给新人兑换的」。
+<li> <b>邀请码场景存在但口径混乱</b>：当前 C 端「邀请码」FAB 入口存在，但实物订单页面无邀请码字段、兑换订单与会员订单混合展示，导致运营难以区分「会员自己买的」与「会员分享给新人兑换的」。
 </li></li></li></ul>
 
 <h3>2.2 项目目标</h3>
@@ -356,7 +356,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <thead><tr><th>层</th><th>实体</th><th>字段</th></tr></thead>
 <tr><td rowspan="3">前端展示层</td><td>会员订单（member）</td><td>订单号、邀请码数量、实付金额、支付时间、订单状态</td></tr>
 <tr><td>兑换订单（exchange）</td><td>订单号、邀请码、收货人、收货地址、商品明细、抵扣金额、实付金额、状态</td></tr>
-<tr><td>邀请码</td><td>码值、生成时间、来源（购买生成/系统生成）、状态（未使用/已使用）、使用时间、关联订单</td></tr>
+<tr><td>邀请码</td><td>码值、生成时间、状态（未使用/已使用）、使用时间、关联订单</td></tr>
 <tr><td rowspan="2">后端配置层</td><td>商品（礼包 SKU）</td><td>名称、规格、价格、库存、商品类型、上下架状态；<b>价格由后台商品管理配置</b></td></tr>
 <tr><td>水权益订单</td><td>用户 ID、关联兑换订单、生效时间（首取水后 30 天）、剩余袋数、累计已取袋数</td></tr>
 <tr><td>数据层</td><td>邀请码表（code）/ 订单表（order）/ 商品表（goods）/ 地址表（address）/ 水权益表（water_bag）</td><td>详细字段 ⚠️ 待确认 @技术组</td></tr>
@@ -365,7 +365,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <h3>3.3 状态机：邀请码</h3>
 <table>
 <thead><tr><th>起始状态</th><th>触发动作</th><th>前置/后置条件</th><th>目标状态</th></tr></thead>
-<tr><td>（系统生成）</td><td>创建码</td><td>购买邀请码订单支付成功 OR 运营手动生成</td><td>未使用</td></tr>
+<tr><td>（购买生成）</td><td>创建码</td><td>邀请码订单（member）支付成功</td><td>未使用</td></tr>
 <tr><td>未使用</td><td>核销</td><td>码有效 + 提交账号未兑换过 + 码未过期</td><td>已使用</td></tr>
 <tr><td>未使用</td><td>过期</td><td>超过有效期（⚠️ 待确认 @业务组：有效期多久）</td><td>已过期</td></tr>
 <tr><td>已使用</td><td>—</td><td>不可回退；关联兑换订单不可取消</td><td>（终态）</td></tr>
@@ -399,7 +399,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <tr><td>管理后台</td><td>沿用 + 改动</td><td><b>本需求仅覆盖平台端</b>；商家后台只承担「商品维护 + 订单查询 / 导出」，不做营销配置</td></tr>
 <tr><td rowspan="4">业务模块</td><td>商品中心 → 商品管理</td><td>改动</td><td>商品类型新增「兑换商品」枚举；新增「兑换商品设置」（B16 / B17）；礼包价格、库存、上下架均在此配置</td></tr>
 <tr><td>交易 → 订单管理</td><td>改动</td><td>订单类型新增「邀请码订单」「兑换订单」；新增类型筛选与按类型导出（B18）</td></tr>
-<tr><td>交易 → 邀请码管理（新增菜单）</td><td>新增</td><td>hub 侧栏新增「邀请码管理」页；邀请码列表 + code 表（B19）</td></tr>
+<tr><td>交易 → 订单管理 · 订单详情</td><td>改动</td><td>邀请码订单详情页新增「邀请码状态」表格；与订单商品信息同一屏展示，不新增后台菜单（B19）</td></tr>
 <tr><td>会员中心</td><td>改动</td><td>用户表新增 <code>activated</code>（是否已激活新人礼包）字段，用于 FAB 显隐与兑换资格校验</td></tr>
 <tr><td>水权益（水袋）</td><td>新增</td><td>新增独立水权益订单实体与状态机（§3.4），不并进兑换订单商品行</td></tr>
 <tr><td rowspan="2">数据 / 实体</td><td>新增实体</td><td>新增</td><td>邀请码表（code）、水权益表（water_bag）</td></tr>
@@ -781,22 +781,25 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <thead><tr><th>维度</th><th>改动说明</th><th>数据来源</th></tr></thead>
 <tr><td>订单类型枚举</td><td>在原有 <code>normal</code>=常规订单（灰）基础上，新增：<br><code>member</code>=邀请码订单（橙，购买激活码生成）<br><code>exchange</code>=兑换订单（蓝，邀请码核销生成）</td><td>取《order 表》type</td></tr>
 <tr><td>二级筛选（订单类型）</td><td>新增：全部 / 常规订单 / 邀请码订单 / 兑换订单；按 data-type 控制行显隐</td><td>沿用列表筛选组件</td></tr>
-<tr><td>操作列（按 type 渲染）</td><td>邀请码订单：查看详情 · 备注<br>兑换订单：查看详情 · 备注<br><span class="kw">⚠️ 9-04 裁定：订单管理操作列已删除「生成邀请码」按钮，生成入口移至 §B19 邀请码管理页</span></td><td>前端按 type 条件渲染</td></tr>
+<tr><td>操作列（按 type 渲染）</td><td>邀请码订单：查看详情 · 备注<br>兑换订单：查看详情 · 备注<br><span class="kw">⚠️ 9-04/9-07 裁定：订单管理操作列已删除「生成邀请码」按钮；邀请码随邀请码订单在订单详情内展示，不再提供独立邀请码管理页与后台生成入口</span></td><td>前端按 type 条件渲染</td></tr>
 <tr><td>实付金额显示</td><td>邀请码订单 ¥49.90 → ¥35.00（-¥14.90，会员价）<br>兑换订单 ¥49.90 → ¥0.00（邀请码全额抵扣，支付单号显示「--」）</td><td>取《order 表》paid</td></tr>
 <tr><td>收货人</td><td>邀请码订单 = 「-- 不需要收货地址 --」<br>兑换订单 = 收货人 + 手机 + 地址</td><td>取《address 表》</td></tr>
 <tr><td>CSV 导出</td><td>支持按当前「订单类型」筛选条件导出</td><td>沿用导出组件</td></tr>
 </table>
 
-<h3 id="a4"><span class="section-mark">B</span>19. 页面：邀请码管理（新增 · hub viewInviteCodes）</h3>
-<div class="screenshot admin"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/admin_invite_codes.png" alt="邀请码管理"></div>
+<h3 id="a4"><span class="section-mark">B</span>19. 页面：订单详情 · 邀请码状态（viewOrderDetail）</h3>
+<div class="screenshot admin"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/admin_order_detail.png" alt="订单详情-邀请码状态"></div>
 
-<p>商家后台 hub 侧栏<strong>新增「邀请码管理」菜单</strong>（本期新页面，复用 hub 框架，不跳独立页）。本页<strong>沿用 hub 列表通用框架</strong>（筛选 / 分页 / 导出），仅列新增 / 差异项：</p>
+<p>商家后台 hub 沿用现有「订单管理 → 查看详情」进入订单详情页。针对<strong>邀请码订单（type=member）</strong>，在订单详情「商品信息」卡片内直接展示该订单生成的邀请码列表；商品信息卡片本身不展示实物商品行。本需求对订单详情页仅新增 / 差异项如下：</p>
 <table>
 <thead><tr><th>维度</th><th>说明</th></tr></thead>
-<tr><td>顶部操作</td><td>「批量导出」+「+ 生成邀请码」<span class="kw">⚠️ 按钮功能待补，本期不接线</span></td></tr>
-<tr><td>筛选条件</td><td>生成时间 / 邀请码 / 购买人·生成人 / 关联订单编号</td></tr>
-<tr><td>二级筛选</td><td>生成途径（全部 / 购买生成 / 系统生成）+ 下单状态（全部 / 未下单 / 已下单）</td></tr>
-<tr><td>表格 7 列</td><td>邀请码 / 生成途径 / 生成时间 / 购买人·生成人 / 下单状态 / 关联订单编号 / 操作（查看详情）</td></tr>
+<tr><td>入口</td><td>订单管理列表（viewOrders）中邀请码订单行「查看详情」→ <code>go('orderDetail')</code></td></tr>
+<tr><td>适用订单类型</td><td>仅邀请码订单（type=member）展示邀请码状态表；常规订单 / 兑换订单沿用原有订单详情样式</td></tr>
+<tr><td>表格位置</td><td>嵌于订单详情「商品信息」卡片内，商品信息标题下方</td></tr>
+<tr><td>表格 5 列</td><td>邀请码 / 生成时间 / 购买人 · 生成人 / 兑换状态 / 关联订单编号</td></tr>
+<tr><td>购买人 · 生成人</td><td>生成该邀请码的会员信息：昵称 + 账号</td></tr>
+<tr><td>兑换状态</td><td>未兑换 / 已兑换；已兑换时展示关联兑换订单号</td></tr>
+<tr><td>无操作列</td><td>本期不开放后台手动生成 / 删除 / 编辑邀请码，仅做查询展示</td></tr>
 </table>
 
 <h4>19.1 新增数据实体：code 表（邀请码）</h4>
@@ -808,7 +811,6 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <tr><td>use_time</td><td>使用时间</td><td>核销成功时写入</td></tr>
 <tr><td>order_no</td><td>关联订单号</td><td>购买邀请码订单（member）/ 兑换订单（exchange）</td></tr>
 <tr><td>user_id</td><td>关联购买人</td><td>生成该码的会员 user_id</td></tr>
-<tr><td>gen_way</td><td>生成途径</td><td>buy（购买生成）/ sys（系统生成）</td></tr>
 </table>
 
 <h4>19.2 异常处理（仅本期明确一项）</h4>
@@ -853,7 +855,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <tr><td>water_bag_first_pickup</td><td>水袋首取</td><td>C 端</td><td>App/H5/小程序</td><td>用户到店扫码首取 1 袋</td><td>水权益订单号、累计已取袋数</td><td>对应 §3.4 状态机</td></tr>
 </table>
 
-<p class="callout">埋点补充：邀请码管理页「+ 生成邀请码」操作（待补）对应事件 <code>admin_gen_invite_done</code>，参数含操作人、数量、关联订单号。所有事件英文名严格遵循 v2.3 既有目录，不新增事件定义。</p>
+<p class="callout">埋点补充：后台不再提供独立「生成邀请码」入口，原 <code>admin_gen_invite_done</code> 事件不再使用；订单详情浏览沿用现有页面埋点 <code>page_view</code>，不新增后台事件。所有事件英文名严格遵循 v2.3 既有目录，不新增事件定义。</p>
 
 <!-- ============ 六 ============ -->
 <h2 id="s6">六、验收标准</h2>
@@ -870,7 +872,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <tr><td>AC-08</td><td>地址表单校验</td><td>新增地址页</td><td>姓名/手机号/省市区/详细地址 任一留空 → 点保存</td><td>对应 Toast 提示，地址不保存</td></tr>
 <tr><td>AC-09</td><td>手机号格式校验</td><td>同上</td><td>输入手机号「139123456」点保存</td><td>Toast「请输入 11 位手机号」</td></tr>
 <tr><td>AC-10</td><td>水权益订单创建</td><td>AC-03 成功后</td><td>检查用户水权益列表</td><td>新增 1 条水权益订单，状态=待首取，总袋数=7</td></tr>
-<tr><td>AC-11</td><td>邀请码管理页「+ 生成邀请码」</td><td>viewInviteCodes 页（§B19）</td><td>点「+ 生成邀请码」→ 输入 5</td><td>⚠️ 按钮功能待补（本期不接线），验收以技术组实现为准</td></tr>
+<tr><td>AC-11</td><td>后台邀请码订单详情</td><td>订单管理已存在邀请码订单</td><td>点「查看详情」进入 viewOrderDetail</td><td>商品信息卡片内展示 5 列邀请码状态表（含兑换状态：未兑换 / 已兑换）</td></tr>
 <tr><td>AC-12</td><td>后台兑换订单筛选</td><td>viewOrders</td><td>点「兑换订单」二级筛选</td><td>只展示 data-type=exchange 的 3 条订单</td></tr>
 <tr><td>AC-13</td><td>非会员不能买邀请码</td><td>_user.level=guest</td><td>首页 → 新人礼包 FAB → 聚合页（购买 Tab） → 立即购买</td><td>后端校验会员等级失败 → Toast「该礼包为会员专享，请先开通会员」</td></tr>
 <tr><td>AC-14</td><td>水袋状态机过期清零</td><td>水权益订单状态=已生效，已过 30 天</td><td>用户尝试再次取水</td><td>扫码返回「权益已过期」</td></tr>
@@ -895,7 +897,6 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <tr><td>逆向流 / 退款</td><td>兑换订单退款</td><td>本期不支持退款（实物+水权益链路长）；⚠️ 待确认 @业务组</td></tr>
 <tr><td>高并发与防重</td><td>收银台支付防重</td><td>按钮 disabled 1500ms 防抖</td></tr>
 <tr><td>高并发与防重</td><td>核销防重</td><td>code-modal 提交按钮 disabled；后端幂等键（邀请码+用户 ID+订单号）</td></tr>
-<tr><td>高并发与防重</td><td>「生成邀请码」后台防重</td><td>按钮 disabled + 后端幂等键（订单号）</td></tr>
 </table>
 
 <!-- ============ 八 ============ -->
@@ -904,7 +905,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <li> <b>版本号规范</b>：大迭代（新增模块/主流程变更）走 V1.0/V2.0；小修改走 V1.1/V1.2
 <li> <b>历史记录</b>：修订人/时间/原因必填（见 §1.2 历史修订记录表）
 <li> <b>变更周知</b>：定稿后变更在文档中高亮标出（<code>&lt;span style="background:#fff1f0"&gt;</code> 红字底），并在评审会上 @ 对应开发/测试
-<li> <b>交付形式</b>：GitHub Pages HTML 为主文档，钉钉文档为派生镜像（旧版 <code>lvyunjia-newuser-gift-prd.html</code> 已在 2026-09-03 标记为废，新版 <code>lvyunjia-newuser-gift-prd-v2.html</code> 上线后废文件可删）
+<li> <b>交付形式</b>：GitHub Pages HTML 为主文档，钉钉文档为派生镜像；线上主文档为 <code>lvyunjia-newuser-gift-prd-v2.html</code>，旧版 <code>lvyunjia-newuser-gift-prd.html</code> 已从 gh-pages 移除
 </li></li></li></li></ul>
 
 <!-- ============ 九 ============ -->
@@ -918,12 +919,11 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <tr><td>⑤</td><td>兑换订单单品价（益齿健 ¥19.9、辅酶 Q10 ¥2.0）</td><td>§C14 兑换订单详情</td><td>@运营组</td></tr>
 <tr><td>⑥</td><td>邀请码有效期（多少天后变「已过期」）</td><td>§3.3 邀请码状态机</td><td>@业务组</td></tr>
 <tr><td>⑦</td><td>兑换订单退款政策</td><td>§七 边界清单</td><td>@业务组</td></tr>
-<tr><td>⑧</td><td>「生成邀请码」运营权限范围（仅总部/区域/门店？）</td><td>§B18 订单管理「生成邀请码」操作</td><td>@运营组</td></tr>
-<tr><td>⑨</td><td>技术 Owner / 测试 Owner 具体到人</td><td>§1.1 项目基本信息</td><td>@技术组 @测试组</td></tr>
-<tr><td>⑩</td><td>订单筛选/排序/分页字段是否做服务端过滤</td><td>§B16 §B18</td><td>@技术组</td></tr>
-<tr><td>⑪</td><td>KPI 基线值与目标值（邀请码核销率、新人激活率）</td><td>§2.3 KPI</td><td>@运营组 @BI</td></tr>
-<tr><td>⑫</td><td>实物订单页商品名（套装购物礼包 / 新人礼包）以业务组口径为准</td><td>§B18 18.2.2 边界</td><td>@业务组</td></tr>
-<tr><td>⑬</td><td>非会员用户购买邀请码时引导开通会员的具体入口</td><td>§C3 邀请码详情</td><td>@产品组</td></tr>
+<tr><td>⑧</td><td>技术 Owner / 测试 Owner 具体到人</td><td>§1.1 项目基本信息</td><td>@技术组 @测试组</td></tr>
+<tr><td>⑨</td><td>订单筛选/排序/分页字段是否做服务端过滤</td><td>§B16 §B18</td><td>@技术组</td></tr>
+<tr><td>⑩</td><td>KPI 基线值与目标值（邀请码核销率、新人激活率）</td><td>§2.3 KPI</td><td>@运营组 @BI</td></tr>
+<tr><td>⑪</td><td>实物订单页商品名（套装购物礼包 / 新人礼包）以业务组口径为准</td><td>§B18 18.2.2 边界</td><td>@业务组</td></tr>
+<tr><td>⑫</td><td>非会员用户购买邀请码时引导开通会员的具体入口</td><td>§C3 邀请码详情</td><td>@产品组</td></tr>
 </table>
 
 <div class="callout note">
