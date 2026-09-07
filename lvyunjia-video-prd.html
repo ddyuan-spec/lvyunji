@@ -162,22 +162,21 @@
   <!-- 4 提交 -->
   <rect x="320" y="254" width="240" height="40" rx="7" fill="#fff" stroke="#2196F3" stroke-width="1.6"/>
   <text class="w" x="440" y="279" text-anchor="middle">⑦ 点「生成视频」</text>
-  <line x1="440" y1="294" x2="440" y2="320" stroke="#666" marker-end="url(#ar)"/>
+  <line x1="450" y1="294" x2="450" y2="320" stroke="#666" marker-end="url(#ar)"/>
 
-  <!-- 5 校验描述 -->
-  <polygon points="440,322 580,322 560,352 600,352 440,392 480,357 440,357" fill="none" stroke="none"/>
-  <path d="M360,322 L520,322 L500,352 L540,352 L440,392 L480,357 L360,357 Z" fill="#fff" stroke="#FF9800" stroke-width="1.6"/>
-  <text class="w" x="450" y="343" text-anchor="middle">描述非空？</text>
-  <text class="s" x="452" y="376" text-anchor="middle" fill="#C62828">否 → toast「请填写画面描述」</text>
-  <line x1="440" y1="392" x2="440" y2="418" stroke="#666" marker-end="url(#ar)"/>
+  <!-- 5 校验描述：标准菱形 -->
+  <polygon points="450,322 520,357 450,392 380,357" fill="#FFF3E0" stroke="#FF9800" stroke-width="1.6"/>
+  <text class="w" x="450" y="361" text-anchor="middle">描述非空？</text>
+  <text class="s" x="450" y="412" text-anchor="middle" fill="#C62828">否 → toast「请填写画面描述」</text>
+  <line x1="450" y1="392" x2="450" y2="418" stroke="#666" marker-end="url(#ar)"/>
 
-  <!-- 6 校验灵感值 -->
-  <path d="M360,420 L520,420 L500,450 L540,450 L440,490 L480,445 L360,445 Z" fill="#fff" stroke="#FF9800" stroke-width="1.6"/>
-  <text class="w" x="450" y="441" text-anchor="middle">灵感值 ≥ 10？</text>
-  <text class="s" x="452" y="474" text-anchor="middle" fill="#C62828">否 → 额度不足弹窗 ↓</text>
+  <!-- 6 校验灵感值：标准菱形 -->
+  <polygon points="450,420 520,455 450,490 380,455" fill="#FFF3E0" stroke="#FF9800" stroke-width="1.6"/>
+  <text class="w" x="450" y="459" text-anchor="middle">灵感值 ≥ 10？</text>
+  <text class="s" x="450" y="510" text-anchor="middle" fill="#C62828">否 → 额度不足弹窗 ↓</text>
 
   <!-- 7 额度不足弹窗（用户泳道） -->
-  <line x1="360" y1="460" x2="270" y2="460" stroke="#C62828" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <line x1="380" y1="455" x2="270" y2="460" stroke="#C62828" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#ar)"/>
   <rect x="20" y="430" width="250" height="70" rx="7" fill="#FFEBEE" stroke="#C62828" stroke-width="1.4"/>
   <text class="w" x="145" y="450" text-anchor="middle" fill="#C62828">额度不足弹窗</text>
   <text class="s" x="32" y="468">· 取消（不扣减）</text>
