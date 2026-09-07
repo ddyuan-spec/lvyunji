@@ -250,6 +250,31 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
 .toast.show{display:block;animation:fadeIn .2s}
 @keyframes fadeIn{from{opacity:0;transform:translate(-50%,-10px)}to{opacity:1;transform:translate(-50%,0)}}
 
+/* ===== 订单详情视图（真实后台截图复刻 + 邀请码状态） ===== */
+.od-card .card-head{height:auto;min-height:46px;padding:14px 16px}
+.od-card .card-head .title{display:flex;align-items:center}
+.od-card .card-head .title::before{content:"";display:inline-block;width:3px;height:14px;background:var(--primary);margin-right:8px}
+.tag-invite{margin-left:10px;font-size:11px;color:var(--primary);border:1px solid var(--primary);border-radius:3px;padding:1px 8px;background:#fff;font-weight:400}
+.od-status{margin-left:auto;color:var(--primary);font-size:13px}
+.od-eval{margin-left:auto;color:var(--primary);font-size:13px;cursor:pointer}
+.od-eval:hover{text-decoration:underline}
+.od-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px 24px;padding:18px 16px}
+.od-grid-2{grid-template-columns:repeat(2,1fr)}
+.od-item{display:flex;align-items:center;font-size:13px;min-width:0}
+.od-item .k{color:var(--text-3);flex-shrink:0;margin-right:6px;white-space:nowrap}
+.od-item .v{color:var(--text);word-break:break-all}
+.od-body{padding:16px}
+.od-goods{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:4px;padding:12px 14px;max-width:520px}
+.od-goods-info{flex:1;min-width:0}
+.od-goods-name{font-size:13px;color:var(--text);margin-bottom:6px}
+.od-goods-price{display:flex;flex-direction:column;align-items:flex-end;gap:8px;font-size:13px;color:var(--text)}
+.od-subtitle{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;margin:18px 0 10px}
+.od-subtitle::before{content:"";display:inline-block;width:3px;height:12px;background:var(--primary);margin-right:8px}
+.od-invite-table{border:1px solid var(--line);border-radius:4px}
+.od-invite-table td{padding:10px 12px}
+.od-duo{display:flex;gap:12px;align-items:stretch}
+.od-duo .card{flex:1;margin-bottom:12px}
+
 /* 折叠侧栏菜单视觉对齐 */
 .menu-item .icon{width:14px;height:14px;display:inline-block;background:rgba(255,255,255,.15);border-radius:2px;flex-shrink:0}
 </style>
@@ -294,8 +319,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
       <div class="group-title" onclick="toggleGroup(this)">交易 <span class="arrow">▾</span></div>
       <div class="sub">
         <div class="menu-item" data-view="orders" onclick="go('orders')">订单管理</div>
-        <div class="menu-item" data-view="inviteCodes" onclick="go('inviteCodes')">邀请码管理</div>
-        <div class="menu-item">订单源设置</div>
+                <div class="menu-item">订单源设置</div>
       </div>
     </div>
     <div class="group">
@@ -340,7 +364,8 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
       <a>商品评价</a><span class="divider">/</span>
       <a id="nav_list" class="active" onclick="go('list')">商家商品管理</a><span class="divider">/</span>
       <a id="nav_create" onclick="go('create')">新增商品</a><span class="divider">/</span>
-      <a id="nav_orders" onclick="go('orders')">订单管理</a>
+      <a id="nav_orders" onclick="go('orders')">订单管理</a><span class="divider">/</span>
+      <a id="nav_orderDetail" onclick="go('orderDetail')">订单详情</a>
     </div>
 
     <!-- ============================================ -->
@@ -965,7 +990,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                   </td>
                   <td>
                     <div class="op-list">
-                      <span class="op">查看详情</span>
+                      <span class="op" onclick="go('orderDetail')">查看详情</span>
                       <br>
                       <span class="op">备注</span>
                     </div>
@@ -1013,7 +1038,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                   </td>
                   <td>
                     <div class="op-list">
-                      <span class="op">查看详情</span>
+                      <span class="op" onclick="go('orderDetail')">查看详情</span>
                       <span class="dot">·</span>
                       <span class="op">备注</span>
                     </div>
@@ -1060,7 +1085,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                   </td>
                   <td>
                     <div class="op-list">
-                      <span class="op">查看详情</span>
+                      <span class="op" onclick="go('orderDetail')">查看详情</span>
                       <span class="dot">·</span>
                       <span class="op">备注</span>
                     </div>
@@ -1107,7 +1132,7 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
                   </td>
                   <td>
                     <div class="op-list">
-                      <span class="op">查看详情</span>
+                      <span class="op" onclick="go('orderDetail')">查看详情</span>
                       <span class="dot">·</span>
                       <span class="op">备注</span>
                     </div>
@@ -1133,141 +1158,132 @@ table.lvyunji-table tr:hover td{background:#fafbfc}
 
       </section>
 
-    <!-- 视图：邀请码管理（搬入 hub，复用侧栏，不跳独立页） -->
-    <section id="viewInviteCodes" class="view">
-      <div class="card">
+    <!-- ============================================ -->
+    <!-- 视图：订单详情（真实后台截图复刻，商品信息含邀请码状态，一单多码） -->
+    <!-- ============================================ -->
+    <section id="viewOrderDetail" class="view">
+
+      <!-- 基础信息 -->
+      <div class="card od-card">
         <div class="card-head">
-          <div class="title">邀请码管理</div>
-          <div class="actions">
-            <button class="btn" onclick="showToast('已导出邀请码列表')">批量导出</button>
-            <button class="btn btn-primary" onclick="showToast('生成邀请码功能待补')">+ 生成邀请码</button>
+          <div class="title">基础信息</div>
+          <span class="tag-invite">邀请码订单</span>
+          <div class="od-status">待发货</div>
+        </div>
+        <div class="od-grid">
+          <div class="od-item"><span class="k">主订单编号:</span><span class="v">1260007676594096223</span></div>
+          <div class="od-item"><span class="k">子订单编号:</span><span class="v">605909</span></div>
+          <div class="od-item"><span class="k">支付单号:</span><span class="v"></span></div>
+          <div class="od-item"><span class="k">微信支付单号:</span><span class="v"></span></div>
+          <div class="od-item"><span class="k">订单类型:</span><span class="v">常规订单</span></div>
+          <div class="od-item"><span class="k">商品类型:</span><span class="v">实体商品</span></div>
+          <div class="od-item"><span class="k">积分抵扣:</span><span class="v">1000</span></div>
+          <div class="od-item"><span class="k">余额抵扣:</span><span class="v">0</span></div>
+          <div class="od-item"><span class="k">优惠券抵扣:</span><span class="v">0</span></div>
+          <div class="od-item"><span class="k">电子钱包抵扣:</span><span class="v">0</span></div>
+          <div class="od-item"><span class="k">专享优惠:</span><span class="v">0</span></div>
+          <div class="od-item"><span class="k">随机立减:</span><span class="v">0</span></div>
+          <div class="od-item"><span class="k">实付金额:</span><span class="v">0</span></div>
+          <div class="od-item"></div>
+          <div class="od-item"></div>
+          <div class="od-item"><span class="k">下单时间:</span><span class="v">2025-09-07 11:00</span></div>
+          <div class="od-item"><span class="k">最晚发货时间:</span><span class="v">2025-09-10 11:00</span></div>
+          <div class="od-item"><span class="k">实际发货时间:</span><span class="v">—</span></div>
+          <div class="od-item"><span class="k">确认收货时间:</span><span class="v">—</span></div>
+          <div class="od-item"><span class="k">订单完结日期:</span><span class="v">—</span></div>
+          <div class="od-item"></div>
+          <div class="od-item"><span class="k">客户备注:</span><span class="v">-0.00 元</span></div>
+        </div>
+      </div>
+
+      <!-- 用户信息 -->
+      <div class="card od-card">
+        <div class="card-head">
+          <div class="title">用户信息</div>
+          <div class="od-eval" onclick="showToast('查看评价')">查看评价&gt;</div>
+        </div>
+        <div class="od-grid od-grid-2">
+          <div class="od-item"><span class="k">购买人:</span><span class="v">Melo</span></div>
+          <div class="od-item"><span class="k">购买人会员类型:</span><span class="v">普通用户</span></div>
+          <div class="od-item"><span class="k">收货人:</span><span class="v">Melo（18508415555）</span></div>
+          <div class="od-item"><span class="k">收货地址:</span><span class="v">河北省秦皇岛市山海关区11111</span><button class="btn btn-sm" style="margin-left:12px" onclick="showToast('修改收货地址')">修改收货地址</button></div>
+        </div>
+      </div>
+
+      <!-- 商品信息（含邀请码状态） -->
+      <div class="card od-card">
+        <div class="card-head">
+          <div class="title">商品信息</div>
+        </div>
+        <div class="od-body">
+          <div class="od-goods">
+            <div class="goods-thumb">🧴</div>
+            <div class="od-goods-info">
+              <div class="od-goods-name">澳韵兰菌盐健固牙膏</div>
+              <span class="tag">1支</span>
+            </div>
+            <div class="od-goods-price">
+              <div>¥0</div>
+              <div>x1</div>
+            </div>
+          </div>
+
+          <div class="od-invite">
+            <div class="od-subtitle">邀请码状态</div>
+            <div class="table-wrap od-invite-table">
+              <table class="lvyunji-table">
+                <thead>
+                  <tr>
+                    <th>邀请码</th>
+                    <th>生成途径</th>
+                    <th>生成时间</th>
+                    <th>购买人 / 生成人</th>
+                    <th>下单状态</th>
+                    <th>关联订单号</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>A8$kL9#mN2@</td>
+                    <td><span class="tag purchase">购买生成</span></td>
+                    <td>2025-09-07 11:00</td>
+                    <td>昵称：Melo<br>账号：18508415555</td>
+                    <td><span class="tag ordered">已下单</span></td>
+                    <td>605909</td>
+                  </tr>
+                  <tr>
+                    <td>Dg3SUy3@Wq</td>
+                    <td><span class="tag purchase">购买生成</span></td>
+                    <td>2025-09-07 11:00</td>
+                    <td>昵称：Melo<br>账号：18508415555</td>
+                    <td><span class="tag ordered">已下单</span></td>
+                    <td>605909</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="filters">
-          <div class="filter-row">
-            <div class="item">
-              <span class="lbl">生成时间</span>
-              <input class="input" value="2026-08-25 00:00:00">
-              <span>至</span>
-              <input class="input" value="2026-09-01 23:59:59">
-            </div>
-            <div class="item"><input class="input" placeholder="邀请码"></div>
-            <div class="item"><input class="input" placeholder="购买人/生成人（昵称或账号）"></div>
-            <div class="item"><input class="input" placeholder="关联订单编号"></div>
-            <button class="btn btn-primary">查询</button>
-            <button class="btn">重置</button>
+      <!-- 售后信息 / 物流信息 -->
+      <div class="od-duo">
+        <div class="card od-card">
+          <div class="card-head">
+            <div class="title">售后信息</div>
           </div>
         </div>
-        <div class="sub-filters">
-          <span class="lbl">生成途径：</span>
-          <span class="opt active" id="src_all" onclick="setSrc('src_all')">全部</span>
-          <span class="opt" id="src_purchase" onclick="setSrc('src_purchase')">购买生成</span>
-          <span class="opt" id="src_system" onclick="setSrc('src_system')">系统生成</span>
-          <span style="width:1px;height:14px;background:var(--line-strong);margin:0 6px"></span>
-          <span class="lbl">下单状态：</span>
-          <span class="opt active" id="ord_all" onclick="setOrd('ord_all')">全部</span>
-          <span class="opt" id="ord_no" onclick="setOrd('ord_no')">未下单</span>
-          <span class="opt" id="ord_yes" onclick="setOrd('ord_yes')">已下单</span>
-        </div>
-        <div class="table-wrap">
-          <table class="lvyunji-table">
-            <thead>
-              <tr>
-                <th>邀请码</th>
-                <th>生成途径</th>
-                <th>生成时间</th>
-                <th>购买人 / 生成人</th>
-                <th>下单状态</th>
-                <th>关联订单编号</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody id="invite_tbody">
-              <tr data-src="purchase" data-ord="yes">
-                <td>A8$kL9#mN2@</td>
-                <td><span class="tag purchase">购买生成</span></td>
-                <td>2026-08-31 14:22:07</td>
-                <td>昵称：服务达人-李<br>账号：13812345678</td>
-                <td><span class="tag ordered">已下单</span></td>
-                <td>605893</td>
-                <td><div class="op-list"><a class="op" onclick="showToast('查看邀请码详情：A8$kL9#mN2@')">查看详情</a></div></td>
-              </tr>
-              <tr data-src="purchase" data-ord="yes">
-                <td>Dg3SUy3@Wq</td>
-                <td><span class="tag purchase">购买生成</span></td>
-                <td>2026-08-31 11:08:45</td>
-                <td>昵称：会员小小<br>账号：13987654321</td>
-                <td><span class="tag ordered">已下单</span></td>
-                <td>605880</td>
-                <td><div class="op-list"><a class="op" onclick="showToast('查看邀请码详情：Dg3SUy3@Wq')">查看详情</a></div></td>
-              </tr>
-              <tr data-src="purchase" data-ord="yes">
-                <td>Hy7*Pz@8Qr</td>
-                <td><span class="tag purchase">购买生成</span></td>
-                <td>2026-08-30 16:55:12</td>
-                <td>昵称：王小妹<br>账号：13645217896</td>
-                <td><span class="tag ordered">已下单</span></td>
-                <td>605875</td>
-                <td><div class="op-list"><a class="op" onclick="showToast('查看邀请码详情：Hy7*Pz@8Qr')">查看详情</a></div></td>
-              </tr>
-              <tr data-src="purchase" data-ord="yes">
-                <td>Bm4@Tn5$Kp</td>
-                <td><span class="tag purchase">购买生成</span></td>
-                <td>2026-08-30 10:31:23</td>
-                <td>昵称：体验达人-赵<br>账号：13578963214</td>
-                <td><span class="tag ordered">已下单</span></td>
-                <td>605868</td>
-                <td><div class="op-list"><a class="op" onclick="showToast('查看邀请码详情：Bm4@Tn5$Kp')">查看详情</a></div></td>
-              </tr>
-              <tr data-src="purchase" data-ord="yes">
-                <td>Wp2#Xc6lYq</td>
-                <td><span class="tag purchase">购买生成</span></td>
-                <td>2026-08-29 19:14:56</td>
-                <td>昵称：老顾客-周<br>账号：13854789632</td>
-                <td><span class="tag ordered">已下单</span></td>
-                <td>605852</td>
-                <td><div class="op-list"><a class="op" onclick="showToast('查看邀请码详情：Wp2#Xc6lYq')">查看详情</a></div></td>
-              </tr>
-              <tr data-src="purchase" data-ord="no">
-                <td>Qt9kFn1!Zd</td>
-                <td><span class="tag purchase">购买生成</span></td>
-                <td>2026-09-01 13:45:30</td>
-                <td>昵称：新用户-陈<br>账号：13820314567</td>
-                <td><span class="tag no-order">未下单</span></td>
-                <td class="muted">—</td>
-                <td><div class="op-list"><a class="op" onclick="showToast('查看邀请码详情：Qt9kFn1!Zd')">查看详情</a><span class="dot">·</span><button class="op danger" onclick="showToast('已禁用该邀请码')">禁用</button></div></td>
-              </tr>
-              <tr data-src="system" data-ord="no">
-                <td>Gc1@Hp9#Rz</td>
-                <td><span class="tag system">系统生成</span></td>
-                <td>2026-09-01 10:02:11</td>
-                <td>生成人：后台运营-袁<br>账号：13800001234<br>购买人：—</td>
-                <td><span class="tag no-order">未下单</span></td>
-                <td class="muted">—</td>
-                <td><div class="op-list"><a class="op" onclick="showToast('查看邀请码详情：Gc1@Hp9#Rz')">查看详情</a><span class="dot">·</span><button class="op danger" onclick="showToast('已禁用该邀请码')">禁用</button></div></td>
-              </tr>
-              <tr data-src="system" data-ord="no">
-                <td>Yt6#Kv2$Lm</td>
-                <td><span class="tag system">系统生成</span></td>
-                <td>2026-08-31 17:36:48</td>
-                <td>生成人：后台运营-袁<br>账号：13800001234<br>购买人：—</td>
-                <td><span class="tag no-order">未下单</span></td>
-                <td class="muted">—</td>
-                <td><div class="op-list"><a class="op" onclick="showToast('查看邀请码详情：Yt6#Kv2$Lm')">查看详情</a><span class="dot">·</span><button class="op danger" onclick="showToast('已禁用该邀请码')">禁用</button></div></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="pager">
-          <span class="total">共 8 条</span>
-          <select class="size-select"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>
-          <div class="pages"><button class="pg">&lt;</button><button class="pg active">1</button><button class="pg">&gt;</button></div>
-          <div class="jump"><span>跳转</span><input class="input" value="1"><span>页</span></div>
+        <div class="card od-card">
+          <div class="card-head">
+            <div class="title">物流信息</div>
+          </div>
+          <div class="od-grid od-grid-2">
+            <div class="od-item"><span class="k">物流公司:</span><span class="v"></span></div>
+            <div class="od-item"><span class="k">物流单号:</span><span class="v"></span></div>
+          </div>
         </div>
       </div>
+
     </section>
   </main>
 </div>
@@ -1490,28 +1506,6 @@ function toast(msg){
   t.classList.add('show');
   clearTimeout(window.__toastT);
   window.__toastT = setTimeout(function(){ t.classList.remove('show'); }, 1600);
-}
-/* ============== 邀请码管理视图（搬入 hub，复用侧栏） ============== */
-let currentSrc='all', currentOrd='all';
-function setSrc(id){
-  document.querySelectorAll('[id^="src_"]').forEach(function(el){ el.classList.remove('active'); });
-  document.getElementById(id).classList.add('active');
-  currentSrc = id.replace('src_','');
-  applyInviteFilter();
-}
-function setOrd(id){
-  document.querySelectorAll('[id^="ord_"]').forEach(function(el){ el.classList.remove('active'); });
-  document.getElementById(id).classList.add('active');
-  currentOrd = id.replace('ord_','');
-  applyInviteFilter();
-}
-function applyInviteFilter(){
-  var tb = document.getElementById('invite_tbody'); if(!tb) return;
-  tb.querySelectorAll('tr').forEach(function(tr){
-    var src = tr.getAttribute('data-src'), ord = tr.getAttribute('data-ord');
-    var ok = (currentSrc==='all' || src===currentSrc) && (currentOrd==='all' || ord===currentOrd);
-    tr.style.display = ok ? '' : 'none';
-  });
 }
 function showToast(msg){
   var t = document.getElementById('toast'); if(!t) return;
