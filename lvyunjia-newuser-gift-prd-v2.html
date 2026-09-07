@@ -57,12 +57,12 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <body>
 <div class="wrap">
 
-<h1>绿韵家App · 新人激活码礼包 PRD <span class="sub">V3.0 · 2026-09-07 · 基于墨刀 V4 原型更新（双 Tab 聚合页 / 会员价 / 兑换流程对齐）</span></h1>
+<h1>绿韵家App · 新人激活码礼包 PRD <span class="sub">V3.2 · 2026-09-07 · 后台简化（B16-18 仅列新增数据 / 新增 B19 邀请码管理）+ C 端 13 屏重截（内容裁切）</span></h1>
 
 <div class="meta-grid">
   <div class="b"><div class="k">项目名称</div><div class="v">绿韵家App · 新人激活码礼包</div></div>
   <div class="b"><div class="k">文档状态</div><div class="v">评审中（V1.0 已废，本版为新基线）</div></div>
-  <div class="b"><div class="k">版本号</div><div class="v">V3.0</div></div>
+  <div class="b"><div class="k">版本号</div><div class="v">V3.2</div></div>
   <div class="b"><div class="k">产品负责人</div><div class="v">袁中天（产品）</div></div>
   <div class="b"><div class="k">技术 Owner</div><div class="v">⚠️ 待确认 @技术组</div></div>
   <div class="b"><div class="k">测试 Owner</div><div class="v">⚠️ 待确认 @测试组</div></div>
@@ -98,6 +98,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
     <li><a href="#a1">后台 - 商家商品管理（viewList）</a></li>
     <li><a href="#a2">后台 - 新增商品（viewCreate）</a></li>
     <li><a href="#a3">后台 - 订单管理（viewOrders）</a></li>
+    <li><a href="#a4">后台 - 邀请码管理（新增 · viewInviteCodes）</a></li>
   </ol>
 </li>
 <li><a href="#s5">非功能性需求</a></li>
@@ -126,7 +127,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <table>
 <thead><tr><th>版本</th><th>日期</th><th>修订人</th><th>修订内容</th><th>状态</th></tr></thead>
 <tr><td>V1.0</td><td>2026-09-01</td><td>袁中天</td><td>旧版 PRD（仅文字，无原型截图；含图生图内容）</td><td>废</td></tr>
-<tr><td>V2.0</td><td>2026-09-03</td><td>袁中天</td><td>基于已确认的 C 端 + 商家后台双端原型重写；剔除图生图/AI 商业化内容；18 张原型截图入正文；§四按页面拆解至按钮级</td><td>评审中</td></tr><tr><td>V3.0</td><td>2026-09-07</td><td>袁中天</td><td>C 端原型按墨刀 12 屏 1:1 更新为 V4（p_gift_intro 双 Tab 聚合页取代原 p_invite_detail 独立页；补会员价 ¥35；兑换流程 code-modal 对齐）；本 PRD 同步 §C2/C3 合并为聚合页、§C4 补会员价、FAB 导航修正</td><td>评审中</td></tr>
+<tr><td>V2.0</td><td>2026-09-03</td><td>袁中天</td><td>基于已确认的 C 端 + 商家后台双端原型重写；剔除图生图/AI 商业化内容；18 张原型截图入正文；§四按页面拆解至按钮级</td><td>评审中</td></tr><tr><td>V3.0</td><td>2026-09-07</td><td>袁中天</td><td>C 端原型按墨刀 12 屏 1:1 更新为 V4（p_gift_intro 双 Tab 聚合页取代原 p_invite_detail 独立页；补会员价 ¥35；兑换流程 code-modal 对齐）；本 PRD 同步 §C2/C3 合并为聚合页、§C4 补会员价、FAB 导航修正</td><td>评审中</td></tr><tr><td>V3.2</td><td>2026-09-07</td><td>袁中天</td><td>① 修流程图「双 FAB」错描述（实为单 FAB → 双 Tab）；② C 端 13 屏按内容尺寸重截（裁掉空白）推 GitHub；③ 后台按「沿用现有 + 仅列新增数据」重写：B16 商品管理仅加商品类型=兑换券、B17 新增商品仅加兑换商品设置+会员价、B18 订单管理仅加订单类型（9-04 裁定删订单管理「生成邀请码」按钮）；④ 新增 B19 邀请码管理页（hub 菜单 + code 表 + 退款失效异常处理）</td><td>评审中</td></tr>
 </table>
 
 <!-- ============ 二 ============ -->
@@ -398,6 +399,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <tr><td>管理后台</td><td>沿用 + 改动</td><td><b>本需求仅覆盖平台端</b>；商家后台只承担「商品维护 + 订单查询 / 导出」，不做营销配置</td></tr>
 <tr><td rowspan="4">业务模块</td><td>商品中心 → 商品管理</td><td>改动</td><td>商品类型新增「兑换商品」枚举；新增「兑换商品设置」（B16 / B17）；礼包价格、库存、上下架均在此配置</td></tr>
 <tr><td>交易 → 订单管理</td><td>改动</td><td>订单类型新增「邀请码订单」「兑换订单」；新增类型筛选与按类型导出（B18）</td></tr>
+<tr><td>交易 → 邀请码管理（新增菜单）</td><td>新增</td><td>hub 侧栏新增「邀请码管理」页；邀请码列表 + code 表（B19）</td></tr>
 <tr><td>会员中心</td><td>改动</td><td>用户表新增 <code>activated</code>（是否已激活新人礼包）字段，用于 FAB 显隐与兑换资格校验</td></tr>
 <tr><td>水权益（水袋）</td><td>新增</td><td>新增独立水权益订单实体与状态机（§3.4），不并进兑换订单商品行</td></tr>
 <tr><td rowspan="2">数据 / 实体</td><td>新增实体</td><td>新增</td><td>邀请码表（code）、水权益表（water_bag）</td></tr>
@@ -747,136 +749,72 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <!-- ==================== 后台 ==================== -->
 
 <h3 id="a1"><span class="section-mark">B</span>16. 页面：商家商品管理（后台 viewList）</h3>
-<div class="screenshot admin"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/admin_goods_list.png" alt="商品管理"></div>
+<div class="screenshot admin"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/admin_goods.png" alt="商品管理"></div>
 
-<h4>16.1 页面原型与交互示意</h4>
-<p>左侧侧栏：商品中心（商品管理 / 商家素材管理）/ 交易（订单管理 / 订单源设置）/ 会员中心（会员管理）/ 数据中心 / 运维中心（广告位管理 / 新建广告 / 商品审核 / 商品举报 / 健保专区 / 专题管理 / 商品评价）。顶部水平 nav：首页 / 商家管理 / … / 商家商品管理（高亮）/ 新增商品 / 订单管理。主区：</p>
-<ul>
-<li> 标题「商家商品管理」+ 按钮（查询 / 新增商品 / 重置）
-<li> 3 Tab：全部(344) / 已上架(273) / 已下架(71)
-<li> 主筛选行：商家类型 / 商家 / 商品名 / <b>商品类型</b>（全部/实体商品/团购商品/海淘/跨境）/ 是否建立加价单 / 运营类型
-<li> 二级筛选：批量操作下拉（批量上架/下架/改价/删除）+ 「批量删除」按钮
-<li> 表格 13 列：☑ / 商品编号 / 商品 / 审核状态 / 品牌分类 / 是否建立加价单 / 运营类型 / 商品状态 / 库存 / 商家 / 类型 / 排序 / 操作（查看·编辑·上架·删除·复制商品 / 下架·复制商品）
-<li> 分页：共 344 条 / 10 条·页 / 1 2 3 4 5 › ... 35 / 跳转页码
-</li></li></li></li></li></li></ul>
-
-<h4>16.2 详细逻辑规则</h4>
-<h5>16.2.1 界面与展示规则（列表字段表）</h5>
+<p>本页<strong>沿用现有商品列表页整体框架</strong>（列表 / 筛选 / 排序 / 分页 / 上下架），本期仅在「商品类型」维度上<strong>新增一种枚举值</strong>，不改动任何既有字段与交互。</p>
 <table>
-<thead><tr><th>字段</th><th>需求说明</th><th>数据来源</th></tr></thead>
-<tr><td>商品编号</td><td>商品表主键（如 589）</td><td>取《goods表》id</td></tr>
-<tr><td>商品</td><td>缩略图 + 商品名（如「惠民补贴-198储水卡」）+ 商品 ID + 「实践商品」标</td><td>取《goods表》name/goods_id</td></tr>
-<tr><td>审核状态</td><td>enum: <code>passed</code>=已通过 / <code>rejected</code>=已拒绝 / <code>pending</code>=待审核</td><td>取《goods表》audit_status</td></tr>
-<tr><td>品牌分类</td><td>品牌: xxx / 分类: 一级/二级/三级</td><td>取《brand表》+《category表》</td></tr>
-<tr><td>是否建立加价单</td><td>enum: 是/否</td><td>取《goods表》has_markup</td></tr>
-<tr><td>运营类型</td><td>enum: 履约补贴 / 常规 / 拼团 / 秒杀 / 新人特惠 / 惠民补贴 / 数字人 / 进阶会员 / 享瘦套餐 / 换购商品</td><td>取《goods表》op_type</td></tr>
-<tr><td>商品状态</td><td>enum: 已上架 / 未上架 / 已下架</td><td>取《goods表》status</td></tr>
-<tr><td>库存</td><td>整数（如 10752）；0 时行不变色（仅 UI 层可选加红字）</td><td>取《goods表》stock</td></tr>
-<tr><td>商家</td><td>商家名 + 「厂家/经销商」类型</td><td>取《merchant表》</td></tr>
-<tr><td>类型</td><td>角标：厂家 / 经销商 / …</td><td>取《merchant表》type</td></tr>
-<tr><td>排序</td><td>主排序值 + 「约 N」预估位置（公式 ⚠️ 待确认 @技术组）</td><td>取《goods表》sort</td></tr>
-<tr><td>操作</td><td>按 status 展示不同操作集：未上架 = 查看·编辑·上架·删除·复制商品；已上架 = 查看·下架·复制商品</td><td>前端按 status 条件渲染</td></tr>
+<thead><tr><th>维度</th><th>改动说明</th><th>数据来源</th></tr></thead>
+<tr><td>商品类型枚举</td><td>新增「<b>兑换商品</b>」选项；仅此类型可被邀请码兑换（其余类型沿用既有逻辑）</td><td>取《goods 表》goods_type 枚举</td></tr>
+<tr><td>列表筛选</td><td>筛选区「商品类型」下拉新增「兑换商品」；勾选后仅展示兑换类商品</td><td>沿用列表筛选组件</td></tr>
+<tr><td>列表展示</td><td>兑换类商品卡片沿用现有商品卡片样式；无新增专属列</td><td>—</td></tr>
 </table>
+<p class="callout">说明：商品的新增 / 编辑、价格、库存、上下架流程均沿用现有功能，本 PRD 不重复描述。</p>
 
-<h5>16.2.2 业务逻辑与边界条件</h5>
-<ul>
-<li> 「新增商品」 → <code>go('create')</code> 跳转 §B17
-<li> 「上架/下架/删除/批量删除/批量上架/批量下架/批量改价」→ 调后后端接口；成功 Toast「操作成功」；失败 Toast「操作失败，请重试」
-<li> 搜索/筛选/重置：本期前端<b>不实际过滤</b>（仅 UI 占位，依赖后端联调）；⚠️ 待确认 @技术组
-<li> 排序字段：本期不实排，按 ID 倒序展示
-</li></li></li></li></ul>
-
-<h3 id="a2"><span class="section-mark">B</span>17. 页面：新增商品（后台 viewCreate）</h3>
+<h3 id="a2"><span class="section-mark">B</span>17. 页面：新增 / 编辑商品（后台 viewCreate）</h3>
 <div class="screenshot admin"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/admin_goods_create.png" alt="新增商品"></div>
 
-<h4>17.1 页面原型与交互示意</h4>
-<p>顶部水平 nav 高亮「新增商品」。主区 4 张卡：</p>
-<ul>
-<li> <b>基础信息</b>：分类 / 品牌 / <span class="kw">*</span>商品名（maxlength=60，0/60 计数）/ <span class="kw">*</span>商家 / 商品类型（实体/团购/淘客/跨店 radio）/ 运营类型（9 个 radio）/ <span class="kw">*</span>本地生活分类 / 是否使用优惠券（是/否 radio）/ 销售时间（开始/结束日期）/ 商品货号（maxlength=60）/ <span class="kw">*</span>起购数量（stepper，默认 1）/ <span class="kw">*</span>限购数量（stepper，默认 0，「0 为不限购」）/ <span class="kw">*</span>商品排序（stepper，默认 0，「排序值越大越靠前」）/ 商品标签（chip + 「+」）/ 关键词（输入框 + 「+」）/ 卖点（textarea，maxlength=60）
-<li> <b>商品规格</b>：规格行（<span class="kw">*</span>规格名1 / 添加规格图片 / 购买级别(z) / 子规格 / 「+ 创建新规格」按钮）
-<li> <b>商品参数</b>：「+ 添加新参数」按钮（参数列表本身为空）
-<li> <b>商品详情</b>：5 张图上传（<span class="kw">*</span>商品主图 750×750 / 商城封面图 700×465 / <span class="kw">*</span>商品轮播图 640×640 ×9 张 / 商城内图片 500×400 / <span class="kw">*</span>详情图 600-1800×≥400，1-20 张）
-<li> 底部按钮：取消 / 保存
-</li></li></li></li></li></ul>
-
-<h4>17.2 详细逻辑规则</h4>
-<h5>17.2.1 界面与展示规则（表单字段表）</h5>
+<p>本页<strong>沿用现有「新增商品」4 张卡结构</strong>（基础信息 / 商品规格 / 商品参数 / 商品详情）与全部原有字段。本期<strong>仅新增与兑换相关的字段</strong>：</p>
 <table>
-<thead><tr><th>卡片</th><th>字段</th><th>类型</th><th>必填</th><th>长度/枚举/限制</th></tr></thead>
-<tr><td>基础信息</td><td>分类</td><td>select</td><td>—</td><td>一级/二级/三级联动</td></tr>
-<tr><td>基础信息</td><td>品牌</td><td>select</td><td>—</td><td>由品牌表枚举</td></tr>
-<tr><td>基础信息</td><td>商品名</td><td>text</td><td><span class="kw">*</span></td><td>1-60 字</td></tr>
-<tr><td>基础信息</td><td>商家</td><td>select</td><td><span class="kw">*</span></td><td>由商家表枚举</td></tr>
-<tr><td>基础信息</td><td>商品类型</td><td>radio</td><td>—</td><td>实体商品 / 团购商品 / 淘客 / 跨店</td></tr>
-<tr><td>基础信息</td><td>运营类型</td><td>radio</td><td>—</td><td>拼团 / 常规 / 秒杀 / 新人特惠 / 惠民补贴 / 数字人 / 进阶会员 / 享瘦套餐 / 换购商品</td></tr>
-<tr><td>基础信息</td><td>本地生活分类</td><td>select</td><td><span class="kw">*</span></td><td>由本地生活分类枚举</td></tr>
-<tr><td>基础信息</td><td>是否使用优惠券</td><td>radio</td><td>—</td><td>是 / 否（默认否）</td></tr>
-<tr><td>基础信息</td><td>销售时间</td><td>date range</td><td>—</td><td>开始/结束日期；本期不校验 ⚠️</td></tr>
-<tr><td>基础信息</td><td>商品货号</td><td>text</td><td>—</td><td>0-60 字</td></tr>
-<tr><td>基础信息</td><td>起购数量</td><td>stepper</td><td><span class="kw">*</span></td><td>整数 ≥ 1（默认 1）</td></tr>
-<tr><td>基础信息</td><td>限购数量</td><td>stepper</td><td><span class="kw">*</span></td><td>整数 ≥ 0（0=不限购）</td></tr>
-<tr><td>基础信息</td><td>商品排序</td><td>stepper</td><td><span class="kw">*</span></td><td>整数（越大越靠前）</td></tr>
-<tr><td>基础信息</td><td>商品标签</td><td>chip + +</td><td>—</td><td>chip 输入 + 回车添加；× 删除</td></tr>
-<tr><td>基础信息</td><td>关键词</td><td>text + +</td><td>—</td><td>回车添加；上限 ⚠️ 待确认</td></tr>
-<tr><td>基础信息</td><td>卖点</td><td>textarea</td><td>—</td><td>0-60 字</td></tr>
-<tr><td>商品规格</td><td>规格名1</td><td>select</td><td><span class="kw">*</span></td><td>由规格库枚举</td></tr>
-<tr><td>商品规格</td><td>添加规格图片</td><td>image</td><td>—</td><td>每规格一张</td></tr>
-<tr><td>商品规格</td><td>购买级别(z)</td><td>select</td><td>—</td><td>不限制 / 初级会员 / 中级会员 / 高级会员</td></tr>
-<tr><td>商品参数</td><td>参数项</td><td>key-value</td><td>—</td><td>动态添加</td></tr>
-<tr><td>商品详情</td><td>商品主图</td><td>image</td><td><span class="kw">*</span></td><td>1 张，≤800KB，建议 750×750</td></tr>
-<tr><td>商品详情</td><td>商城封面图</td><td>image</td><td>—</td><td>1 张，≤800KB，建议 700×465</td></tr>
-<tr><td>商品详情</td><td>商品轮播图</td><td>image</td><td><span class="kw">*</span></td><td>1-9 张，≤800KB，建议 640×640</td></tr>
-<tr><td>商品详情</td><td>商城内图片</td><td>image</td><td>—</td><td>1 张，≤800KB，建议 500×400</td></tr>
-<tr><td>商品详情</td><td>详情图</td><td>image</td><td><span class="kw">*</span></td><td>1-20 张，宽 600-1800、高 ≥400</td></tr>
+<thead><tr><th>位置</th><th>新增字段</th><th>说明</th><th>数据来源</th></tr></thead>
+<tr><td>基础信息 · 商品类型</td><td>radio 新增「<b>兑换商品</b>」</td><td>选中后<strong>条件显示</strong>下方「兑换商品设置」分组；其余类型不显示</td><td>取《goods 表》goods_type</td></tr>
+<tr><td rowspan="2">基础信息 · 兑换商品设置（仅商品类型=兑换商品时显示）</td><td>关联 SKU（多选）</td><td>≥1 个；即该兑换商品套装包含的具体 SKU（如益齿健牙膏 / 辅酶 Q10 / 5L 饮用水）</td><td>取《sku 表》</td></tr>
+<tr><td>兑换次数限制</td><td>默认 1；1 个邀请码可兑换的份数</td><td>取《goods 表》redeem_limit</td></tr>
+<tr><td>基础信息 · 会员价</td><td>会员价（number，¥）</td><td>可选，默认 = 销售价；用于 §C4 自购路径的会员价计算（会员实付 = 会员价，自动 -¥14.9）</td><td>取《goods 表》member_price</td></tr>
 </table>
-
-<h5>17.2.2 业务逻辑与边界条件</h5>
-<ul>
-<li> 「保存」按钮 → 提交《goods表》写入；成功 Toast「保存成功」+ 跳 viewList；失败 Toast「保存失败：{err}」
-<li> 「取消」按钮 → 二次确认弹窗（是否放弃编辑？）→ 确认后跳 viewList
-<li> 边界：图片上传走统一的图片上传服务；超过 800KB 提示「图片过大，请压缩后上传」；超数量（轮播 >9、详情图 >20） 阻止继续上传
-<li> 校验：商品名/商家/本地生活分类/起购数量/限购数量/商品排序 为必填，<b>未填点保存 → 高亮缺字段 + Toast「请补全必填项：商品名/商家/...」</b>
-<li> 规格/参数：本原型仅展示 1 行规格骨架，「+ 创建新规格」/「+ 添加新参数」/「+ 添加子规格」均未接线，⚠️ 待确认 @技术组（后续版本扩）
-</li></li></li></li></li></ul>
+<p class="callout">说明：销售价、库存、规格、参数、详情图等全部沿用现有字段与校验，本 PRD 不重复列举。</p>
 
 <h3 id="a3"><span class="section-mark">B</span>18. 页面：订单管理（后台 viewOrders）</h3>
 <div class="screenshot admin"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/admin_orders.png" alt="订单管理"></div>
 
-<h4>18.1 页面原型与交互示意</h4>
-<p>主区 1 张卡（订单列表）：</p>
-<ul>
-<li> 标题「订单列表」+ 按钮（查询 / 重置 / 「导出当前筛选订单(4)」/ 「导出发货订单」）
-<li> 子导航：订单列表（高亮）/ 批量发货(589) / 导出虚拟订单
-<li> 8 Tab（状态）：全部(152907) / 拼团中(1) / 待发货(589) / 即将逾期发货(0) / 已逾期(2207) / 备货中(1621) / 已发货(4) / 已完成(147478)
-<li> 主筛选行：日期范围（2026-08-25 至 2026-09-01）/ 主订单编号 / 子订单编号 / 下单人 / 支付订单号 / 微信支付订单号
-<li> 二级筛选：<b>订单类型：全部(4) / 常规订单(0) / 新人订单(1) / 兑换订单(3)</b>
-<li> 表格 10 列：订单编号 / 支付订单号 / 订单类型 / 下单时间 / 实付金额 / 购买人信息 / 付款人信息 / 收货人信息 / 商品 / 操作
-</li></li></li></li></li></li></ul>
-
-<h4>18.2 详细逻辑规则</h4>
-<h5>18.2.1 界面与展示规则（列表字段表）</h5>
+<p>本页<strong>沿用现有订单列表页框架</strong>（8 个状态 Tab / 主筛选 / 导出 / 备注 / 10 列表格）。本期<strong>仅新增「订单类型」维度</strong>，并调整操作列：</p>
 <table>
-<thead><tr><th>字段</th><th>需求说明</th><th>数据来源</th></tr></thead>
-<tr><td>订单编号</td><td>主订单编号（26…） + 子订单编号（6058…）</td><td>取《order表》order_no/sub_order_no</td></tr>
-<tr><td>支付订单号</td><td>支付单号 + 微信支付单号（兑换订单为「--」）</td><td>取《payment表》</td></tr>
-<tr><td>订单类型</td><td><code>normal</code>=常规订单（灰）/ <code>member</code>=新人订单（橙）/ <code>exchange</code>=兑换订单（蓝）</td><td>取《order表》type</td></tr>
-<tr><td>下单时间</td><td>YYYY-MM-DD HH:MM 格式</td><td>取《order表》create_time</td></tr>
-<tr><td>实付金额</td><td>总金额 / 优惠折扣 / 运费 / 实付；新人订单= ¥35.00（-¥14.90）/ 兑换订单= ¥49.90（-¥49.90，邀请码全额抵扣，实付 ¥0.00）</td><td>取《order表》paid/discount/freight</td></tr>
-<tr><td>购买人信息</td><td>昵称 + 昵称ID + 手机号</td><td>取《user表》</td></tr>
-<tr><td>付款人信息</td><td>同购买人（默认），可不同</td><td>取《order表》payer_id</td></tr>
-<tr><td>收货人信息</td><td>新人订单 = 「-- 不需要收货地址 --」；兑换订单 = 收货人 + 手机 + 地址</td><td>取《address表》</td></tr>
-<tr><td>商品</td><td>缩略图 + 商品名 + 商品 ID</td><td>取《goods表》</td></tr>
-<tr><td>操作</td><td>新人订单：查看详情·生成邀请码 / 备注；兑换订单：查看详情 / 备注</td><td>前端按 type 条件渲染</td></tr>
+<thead><tr><th>维度</th><th>改动说明</th><th>数据来源</th></tr></thead>
+<tr><td>订单类型枚举</td><td>在原有 <code>normal</code>=常规订单（灰）基础上，新增：<br><code>member</code>=邀请码订单（橙，购买激活码生成）<br><code>exchange</code>=兑换订单（蓝，邀请码核销生成）</td><td>取《order 表》type</td></tr>
+<tr><td>二级筛选（订单类型）</td><td>新增：全部 / 常规订单 / 邀请码订单 / 兑换订单；按 data-type 控制行显隐</td><td>沿用列表筛选组件</td></tr>
+<tr><td>操作列（按 type 渲染）</td><td>邀请码订单：查看详情 · 备注<br>兑换订单：查看详情 · 备注<br><span class="kw">⚠️ 9-04 裁定：订单管理操作列已删除「生成邀请码」按钮，生成入口移至 §B19 邀请码管理页</span></td><td>前端按 type 条件渲染</td></tr>
+<tr><td>实付金额显示</td><td>邀请码订单 ¥49.90 → ¥35.00（-¥14.90，会员价）<br>兑换订单 ¥49.90 → ¥0.00（邀请码全额抵扣，支付单号显示「--」）</td><td>取《order 表》paid</td></tr>
+<tr><td>收货人</td><td>邀请码订单 = 「-- 不需要收货地址 --」<br>兑换订单 = 收货人 + 手机 + 地址</td><td>取《address 表》</td></tr>
+<tr><td>CSV 导出</td><td>支持按当前「订单类型」筛选条件导出</td><td>沿用导出组件</td></tr>
 </table>
 
-<h5>18.2.2 业务逻辑与边界条件</h5>
+<h3 id="a4"><span class="section-mark">B</span>19. 页面：邀请码管理（新增 · hub viewInviteCodes）</h3>
+<div class="screenshot admin"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/admin_invite_codes.png" alt="邀请码管理"></div>
+
+<p>商家后台 hub 侧栏<strong>新增「邀请码管理」菜单</strong>（本期新页面，复用 hub 框架，不跳独立页）。本页<strong>沿用 hub 列表通用框架</strong>（筛选 / 分页 / 导出），仅列新增 / 差异项：</p>
+<table>
+<thead><tr><th>维度</th><th>说明</th></tr></thead>
+<tr><td>顶部操作</td><td>「批量导出」+「+ 生成邀请码」<span class="kw">⚠️ 按钮功能待补，本期不接线</span></td></tr>
+<tr><td>筛选条件</td><td>生成时间 / 邀请码 / 购买人·生成人 / 关联订单编号</td></tr>
+<tr><td>二级筛选</td><td>生成途径（全部 / 购买生成 / 系统生成）+ 下单状态（全部 / 未下单 / 已下单）</td></tr>
+<tr><td>表格 7 列</td><td>邀请码 / 生成途径 / 生成时间 / 购买人·生成人 / 下单状态 / 关联订单编号 / 操作（查看详情）</td></tr>
+</table>
+
+<h4>19.1 新增数据实体：code 表（邀请码）</h4>
+<table>
+<thead><tr><th>字段</th><th>说明</th><th>取值</th></tr></thead>
+<tr><td>code_value</td><td>邀请码值</td><td>≥8 位，含大小写字母 + 特殊符号（与 §C13 校验一致）</td></tr>
+<tr><td>gen_time</td><td>生成时间</td><td>datetime</td></tr>
+<tr><td>status</td><td>状态</td><td>unused（未使用）/ used（已核销）/ expired（已失效）</td></tr>
+<tr><td>use_time</td><td>使用时间</td><td>核销成功时写入</td></tr>
+<tr><td>order_no</td><td>关联订单号</td><td>购买邀请码订单（member）/ 兑换订单（exchange）</td></tr>
+<tr><td>user_id</td><td>关联购买人</td><td>生成该码的会员 user_id</td></tr>
+<tr><td>gen_way</td><td>生成途径</td><td>buy（购买生成）/ sys（系统生成）</td></tr>
+</table>
+
+<h4>19.2 异常处理（仅本期明确一项）</h4>
 <ul>
-<li> 订单类型二级筛选：点击 opt_all/opt_normal/opt_newuser/opt_exchange → 控制 tr 显示/隐藏（按 data-type）
-<li> 「生成邀请码」操作（仅新人订单）：弹窗输入数量 N → 后端调码生成接口 → 成功 Toast「已生成 N 个邀请码，已存入买家『我的邀请码』」+ 跳用户详情
-<li> 「导出当前筛选订单(N)」 → 按当前筛选条件导出 CSV；「导出发货订单」导出 status=toship/receiving 的订单
-<li> 边界：示例数据中<b>商品名</b>沿用实物商家后台订单列表的字段；本期按实物忠实复刻：会员订单商品名 = 「套装购物礼包」（实物订单列表第一个商品名）；兑换订单商品名 = 「新人礼包（实体商品组合）」——<b>⚠️ 注：「套装购物礼包」「新人礼包（实体商品组合）」是实物订单页的当前商品名，按实物复刻保留；本 PRD 业务口径中礼包正式名为「新人礼包 - 益齿健套装」（与 C 端一致），具体文案同步规范以业务组口径为准 ⚠️ 待确认</b>
-<li> 校验：日期范围 / 订单号 / 微信支付单号：本原型不实过滤，仅 UI 占位；⚠️ 待确认 @技术组
-</li></li></li></li></li></ul>
+<li> <strong>生成码后后台退款导致码失效</strong>：若邀请码订单（member）发生退款（全额 / 部分），该订单生成的邀请码状态置为 <code>expired</code>；若码已被核销（used），则标记异常并通知运营介入。C 端已核销并发放权益的订单<strong>不回滚</strong>（权益不追溯）。<span class="kw">⚠️ 退款回调字段、通知渠道待确认 @技术组</span></li>
+</ul>
 
 <!-- ============ 五 ============ -->
 <h2 id="s5">五、非功能性需求</h2>
@@ -915,7 +853,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <tr><td>water_bag_first_pickup</td><td>水袋首取</td><td>C 端</td><td>App/H5/小程序</td><td>用户到店扫码首取 1 袋</td><td>水权益订单号、累计已取袋数</td><td>对应 §3.4 状态机</td></tr>
 </table>
 
-<p class="callout">埋点补充：后台「生成邀请码」操作对应事件 <code>admin_gen_invite_done</code>，参数含操作人、数量、关联订单号。所有事件英文名严格遵循 v2.3 既有目录，不新增事件定义。</p>
+<p class="callout">埋点补充：邀请码管理页「+ 生成邀请码」操作（待补）对应事件 <code>admin_gen_invite_done</code>，参数含操作人、数量、关联订单号。所有事件英文名严格遵循 v2.3 既有目录，不新增事件定义。</p>
 
 <!-- ============ 六 ============ -->
 <h2 id="s6">六、验收标准</h2>
@@ -932,7 +870,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <tr><td>AC-08</td><td>地址表单校验</td><td>新增地址页</td><td>姓名/手机号/省市区/详细地址 任一留空 → 点保存</td><td>对应 Toast 提示，地址不保存</td></tr>
 <tr><td>AC-09</td><td>手机号格式校验</td><td>同上</td><td>输入手机号「139123456」点保存</td><td>Toast「请输入 11 位手机号」</td></tr>
 <tr><td>AC-10</td><td>水权益订单创建</td><td>AC-03 成功后</td><td>检查用户水权益列表</td><td>新增 1 条水权益订单，状态=待首取，总袋数=7</td></tr>
-<tr><td>AC-11</td><td>后台新人订单「生成邀请码」</td><td>viewOrders 列表 1 条 type=member 订单</td><td>点「生成邀请码」→ 输入 5</td><td>Toast「已生成 5 个邀请码」；订单购买人「我的邀请码」+5</td></tr>
+<tr><td>AC-11</td><td>邀请码管理页「+ 生成邀请码」</td><td>viewInviteCodes 页（§B19）</td><td>点「+ 生成邀请码」→ 输入 5</td><td>⚠️ 按钮功能待补（本期不接线），验收以技术组实现为准</td></tr>
 <tr><td>AC-12</td><td>后台兑换订单筛选</td><td>viewOrders</td><td>点「兑换订单」二级筛选</td><td>只展示 data-type=exchange 的 3 条订单</td></tr>
 <tr><td>AC-13</td><td>非会员不能买邀请码</td><td>_user.level=guest</td><td>首页 → 新人礼包 FAB → 聚合页（购买 Tab） → 立即购买</td><td>后端校验会员等级失败 → Toast「该礼包为会员专享，请先开通会员」</td></tr>
 <tr><td>AC-14</td><td>水袋状态机过期清零</td><td>水权益订单状态=已生效，已过 30 天</td><td>用户尝试再次取水</td><td>扫码返回「权益已过期」</td></tr>
