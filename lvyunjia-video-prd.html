@@ -302,16 +302,16 @@
   <line x1="265" y1="150" x2="265" y2="188" stroke="#90A4AE" marker-end="url(#as)"/>
   <text class="lb" x="322" y="172" fill="#546E7A">点「取消」</text>
 
-  <!-- 失败→重试 -->
+  <!-- 失败→空状态进入 -->
   <path d="M705,152 Q705,215 340,215" fill="none" stroke="#666" stroke-dasharray="5 4" marker-end="url(#as)"/>
-  <text class="lb" x="520" y="238" text-anchor="middle">点「重试」→ 重新提交（再次扣减）</text>
+  <text class="lb" x="520" y="238" text-anchor="middle">点击失败项 → 进入创作页（不预填原信息）</text>
 
   <text class="lb" x="900" y="34" text-anchor="end" fill="#999">图 3-2 单条作品状态机</text>
 </svg></div>
 <ul>
   <li><b>生成中</b>：列表项图标=沙漏，标签 = 「生成中」+ 取消按钮（点击后状态变「已取消」并释放冻结灵感值）。</li>
   <li><b>已完成</b>：图标=胶片/花朵，标签 = 「生视频 · 9:16 · 2026-08-18 16:05」。</li>
-  <li><b>失败</b>：列表项置灰，标签 = 「生成失败」，提供「重试」操作；已扣减的灵感值按退款规则返还（沿用 ai-generation PRD §4.1.5）。</li>
+  <li><b>失败</b>：列表项置灰，标签 = 「生成失败」；toast 提示「生成失败，已返还灵感值」；<b>不提供重试按钮</b>；点击该列表项直接进入创作页（<b>不预填原首帧图、画面描述、参数</b>，由用户重新填写后再次提交）。已扣减的灵感值按退款规则返还（沿用 ai-generation PRD §4.1.5）。</li>
 </ul>
 
 <h2>四、功能需求详情</h2>
@@ -393,7 +393,7 @@
   <li>任务失败 → 释放冻结灵感值并按退款规则返还，写失败日志。</li>
 </ol>
 
-<h4 id="4.2.8">4.2.8 额度不足弹窗（本期新增）<span class="tag r">V0.1 定稿</span></h4>
+<h4 id="4.2.8">4.2.8 额度不足弹窗（本期新增）<span class="tag y">V0.1 定稿</span></h4>
 <p>原型：<code>额度不足.png</code>。当用户灵感值 < 本次预计消耗时触发。</p>
 <div class="shot-row">
   <div class="col"><img class="shot" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/c_insufficient_credit.png" alt="额度不足弹窗"><div class="shot-cap">图 4-2 额度不足弹窗</div></div>
@@ -407,9 +407,7 @@
   <tr><td>购买额度</td><td>① 优先尝试积分抵扣：若用户当前积分 ≥ 600 且「不再提示」勾选有效（本期始终走提示，二期再做默认抵扣），弹「确认用 600 积分兑换？」→ 确认后扣 600 积分、+1 额度，继续提交；② 否则跳「购买灵感值」页（沿用 ai-generation PRD §4.1.4）</td></tr>
   <tr><td>「额度不足不再提示自动用积分抵扣」</td><td>勾选项，勾选后本次会话内再次触发该弹窗直接走积分抵扣（不弹窗）。<b>会话级</b>，下次进入 App 重置。落库字段 user_pref.no_credit_popup，本期可不落库（仅前端 sessionStorage 即可），建议落库便于跨设备一致。</td></tr>
 </table>
-<div class="warn">
-<b>关键确认（@袁中天）</b>：600 积分 = 1 额度 <span class="tbd">是否为定稿</span>？积分抵扣来源是「绿韵家会员积分体系」还是「独立平台积分」？两套积分体系在本 App 是否打通？需在 §9 拍板。
-</div>
+<div class="tip"><b>V0.1 定稿</b>：① 「600 积分 = 1 额度」为本期定稿，来源为<b>会员积分体系</b>（绿韵家会员积分/平台积分已打通，抵扣前不区分）；② 勾选「额度不足不再提示自动用积分抵扣」落库字段 <code>user_pref.no_credit_popup</code>，跨设备一致；取消按钮不扣减；用户拒绝 / 取消勾选后下次额度不足仍走提示流程。</div>
 
 <h4>4.2.9 积分不足弹窗</h4>
 <p>原型：<code>积分不足 .png</code>。当用户在额度不足弹窗点「购买额度」、但其当前积分 = 0 时触发（积分不足导致无法抵扣）。</p>
@@ -438,7 +436,7 @@
   <tr><td>开始你的 AI 创作 / 新人首单 Banner</td><td>无差异（沿用）</td></tr>
   <tr><td>生成记录列表-图标</td><td>生图 = 🌸 / 🎨；生视频 = 🎬；生成中 = ⏳ 沙漏</td></tr>
   <tr><td>生成记录列表-类型字段</td><td>新增「生视频 · 9:16 · 2026-08-18 16:05」格式；类型前缀统一为生图 / 生视频</td></tr>
-  <tr><td>生成记录列表-操作</td><td>生成中：可点「取消」终止任务并释放冻结灵感值；已完成：可点「查看」进入作品详情</td></tr>
+  <tr><td>生成记录列表-操作</td><td>生成中：可点「取消」终止任务并释放冻结灵感值；已完成：可点「查看」进入作品详情；<b>失败：置灰展示「生成失败」+ toast「生成失败，已返还灵感值」；列表页不提供「重试」按钮，点击失败项直接进入 AI 创作页（空状态，不预填原首帧图、画面描述、参数）</b></td></tr>
 </table>
 
 <h3>4.4 作品详情 <span class="tag y">C端</span></h3>
@@ -537,9 +535,7 @@
 <div class="fig"><img class="shot-admin" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/admin_cost.png" alt="AI 工具消耗配置 - 列表"><div class="fig-cap">图 4-8 AI 工具消耗配置 - 列表（「工具」枚举新增「生视频」）</div></div>
 <div class="fig"><img class="shot-admin" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/admin_cost_edit.png" alt="AI 工具消耗配置 - 新增"><div class="fig-cap">图 4-9 新增消耗配置（「10 秒消耗」只读行 = 5s 基准 × 3）</div></div>
 
-<div class="warn">
-<b>关键确认</b>：是否允许运营对「生视频」工具设置与生图不同的首单优惠（如 5 折生成视频）？V0.1 默认与生图共用首单规则。
-</div>
+<div class="tip"><b>V0.1 定稿补充</b>：① <b>套餐（灵感值包）不区分生图/生视频</b>，统一按「灵感值」计量（C 端「购买灵感值」页与生图共用，详见 §5.2）；② 生视频<b>不单独享有首单优惠</b>，与生图共用 ai-generation PRD §4.1.2 的首单规则（一单一次，与用户维度对齐）。</div>
 
 <h3>4.8 后台 - 辅助提示词配置 <span class="tag b">后台</span></h3>
 <p>原型：<code>viewPromptConfig / viewPromptGroupEdit</code>。本期改动：<b>新增「适用类型」列与筛选、编辑页适用类型改多选、新增「词条」标签编辑器</b>。</p>
@@ -654,7 +650,7 @@
   <tr><td>12</td><td>分享落地为作品详情</td><td>微信好友/朋友圈/复制链接任一渠道，被点击用户进入作品详情页</td></tr>
   <tr><td>13</td><td>后台 - 视频参数列</td><td>用户生成日志中「内容类型=生视频」时展示视频参数列，文案与 PRD 一致</td></tr>
   <tr><td>14</td><td>后台 - 辅助提示词分类适用类型</td><td>新增分类可指定「生图 / 生视频」，C 端只拉取「含生视频」的分类</td></tr>
-  <tr><td>15</td><td>任务失败正确释放灵感值</td><td>任务失败时已扣灵感值按退款规则返还，列表显示「生成失败」+ 重试</td></tr>
+  <tr><td>15</td><td>任务失败正确释放灵感值</td><td>任务失败时已扣灵感值按退款规则返还，列表项标签「生成失败」+ toast 提示「生成失败，已返还灵感值」；列表页<b>不提供重试按钮</b>，点击失败项进入 AI 创作页（<b>空状态，不预填原首帧图、画面描述、参数</b>）</td></tr>
 </table>
 
 <h2>七、关键边界设计检查清单</h2>
@@ -687,19 +683,19 @@
 
 <h2>九、待确认项汇总</h2>
 <table>
-  <tr><th>#</th><th>待确认点</th><th>建议方案</th><th>确认人</th><th>状态</th></tr>
-  <tr><td>1</td><td>600 积分 = 1 额度 是否为本期定稿？积分来源是会员积分还是平台积分？两套积分体系是否打通？</td><td>按 600 = 1 额度、来源=会员积分、已打通，纳入本期</td><td>袁中天</td><td><span class="tbd">待确认</span></td></tr>
-  <tr><td>2</td><td>「额度不足不再提示自动用积分抵扣」勾选：是否落库 user_pref 跨设备一致？</td><td>落库（user_pref.no_credit_popup）</td><td>袁中天</td><td><span class="tbd">待确认</span></td></tr>
-  <tr><td>3</td><td>生视频是否单独享有首单优惠（与生图差异化）？</td><td>与生图共用首单规则，不单独</td><td>袁中天</td><td><span class="tbd">待确认</span></td></tr>
-  <tr><td>4</td><td>生视频是否走相同的水印策略（固定 true，C 端无开关）？</td><td>是，固定水印，C 端无开关</td><td>袁中天</td><td><span class="tbd">待确认</span></td></tr>
-  <tr><td>5</td><td>辅助提示词分类「运镜 / 动态」是否一期上线即配齐 5 个词条（缓慢推近、镜头环绕、人物走动、物体旋转、光影流动）？</td><td>是，由运营维护</td><td>袁中天 / 运营</td><td><span class="tbd">待确认</span></td></tr>
-  <tr><td>6</td><td>10s 视频是否本期就开放给所有用户？或先灰度 VIP / 高级会员？</td><td>本期全量开放</td><td>袁中天</td><td><span class="tbd">待确认</span></td></tr>
-  <tr><td>7</td><td>作品详情「生成视频」同款是否带回首帧图？</td><td>不自动带回，需用户重新上传（PRD 当前方案）</td><td>袁中天</td><td><span class="tbd">待确认</span></td></tr>
-  <tr><td>8</td><td>生成视频任务「失败」文案与重试交互是否由产品最终拍板？</td><td>建议：toast「生成失败，已返还灵感值」+ 列表项「重试」</td><td>袁中天</td><td><span class="tbd">待确认</span></td></tr>
+  <tr><th>#</th><th>待确认点</th><th>确认结论</th><th>确认人</th><th>状态</th></tr>
+  <tr><td>1</td><td>600 积分 = 1 额度 是否为本期定稿？积分来源？两套积分是否打通？</td><td><b>✅ 定稿</b>：600 积分 = 1 额度为本期定稿；来源为会员积分体系，会员积分 / 平台积分已打通</td><td>袁中天</td><td><span class="tag y">V0.1 定稿</span></td></tr>
+  <tr><td>2</td><td>「额度不足不再提示自动用积分抵扣」勾选是否落库 user_pref 跨设备一致？</td><td><b>✅ 定稿</b>：落库 <code>user_pref.no_credit_popup</code>，跨设备一致；取消勾选下次仍走提示</td><td>袁中天</td><td><span class="tag y">V0.1 定稿</span></td></tr>
+  <tr><td>3</td><td>生视频是否单独享首单优惠？套餐是否区分生图/生视频？</td><td><b>✅ 定稿</b>：生视频不单独享首单优惠，与生图共用首单规则；<b>套餐（灵感值包）不区分生图/生视频</b>，统一按灵感值计量</td><td>袁中天</td><td><span class="tag y">V0.1 定稿</span></td></tr>
+  <tr><td>4</td><td>生视频是否走相同的水印策略（固定 true，C 端无开关）？</td><td><b>✅ 定稿</b>：固定水印，C 端无开关（与生图相同）</td><td>袁中天</td><td><span class="tag y">V0.1 定稿</span></td></tr>
+  <tr><td>5</td><td>辅助提示词分类「运镜 / 动态」一期上线是否配齐 5 个词条（缓慢推近、镜头环绕、人物走动、物体旋转、光影流动）？</td><td><b>✅ 定稿</b>：一期上线即配齐 5 个词条，<b>先内置由运营维护</b>（后台 viewPromptGroupEdit 支持新增/编辑/上下线）</td><td>袁中天 / 运营</td><td><span class="tag y">V0.1 定稿</span></td></tr>
+  <tr><td>6</td><td>10s 视频是否本期就开放给所有用户？或先灰度 VIP / 高级会员？</td><td><b>✅ 定稿</b>：<b>本期全量开放</b> 10s 视频（不灰度），所有用户均可使用 5s / 10s 两种时长</td><td>袁中天</td><td><span class="tag y">V0.1 定稿</span></td></tr>
+  <tr><td>7</td><td>作品详情「生成视频」同款是否带回首帧图？</td><td><b>✅ 定稿</b>：<b>不自动带回</b>首帧图，由用户在创作页重新上传（仅携带 prompt + 视频参数）</td><td>袁中天</td><td><span class="tag y">V0.1 定稿</span></td></tr>
+  <tr><td>8</td><td>生成视频任务「失败」文案与重试交互？</td><td><b>✅ 定稿</b>：作品列表项标签「生成失败」+ toast「生成失败，已返还灵感值」；<b>列表无重试按钮</b>，点击失败项进入 AI 创作页<b>（空状态，不预填原首帧图、画面描述、参数）</b></td><td>袁中天</td><td><span class="tag y">V0.1 定稿</span></td></tr>
 </table>
 
 <hr>
-<p class="meta">本 PRD 依据 C 端 8 张截图与后台原型 lvyunjia-admin-video-proto.html V0.8 编写。V0.1 首次发布，后续按需补丁迭代。</p>
+<p class="meta">本 PRD 依据 C 端 8 张截图与后台原型 lvyunjia-admin-video-proto.html V0.8 编写。V0.1 首次发布，§9 全部 8 项已确认定稿。后续按需补丁迭代。</p>
 
 </body>
 </html>
