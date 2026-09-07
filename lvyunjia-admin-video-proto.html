@@ -425,7 +425,7 @@
   <div class="page-body">
     <div class="filter-row">
       <input class="filter-input" placeholder="用户账号/昵称">
-      <select class="filter-select"><option>内容类型</option><option>生图</option><option>素材下载</option></select>
+      <select class="filter-select"><option>内容类型</option><option>生图</option><option>生视频</option><option>素材下载</option></select>
       <select class="filter-select"><option>状态</option><option>成功</option><option>失败</option><option>进行中</option></select>
       <input class="filter-input" placeholder="开始时间" value="2026-08-25 00:00:00">
       <input class="filter-input" placeholder="结束时间" value="2026-09-01 23:59:59">
@@ -438,6 +438,7 @@
           <th>用户</th>
           <th>生成时间</th>
           <th>内容类型</th>
+          <th>视频参数</th>
           <th>提示词</th>
           <th>消耗灵感值</th>
           <th>结果</th>
@@ -449,7 +450,7 @@
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#e6f7ff;display:flex;align-items:center;justify-content:center;font-size:10px;color:#1890FF;">袁</div>袁中天</div></td>
           <td>2026-09-01 14:32:08</td>
-          <td>生图</td>
+          <td>生图</td><td>-</td>
           <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">AI可爱风蜡笔涂鸦，校服女孩，糖果贴纸</td>
           <td style="color:var(--red);font-weight:600;">-1</td>
           <td><span class="action-link" onclick="toast('查看 袁中天 的生成结果')">查看结果</span></td>
@@ -459,7 +460,7 @@
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#f6ffed;display:flex;align-items:center;justify-content:center;font-size:10px;color:#52c41a;">李</div>李四光</div></td>
           <td>2026-09-01 12:10:25</td>
-          <td>生图</td>
+          <td>生图</td><td>-</td>
           <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">日落街道，男生伸手，电影感逆光</td>
           <td style="color:var(--red);font-weight:600;">-1</td>
           <td><span class="action-link" onclick="toast('查看 李四光 的生成结果')">查看结果</span></td>
@@ -469,7 +470,7 @@
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#fff7e6;display:flex;align-items:center;justify-content:center;font-size:10px;color:#faad14;">张</div>张小明</div></td>
           <td>2026-09-01 10:05:33</td>
-          <td>生图</td>
+          <td>生图</td><td>-</td>
           <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">治愈系猫咪，窗台晒太阳，柔光</td>
           <td style="color:var(--red);font-weight:600;">-1</td>
           <td><span class="action-link" onclick="toast('查看 张小明 的生成结果')">查看结果</span></td>
@@ -479,7 +480,7 @@
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#e6f7ff;display:flex;align-items:center;justify-content:center;font-size:10px;color:#1890FF;">袁</div>袁中天</div></td>
           <td>2026-08-31 22:48:10</td>
-          <td>生图</td>
+          <td>生图</td><td>-</td>
           <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">赛博朋克城市夜景，霓虹灯，雨后街道</td>
           <td style="color:var(--red);font-weight:600;">-1</td>
           <td><span class="action-link danger" onclick="toast('查看 袁中天 的错误详情')">查看错误</span></td>
@@ -489,7 +490,7 @@
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#fff0f6;display:flex;align-items:center;justify-content:center;font-size:10px;color:#eb2f96;">赵</div>赵六六</div></td>
           <td>2026-08-31 18:33:21</td>
-          <td>素材下载</td>
+          <td>素材下载</td><td>-</td>
           <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">下载素材包：秋季促销海报模板 v2</td>
           <td style="color:var(--red);font-weight:600;">0</td>
           <td>-</td>
@@ -499,7 +500,7 @@
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#f6ffed;display:flex;align-items:center;justify-content:center;font-size:10px;color:#52c41a;">周</div>周小周</div></td>
           <td>2026-08-31 15:20:45</td>
-          <td>生图</td>
+          <td>生图</td><td>-</td>
           <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">水彩风花卉插画，淡雅配色，手绘质感</td>
           <td style="color:var(--red);font-weight:600;">-1</td>
           <td><span class="action-link" onclick="toast('查看 周小周 的生成结果')">查看结果</span></td>
@@ -509,7 +510,7 @@
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#e6f7ff;display:flex;align-items:center;justify-content:center;font-size:10px;color:#1890FF;">陈</div>陈大文</div></td>
           <td>2026-08-30 20:15:00</td>
-          <td>生图</td>
+          <td>生图</td><td>-</td>
           <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">极简线条人物，黑白配色，扁平设计</td>
           <td style="color:var(--red);font-weight:600;">-1</td>
           <td><span class="action-link" onclick="toast('查看 陈大文 的生成结果')">查看结果</span></td>
@@ -519,7 +520,7 @@
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#fff7e6;display:flex;align-items:center;justify-content:center;font-size:10px;color:#faad14;">吴</div>吴小明</div></td>
           <td>2026-08-30 14:08:33</td>
-          <td>生图</td>
+          <td>生图</td><td>-</td>
           <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">日系动漫少女，樱花背景，春日氛围</td>
           <td style="color:var(--red);font-weight:600;">-1</td>
           <td><span class="action-link" onclick="toast('查看 吴小明 的生成结果')">查看结果</span></td>
@@ -529,7 +530,7 @@
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#e6f7ff;display:flex;align-items:center;justify-content:center;font-size:10px;color:#1890FF;">袁</div>袁中天</div></td>
           <td>2026-09-01 09:20:14</td>
-          <td>生视频</td>
+          <td>生视频</td><td>5s · 1080p · 9:16</td>
           <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">校服女孩走廊，糖果贴纸，镜头缓慢推近</td>
           <td style="color:var(--red);font-weight:600;">-10</td>
           <td><span class="action-link" onclick="toast('查看 袁中天 的视频结果')">查看结果</span></td>
@@ -539,9 +540,9 @@
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#f6ffed;display:flex;align-items:center;justify-content:center;font-size:10px;color:#52c41a;">李</div>李四光</div></td>
           <td>2026-08-31 20:11:02</td>
-          <td>生视频</td>
+          <td>生视频</td><td>10s · 720p · 16:9</td>
           <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">城市夜景延时，霓虹流动，电影感</td>
-          <td style="color:var(--red);font-weight:600;">-10</td>
+          <td style="color:var(--red);font-weight:600;">-30</td>
           <td><span class="action-link danger" onclick="toast('查看 李四光 的视频错误')">查看错误</span></td>
           <td><span class="badge badge-error">失败</span></td>
           <td><span class="action-link" onclick="toast('复制 李四光 的视频 URL')">复制 URL</span></td>
@@ -549,7 +550,7 @@
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#e6f7ff;display:flex;align-items:center;justify-content:center;font-size:10px;color:#1890FF;">袁</div>袁中天</div></td>
           <td>2026-08-29 17:55:12</td>
-          <td>生图</td>
+          <td>生图</td><td>-</td>
           <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">3D 渲染产品展示，白色背景，专业摄影光</td>
           <td style="color:var(--red);font-weight:600;">-1</td>
           <td><span class="action-link" onclick="toast('查看 袁中天 的生成结果')">查看结果</span></td>
@@ -559,7 +560,7 @@
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:26px;height:26px;border-radius:50%;background:#f6ffed;display:flex;align-items:center;justify-content:center;font-size:10px;color:#52c41a;">李</div>李四光</div></td>
           <td>2026-08-29 11:30:00</td>
-          <td>生图</td>
+          <td>生图</td><td>-</td>
           <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">油画风景，莫奈风格，睡莲池塘</td>
           <td style="color:var(--red);font-weight:600;">-1</td>
           <td><span class="action-link" onclick="toast('查看 李四光 的生成结果')">查看结果</span></td>
@@ -720,14 +721,19 @@
   <div class="page-body">
     <div class="form-row">
       <label class="form-label">工具</label>
-      <select class="form-input" id="costFormTool" style="width:200px;"></select>
+      <select class="form-input" id="costFormTool" style="width:200px;" onchange="syncCostVideoRow()"></select>
       <span style="font-size:13px;color:var(--red);">*</span>
     </div>
     <div class="form-row">
       <label class="form-label">每次消耗</label>
-      <input class="form-input" type="number" id="costFormCredits" min="1" max="999" value="1" style="width:120px;">
+      <input class="form-input" type="number" id="costFormCredits" min="1" max="999" value="1" style="width:120px;" oninput="syncCostVideoRow()">
       <span style="font-size:13px;color:var(--text-tertiary);">灵感值 / 次</span>
       <span style="font-size:13px;color:var(--red);">*</span>
+    </div>
+    <div class="form-row" id="costFormVideoRow" style="display:none;">
+      <label class="form-label">10 秒消耗</label>
+      <div style="font-size:14px;color:var(--text);" id="costFormVideo10s">30 灵感值 / 次</div>
+      <span style="font-size:13px;color:var(--text-tertiary);">按 5s 基准 × 3 自动计算</span>
     </div>
     <div class="form-row">
       <label class="form-label">生效日期</label>
@@ -1455,19 +1461,29 @@ function resetInitFilter() {
 // 工具分类（图片生成已上线；视频生成/数字人分身分别预计 V0.7 / V0.8 上线，作为占位 tab）
 var COST_TOOLS = [
   { key: 'image',  name: '图片生成',   planVersion: '',    plannedNote: '' },
-  { key: 'video',  name: '视频生成',   planVersion: 'V0.7', plannedNote: '预计 V0.7 上线' },
+  { key: 'video',  name: '视频生成',   planVersion: '',     plannedNote: '' },
   { key: 'avatar', name: '数字人分身', planVersion: 'V0.8', plannedNote: '预计 V0.8 上线' }
 ];
 var COST_ACTIVE_TOOL = 'all';
 // 历史快照（每条记录按 tool 分组；同组仅一条生效中）
 var COST_CONFIGS = [
   { id: 'c1', tool: 'image', credits: 1, effDate: '2026-09-01', operator: '运营小李', remark: '默认值',       status: '生效中' },
-  { id: 'c2', tool: 'image', credits: 2, effDate: '2026-08-21', operator: '产品小王', remark: '测试期高耗量', status: '已失效' }
+  { id: 'c2', tool: 'image', credits: 2, effDate: '2026-08-21', operator: '产品小王', remark: '测试期高耗量', status: '已失效' },
+  { id: 'c3', tool: 'video', credits: 10, effDate: '2026-09-07', operator: '产品小王', remark: '5s 基准，10s 按 3 倍计', status: '生效中' }
 ];
 
 function _costToolLabel(t) {
   var tool = COST_TOOLS.find(function (x) { return x.key === t; });
   return tool ? tool.name : t;
+}
+
+// 每次消耗单元格：视频生成按 5s 基准展示，10s 按 3 倍计
+function _costCreditCell(r) {
+  if (r.tool === 'video') {
+    return '<b>' + r.credits + ' 灵感值/次</b>' +
+           '<div style="font-size:12px;color:var(--text-tertiary);margin-top:2px;">5s 基准 · 10s ' + (r.credits * 3) + '</div>';
+  }
+  return '<b>' + r.credits + ' 灵感值/次</b>';
 }
 
 function renderCostToolTabs() {
@@ -1522,7 +1538,7 @@ function renderCostList() {
       : '-';
     html += '<tr>' +
       '<td>' + _costToolLabel(r.tool) + '</td>' +
-      '<td><b>' + r.credits + ' 灵感值/次</b></td>' +
+      '<td>' + _costCreditCell(r) + '</td>' +
       '<td>' + r.effDate + '</td>' +
       '<td>' + r.operator + '</td>' +
       '<td>' + r.remark + '</td>' +
@@ -1540,6 +1556,16 @@ function resetCostFilter() {
   document.getElementById('costOperatorFilter').value = '';
   document.getElementById('costStatusFilter').value = '';
   renderCostList();
+}
+
+// 工具=视频生成时展示 10 秒档消耗（5s 基准 × 3），切换工具/改基准值实时同步
+function syncCostVideoRow() {
+  var row = document.getElementById('costFormVideoRow');
+  if (!row) return;
+  var tool = document.getElementById('costFormTool').value;
+  var v = parseInt(document.getElementById('costFormCredits').value, 10) || 0;
+  row.style.display = (tool === 'video') ? '' : 'none';
+  document.getElementById('costFormVideo10s').textContent = (v * 3) + ' 灵感值 / 次';
 }
 
 function openCostEdit(id) {
@@ -1575,6 +1601,7 @@ function openCostEdit(id) {
       document.getElementById('costFormRemark').disabled    = true;
     }
   }
+  syncCostVideoRow();
   go('costEdit');
 }
 
@@ -1593,7 +1620,7 @@ function saveCostConfig() {
   });
   renderCostList();
   go('cost');
-  toast('已保存：' + _costToolLabel(tool) + ' 每次消耗 ' + v + ' 灵感值');
+  toast('已保存：' + _costToolLabel(tool) + ' 每次消耗 ' + v + ' 灵感值' + (tool === 'video' ? '（5s 基准，10s ' + (v * 3) + '）' : ''));
 }
 
 function voidCostConfig(id) {
