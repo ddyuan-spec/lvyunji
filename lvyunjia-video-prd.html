@@ -39,9 +39,9 @@
 </head>
 <body>
 
-<h1>图生视频 V0.1 PRD <span class="tag y">V0.1</span><span class="tag o">客户端 + 后台</span></h1>
+<h1>图生视频 V0.1 PRD <span class="tag y">V0.1.1</span><span class="tag o">客户端 + 后台</span></h1>
 
-<p class="meta">文档维护：袁中天　|　编写日期：2026-09-07　|　适用产品：绿韵家 App（H5 内嵌）+ 数商服务后台　|　依据素材：C 端原型截图 8 张（用户提供 zip）+ 后台原型 <code>lvyunjia-admin-video-proto.html</code>（已确认）+ C 端交互原型 <code>lvyunjia-video-c-proto.html</code> V0.5 基础</p>
+<p class="meta">文档维护：袁中天　|　编写日期：2026-09-07（V0.1.1 更新 2026-09-08）　|　适用产品：绿韵家 App（H5 内嵌）+ 数商服务后台　|　依据素材：C 端原型截图（用户提供 zip）+ 后台原型 <code>lvyunjia-admin-video-proto.html</code>（已确认）+ C 端交互原型 <code>lvyunjia-video-c-proto.html</code> V0.9</p>
 
 <div class="note">
 <b>与 <a href="lvyunjia-ai-generation-prd.html">lvyunjia-ai-generation-prd.html</a>（V0.5.1）的关系</b><br>
@@ -52,7 +52,7 @@
 <table>
   <tr><th style="width: 18%;">项目</th><th>内容</th></tr>
   <tr><td>文档名称</td><td>图生视频产品需求 PRD</td></tr>
-  <tr><td>文档版本</td><td>V0.1（首版）</td></tr>
+  <tr><td>文档版本</td><td>V0.1.1（V0.1 首版 + 原型同步补丁，见 §8 变更记录）</td></tr>
   <tr><td>产品定位</td><td>在绿韵家 AI 创作体系下，提供「图生视频」独立能力。基于单张参考图（选填）+ 文本描述 + 参数控制，生成 5s / 10s 短视频。</td></tr>
   <tr><td>本期范围</td><td>① C 端 H5「AI 创作-生视频」完整闭环 ② 灵感值消耗与积分抵扣逻辑 ③ 后台视频消耗配置、辅助提示词管理、生成日志视频维度</td></tr>
   <tr><td>不包含</td><td>数字人口播、模板化视频、图生视频接入外部平台分发的能力（后续 V0.2+ 评估）</td></tr>
@@ -317,14 +317,17 @@
 <h2>四、功能需求详情</h2>
 
 <h3>4.1 数商服务 - 视频生成入口 <span class="tag y">C端</span></h3>
-<p>数商服务首页 AI 工具区第 4 位「视频生成」从占位变为可点击（参见原型截图：<code>数商服务.png</code>）。点击进入 AI 创作页，<b>默认 mode = video</b>，用户可在顶部 Tab 切换生图/生视频。</p>
+<p>数商服务首页 AI 工具区第 4 位「视频生成」从占位变为可点击。点击进入 AI 创作页，<b>默认 mode = video</b>，用户可在顶部 Tab 切换生图/生视频。</p>
+<div class="shot-row">
+  <div class="col"><img class="shot" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/shushang_service.png" alt="数商服务首页"><div class="shot-cap">图 4-1 数商服务首页（AI 工具区第 4 位「视频生成」入口）</div></div>
+</div>
 <div class="tip">通用 AI 工具区（素材库 / 我的作品 / 图片生成 / 视频生成）、个人头部（Hi 大不列颠蛋黄酥啊啊啊 / 至尊达人 / 执行家）、客户管理、活跃走势等模块本期无改动，沿用 ai-generation PRD §4.2。</div>
 
 <h3>4.2 AI 创作页 - 生视频模式 <span class="tag y">C端</span></h3>
 <p>原型：<code>代码组件 2.png</code>。该模式是本期核心新增，下文按字段逐项定义。</p>
 
 <div class="shot-row">
-  <div class="col"><img class="shot" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/c_video_create.png" alt="AI 创作 - 生视频"><div class="shot-cap">图 4-1 AI 创作 - 生视频模式</div></div>
+  <div class="col"><img class="shot" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/c_video_create.png" alt="AI 创作 - 生视频"><div class="shot-cap">图 4-2 AI 创作 - 生视频模式</div></div>
 </div>
 
 <h4>4.2.1 模式切换</h4>
@@ -391,12 +394,13 @@
   <li>创建作品记录，状态 = 生成中，跳转「我的作品」页。</li>
   <li>后端异步任务；前端每 5s 轮询或 WebSocket 推送任务状态；任务成功 → 更新作品为已完成并写生成日志。</li>
   <li>任务失败 → 释放冻结灵感值并按退款规则返还，写失败日志。</li>
+  <li>任务状态变更（完成/失败/离开页面期间完成）的前端通知与后台运行规则见 <a href="#4.2.10">§4.2.10</a>。</li>
 </ol>
 
 <h4 id="4.2.8">4.2.8 额度不足弹窗（本期新增）<span class="tag y">V0.1 定稿</span></h4>
 <p>原型：<code>额度不足.png</code>。当用户灵感值 < 本次预计消耗时触发。</p>
 <div class="shot-row">
-  <div class="col"><img class="shot" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/c_insufficient_credit.png" alt="额度不足弹窗"><div class="shot-cap">图 4-2 额度不足弹窗</div></div>
+  <div class="col"><img class="shot" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/c_insufficient_credit.png" alt="额度不足弹窗"><div class="shot-cap">图 4-3 额度不足弹窗</div></div>
 </div>
 <table>
   <tr><th>字段</th><th>规则</th></tr>
@@ -412,7 +416,7 @@
 <h4>4.2.9 积分不足弹窗</h4>
 <p>原型：<code>积分不足 .png</code>。当用户在额度不足弹窗点「购买额度」、但其当前积分 = 0 时触发（积分不足导致无法抵扣）。</p>
 <div class="shot-row">
-  <div class="col"><img class="shot" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/c_insufficient_point.png" alt="积分不足弹窗"><div class="shot-cap">图 4-3 积分不足弹窗</div></div>
+  <div class="col"><img class="shot" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/c_insufficient_point.png" alt="积分不足弹窗"><div class="shot-cap">图 4-4 积分不足弹窗</div></div>
 </div>
 <table>
   <tr><th>字段</th><th>规则</th></tr>
@@ -422,12 +426,24 @@
   <tr><td>获取积分</td><td>跳「我的-积分」或积分获取页（沿用既有会员积分入口）</td></tr>
 </table>
 
+<h4 id="4.2.10">4.2.10 生成状态通知与后台运行（本期新增）<span class="tag y">V0.9 原型同步</span></h4>
+<p>对应原型 <code>lvyunjia-video-c-proto.html</code> V0.9 新增的顶部浮窗与后台/中断机制（<b>V0.1.1 补录</b>）。原型用 localStorage 模拟任务态，本节按真实实现口径编写：生成任务状态由<b>服务端</b>管理（提交后异步执行，见 §4.2.7），C 端通过轮询/推送感知状态变更。</p>
+<table>
+  <tr><th>场景</th><th>交互规则</th></tr>
+  <tr><td>顶部浮窗（通用）</td><td>生成状态变更时在页面顶部弹出浮窗：文案 + 点击区 +「×」关闭按钮；点击浮窗统一跳转「我的作品」；「×」仅关闭浮窗，不影响任务</td></tr>
+  <tr><td>App 内前台生成完成</td><td>浮窗「您的视频已生成完成」，点击进入「我的作品」（可再进作品详情）</td></tr>
+  <tr><td>离开页面 / 切后台期间完成</td><td>任务<b>不中断</b>（服务端继续执行）；用户重进时浮窗提示「视频已生成，立即查看」，点击进入「我的作品」</td></tr>
+  <tr><td>任务失败（前台感知或重进发现）</td><td>提示「生成失败」；灵感值按规则返还，toast「生成失败，已返还灵感值」；列表失败态与点击行为沿用 §4.3（无重试按钮，进创作页空状态）</td></tr>
+  <tr><td>主动取消</td><td>生成中在「我的作品」列表点「取消」终止任务并释放冻结灵感值（沿用 §4.3 / §7 #11）</td></tr>
+</table>
+<div class="tip"><b>边界说明</b>：原型中「退出并打断生成」为演示分支（模拟本地任务丢失）；真实实现中任务一旦提交即由服务端接管，<b>退出页面/App 不产生失败</b>，仅在服务端任务真实失败时走失败返还流程。</div>
+
 <h3>4.3 我的作品 <span class="tag y">C端</span></h3>
 <p>原型：<code>我的作品.png</code>、<code>我的作品-生成中.png</code>。通用壳沿用 ai-generation PRD §4.1.5；本节仅写生视频相关差异。</p>
 
 <div class="shot-row">
-  <div class="col"><img class="shot" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/c_myworks.png" alt="我的作品"><div class="shot-cap">图 4-4 我的作品（已完成）</div></div>
-  <div class="col"><img class="shot" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/c_myworks_generating.png" alt="我的作品-生成中"><div class="shot-cap">图 4-5 我的作品（生成中）</div></div>
+  <div class="col"><img class="shot" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/c_myworks.png" alt="我的作品"><div class="shot-cap">图 4-5 我的作品（已完成）</div></div>
+  <div class="col"><img class="shot" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/c_myworks_generating.png" alt="我的作品-生成中"><div class="shot-cap">图 4-6 我的作品（生成中）</div></div>
 </div>
 
 <table>
@@ -442,7 +458,7 @@
 <h3>4.4 作品详情 <span class="tag y">C端</span></h3>
 <p>原型：<code>作品详情.png</code>。</p>
 <div class="shot-row">
-  <div class="col"><img class="shot" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/c_work_detail.png" alt="作品详情"><div class="shot-cap">图 4-6 作品详情</div></div>
+  <div class="col"><img class="shot" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/c_work_detail.png" alt="作品详情"><div class="shot-cap">图 4-7 作品详情</div></div>
 </div>
 <table>
   <tr><th>字段</th><th>规则</th></tr>
@@ -450,7 +466,7 @@
   <tr><td>标题区</td><td>「AI 视频 · 9:16」+ 用户自定义标题（如「123」）</td></tr>
   <tr><td>底部 3 按钮</td><td>
     <ol>
-      <li><b>生成视频</b>（绿色主按钮）：以本作品为参考生成同款视频，回到创作页（<b>不自动生成</b>，由用户再点提交）。携带原 prompt + 视频参数（时长、比例、音频、摄像头）。首帧图不自动带，需要用户重新上传。</li>
+      <li><b>再次生成</b>（绿色主按钮）：回到 AI 创作页（生视频模式，<b>空状态</b>）——<b>不自动生成</b>、<b>不预填</b>原作品的首帧图、画面描述与视频参数，全部由用户重新填写/上传（与 §4.3 失败项点击进入创作页的口径一致）。原型佐证：新版 <code>作品详情.png</code> 按钮文案已由「生成视频」改为「再次生成」（<b>V0.1.1 修正</b>，替代前版「携带原 prompt + 视频参数」口径）。</li>
       <li><b>保存到相册</b>：下载 MP4 到本地相册（需相册权限，无权限时弹原生授权）。</li>
       <li><b>分享</b>：打开分享面板 §4.5。</li>
     </ol>
@@ -460,7 +476,7 @@
 <h3>4.5 分享 <span class="tag y">C端</span></h3>
 <p>原型：<code>分享弹窗.png</code>。通用分享沿用 ai-generation PRD §4.1.7；本节只写视频类作品的差异。</p>
 <div class="shot-row">
-  <div class="col"><img class="shot" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/c_share_panel.png" alt="分享弹窗"><div class="shot-cap">图 4-7 分享面板</div></div>
+  <div class="col"><img class="shot" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/c_share_panel.png" alt="分享弹窗"><div class="shot-cap">图 4-8 分享面板</div></div>
 </div>
 <table>
   <tr><th>字段</th><th>生视频差异</th></tr>
@@ -478,39 +494,39 @@
     <td>「工具」枚举 +「生视频」</td>
     <td>原枚举仅「生图」；新增「生视频」作为独立计费工具，与生图分开配置与计价</td>
     <td><span class="tag y">新增</span></td>
-    <td>图 4-8</td>
+    <td>图 4-9</td>
   </tr>
   <tr>
     <td>「10 秒消耗」行（只读）</td>
     <td>生图无时长概念，此行是生视频专属。值 = 5s 基准 × 3，<b>不可单独编辑</b>，随「每次消耗」自动联动</td>
     <td><span class="tag y">新增</span></td>
-    <td>图 4-9</td>
+    <td>图 4-10</td>
   </tr>
   <tr>
     <td rowspan="2"><b>辅助提示词配置</b><br><code>viewPromptConfig</code><br><code>viewPromptGroupEdit</code></td>
     <td>「适用类型」列 + 筛选下拉</td>
     <td>列表新增「适用类型」列展示，筛选区新增「全部类型 / 生图 / 生视频」下拉，便于按端检索词条</td>
     <td><span class="tag y">新增</span></td>
-    <td>图 4-10</td>
+    <td>图 4-11</td>
   </tr>
   <tr>
     <td>「适用类型」<b>单选 → 可多选</b>；「词条」标签编辑器</td>
     <td>编辑页「适用类型」允许同时勾选生图 + 生视频（同一分类可服务两端）；「词条」支持逐个添加/删除并排序</td>
     <td><span class="tag o">变更</span><br><span class="tag y">新增</span></td>
-    <td>图 4-11</td>
+    <td>图 4-12</td>
   </tr>
   <tr>
     <td rowspan="2"><b>用户生成日志</b><br><code>viewLog</code></td>
     <td>「内容类型」枚举 +「生视频」</td>
     <td>与「生图」「素材下载」并列，用于按内容形态筛选/统计</td>
     <td><span class="tag y">新增</span></td>
-    <td>图 4-12</td>
+    <td>图 4-13</td>
   </tr>
   <tr>
     <td>「视频参数」列</td>
     <td>生视频专属列，格式「5s · 9:16 · 音频开 · 摄像头关」；生图/素材下载类该列留空</td>
     <td><span class="tag y">新增</span></td>
-    <td>图 4-12</td>
+    <td>图 4-13</td>
   </tr>
   <tr>
     <td><b>其余 5 个模块</b><br>会员/调整/初始/套餐/素材</td>
@@ -518,7 +534,7 @@
     <td>—</td>
   </tr>
 </table>
-<div class="note">C 端本期增量（创作页生视频模式、额度不足积分抵扣、生成中状态、视频类详情与分享）见 §4.1–§4.5 及图 4-1 ~ 图 4-7。</div>
+<div class="note">C 端本期增量（创作页生视频模式、额度不足积分抵扣、生成中状态、视频类详情与分享）见 §4.1–§4.5 及图 4-1 ~ 图 4-8。</div>
 
 <h3>4.7 后台 - AI 工具消耗配置 <span class="tag b">后台</span></h3>
 <p>原型：<code>viewCost / viewCostEdit</code>。本期改动：<b>工具枚举 + 生视频、新增「10 秒消耗」只读行</b>。</p>
@@ -532,8 +548,8 @@
   <tr><td>历史</td><td>保留全部历史配置，状态「生效中 / 已失效」</td><td><span class="tag b">沿用</span></td></tr>
 </table>
 
-<div class="fig"><img class="shot-admin" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/admin_cost.png" alt="AI 工具消耗配置 - 列表"><div class="fig-cap">图 4-8 AI 工具消耗配置 - 列表（「工具」枚举新增「生视频」）</div></div>
-<div class="fig"><img class="shot-admin" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/admin_cost_edit.png" alt="AI 工具消耗配置 - 新增"><div class="fig-cap">图 4-9 新增消耗配置（「10 秒消耗」只读行 = 5s 基准 × 3）</div></div>
+<div class="fig"><img class="shot-admin" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/admin_cost.png" alt="AI 工具消耗配置 - 列表"><div class="fig-cap">图 4-9 AI 工具消耗配置 - 列表（「工具」枚举新增「生视频」）</div></div>
+<div class="fig"><img class="shot-admin" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/admin_cost_edit.png" alt="AI 工具消耗配置 - 新增"><div class="fig-cap">图 4-10 新增消耗配置（「10 秒消耗」只读行 = 5s 基准 × 3）</div></div>
 
 <div class="tip"><b>V0.1 定稿补充</b>：① <b>套餐（灵感值包）不区分生图/生视频</b>，统一按「灵感值」计量（C 端「购买灵感值」页与生图共用，详见 §5.2）；② 生视频<b>不单独享有首单优惠</b>，与生图共用 ai-generation PRD §4.1.2 的首单规则（一单一次，与用户维度对齐）。</div>
 
@@ -549,8 +565,8 @@
   <tr><td><b>词条</b></td><td>标签式编辑器：逐个「添加」，可单个删除并调整顺序；V0.1 默认「运镜 / 动态」分类 5 个词条</td><td><span class="tag y">新增</span></td></tr>
 </table>
 
-<div class="fig"><img class="shot-admin" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/admin_prompt_config.png" alt="辅助提示词配置 - 列表"><div class="fig-cap">图 4-10 辅助提示词配置 - 列表（新增「适用类型」列 + 筛选下拉）</div></div>
-<div class="fig"><img class="shot-admin" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/admin_prompt_group_edit.png" alt="辅助提示词配置 - 新增分类"><div class="fig-cap">图 4-11 新增/编辑分类（「适用类型」可多选 +「词条」标签编辑器）</div></div>
+<div class="fig"><img class="shot-admin" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/admin_prompt_config.png" alt="辅助提示词配置 - 列表"><div class="fig-cap">图 4-11 辅助提示词配置 - 列表（新增「适用类型」列 + 筛选下拉）</div></div>
+<div class="fig"><img class="shot-admin" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/admin_prompt_group_edit.png" alt="辅助提示词配置 - 新增分类"><div class="fig-cap">图 4-12 新增/编辑分类（「适用类型」可多选 +「词条」标签编辑器）</div></div>
 
 <div class="tip">C 端只拉取「适用类型含生视频」且「分类 + 词条均启用」的数据。同一词条若同时属于生图与生视频分类，词条 ID 复用，C 端按所属分类展示。</div>
 
@@ -575,7 +591,7 @@
   <tr><td>用户 / 时间区间</td><td>沿用既有查询条件</td><td><span class="tag b">沿用</span></td></tr>
 </table>
 
-<div class="fig"><img class="shot-admin" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/admin_log.png" alt="用户生成日志"><div class="fig-cap">图 4-12 用户生成日志（新增「生视频」类型 +「视频参数」列）</div></div>
+<div class="fig"><img class="shot-admin" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/admin_log.png" alt="用户生成日志"><div class="fig-cap">图 4-13 用户生成日志（新增「生视频」类型 +「视频参数」列）</div></div>
 
 <h3>4.10 后台 - 通用模块（本期零改动，沿用）</h3>
 <div class="note">
@@ -674,6 +690,7 @@
 <table>
   <tr><th>版本</th><th>日期</th><th>变更人</th><th>变更内容</th></tr>
   <tr><td>V0.1</td><td>2026-09-07</td><td>袁中天</td><td>首版，依据 C 端截图 8 张 + 后台原型 lvyunjia-admin-video-proto.html 编写</td></tr>
+  <tr><td>V0.1.1</td><td>2026-09-08</td><td>袁中天</td><td>同步 C 端原型 V0.9 / 9-08 改动：① 新增 §4.2.10 生成状态通知与后台运行机制（顶部浮窗三态 + 服务端任务口径）；② §4.4 作品详情主按钮「生成视频」→「再次生成」，点击回创作页<b>全空状态</b>（不预填描述/参数/首帧图），§9 #7 结论同步修正；③ §4.1 补嵌数商服务首页截图（shushang_service.png）+ 作品详情截图更新；④ 全文图号顺延（图 4-1~4-13）</td></tr>
 </table>
 <ul>
   <li>变更一律打补丁 + 追加版本表行，<b>不覆盖</b>前序版本号。</li>
@@ -690,12 +707,12 @@
   <tr><td>4</td><td>生视频是否走相同的水印策略（固定 true，C 端无开关）？</td><td><b>✅ 定稿</b>：固定水印，C 端无开关（与生图相同）</td><td>袁中天</td><td><span class="tag y">V0.1 定稿</span></td></tr>
   <tr><td>5</td><td>辅助提示词分类「运镜 / 动态」一期上线是否配齐 5 个词条（缓慢推近、镜头环绕、人物走动、物体旋转、光影流动）？</td><td><b>✅ 定稿</b>：一期上线即配齐 5 个词条，<b>先内置由运营维护</b>（后台 viewPromptGroupEdit 支持新增/编辑/上下线）</td><td>袁中天 / 运营</td><td><span class="tag y">V0.1 定稿</span></td></tr>
   <tr><td>6</td><td>10s 视频是否本期就开放给所有用户？或先灰度 VIP / 高级会员？</td><td><b>✅ 定稿</b>：<b>本期全量开放</b> 10s 视频（不灰度），所有用户均可使用 5s / 10s 两种时长</td><td>袁中天</td><td><span class="tag y">V0.1 定稿</span></td></tr>
-  <tr><td>7</td><td>作品详情「生成视频」同款是否带回首帧图？</td><td><b>✅ 定稿</b>：<b>不自动带回</b>首帧图，由用户在创作页重新上传（仅携带 prompt + 视频参数）</td><td>袁中天</td><td><span class="tag y">V0.1 定稿</span></td></tr>
+  <tr><td>7</td><td>作品详情「再次生成」同款带回什么？</td><td><b>✅ 定稿（V0.1.1 修正）</b>：<b>全空状态</b>——不自动带回首帧图、画面描述、视频参数，全部由用户重新填写/上传（原「仅携带 prompt + 视频参数」口径作废，与 §9 #8 失败项口径统一）</td><td>袁中天</td><td><span class="tag y">V0.1 定稿</span></td></tr>
   <tr><td>8</td><td>生成视频任务「失败」文案与重试交互？</td><td><b>✅ 定稿</b>：作品列表项标签「生成失败」+ toast「生成失败，已返还灵感值」；<b>列表无重试按钮</b>，点击失败项进入 AI 创作页<b>（空状态，不预填原首帧图、画面描述、参数）</b></td><td>袁中天</td><td><span class="tag y">V0.1 定稿</span></td></tr>
 </table>
 
 <hr>
-<p class="meta">本 PRD 依据 C 端 8 张截图与后台原型 lvyunjia-admin-video-proto.html V0.8 编写。V0.1 首次发布，§9 全部 8 项已确认定稿。后续按需补丁迭代。</p>
+<p class="meta">本 PRD 依据 C 端截图与后台原型 lvyunjia-admin-video-proto.html 编写。V0.1 首次发布，§9 全部 8 项已确认定稿；V0.1.1（2026-09-08）同步 C 端原型 V0.9 生成通知机制与「再次生成」全空状态定稿。后续按需补丁迭代。</p>
 
 </body>
 </html>
