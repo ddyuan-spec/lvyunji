@@ -256,12 +256,6 @@
     .top-notify .tn-text { flex:1; line-height:1.4; }
     .top-notify .tn-close { position:absolute; right:12px; font-size:22px; opacity:.7; padding:0 4px; line-height:1; }
 
-    /* 演示入口（模拟退出App / 重新进入，预览时可删） */
-    .demo-pill { position:absolute; bottom:82px; right:12px; z-index:200; background:#1f1f2e; color:#fff; font-size:12px; padding:7px 13px; border-radius:16px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.2); }
-    .demo-menu { position:absolute; bottom:122px; right:12px; z-index:201; background:#fff; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,.18); width:196px; overflow:hidden; display:none; }
-    .demo-menu div { padding:13px 14px; font-size:13px; color:var(--text); border-bottom:1px solid var(--border-light); cursor:pointer; }
-    .demo-menu div:last-child { border-bottom:none; }
-    .demo-menu div:active { background:#f5f5f5; }
   </style>
 </head>
 <body>
@@ -285,14 +279,6 @@
       <span class="tn-icon" id="tnIcon">✅</span>
       <span class="tn-text" id="tnText"></span>
       <span class="tn-close" onclick="dismissTopNotify(event)">×</span>
-    </div>
-
-    <!-- 演示入口：模拟退出App / 打断 / 重新进入（预览时可删） -->
-    <div class="demo-pill" onclick="toggleDemoMenu()">🧪 演示</div>
-    <div class="demo-menu" id="demoMenu">
-      <div onclick="demoExitBackground()">退出App（后台生成）</div>
-      <div onclick="demoExitInterrupt()">退出并打断生成</div>
-      <div onclick="demoReset()">清除演示状态</div>
     </div>
 
   <!-- ================== AI 创作页（生图 / 生视频切换，独立成行） ================== -->
@@ -1072,24 +1058,6 @@
         }
       }
     }
-
-    // ===== 演示：模拟退出App / 打断 / 重新进入（预览时可删） =====
-    function toggleDemoMenu() { const m = document.getElementById('demoMenu'); const hidden = window.getComputedStyle(m).display === 'none'; m.style.display = hidden ? 'block' : 'none'; }
-    function demoExitBackground() {
-      const g = loadGen();
-      if (!g || g.status !== 'generating') { toast('请先在创作页点一次「生成」再演示退出'); return; }
-      g.startedAt = Date.now() - g.duration - 500;  // 模拟后台已生成完成
-      persistGen(g);
-      location.reload();
-    }
-    function demoExitInterrupt() {
-      const g = loadGen();
-      if (!g || g.status !== 'generating') { toast('请先在创作页点一次「生成」再演示退出'); return; }
-      g.interrupted = true;
-      persistGen(g);
-      location.reload();
-    }
-    function demoReset() { clearGen(); dismissTopNotify(); toast('已清除演示状态'); }
 
     function goWorkDetail(id) {
       const work = state.history.find(h => h.id === id);
