@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>绿韵家 · 数智</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #f7f8fa;
+      --card: #ffffff;
+      --text: #1f2329;
+      --text-2: #4e5969;
+      --text-3: #86909c;
+      --line: #e5e6eb;
+      --buy: #ff9900;
+      --buy-bg: #fff5e6;
+      --see: #1890ff;
+      --see-bg: #e6f7ff;
+      --save: #52c41a;
+      --save-bg: #f6ffed;
+      --choose: #00b578;
+      --choose-bg: #e6fff5;
+      --assistant: #f2f3f5;
+      --user: #d6e9ff;
+    }
+    html, body { height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+    }
+    .phone {
+      width: 100%;
+      max-width: 414px;
+      height: 100%;
+      max-height: 896px;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+    @media (min-width: 430px) {
+      .phone { border-radius: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.12); margin: 20px 0; height: calc(100% - 40px); }
+    }
+
+    /* status bar */
+    .statusbar {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      font-size: 14px;
+      font-weight: 600;
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+    .statusbar .time { font-size: 15px; font-weight: 700; }
+    .statusbar .icons { display: flex; gap: 5px; align-items: center; }
+    .signal, .wifi, .battery { width: 18px; height: 12px; background-size: contain; background-repeat: no-repeat; }
+    .signal { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 12'%3E%3Cpath fill='%231f2329' d='M0 10h2v2H0zm3-3h2v5H3zm3-3h2v8H6zm3-3h2v11H9zm3-4h2v15h-2z'/%3E%3C/svg%3E"); }
+    .wifi { width: 16px; height: 12px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 12'%3E%3Cpath fill='%231f2329' d='M8 0C4.5 0 1.5 1.5 0 3.5l8 8.5 8-8.5C14.5 1.5 11.5 0 8 0z'/%3E%3C/svg%3E"); }
+    .battery { width: 24px; height: 12px; border: 1px solid #1f2329; border-radius: 3px; position: relative; }
+    .battery::after { content: ''; position: absolute; right: -3px; top: 3px; width: 2px; height: 4px; background: #1f2329; border-radius: 0 1px 1px 0; }
+    .battery::before { content: ''; position: absolute; left: 1px; top: 1px; width: 18px; height: 8px; background: #1f2329; border-radius: 1px; }
+
+    /* header */
+    .header {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+    .header-title { font-size: 17px; font-weight: 600; }
+    .menu-btn { width: 24px; height: 24px; display: flex; flex-direction: column; justify-content: center; gap: 5px; }
+    .menu-btn span { display: block; height: 2px; background: var(--text); border-radius: 1px; }
+    .menu-btn span:nth-child(1) { width: 18px; }
+    .menu-btn span:nth-child(2) { width: 14px; }
+    .menu-btn span:nth-child(3) { width: 10px; }
+
+    /* scrollable content */
+    .chat-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 16px 16px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .chat-scroll::-webkit-scrollbar { display: none; }
+
+    /* greeting */
+    .greeting {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-top: 8px;
+      margin-bottom: 20px;
+    }
+    .avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffe8df 0%, #fff0f0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .avatar::after {
+      content: 'Hi';
+      position: absolute;
+      right: -6px;
+      top: 0;
+      background: #ff4d4f;
+      color: #fff;
+      font-size: 10px;
+      padding: 2px 5px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+    .greeting-text h1 { font-size: 22px; font-weight: 700; line-height: 1.3; }
+    .greeting-text p { font-size: 13px; color: var(--text-2); margin-top: 6px; }
+
+    /* entry cards */
+    .entries { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .entry-card {
+      border-radius: 12px;
+      padding: 14px 12px;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+      position: relative;
+    }
+    .entry-card:active { transform: scale(0.98); }
+    .entry-card.buy { background: var(--buy-bg); border: 1px solid rgba(255,153,0,0.15); }
+    .entry-card.see { background: var(--see-bg); border: 1px solid rgba(24,144,255,0.15); }
+    .entry-card.save { background: var(--save-bg); border: 1px solid rgba(82,196,26,0.15); }
+    .entry-card.choose { background: var(--choose-bg); border: 1px solid rgba(0,181,120,0.15); }
+    .entry-card.active { box-shadow: 0 0 0 2px currentColor; }
+    .entry-card.buy.active { box-shadow: 0 0 0 2px var(--buy); }
+    .entry-card.see.active { box-shadow: 0 0 0 2px var(--see); }
+    .entry-card.save.active { box-shadow: 0 0 0 2px var(--save); }
+    .entry-card.choose.active { box-shadow: 0 0 0 2px var(--choose); }
+    .entry-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .entry-icon { width: 26px; height: 26px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; }
+    .entry-card.buy .entry-icon { background: var(--buy); }
+    .entry-card.see .entry-icon { background: var(--see); }
+    .entry-card.save .entry-icon { background: var(--save); }
+    .entry-card.choose .entry-icon { background: var(--choose); }
+    .entry-title { font-size: 15px; font-weight: 700; }
+    .entry-card.buy .entry-title { color: var(--buy); }
+    .entry-card.see .entry-title { color: var(--see); }
+    .entry-card.save .entry-title { color: var(--save); }
+    .entry-card.choose .entry-title { color: var(--choose); }
+    .entry-desc { font-size: 11px; color: var(--text-2); line-height: 1.35; }
+    .entry-badge {
+      position: absolute;
+      right: 8px;
+      top: 8px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .entry-card.buy .entry-badge { color: var(--buy); }
+    .entry-card.see .entry-badge { color: var(--see); }
+    .entry-card.save .entry-badge { color: var(--save); }
+    .entry-card.choose .entry-badge { color: var(--choose); }
+
+    /* mode tag */
+    .mode-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-2);
+      margin-bottom: 12px;
+      padding: 4px 10px;
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .mode-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .mode-dot.buy { background: var(--buy); }
+    .mode-dot.save { background: var(--save); }
+    .mode-dot.choose { background: var(--choose); }
+
+    /* messages */
+    .messages { display: flex; flex-direction: column; gap: 16px; padding-bottom: 8px; }
+    .msg { display: flex; gap: 10px; max-width: 100%; }
+    .msg.user { flex-direction: row-reverse; }
+    .msg-avatar { width: 36px; height: 36px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .msg.user .msg-avatar { background: var(--user); }
+    .bubble {
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.5;
+      max-width: calc(100% - 52px);
+      word-break: break-word;
+    }
+    .msg.assistant .bubble { background: var(--assistant); color: var(--text); border-top-left-radius: 4px; }
+    .msg.user .bubble { background: var(--user); color: var(--text); border-top-right-radius: 4px; }
+
+    /* product cards */
+    .card-group { max-width: calc(100% - 52px); margin-left: 46px; }
+    .product-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      display: flex;
+      gap: 10px;
+      cursor: pointer;
+    }
+    .product-card:active { opacity: 0.9; }
+    .product-img {
+      width: 70px;
+      height: 70px;
+      border-radius: 8px;
+      background: #f2f3f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+    .product-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .product-name { font-size: 14px; font-weight: 600; color: var(--text); }
+    .product-desc { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+    .product-meta { display: flex; align-items: baseline; justify-content: space-between; margin-top: 8px; }
+    .product-price { font-size: 16px; font-weight: 700; color: #ff4d4f; }
+    .product-price small { font-size: 11px; font-weight: 400; color: var(--text-3); margin-left: 2px; }
+    .product-tag { font-size: 10px; color: var(--text-3); background: var(--bg); padding: 2px 6px; border-radius: 4px; }
+
+    /* input area */
+    .input-area {
+      background: var(--card);
+      border-top: 1px solid var(--line);
+      padding: 8px 12px 20px;
+      flex-shrink: 0;
+    }
+    .input-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg);
+      border-radius: 22px;
+      padding: 6px 6px 6px 14px;
+    }
+    .input-box input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      outline: none;
+      color: var(--text);
+    }
+    .input-box input::placeholder { color: var(--text-3); }
+    .send-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #d9d9d9;
+      color: #fff;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .send-btn.active { background: #1890ff; }
+
+    /* empty state helper */
+    .hint { font-size: 12px; color: var(--text-3); text-align: center; margin-top: 10px; }
+
+    /* section title inside chat */
+    .section-title { font-size: 12px; color: var(--text-3); margin: 8px 0 8px 46px; }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="statusbar">
+      <div class="time" id="clock">9:41</div>
+      <div class="icons"><div class="signal"></div><div class="wifi"></div><div class="battery"></div></div>
+    </div>
+
+    <div class="header">
+      <div></div>
+      <div class="header-title">数智</div>
+      <div class="menu-btn"><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="chat-scroll" id="scroll">
+      <div class="greeting">
+        <div class="avatar">👩‍⚕️</div>
+        <div class="greeting-text">
+          <h1>Hi~<br>我是你的AI助手</h1>
+          <p>试着和我聊聊这些话题吧~</p>
+        </div>
+      </div>
+
+      <div class="entries" id="entries">
+        <div class="entry-card buy" data-mode="buy">
+          <div class="entry-badge">1</div>
+          <div class="entry-header">
+            <div class="entry-icon">🛍️</div>
+            <div class="entry-title">AI帮你「买」</div>
+          </div>
+          <div class="entry-desc">想买什么，告诉我帮你找</div>
+        </div>
+        <div class="entry-card see" data-mode="see">
+          <div class="entry-badge">4</div>
+          <div class="entry-header">
+            <div class="entry-icon">👁️</div>
+            <div class="entry-title">AI帮你「看」</div>
+          </div>
+          <div class="entry-desc">看舌、报告解读、体质检测</div>
+        </div>
+        <div class="entry-card save" data-mode="save">
+          <div class="entry-badge">2</div>
+          <div class="entry-header">
+            <div class="entry-icon">¥</div>
+            <div class="entry-title">AI帮你「省」</div>
+          </div>
+          <div class="entry-desc">全站好价，帮你划算下单</div>
+        </div>
+        <div class="entry-card choose" data-mode="choose">
+          <div class="entry-badge">3</div>
+          <div class="entry-header">
+            <div class="entry-icon">🔍</div>
+            <div class="entry-title">AI帮你「选」</div>
+          </div>
+          <div class="entry-desc">一键查询，总结产品亮点</div>
+        </div>
+      </div>
+
+      <div class="messages" id="messages"></div>
+      <div class="hint" id="hint">点击上方入口切换模式，产品信息会跨模式保留</div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-box">
+        <input type="text" id="input" placeholder="输入你想了解的商品、功效或症状…">
+        <button class="send-btn" id="send">↑</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modeNames = { buy: '帮我买', save: '帮我省', choose: '帮我选', see: '帮我看' };
+    const modeColors = { buy: '#ff9900', save: '#52c41a', choose: '#00b578', see: '#1890ff' };
+    let currentMode = null;
+    let contextProduct = null;
+
+    const entries = document.querySelectorAll('.entry-card');
+    const input = document.getElementById('input');
+    const sendBtn = document.getElementById('send');
+    const messages = document.getElementById('messages');
+    const scroll = document.getElementById('scroll');
+    const hint = document.getElementById('hint');
+
+    function updateClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('clock').textContent = h + ':' + m;
+    }
+    updateClock();
+
+    function setMode(mode) {
+      if (mode === 'see') {
+        addAssistantMessage('「帮我看」是独立功能占位入口，本期暂不演示，请切换买/省/选体验。');
+        return;
+      }
+      currentMode = mode;
+      entries.forEach(c => c.classList.remove('active'));
+      document.querySelector(`.entry-card.${mode}`).classList.add('active');
+      hint.textContent = `当前模式：${modeNames[mode]}｜产品上下文：${contextProduct || '无'}`;
+      input.placeholder = mode === 'buy' ? '想买什么？告诉我症状/功效/商品名' :
+                           mode === 'save' ? '帮你找关联套餐，更划算' :
+                           '输入产品 A，我帮你对比推荐 B';
+    }
+
+    entries.forEach(card => card.addEventListener('click', () => setMode(card.dataset.mode)));
+
+    function scrollToBottom() { setTimeout(() => scroll.scrollTop = scroll.scrollHeight, 50); }
+
+    function addUserMessage(text) {
+      const div = document.createElement('div');
+      div.className = 'msg user';
+      div.innerHTML = `<div class="msg-avatar">🙂</div><div class="bubble">${escapeHtml(text)}</div>`;
+      messages.appendChild(div);
+      scrollToBottom();
+    }
+
+    function addAssistantMessage(text) {
+      const div = document.createElement('div');
+      div.className = 'msg assistant';
+      div.innerHTML = `<div class="msg-avatar">🤖</div><div class="bubble">${escapeHtml(text)}</div>`;
+      messages.appendChild(div);
+      scrollToBottom();
+    }
+
+    function addModeTag(mode) {
+      const tag = document.createElement('div');
+      tag.className = 'mode-tag';
+      tag.innerHTML = `<span class="mode-dot ${mode}"></span>进入 ${modeNames[mode]} 模式`;
+      messages.appendChild(tag);
+      scrollToBottom();
+    }
+
+    function escapeHtml(t) {
+      return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function productCard(name, desc, price, tag, emoji) {
+      return `<div class="product-card" onclick="alert('跳转商品详情：${name}')">
+        <div class="product-img">${emoji}</div>
+        <div class="product-info">
+          <div><div class="product-name">${escapeHtml(name)}</div><div class="product-desc">${escapeHtml(desc)}</div></div>
+          <div class="product-meta"><div class="product-price">¥${price}<small>起</small></div><div class="product-tag">${escapeHtml(tag)}</div></div>
+        </div>
+      </div>`;
+    }
+
+    function renderBuyResponse(text) {
+      const group = document.createElement('div');
+      group.className = 'card-group';
+      group.innerHTML = productCard('绿韵家·安神助眠精华', '睡前一滴，舒缓神经，提升深睡时长', '129', '助眠爆款', '🌙') +
+                         productCard('酸枣仁茯苓茶', '传统草本配方，养心安神', '59', '茶饮', '🍵') +
+                         productCard('褪黑素软糖', '低糖配方，快速入睡', '89', '营养补充', '🍬');
+      messages.appendChild(group);
+      scrollToBottom();
+      contextProduct = text.includes('助眠') ? '助眠' : (text.includes('B') ? 'B产品' : text);
+    }
+
+    function renderSaveResponse() {
+      const group = document.createElement('div');
+      group.className = 'card-group';
+      group.innerHTML = `<div class="section-title">含「${contextProduct || '当前产品'}」的关联套餐</div>` +
+                         productCard('安神助眠组合装', '精华+茶饮+软糖 三件套，搭配更划算', '229', '省 ¥48', '📦') +
+                         productCard('深睡养护月套餐', '精华×2 + 茶饮×2，整月调理', '358', '省 ¥86', '📦') +
+                         productCard('全家睡眠礼盒', '精华+茶饮+眼罩+香薰', '459', '省 ¥120', '🎁');
+      messages.appendChild(group);
+      scrollToBottom();
+    }
+
+    function renderChooseResponse(text) {
+      const a = contextProduct || '安神精华';
+      const b = text.includes('B') ? 'B产品（酸枣仁茶）' : '酸枣仁茯苓茶';
+      const group = document.createElement('div');
+      group.className = 'card-group';
+      group.innerHTML = `<div class="section-title">${a} vs ${b} 功效对比</div>` +
+                         productCard(a, '见效快、适合短期入睡困难', '129', '当前产品', '🌙') +
+                         productCard(b, '温和调理、适合长期养心安神', '59', '推荐 B', '🍵') +
+                         `<div class="section-title">含 A / 含 B 套餐</div>` +
+                         productCard(`含${a}套餐`, `${a}+眼罩+香薰`, '199', '含A', '📦') +
+                         productCard(`含${b}套餐`, `${b}+草本足浴包`, '99', '含B', '📦');
+      messages.appendChild(group);
+      scrollToBottom();
+    }
+
+    function send() {
+      const text = input.value.trim();
+      if (!text) return;
+      if (!currentMode) { alert('请先点击「买/省/选」入口'); return; }
+      addUserMessage(text);
+      input.value = '';
+      sendBtn.classList.remove('active');
+
+      setTimeout(() => {
+        if (currentMode === 'buy') {
+          addAssistantMessage(`针对你的需求，为你找到以下商品：`);
+          renderBuyResponse(text);
+        } else if (currentMode === 'save') {
+          addAssistantMessage('为你找到包含该商品的关联套餐，搭配购买比单买更划算。');
+          renderSaveResponse();
+        } else if (currentMode === 'choose') {
+          addAssistantMessage(`相比于 ${contextProduct || 'A产品'}，酸枣仁茯苓茶在温和调理、长期养心方面更合适；以下含 A、含 B 的套餐供你参考。`);
+          renderChooseResponse(text);
+        }
+        hint.textContent = `当前模式：${modeNames[currentMode]}｜产品上下文：${contextProduct || '无'}`;
+      }, 400);
+    }
+
+    input.addEventListener('input', () => sendBtn.classList.toggle('active', input.value.trim().length > 0));
+    sendBtn.addEventListener('click', send);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+
+    // initial demo: click buy + auto message
+    setTimeout(() => {
+      setMode('buy');
+      addModeTag('buy');
+      input.value = '我想买助眠的';
+      sendBtn.classList.add('active');
+    }, 300);
+  </script>
+</body>
+</html>
