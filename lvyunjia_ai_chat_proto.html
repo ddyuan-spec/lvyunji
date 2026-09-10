@@ -384,11 +384,12 @@
     }
     updateClock();
 
-    function setMode(mode) {
+    function setMode(mode, silent) {
       if (mode === 'see') {
         addAssistantMessage('「帮我看」是独立功能占位入口，本期暂不演示，请切换买/省/选体验。');
         return;
       }
+      const prev = currentMode;
       currentMode = mode;
       entries.forEach(c => c.classList.remove('active'));
       document.querySelector(`.entry-card.${mode}`).classList.add('active');
@@ -396,6 +397,18 @@
       input.placeholder = mode === 'buy' ? '想买什么？告诉我症状/功效/商品名' :
                            mode === 'save' ? '帮你找关联套餐，更划算' :
                            '输入产品 A，我帮你对比推荐 B';
+      // 意图切换：跨模式保留产品上下文并显式提示（silent 用于初始化避免噪音）
+      if (!silent && prev && prev !== mode && contextProduct) {
+        addSystemNote(`↪ 切换到「${modeNames[mode]}」，已沿用上一轮产品上下文：<b>${contextProduct}</b>`);
+      }
+    }
+
+    function addSystemNote(html) {
+      const div = document.createElement('div');
+      div.className = 'msg assistant';
+      div.innerHTML = `<div class="msg-avatar" style="background:#e8f3ff">🔄</div><div class="bubble" style="background:#e8f3ff;color:#0958d9;font-size:12px">${html}</div>`;
+      messages.appendChild(div);
+      scrollToBottom();
     }
 
     entries.forEach(card => card.addEventListener('click', () => setMode(card.dataset.mode)));
@@ -479,9 +492,13 @@
 
     function send() {
       const text = input.value.trim();
-      if (!text) return;
       if (!currentMode) { alert('请先点击「买/省/选」入口'); return; }
-      addUserMessage(text);
+      // save/choose 模式下，允许空输入复用上下文产品
+      if (!text && currentMode !== 'buy' && !contextProduct) { alert('还没有产品上下文，请先输入一个产品'); return; }
+      if (!text && currentMode === 'buy') return;
+
+      if (text) addUserMessage(text);
+      else addSystemNote(`↪ 未输入新产品，使用上下文 <b>${contextProduct}</b> 继续执行「${modeNames[currentMode]}」`);
       input.value = '';
       sendBtn.classList.remove('active');
 
@@ -506,7 +523,7 @@
 
     // initial demo: click buy + auto message
     setTimeout(() => {
-      setMode('buy');
+      setMode('buy', true);
       addModeTag('buy');
       input.value = '我想买助眠的';
       sendBtn.classList.add('active');
