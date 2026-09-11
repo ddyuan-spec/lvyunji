@@ -127,6 +127,7 @@
   <li><b>conversation_id 必须稳定复用</b>：同一通会话的每一轮请求，传同一个 <code>conversation_id</code>。工作流 LLM 节点的"会话历史"开关会自动按此 ID 拉取历史（轮数 5~6 轮），App 端<b>不要自己拼历史对话</b>传进去。</li>
   <li><b>指代理解由工作流负责</b>：如第一轮问"助眠的有什么"，第二轮问"那个贵不贵"，工作流内部结合会话历史能指向同一商品，App 只需传第二轮文本 + 同一 conversation_id。</li>
   <li><b>新会话</b>：生成新的 conversation_id（建议 <code>conv_{userId}_{时间戳}</code> 或后端会话表主键）。</li>
+  <li><b>入口类型每轮都传</b>：<code>custom_variables</code> 在<b>每一轮</b>都带上（值不变也传）。意图由 App 会话层维护，不依赖 Coze 变量粘性，详见第十一节。</li>
 </ul>
 
 <h2>六、图片传入</h2>
@@ -157,6 +158,7 @@
   <tr><td>5</td><td>自己拼 chatHistory 传进去</td><td>不要传历史，工作流内部按 conversation_id 自动管理（轮数 5~6）</td></tr>
   <tr><td>6</td><td>问候/闲聊当成异常</td><td>正常走"非产品分支"返回问候引导语，无需 App 特殊处理，只要 entry 传对</td></tr>
   <tr><td>7</td><td>意图识别放前端做</td><td>意图解析（keywords / is_product）由工作流 <code>parse_buy_query</code> + 代码节点完成，前端只传入口类型 + 文本</td></tr>
+  <tr><td>8</td><td>只在首次点入口传 <code>custom_variables</code>，后续轮次不传</td><td>每轮都传（值不变也传）；意图由 App 会话层维护，不依赖 Coze 变量粘性，详见第十一节</td></tr>
 </table>
 
 <h2>九、联调 Checklist</h2>
@@ -168,6 +170,25 @@
   <li>☐ 多轮：第一轮问 A，第二轮"那个多少钱"能正确指代 A</li>
   <li>☐ 传图 → 对应解读节点返回分析结果</li>
   <li>☐ 工作流 API 模式下，App 能正确解析输出节点的 output 变量并渲染</li>
+</ul>
+
+<h2>十一、意图生命周期与失效规则（V1.1 新增）</h2>
+<div class="ok">
+<b>核心模型：空 → 选了就一直传 → 直到被覆盖。</b> <code>current_intent</code>（即 <code>custom_variables</code>）是 App 会话层维护的状态，<b>不靠 Coze 平台粘性、不靠对话轮次</b>。
+</div>
+<table>
+  <tr><th>阶段</th><th>App 行为</th><th>传给工作流的值</th></tr>
+  <tr><td>用户从未点过入口</td><td>不写入意图</td><td>空（<code>""</code> / <code>null</code>），或不传该字段</td></tr>
+  <tr><td>首次点「帮我买 / 省 / 选」</td><td>写入 buy / save / choose</td><td>该意图字符串，<b>且后续每一轮都重传（值不变也传）</b></td></tr>
+  <tr><td>同会话继续打字（没点入口）</td><td>沿用已选意图，不重置</td><td>继续传上次的值</td></tr>
+  <tr><td>改点另一个入口</td><td><b>覆盖</b>为新的意图</td><td>新意图字符串，之后沿用</td></tr>
+  <tr><td>新开会话（新 conversation_id / 点「新对话」/ 重进数智中心开新会话）</td><td>重置为 null</td><td>回到"空"状态，等待用户重新点入口</td></tr>
+</table>
+<ul>
+  <li><b>不设置空闲超时失效</b>：意图不会因"沉默多久"而丢失，只能被用户主动覆盖或新会话重置。这是产品决策——既避免隔天回来还挂着旧意图，也避免误清正在用的意图。</li>
+  <li><b>每轮都传，值不变也传</b>：无论 Bot 对话 API 还是工作流直调 API，都要求 App 每轮显式带上 <code>custom_variables</code>。原因：直调 API 每轮独立（不传即空）；Bot 变量虽粘性但漏传会串味。统一"每轮重传"两种方案行为一致。</li>
+  <li><b>LLM 上下文轮数建议 5 轮</b>：可在 Coze LLM 节点「对话历史轮数」配置（越大 token 越贵）。超轮后早期对话被丢弃，但意图与产品上下文不受影响——二者由 App 显式维护、每轮传入，不依赖 LLM 记忆。</li>
+  <li><b>无意图兜底</b>：收到空意图 + 用户直接打字时，工作流走自由问答通道，由 LLM 猜意图；猜中后在卡片顶部给"猜你想【省】？"可切换 chips 让用户确认，猜不中再走兜底文案。</li>
 </ul>
 
 <h2>十、待后端确认的开放项</h2>
