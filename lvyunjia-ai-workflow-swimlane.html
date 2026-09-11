@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>绿韵家「数智」工作流 · APP端 × Coze 泳道图（结合原型）</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+<style>
+  body { font-family: "Microsoft YaHei", sans-serif; max-width: 1080px; margin: 24px auto; padding: 0 20px; color: #1f2329; line-height: 1.6; }
+  h1 { font-size: 22px; border-bottom: 3px solid #00b578; padding-bottom: 8px; }
+  h2 { font-size: 18px; margin-top: 32px; color: #00b578; }
+  h3 { font-size: 15px; margin-top: 20px; color: #333; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; margin: 12px 0; }
+  th, td { border: 1px solid #d0d7de; padding: 7px 10px; text-align: left; vertical-align: top; }
+  th { background: #2f5496; color: #fff; }
+  tr:nth-child(even) td { background: #f6f8fa; }
+  .warn { background: #fff2e8; border-left: 4px solid #fa8c16; padding: 12px 16px; margin: 16px 0; border-radius: 4px; }
+  .ok { background: #f6ffed; border-left: 4px solid #52c41a; padding: 12px 16px; margin: 16px 0; border-radius: 4px; }
+  code { background: #f0f2f5; padding: 1px 5px; border-radius: 3px; font-family: Consolas, monospace; font-size: 12px; }
+  pre code { background: none; padding: 0; border-radius: 0; color: inherit; font-size: inherit; }
+  .mermaid { background: #fafbfc; border: 1px solid #e3e8ee; border-radius: 8px; padding: 12px; margin: 16px 0; }
+  .tag { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; color: #fff; }
+  .buy { background: #ff9900; } .save { background: #52c41a; } .choose { background: #00b578; } .see { background: #1890ff; }
+</style>
+</head>
+<body>
+
+<h1>绿韵家「数智」工作流 · APP端 × Coze 泳道图</h1>
+<p><b>文档目的</b>：把 <b>APP 端三入口操作</b> 与 <b>Coze 工作流</b> 用泳道结合，并结合现有原型 <code>lvyunjia_ai_chat_proto.html</code> 说明端到端链路。<br>
+<b>配套文档</b>：<code>lyj_workflow_unified.md</code>（统一架构）、<code>数智工作流-买省选节点配置卡.md</code>（节点配置）、<code>lvyunjia-ai-coze-kb-prep.md</code>（知识库模板）。</p>
+
+<div class="ok">
+<b>核心结论</b>：三入口（<span class="tag buy">帮我买</span><span class="tag save">帮我省</span><span class="tag choose">帮我选</span>）不是三个独立工作流，而是 <b>同一套工作流</b> 下由 <code>analysis_type</code>（= APP 端 <code>currentMode</code>）分流的并行分支。<span class="tag see">帮我看</span> 是占位独立功能，<b>不进本工作流</b>。
+</div>
+
+<h2>一、泳道总览（4 泳道）</h2>
+<div class="mermaid">
+flowchart LR
+  subgraph U["用户与APP端"]
+    U1["看到4入口卡片(看/买/省/选)"]
+    U2["点击帮我买"]
+    U3["输入:想买助眠的"]
+    U4["查看卡片与话术"]
+  end
+  subgraph FE["APP前端代码"]
+    FE1["setMode('buy')<br/>写死 analysis_type=buy"]
+    FE2["contextProduct 跨模式保留<br/>点省/选时沿用"]
+    FE3["消费返回:话术+卡片<br/>分离渲染"]
+  end
+  subgraph WF["Coze工作流"]
+    WF1["① 开始(6变量)<br/>USER_INPUT / CONVERSATION_NAME<br/>user_id / user_images<br/>conversation_id / analysis_type"]
+    WF2["② IF选择器<br/>analysis_type 分流"]
+    WF3["③ parse/意图抽取LLM<br/>输出 product_info"]
+    WF4["④ KB检索 + 商品卡片API"]
+    WF5["⑤ 说明文案LLM"]
+    WF6["⑥ 汇总+消息+结束"]
+  end
+  subgraph KB["知识库/后端API"]
+    KB1["21列产品知识库"]
+    KB2["商品卡片接口<br/>名称/价/卖点/图/跳转"]
+  end
+
+  U1 --> U2 --> U3
+  U2 --> FE1
+  U3 --> FE1
+  FE1 -->|"调工作流<br/>传analysis_type=buy"| WF1
+  FE2 -.->|"跨意图保留"| WF3
+  WF1 --> WF2 --> WF3 --> WF4 --> WF5 --> WF6
+  WF3 --> KB1
+  WF4 --> KB2
+  WF6 -->|"reply_text + card_list"| FE3 --> U4
+  U4 -.->|"点卡片跳详情"| KB2
+</div>
+
+<h2>二、单轮时序（以「帮我买」为例）</h2>
+<div class="mermaid">
+sequenceDiagram
+  participant U as 用户
+  participant FE as APP前端
+  participant WF as Coze工作流
+  participant KB as 知识库API
+  U->>FE: 点击帮我买入口
+  FE->>FE: setMode('buy'), 写死 analysis_type=buy
+  U->>FE: 输入:想买助眠的
+  FE->>WF: 调工作流(USER_INPUT + analysis_type=buy)
+  WF->>WF: ② IF选择 buy分支
+  WF->>WF: ③ parse_buy_query 抽 product_info等于助眠
+  WF->>KB: KB检索助眠 + 调商品卡片API
+  KB-->>WF: kb_context + card_list
+  WF->>WF: ⑤ 说明文案LLM 生成话术
+  WF-->>FE: reply_text + card_list(分隔符)
+  FE->>FE: 拆分话术/卡片, 分离渲染
+  FE-->>U: 显示话术和商品卡片
+  U->>FE: 点击卡片跳转商品详情(KB2)
+</div>
+
+<h2>三、⚠️ 命名对齐（必须统一，否则链路失配）</h2>
+<div class="warn">
+<b>发现冲突</b>：APP 原型、你今天配的 Coze IF 选择器、旧节点配置卡，三处对「三入口」的命名<b>不一致</b>。若不统一，前端传 <code>choose</code> 而 IF 选择器判 <code>select</code> → <b>永远失配</b>。
+</div>
+<table>
+  <tr><th>意图</th><th>① APP 原型 (modeNames)</th><th>② 你 Coze IF 选择器(今日配)</th><th>③ 旧节点配置卡</th><th>建议统一值</th></tr>
+  <tr><td><b>买</b></td><td><code>buy</code></td><td><code>buy</code></td><td><code>4444</code></td><td><b>buy</b></td></tr>
+  <tr><td><b>省</b></td><td><code>save</code></td><td><code>save</code></td><td><code>5555</code></td><td><b>save</b></td></tr>
+  <tr style="background:#fff2e8"><td><b>选</b></td><td><code>choose</code></td><td><code>select</code> ❗</td><td><code>6666</code></td><td><b>choose</b>（改 Coze 的 select→choose）或统一 select（改前端）</td></tr>
+  <tr><td><b>看</b></td><td><code>see</code>（占位）</td><td>—（不进工作流）</td><td>—</td><td><code>see</code>（独立功能，不进工作流）</td></tr>
+</table>
+<p><b>推荐</b>：统一为 <code>buy / save / choose</code>（与前端 <code>modeNames</code> 一致，最贴近用户心智），<b>把 Coze IF 选择器的 <code>select</code> 改成 <code>choose</code></b>。前端 <code>send()</code> 调用工作流时直接传 <code>analysis_type = currentMode</code> 即可，无需额外映射。</p>
+
+<h2>四、各泳道节点详述</h2>
+
+<h3>4.1 👤 用户 / 📱 APP 前端（依据 <code>lvyunjia_ai_chat_proto.html</code>）</h3>
+<table>
+  <tr><th>步骤</th><th>原型实现</th><th>说明</th></tr>
+  <tr><td>入口卡片</td><td>4 张卡片 <code>buy/save/choose/see</code>，点击 <code>setMode(mode)</code></td><td>点「看」出占位文案，不进工作流</td></tr>
+  <tr><td>写死意图</td><td><code>currentMode = mode</code></td><td>即工作流的 <code>analysis_type</code>，由按钮点击决定，<b>不消耗 LLM</b></td></tr>
+  <tr><td>跨模式保留</td><td><code>contextProduct</code> 全局变量</td><td>点省/选时沿用上一轮产品上下文；<code>send()</code> 中 save/choose 允许空输入复用</td></tr>
+  <tr><td>发送校验</td><td><code>if (!currentMode) alert('请先点入口')</code></td><td>buy 模式空输入阻止；save/choose 空输入复用 contextProduct</td></tr>
+  <tr><td>消费返回</td><td>演示用 <code>renderBuyResponse</code> 等 mock</td><td><b>真实环境</b>：把工作流返回用 <code>##########CARD##########</code> 分隔，前半段话术 / 后半卡片 JSON，分离渲染</td></tr>
+  <tr><td>卡片点击</td><td><code>onclick="alert('跳转商品详情')"</code></td><td>真实环境跳商品详情页（接口返回 <code>goodsId</code>）</td></tr>
+</table>
+
+<h3>4.2 ⚙️ Coze 工作流（依据今日搭建 + unified 架构）</h3>
+<table>
+  <tr><th>节点</th><th>类型</th><th>关键配置</th><th>输出</th></tr>
+  <tr><td>① 开始</td><td>Start</td><td>6 变量：USER_INPUT / CONVERSATION_NAME / user_id / user_images / conversation_id / <b>analysis_type</b></td><td>inputs</td></tr>
+  <tr><td>② IF 选择器</td><td>Condition</td><td><code>analysis_type</code> == buy/select/save（⚠️ 改 choose）；否则兜底</td><td>三分支</td></tr>
+  <tr><td>③ parse / 意图抽取</td><td>LLM</td><td>抽 <code>product_info</code>（name/symptom/efficacy/category），<b>不判断意图</b>；开会话历史 5~6 轮</td><td>product_info</td></tr>
+  <tr><td>④ KB检索 + 商品卡片</td><td>Knowledge + Code</td><td>统一库召回 top_k；按意图调不同接口返回 <code>card_list</code></td><td>kb_context + card_list</td></tr>
+  <tr><td>⑤ 说明文案</td><td>LLM</td><td>按意图生成定性话术（≤60字），不编价格</td><td>reply_text</td></tr>
+  <tr><td>⑥ 汇总 + 消息 + 结束</td><td>Code + Output</td><td>合并多路；<code>reply_text + 分隔符 + card_list</code></td><td>推送给 APP</td></tr>
+</table>
+
+<h3>4.3 📚 知识库 / 后端 API</h3>
+<table>
+  <tr><th>依赖</th><th>来源</th><th>状态</th></tr>
+  <tr><td>21列产品知识库</td><td><code>lvyunjia-ai-coze-kb-prep.md</code> → 钉钉表 y20BglGWO05K920nCvdYK7rbVA7depqY</td><td>模板已就绪（21列），待业务填</td></tr>
+  <tr><td>商品卡片接口</td><td>返回 goodsId/name/mainImage/salePrice/卖点/跳转</td><td>⚠️ 域名+字段待研发给（见节点配置卡占位清单）</td></tr>
+</table>
+
+<h2>五、变量与接口约定总表</h2>
+<table>
+  <tr><th>变量</th><th>类型</th><th>产生方</th><th>消费方</th></tr>
+  <tr><td><code>analysis_type</code></td><td>String</td><td>APP 前端（按钮写死）</td><td>Coze 开始 → IF 选择器</td></tr>
+  <tr><td><code>contextProduct</code></td><td>String</td><td>APP 前端（跨模式保留）</td><td>Coze parse（复用）</td></tr>
+  <tr><td><code>product_info</code></td><td>JSON</td><td>Coze parse_buy_query</td><td>KB检索 + 卡片API</td></tr>
+  <tr><td><code>kb_context</code></td><td>String</td><td>KB检索</td><td>说明文案 LLM</td></tr>
+  <tr><td><code>reply_text</code></td><td>String</td><td>说明文案 LLM</td><td>APP 话术渲染</td></tr>
+  <tr><td><code>card_list</code></td><td>JSON数组</td><td>商品卡片API</td><td>APP 卡片渲染</td></tr>
+</table>
+<p>分隔符约定：话术与卡片之间用 <code>##########CARD##########</code> 分隔（沿用现有约定，前端需确认拆分逻辑）。</p>
+
+<h2>六、与原型对应关系</h2>
+<ul>
+  <li>原型文件 <code>lvyunjia_ai_chat_proto.html</code> 第 367 行 <code>modeNames = {buy, save, choose, see}</code> 即三入口+看</li>
+  <li>第 387 行 <code>setMode()</code> 写死 <code>currentMode</code>，对应工作流 <code>analysis_type</code></li>
+  <li>第 446-491 行 <code>renderBuy/Save/ChooseResponse</code> 是<b>原型演示用 mock</b>，真实环境替换为工作流返回的消费逻辑</li>
+  <li>第 493 行 <code>send()</code> 中 <code>if (!currentMode) alert('请先点入口')</code> 与「IF 选择器否则兜底」同源</li>
+</ul>
+
+<h2>七、待确认清单</h2>
+<table>
+  <tr><th>#</th><th>事项</th><th>建议</th></tr>
+  <tr><td>1</td><td><b>命名统一</b>：Coze IF 的 <code>select</code> vs 前端 <code>choose</code></td><td>统一为 <code>choose</code>，改 Coze</td></tr>
+  <tr><td>2</td><td>会话历史轮数</td><td>parse 节点开 5~6 轮（对比/复购场景 3 轮不够）</td></tr>
+  <tr><td>3</td><td>商品卡片接口域名/字段</td><td>研发给占位前可 mock 空数组验证链路</td></tr>
+  <tr><td>4</td><td>「帮我看」独立功能</td><td>不进本工作流，本期占位</td></tr>
+  <tr><td>5</td><td>APP 消费返回的分隔符拆分</td><td>确认前端按 <code>##########CARD##########</code> 拆分</td></tr>
+  <tr><td>6</td><td><b>类目归一化</b>：parse 输出的 <code>category</code> 是自由文本，需「类目归一化节点」查类目映射表转为标准 category；业务不在 KB 表做分类决策，只照抄后台所属分类</td><td>PM 维护类目映射表（见第九章），不属于业务填写项</td></tr>
+</table>
+
+<h2>八、parse_buy_query 节点完整提示词（buy 分支首个节点 · 可直接复制）</h2>
+<p>对应泳道图 WF3 / 节点配置卡「节点 C 获取商品名称」之前的一跳。把下面两段分别粘进 Coze 节点的<b>系统提示词</b>与<b>用户提示词</b>框。</p>
+
+<h3>8.1 系统提示词（System Prompt）</h3>
+<pre style="background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;font-size:12.5px;line-height:1.55;white-space:pre-wrap;font-family:Consolas,monospace"><code>你是一个商品购买意图解析助手，服务于绿韵家用户。
+你的任务是把用户的自然语言输入解析为结构化的购买意图 JSON。
+
+## 输出格式（严格遵守，不要多余文字）
+{
+  "category": "string",          // 用户说的功效词(自由文本,如"助眠"),后续节点查类目映射表归一化
+  "keywords": ["string", ...],   // 召回关键词数组，1~5 个
+  "constraints": {               // 用户主动说的约束（没说就 null，不要推测）
+    "price_max": "number|null",
+    "price_min": "number|null",
+    "taste": "string|null",      // 口感/口味
+    "form": "string|null",       // 形态（胶囊/液体/冲剂/片剂）
+    "suitable_for": "string|null"  // 适用人群
+  },
+  "follow_up_question": "string|null"  // 缺关键信息时反问，否则 null
+}
+
+## 关键规则
+1. category 为用户说的功效词(自由文本，如"助眠")，**不强制白名单**；后续「类目归一化节点」查类目映射表把它归一化到标准 category，未命中则直接用原词去产品表"所属分类"列做包含匹配
+2. keywords 至少 1 个最多 5 个，含产品名/成分/功效词，供下游知识库召回
+3. constraints 只填用户**显式说**的，没说就 null，**禁止推测**
+4. follow_up_question 仅在缺关键信息时填，例：
+   - "想助眠"但没说症状 → "想了解入睡困难、易醒还是早醒？"
+   - "想买水机"但没说预算 → "您的预算范围是？"
+   - "帮父母选"但没说年龄/身体 → "父母多大？有没有忌口或慢病？"
+5. 多轮对话：结合 {{chatHistory}} 理解指代
+   - "那个多少钱" → 上轮提到的产品
+   - "和它类似的" → 上轮类目
+6. 不要编造产品名/价格/功效，只解析意图
+
+## 输出示例
+输入："我想买点助眠的，别太贵"
+输出：{
+  "category": "助眠/睡眠",
+  "keywords": ["助眠"],
+  "constraints": {
+    "price_max": 100,
+    "price_min": null,
+    "taste": null,
+    "form": null,
+    "suitable_for": null
+  },
+  "follow_up_question": "想了解入睡困难、易醒还是早醒？预算上限是 100 元吗？"
+}</code></pre>
+
+<h3>8.2 用户提示词（User Prompt）</h3>
+<pre style="background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;font-size:12.5px;line-height:1.55;white-space:pre-wrap;font-family:Consolas,monospace"><code>{{#if chatHistory}}
+【历史对话】
+{{chatHistory}}
+【本轮输入】
+{{input}}
+{{else}}
+{{input}}
+{{/if}}</code></pre>
+
+<div class="ok">
+<b>配置要点</b>：① 节点「会话历史」开关 ON，<b>轮数设 5 或 6</b>（非默认 3）；② 输出勾选 <b>JSON 模式</b>；③ 模型选豆包 2.0 Pro，Temperature 0.1~0.3；④ <code>{{input}}</code> 绑定开始节点的 <code>USER_INPUT</code>。
+</div>
+
+<h2>九、类目归一化方案（回答「分类太多填不完」）</h2>
+<p>业务<b>不在 KB 表做分类决策</b>——第 4 列「所属分类」直接照抄后台三级路径（复制粘贴即可）。类目归一化由工作流侧用一张<strong>类目映射表</strong>自动完成，PM 维护，业务无感。</p>
+<table>
+  <tr><th>环节</th><th>谁做</th><th>说明</th></tr>
+  <tr><td>KB 表第 4 列「所属分类」</td><td>业务</td><td>照抄后台三级路径（如 <code>食品饮料/保健食品/增强免疫</code>），零决策</td></tr>
+  <tr><td>类目映射表（独立小表）</td><td>PM</td><td>三级路径 → 标准 category + 别名；后台有多少三级路径建多少行</td></tr>
+  <tr><td>parse_buy_query 输出 category</td><td>LLM</td><td>用户说的功效词（<b>自由文本</b>，不强制白名单）</td></tr>
+  <tr><td>🆕 类目归一化节点</td><td>工作流</td><td>查类目映射表，把自由文本归一化到标准 category；未命中则用原词去产品表「所属分类」列做<strong>包含匹配</strong></td></tr>
+  <tr><td>KB 检索</td><td>工作流</td><td>query = keywords + 归一化 category，在「所属分类」列包含匹配（路径里含该词即命中）</td></tr>
+</table>
+<p><b>一句话</b>：分类体系交给「类目映射表 + 类目归一化节点」，业务只照抄后台路径。标准 category 去重值 = 类目映射表的产出，不是业务手填的。</p>
+
+<h3>9.1 类目映射表结构（PM 维护，独立数据集）</h3>
+<table>
+  <tr><th>后台所属分类（三级路径）</th><th>标准 category</th><th>别名/同义问法</th></tr>
+  <tr><td>食品饮料/保健食品/增强免疫</td><td>增强免疫</td><td>提高免疫力、抗病毒、增强体质</td></tr>
+  <tr><td>食品饮料/保健食品/助眠</td><td>助眠</td><td>睡眠、失眠、安睡、改善睡眠</td></tr>
+  <tr><td>食品饮料/普通食品/功能饮品</td><td>体重管理</td><td>减肥、瘦身、控卡</td></tr>
+</table>
+
+<h2>十、下一个节点：说明文案 LLM（buy 分支 · 节点 E 适配版）</h2>
+<p>位置：在 <code>parse_buy_query</code> 之后、KB 检索与商品卡片召回完成之后。它只生成<b>话术文本</b>（<code>reply_text</code>），<b>不输出卡片</b>——卡片由「获取商品卡片」节点单独透传。</p>
+
+<h3>10.1 输入变量（来自上游）</h3>
+<table>
+  <tr><th>变量</th><th>来源</th><th>说明</th></tr>
+  <tr><td><code>category</code></td><td>parse_buy_query</td><td>主类目（助眠/肠胃…），用于组织话术侧重</td></tr>
+  <tr><td><code>keywords</code></td><td>parse_buy_query</td><td>召回关键词数组</td></tr>
+  <tr><td><code>constraints</code></td><td>parse_buy_query</td><td>价格/口感/形态/人群约束（null 不展示）</td></tr>
+  <tr><td><code>kb_context</code></td><td>知识库检索_2</td><td>召回的产品名称+功效片段</td></tr>
+  <tr><td>（固定）<code>intent = buy</code></td><td>本分支写死</td><td>不走 LLM 判断，直接按 buy 侧重生成</td></tr>
+</table>
+
+<h3>10.2 系统提示词（System Prompt）</h3>
+<pre style="background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;font-size:12.5px;line-height:1.55;white-space:pre-wrap;font-family:Consolas,monospace"><code>你是绿韵家 AI 健康生活助手，服务于「数智」板块的「帮我买」分支。
+
+## 任务
+结合商品知识库召回内容，用口语化、有温度的话术为用户介绍商品，并贴合购买意图组织内容。
+
+## 输入
+- 用户主类目：{{category}}
+- 用户关注词：{{keywords}}
+- 用户约束（可能为 null）：{{constraints}}
+- 商品知识（产品名称与功效，来自知识库召回）：{{kb_context}}
+
+## 话术侧重（buy 分支）
+- 逐款介绍卖点、核心功效、适用人群、当前价格（有划线价标优惠）；
+- 若用户给了价格/口感/形态约束，话术中点明"符合您说的 XX"；
+- 结尾软性引导"需要我直接帮你加购或看详情可以点卡片"。
+
+## 通用要求
+1. 先一句回应，再逐款介绍，不堆砌参数；
+2. 仅基于商品知识作答，禁止编造功效/价格；
+3. 涉及健康/服用建议，结尾加"以上建议仅供参考，具体请遵医嘱或商品说明"；
+4. 不输出卡片 JSON（卡片由「获取商品卡片」节点单独透传，本节点只出话术）。
+
+## 输出格式
+仅输出话术文本，不超过 120 字（移动端阅读）。</code></pre>
+
+<div class="ok">
+<b>配置要点</b>：① 模型选豆包 2.0 Pro，Temperature <b>0.7</b>（话术要有温度，比 parse 节点高）；② 输入变量绑定上游对应输出；③ 输出变量命名 <code>reply_text</code>，供「产品信息输出」节点拼接。
+</div>
+
+<h3>10.3 之后还差两个节点（当前被阻塞）</h3>
+<table>
+  <tr><th>节点</th><th>阻塞原因</th><th>你现在能做的</th></tr>
+  <tr><td>知识库检索_2（KB 召回）</td><td>需先在 Coze 建商品知识库并导入 21 列表，拿到 <code>dataset_id</code></td><td>先把 KB 表业务填了 → 建库导入 → 填 dataset_id</td></tr>
+  <tr><td>获取商品卡片（代码节点）</td><td>研发未给 API 域名与返回字段（见节点配置卡第五节占位清单）</td><td>先用 mock 返回空数组验证链路，拿到接口后替换域名+字段</td></tr>
+</table>
+<p>这两个节点拿到依赖后，我再给你逐节点出配置（KB 检索的 query 绑定 <code>keywords</code>、卡片代码节点的三种 intent 分支）。现在先把 <b>parse_buy_query</b> 和本 <b>说明文案 LLM</b> 配好，用 mock 卡片跑通「意图解析 → 话术生成」这一段。</p>
+
+</body>
+</html>
