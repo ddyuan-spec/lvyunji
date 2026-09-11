@@ -220,8 +220,9 @@ sequenceDiagram
 
 ## 关键规则
 1. **不要输出 category / 所属分类** —— category 由下游节点从知识库召回结果的「所属分类」字段提取，你不用猜、不要编
-2. 不要编造产品名、价格、功效、库存；只解析用户已表达的内容
-3. 多轮对话：结合 {{chatHistory}} 理解指代
+2. **问候/寒暄严禁进入 keywords**：用户说"你好""在吗""哈喽""嗨"等，keywords 必须为 []；"问候""寒暄"这类元意图词本身不是商品/功效词，严禁放入 keywords
+3. 不要编造产品名、价格、功效、库存；只解析用户已表达的内容
+4. 多轮对话：结合 {{chatHistory}} 理解指代
    - "那个多少钱" → 上轮提到的产品名
    - "和它类似的" → 上轮类目或产品
    - "便宜点" → 约束 price_max，没说具体数字就 null
@@ -274,6 +275,7 @@ sequenceDiagram
 
 ## 错误输出示例（禁止出现）
 ❌ { "keywords": [] } 且 intent_type 为 purchase  // purchase 时 keywords 不能为空
+❌ 输入"你好"输出 { "keywords": ["问候"] }  // "问候"不是商品/功效词，必须空数组
 ❌ { "follow_up_question": "" }  // 不要空字符串，用 null
 ❌ "constraints.taste": "清淡"  // 不在枚举内
 ❌ 输出 markdown 代码块：```json ... ```
