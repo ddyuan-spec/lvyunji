@@ -26,6 +26,10 @@
   .tag-new { display: inline-block; background: #d97706; color: #fff; border-radius: 4px; padding: 1px 8px; font-size: 12px; margin-right: 4px; }
   ul li { margin: 6px 0; }
   .muted { color: #6b7280; font-size: 13px; }
+  .flowfig { margin: 18px 0; text-align: center; }
+  .flowfig img { max-width: 640px; width: 100%; border: 1px solid #e5e7eb; border-radius: 10px; }
+  .flowfig figcaption { color: #6b7280; font-size: 12.5px; margin-top: 8px; }
+  .flowfig .chain { margin-top: 12px; font-size: 12.5px; color: #374151; text-align: left; background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 12px; }
 </style>
 </head>
 <body>
@@ -42,25 +46,13 @@
 
 <p>与「帮我买」骨架同构，<b>只多两跳</b>（提取商品 ID + 查价），其余节点可直接照搬 buy 分支的配置习惯。</p>
 
-<pre><code>① 开始(analysis_type=save)
-   ↓
-② IF 选择器(analysis_type == save)
-   ↓
-③ parse_save_query (LLM)          ← 新节点，独立提示词
-   ↓
-④ 意图提取 (Code)                  ← 同 buy，多输出 save_focus
-   ↓
-⑤ IF(is_product) ── false ──→ 结束（返回 follow_up_question，不查库不调接口）
-   ↓ true
-⑥ KB 检索 (火山 product, topK=5)   ← 只拿商品名/ID，不取价格
-   ↓
-⑦ 提取商品ID (Code)                ← 🆕 buy 没有
-   ↓
-⑧ HTTP 请求 · 查价接口             ← 🆕 buy 没有，后端待开发
-   ↓
-⑨ 生成省钱方案 (LLM)               ← 新提示词，输入含真实价格
-   ↓
-⑩ 结束</code></pre>
+<figure class="flowfig">
+  <img src="lvyunjia-ai-workflow-save-flow.png" alt="「帮我省」链路流程图 ①~⑩">
+  <figcaption>图 1 · 「帮我省」分支链路（①~⑩）；<b>橙红框</b>为相对「帮我买」新增的 ⑦ 提取商品ID、⑧ 查价接口 两跳</figcaption>
+  <div class="chain">
+    一行速览：<b>① 开始(save) → ② IF(==save) → ③ parse_save_query(LLM) → ④ 意图提取(Code) → ⑤ IF(is_product)；<span style="color:#c0392b">false→结束(追问)</span>；<span style="color:#2e9e5b">true→</span> ⑥ KB检索(product,topK=5) → ⑦ 提取商品ID(Code，新增) → ⑧ 查价接口(HTTP，新增) → ⑨ 生成省钱方案(LLM) → ⑩ 结束</b>
+  </div>
+</figure>
 
 <table>
   <tr><th>节点</th><th>类型</th><th>与 buy 分支的差异</th></tr>
