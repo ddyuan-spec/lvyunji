@@ -124,11 +124,13 @@ sequenceDiagram
 <table>
   <tr><th>节点</th><th>类型</th><th>关键配置</th><th>输出</th></tr>
   <tr><td>① 开始</td><td>Start</td><td>6 变量：USER_INPUT / CONVERSATION_NAME / user_id / user_images / conversation_id / <b>analysis_type</b></td><td>inputs</td></tr>
-  <tr><td>② IF 选择器</td><td>Condition</td><td><code>analysis_type</code> == buy/select/save（⚠️ 改 choose）；否则兜底</td><td>三分支</td></tr>
-  <tr><td>③ parse / 意图抽取</td><td>LLM</td><td>抽 <code>product_info</code>（name/symptom/efficacy/category），<b>不判断意图</b>；开会话历史 5~6 轮</td><td>product_info</td></tr>
-  <tr><td>④ KB检索 + 商品卡片</td><td>Knowledge + Code</td><td>统一库召回 top_k；按意图调不同接口返回 <code>card_list</code></td><td>kb_context + card_list</td></tr>
-  <tr><td>⑤ 说明文案</td><td>LLM</td><td>按意图生成定性话术（≤60字），不编价格</td><td>reply_text</td></tr>
-  <tr><td>⑥ 汇总 + 消息 + 结束</td><td>Code + Output</td><td>合并多路；<code>reply_text + 分隔符 + card_list</code></td><td>推送给 APP</td></tr>
+  <tr><td>② IF 选择器（意图分流）</td><td>Condition</td><td><code>analysis_type</code> == buy/choose/save（⚠️ 统一 choose，见第三章）；否则兜底</td><td>三分支</td></tr>
+  <tr><td>③ parse_buy_query</td><td>LLM</td><td>抽 <code>keywords / constraints / follow_up_question</code>，<b>不判断意图、不输出 category</b>；开会话历史 5~6 轮（详见第八章）</td><td>parse_output（JSON）</td></tr>
+  <tr><td>③.5 意图提取</td><td>Code</td><td>解析 parse_output，补 <code>query</code>=keywords.join(' ') 供检索，判 <code>is_product</code>=keywords.length&gt;0（详见第十一章 11.2）</td><td>keywords / constraints / follow_up / is_product / query</td></tr>
+  <tr><td>③.6 IF 选择器（产品判断）</td><td>Condition</td><td><code>is_product</code> == true → 产品分支（查 KB）；否则 → 非产品分支（结束返回 follow_up）</td><td>两分支</td></tr>
+  <tr><td>④ KB 检索</td><td>Knowledge（火山）</td><td>query = <code>意图提取.query</code>，召回 top_k=5，来源=火山知识库 <code>product</code></td><td>outputList</td></tr>
+  <tr><td>⑤ 生成商品推荐回复</td><td>LLM</td><td>输入 keywords/constraints/recall_list，按模板生成导购回复（详见第十一章 11.3）</td><td>reply_text</td></tr>
+  <tr><td>⑥ 结束</td><td>Output</td><td>产品分支返回 <code>reply_text</code>；非产品分支返回 <code>follow_up_question</code></td><td>推送给 APP</td></tr>
 </table>
 
 <h3>4.3 📚 知识库 / 后端 API</h3>
@@ -166,57 +168,117 @@ sequenceDiagram
   <tr><td>3</td><td>商品卡片接口域名/字段</td><td>研发给占位前可 mock 空数组验证链路</td></tr>
   <tr><td>4</td><td>「帮我看」独立功能</td><td>不进本工作流，本期占位</td></tr>
   <tr><td>5</td><td>APP 消费返回的分隔符拆分</td><td>确认前端按 <code>##########CARD##########</code> 拆分</td></tr>
-  <tr><td>6</td><td><b>类目归一化</b>：parse 输出的 <code>category</code> 是自由文本，需「类目归一化节点」查类目映射表转为标准 category；业务不在 KB 表做分类决策，只照抄后台所属分类</td><td>PM 维护类目映射表（见第九章），不属于业务填写项</td></tr>
+  <tr><td>6</td><td><b>category 来源</b>：parse 不输出 category，由「提取类目」代码节点从 KB 召回的「所属分类」字段提取（见第九章）；业务只抄后台路径，PM 不维护映射表</td><td>新增「提取类目」代码节点（Python，split 取末级 + 多数投票）</td></tr>
 </table>
 
 <h2>八、parse_buy_query 节点完整提示词（buy 分支首个节点 · 可直接复制）</h2>
 <p>对应泳道图 WF3 / 节点配置卡「节点 C 获取商品名称」之前的一跳。把下面两段分别粘进 Coze 节点的<b>系统提示词</b>与<b>用户提示词</b>框。</p>
 
 <h3>8.1 系统提示词（System Prompt）</h3>
-<pre style="background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;font-size:12.5px;line-height:1.55;white-space:pre-wrap;font-family:Consolas,monospace"><code>你是一个商品购买意图解析助手，服务于绿韵家用户。
-你的任务是把用户的自然语言输入解析为结构化的购买意图 JSON。
+<pre style="background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;font-size:12.5px;line-height:1.55;white-space:pre-wrap;font-family:Consolas,monospace"><code>你是绿韵家商品购买意图解析助手，只负责把用户输入解析为结构化的购买意图 JSON，不回答、不推荐、不生成话术。
 
-## 输出格式（严格遵守，不要多余文字）
+## 输出格式（严格遵守，不要多余文字，不要 markdown 代码块）
 {
-  "category": "string",          // 用户说的功效词(自由文本,如"助眠"),后续节点查类目映射表归一化
-  "keywords": ["string", ...],   // 召回关键词数组，1~5 个
-  "constraints": {               // 用户主动说的约束（没说就 null，不要推测）
-    "price_max": "number|null",
-    "price_min": "number|null",
-    "taste": "string|null",      // 口感/口味
-    "form": "string|null",       // 形态（胶囊/液体/冲剂/片剂）
-    "suitable_for": "string|null"  // 适用人群
+  "intent_type": "purchase" | "greeting" | "clarify",  // 意图类型，三选一
+  "keywords": ["string", ...],   // 1~5 个 purchase 时不能为空，greeting/clarify 必须为空数组
+  "constraints": {
+    "price_max": number|null,    // 人民币元，整数，没说具体数字就 null
+    "price_min": number|null,    // 人民币元，整数
+    "taste": "string|null",      // 枚举见下方
+    "form": "string|null",       // 枚举见下方
+    "suitable_for": "string|null"  // 枚举见下方
   },
-  "follow_up_question": "string|null"  // 缺关键信息时反问，否则 null
+  "follow_up_question": "string|null"  // 缺关键信息时反问，否则 null（不要填空字符串）
 }
 
-## 关键规则
-1. category 为用户说的功效词(自由文本，如"助眠")，**不强制白名单**；后续「类目归一化节点」查类目映射表把它归一化到标准 category，未命中则直接用原词去产品表"所属分类"列做包含匹配
-2. keywords 至少 1 个最多 5 个，含产品名/成分/功效词，供下游知识库召回
-3. constraints 只填用户**显式说**的，没说就 null，**禁止推测**
-4. follow_up_question 仅在缺关键信息时填，例：
-   - "想助眠"但没说症状 → "想了解入睡困难、易醒还是早醒？"
-   - "想买水机"但没说预算 → "您的预算范围是？"
-   - "帮父母选"但没说年龄/身体 → "父母多大？有没有忌口或慢病？"
-5. 多轮对话：结合 {{chatHistory}} 理解指代
-   - "那个多少钱" → 上轮提到的产品
-   - "和它类似的" → 上轮类目
-6. 不要编造产品名/价格/功效，只解析意图
+## 字段规范
+1. intent_type（三态，必须三选一）
+   - purchase：有明确想买的东西，keywords 非空
+   - greeting：纯问候/闲聊（"你好""在吗""你是谁"），keywords 必须填 []
+   - clarify：需要反问才能明确意图（"你们有啥好的""推荐个"），keywords 必须填 []
+   - 下游 IF 选择器据此二分：purchase → 走产品分支（正常买链路，查 KB）；greeting/clarify 合流 → 走非产品分支（不查 KB，直接返回 follow_up_question，其文本已由 parse 按类型填好问候/反问语）
 
-## 输出示例
-输入："我想买点助眠的，别太贵"
+2. keywords
+   - 来源：从用户原话中提取有语义的名词、动词、形容词、症状词
+   - 允许：产品名、成分、功效、症状、人群、场景词（如"睡不着""失眠""安神""益生菌""父母"）
+   - 禁止：语气词、问候词、标点、重复词
+   - 数量：purchase 时至少 1 个，最多 5 个；greeting/clarify 时必须 []
+   - 策略：用户大白话优先保留原词，同时可扩展 1 个常见同义词（"睡不着"可扩展"失眠"）
+
+3. constraints
+   - 只填用户**显式说**的内容，**禁止推测**
+   - price_max / price_min：必须是数字（元），整数。用户说"一百左右"取 100；说"便宜点""别太贵"没说数字 → null
+   - taste：只能从 ["酸","甜","苦","辣","咸","无味"] 中选，不能填其他
+   - form：只能从 ["胶囊","液体","冲剂","片剂","软糖","粉剂"] 中选，不能填其他
+   - suitable_for：只能从 ["老人","儿童","孕妇","成人","男性","女性"] 中选，不能填其他
+   - 以上字段用户没提 → 必须填 null，不能填 "null" 字符串或空字符串
+
+4. follow_up_question
+   - purchase：仅在缺关键信息、且确需用户补充时填，缺信息但能直接召回（如"助眠"）则 null；必须是完整问句句末带问号，不要一次问超过 1 个
+   - greeting：填问候引导语（"你好，我是绿韵家购物小助手，可以帮您挑产品、比价格、找优惠。请问您想了解哪类产品？"）
+   - clarify：填反问引导语（"想改善哪方面呢？比如睡眠、肠胃、免疫、体重管理，我帮您挑。"）
+
+## 关键规则
+1. **不要输出 category / 所属分类** —— category 由下游节点从知识库召回结果的「所属分类」字段提取，你不用猜、不要编
+2. 不要编造产品名、价格、功效、库存；只解析用户已表达的内容
+3. 多轮对话：结合 {{chatHistory}} 理解指代
+   - "那个多少钱" → 上轮提到的产品名
+   - "和它类似的" → 上轮类目或产品
+   - "便宜点" → 约束 price_max，没说具体数字就 null
+
+## 正确输出示例
+例 1（purchase）
+输入："晚上总睡不着，想买点安神的，别太贵"
 输出：{
-  "category": "助眠/睡眠",
+  "intent_type": "purchase",
+  "keywords": ["睡不着", "失眠", "安神"],
+  "constraints": {"price_max": null, "price_min": null, "taste": null, "form": null, "suitable_for": null},
+  "follow_up_question": "想了解入睡困难、易醒还是早醒？"
+}
+
+例 2（purchase）
+输入："酸枣仁软糖多少钱"
+输出：{
+  "intent_type": "purchase",
+  "keywords": ["酸枣仁", "软糖"],
+  "constraints": {"price_max": null, "price_min": null, "taste": null, "form": "软糖", "suitable_for": null},
+  "follow_up_question": null
+}
+
+例 3（多轮）
+历史：用户上轮说"助眠的有什么"；本轮："那个贵不贵"
+输出：{
+  "intent_type": "purchase",
   "keywords": ["助眠"],
-  "constraints": {
-    "price_max": 100,
-    "price_min": null,
-    "taste": null,
-    "form": null,
-    "suitable_for": null
-  },
-  "follow_up_question": "想了解入睡困难、易醒还是早醒？预算上限是 100 元吗？"
-}</code></pre>
+  "constraints": {"price_max": null, "price_min": null, "taste": null, "form": null, "suitable_for": null},
+  "follow_up_question": null
+}
+
+例 4（greeting）
+输入："你好"
+输出：{
+  "intent_type": "greeting",
+  "keywords": [],
+  "constraints": {"price_max": null, "price_min": null, "taste": null, "form": null, "suitable_for": null},
+  "follow_up_question": "你好，我是绿韵家购物小助手，可以帮您挑产品、比价格、找优惠。请问您想了解哪类产品？"
+}
+
+例 5（clarify）
+输入："你们有啥值得买的"
+输出：{
+  "intent_type": "clarify",
+  "keywords": [],
+  "constraints": {"price_max": null, "price_min": null, "taste": null, "form": null, "suitable_for": null},
+  "follow_up_question": "想改善哪方面呢？比如睡眠、肠胃、免疫、体重管理，我帮您挑。"
+}
+
+## 错误输出示例（禁止出现）
+❌ { "keywords": [] } 且 intent_type 为 purchase  // purchase 时 keywords 不能为空
+❌ { "follow_up_question": "" }  // 不要空字符串，用 null
+❌ "constraints.taste": "清淡"  // 不在枚举内
+❌ 输出 markdown 代码块：```json ... ```
+❌ 编造价格："price_max": 99  // 用户没说具体数字
+❌ 输出 category 字段</code></pre>
 
 <h3>8.2 用户提示词（User Prompt）</h3>
 <pre style="background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;font-size:12.5px;line-height:1.55;white-space:pre-wrap;font-family:Consolas,monospace"><code>{{#if chatHistory}}
@@ -228,37 +290,52 @@ sequenceDiagram
 {{input}}
 {{/if}}</code></pre>
 
+<h3>8.3 节点验收 case（试运行逐条跑）</h3>
+<table>
+  <tr><th>#</th><th>输入</th><th>期望 intent_type</th><th>期望 keywords</th><th>期望 constraints</th><th>期望 follow_up</th></tr>
+  <tr><td>1</td><td>晚上总睡不着，想买点安神的，别太贵</td><td>purchase</td><td>["睡不着","失眠","安神"]</td><td>全 null</td><td>问入睡困难/易醒/早醒</td></tr>
+  <tr><td>2</td><td>酸枣仁软糖多少钱</td><td>purchase</td><td>["酸枣仁","软糖"]</td><td>form=软糖，其余 null</td><td>null</td></tr>
+  <tr><td>3</td><td>看看 200 以内的水机</td><td>purchase</td><td>["水机"]</td><td>price_max=200，其余 null</td><td>null</td></tr>
+  <tr><td>4</td><td>适合孕妇的维生素</td><td>purchase</td><td>["维生素","孕妇"]</td><td>suitable_for=孕妇，其余 null</td><td>null（已够召回）</td></tr>
+  <tr><td>5</td><td>你好</td><td>greeting</td><td>[]</td><td>全 null</td><td>"你好，我是绿韵家购物小助手…想了解哪类产品？"</td></tr>
+  <tr><td>6</td><td>你们有啥值得买的</td><td>clarify</td><td>[]</td><td>全 null</td><td>"想改善哪方面呢？比如睡眠、肠胃…"</td></tr>
+  <tr><td>7</td><td>想买助眠的，要液体的</td><td>purchase</td><td>["助眠"]</td><td>form=液体，其余 null</td><td>问症状（缺症状）</td></tr>
+</table>
+<p><b>验收标准</b>：6 条全过 → 节点 OK。任一条 keywords 为空、不在枚举、输出 markdown 代码块、或编造价格 → 不过，把 case 丢回来调提示词。</p>
+<div class="warn"><b>多轮 case 怎么测</b>：单节点「调试」里 <code>{{chatHistory}}</code> 默认空，要测"那个多少钱"这种指代，需手动在调试输入的 chatHistory 框填 JSON：<br><code>[{"role":"user","content":"助眠的有什么"},{"role":"assistant","content":"推荐酸枣仁软糖"}]</code>，再输入"那个贵不贵"。</div>
+
 <div class="ok">
 <b>配置要点</b>：① 节点「会话历史」开关 ON，<b>轮数设 5 或 6</b>（非默认 3）；② 输出勾选 <b>JSON 模式</b>；③ 模型选豆包 2.0 Pro，Temperature 0.1~0.3；④ <code>{{input}}</code> 绑定开始节点的 <code>USER_INPUT</code>。
 </div>
 
-<h2>九、类目归一化方案（回答「分类太多填不完」）</h2>
-<p>业务<b>不在 KB 表做分类决策</b>——第 4 列「所属分类」直接照抄后台三级路径（复制粘贴即可）。类目归一化由工作流侧用一张<strong>类目映射表</strong>自动完成，PM 维护，业务无感。</p>
+<h2>九、category 怎么来（回答「用户不一定说分类词」）</h2>
+<p>用户说"晚上睡不着"不会蹦出"助眠"。所以 <strong>category 绝不靠 parse 猜</strong>，而是 <strong>KB 检索召回后，从结果文档的「所属分类」字段真实提取</strong>。parse 只负责捞出用户原话的语义词（keywords），召回后知识库自己告诉你它属于哪条线。</p>
 <table>
   <tr><th>环节</th><th>谁做</th><th>说明</th></tr>
   <tr><td>KB 表第 4 列「所属分类」</td><td>业务</td><td>照抄后台三级路径（如 <code>食品饮料/保健食品/增强免疫</code>），零决策</td></tr>
-  <tr><td>类目映射表（独立小表）</td><td>PM</td><td>三级路径 → 标准 category + 别名；后台有多少三级路径建多少行</td></tr>
-  <tr><td>parse_buy_query 输出 category</td><td>LLM</td><td>用户说的功效词（<b>自由文本</b>，不强制白名单）</td></tr>
-  <tr><td>🆕 类目归一化节点</td><td>工作流</td><td>查类目映射表，把自由文本归一化到标准 category；未命中则用原词去产品表「所属分类」列做<strong>包含匹配</strong></td></tr>
-  <tr><td>KB 检索</td><td>工作流</td><td>query = keywords + 归一化 category，在「所属分类」列包含匹配（路径里含该词即命中）</td></tr>
+  <tr><td>parse_buy_query 输出 keywords</td><td>LLM</td><td>只捞用户原话语义词（"睡不着""失眠"），<b>不输出 category</b></td></tr>
+  <tr><td>🆕 知识库检索节点</td><td>工作流</td><td>query = keywords，召回带「所属分类」字段的产品文档</td></tr>
+  <tr><td>🆕 提取类目（代码节点）</td><td>工作流</td><td>遍历召回结果，取「所属分类」<b>最后一级</b>（按 <code>/</code> split 取末段，如 <code>增强免疫</code>），出现最多的作为 category 输出</td></tr>
+  <tr><td>说明文案 LLM</td><td>LLM</td><td>输入加 <code>{{提取类目.category}}</code> 组织话术侧重</td></tr>
 </table>
-<p><b>一句话</b>：分类体系交给「类目映射表 + 类目归一化节点」，业务只照抄后台路径。标准 category 去重值 = 类目映射表的产出，不是业务手填的。</p>
+<p><b>一句话</b>：category 是知识库召回的副产品，不是 LLM 猜的。业务只抄后台路径，PM 不维护映射表（除非别名召回差，再补 9.1 的别名增强）。</p>
 
-<h3>9.1 类目映射表结构（PM 维护，独立数据集）</h3>
+<h3>9.1 别名增强（可选，仅当召回差时做）</h3>
+<p>若用户词（"安睡"）在知识库里召回不到，可建一张<strong>别名映射表</strong>（独立数据集），在检索前用代码节点把"安睡→助眠"替换进 keywords。但<b>优先靠 KB 表第 2 列「别名/俗称」+ 第 17 列「意图触发词」做好召回</b>，多数情况不需要这层。</p>
 <table>
-  <tr><th>后台所属分类（三级路径）</th><th>标准 category</th><th>别名/同义问法</th></tr>
-  <tr><td>食品饮料/保健食品/增强免疫</td><td>增强免疫</td><td>提高免疫力、抗病毒、增强体质</td></tr>
-  <tr><td>食品饮料/保健食品/助眠</td><td>助眠</td><td>睡眠、失眠、安睡、改善睡眠</td></tr>
-  <tr><td>食品饮料/普通食品/功能饮品</td><td>体重管理</td><td>减肥、瘦身、控卡</td></tr>
+  <tr><th>用户原词</th><th>映射为标准词</th></tr>
+  <tr><td>安睡、改善睡眠、睡不好</td><td>助眠</td></tr>
+  <tr><td>瘦身、控卡、减脂</td><td>体重管理</td></tr>
 </table>
 
-<h2>十、下一个节点：说明文案 LLM（buy 分支 · 节点 E 适配版）</h2>
+<h2>十、说明文案 LLM（早期设计 · 参考）</h2>
+<div class="warn"><b>演进说明</b>：本章为早期设计——假设 KB 召回后单独有一个「说明文案 LLM」只出话术、卡片由另一节点透传。当前实际落地已演进为「<b>生成商品推荐回复 LLM</b>」（第十一章）：KB 检索结果直接喂给一个 LLM 节点，融合话术 + 商品推荐一次性输出。本章保留作架构参考，<b>当前以第十一章为准配节点</b>。</div>
 <p>位置：在 <code>parse_buy_query</code> 之后、KB 检索与商品卡片召回完成之后。它只生成<b>话术文本</b>（<code>reply_text</code>），<b>不输出卡片</b>——卡片由「获取商品卡片」节点单独透传。</p>
 
 <h3>10.1 输入变量（来自上游）</h3>
 <table>
   <tr><th>变量</th><th>来源</th><th>说明</th></tr>
-  <tr><td><code>category</code></td><td>parse_buy_query</td><td>主类目（助眠/肠胃…），用于组织话术侧重</td></tr>
+  <tr><td><code>category</code></td><td>提取类目节点</td><td>从 KB 召回结果「所属分类」字段提取的标准类目，用于组织话术侧重</td></tr>
   <tr><td><code>keywords</code></td><td>parse_buy_query</td><td>召回关键词数组</td></tr>
   <tr><td><code>constraints</code></td><td>parse_buy_query</td><td>价格/口感/形态/人群约束（null 不展示）</td></tr>
   <tr><td><code>kb_context</code></td><td>知识库检索_2</td><td>召回的产品名称+功效片段</td></tr>
@@ -302,6 +379,169 @@ sequenceDiagram
   <tr><td>获取商品卡片（代码节点）</td><td>研发未给 API 域名与返回字段（见节点配置卡第五节占位清单）</td><td>先用 mock 返回空数组验证链路，拿到接口后替换域名+字段</td></tr>
 </table>
 <p>这两个节点拿到依赖后，我再给你逐节点出配置（KB 检索的 query 绑定 <code>keywords</code>、卡片代码节点的三种 intent 分支）。现在先把 <b>parse_buy_query</b> 和本 <b>说明文案 LLM</b> 配好，用 mock 卡片跑通「意图解析 → 话术生成」这一段。</p>
+
+<h2>十一、buy 分支当前实际节点（生成商品推荐回复 LLM）</h2>
+<p>本章是 2026-09-11 实际落地的节点链路，取代第十章早期设计。链路顺序：<br>
+<code>② IF(analysis_type)</code> → <code>③ parse_buy_query</code> → <code>③.5 意图提取(代码)</code> → <code>③.6 IF(is_product)</code> → <code>④ KB 检索(火山)</code> → <code>⑤ 生成商品推荐回复 LLM</code> → <code>⑥ 结束</code>。<br>
+非产品分支（greeting/clarify/无关键词）在 <code>③.6</code> 直接走结束，返回 <code>follow_up_question</code>，不查 KB。</p>
+
+<h3>11.1 意图提取代码节点（③.5）</h3>
+<p>为什么需要它：① LLM 输出 <code>keywords</code> 是数组，KB 检索的 <code>query</code> 要字符串，Coze 不能直接把数组喂检索；② IF 选择器无法直接展开 LLM JSON 子字段判断，需在代码节点里算 <code>is_product</code>。故在现有代码节点里多输出一个 <code>query</code> 字段即可，不用新增节点。</p>
+<pre style="background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;font-size:12.5px;line-height:1.55;white-space:pre-wrap;font-family:Consolas,monospace"><code>async function main({ params }) {
+  const obj = JSON.parse(params.parse_output || '{}');
+  const keywords = obj.keywords || [];
+  return {
+    keywords: keywords,
+    constraints: obj.constraints || {},
+    follow_up_question: obj.follow_up_question || null,
+    is_product: keywords.length > 0,
+    query: keywords.join(' ')   // 新增：供 KB 检索使用
+  };
+}</code></pre>
+<table>
+  <tr><th>输出变量</th><th>类型</th><th>说明</th></tr>
+  <tr><td><code>keywords</code></td><td>Array&lt;String&gt;</td><td>透传，供下游 LLM 引用</td></tr>
+  <tr><td><code>constraints</code></td><td>Object</td><td>透传</td></tr>
+  <tr><td><code>follow_up_question</code></td><td>String</td><td>非产品分支的结束返回</td></tr>
+  <tr><td><code>is_product</code></td><td>Boolean</td><td>供 ③.6 IF 选择器判断</td></tr>
+  <tr><td><code>query</code></td><td>String</td><td>供 ④ KB 检索 <code>query</code> 绑定</td></tr>
+</table>
+
+<h3>11.2 KB 检索节点（④）</h3>
+<table>
+  <tr><th>字段</th><th>配置</th></tr>
+  <tr><td>知识库来源</td><td>火山知识库</td></tr>
+  <tr><td>目标知识库</td><td><code>product</code>（绿韵家产品知识库）</td></tr>
+  <tr><td>Query</td><td><code>{{意图提取.query}}</code>（注意不是 keywords 数组）</td></tr>
+  <tr><td>topK</td><td>5</td></tr>
+  <tr><td>输出</td><td><code>outputList</code>（Array&lt;Object&gt;）→ 供 ⑤ LLM 的 <code>recall_list</code></td></tr>
+</table>
+
+<h3>11.3 生成商品推荐回复 LLM（⑤ · 对齐泰小虎标准版）</h3>
+<p>把下面两段分别粘进 Coze 节点的<b>系统提示词</b>与<b>用户提示词</b>框。</p>
+
+<h4>系统提示词（System Prompt）</h4>
+<pre style="background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;font-size:12.5px;line-height:1.55;white-space:pre-wrap;font-family:Consolas,monospace"><code># 角色
+你是「绿韵家」AI 健康好物导购伙伴。基于用户意图、约束条件和知识库召回结果，为用户提供温暖、专业、贴合需求的商品推荐。
+
+---
+
+## 一、输入协议（严格按 XML 标签读取）
+
+&lt;用户意图&gt;
+意图关键词：{{keywords}}
+&lt;/用户意图&gt;
+
+&lt;用户约束&gt;
+{{constraints}}
+&lt;/用户约束&gt;
+
+&lt;召回商品列表&gt;
+{{recall_list}}
+&lt;/召回商品列表&gt;
+
+---
+
+## 二、核心任务与流控引擎
+
+根据输入判断属于哪种情况，严格且仅能选择下方对应模板输出，严禁跨模板混搭。
+
+### 情况 A：召回商品存在且匹配用户意图
+1. 先输出一句暖心共鸣（不超过 25 字），直接针对用户痛点
+2. 从召回列表中筛选 1-3 款最匹配商品
+3. 每款输出：商品名标题 + 一句话核心卖点 + 为什么适合当前用户
+4. 结尾给一句温和行动引导
+
+### 情况 B：召回商品存在但不匹配用户约束 / 意图
+1. 不硬推，承认未找到完美匹配
+2. 给出 1 个关键补充问题，引导用户细化需求
+
+### 情况 C：召回商品为空
+1. 直接输出兜底追问，引导用户补充意图
+
+---
+
+## 三、数据处理与合规规则
+
+1. 数据置信度：所有商品信息（名称、价格、功效、适用人群）必须严格依据「召回商品列表」。若为空或不相关，切勿编造。
+2. 约束优先：严格按「用户约束」过滤召回结果，价格超上限、人群不匹配、剂型不符的必须剔除。
+3. 多轮上下文优先：当前轮即时意图优先级最高，严禁用上一轮模板套用当前回答。
+4. 严禁医疗诊断：不做疾病诊断、不替代医生判断，严禁"治疗""治愈""根治""100%有效"。
+5. 禁用绝对化 / 药品化词汇：严禁"快速抑制""修复疾病""彻底解决""无副作用""一定有效""立刻见效"。
+6. 敏感词替换：使用"辅助""帮助""支持""有助于""适合关注""建议搭配健康作息"等中性表达。
+7. 特殊人群强制提醒：涉及孕妇、哺乳期女性、儿童、老人、慢性病人群、过敏体质、正在用药者，必须提示"建议先咨询医生或专业人士"。
+8. 信息缺失兜底：未明确信息不推测，统一表述为"具体建议以产品包装或官方说明为准"。
+
+---
+
+## 四、输出格式与排版规范
+
+- 语言风格：亲切、接地气、温暖、像朋友推荐。可适度使用"哈""啦""噢"等语气词。
+- 总字数限制：严格控制在 100-250 字之间，精炼且信息密度高。
+- 标题层级：必须且仅能使用五级标题 #####，标题带 emoji，单独成行，下方紧跟正文。
+- 标题规范：示例 ##### 🌿 酸枣仁安神软糖。
+- 杜绝机械寒暄：严禁输出"好的""收到""以下是"等机器人感强烈的话。
+- 输出形式：纯 Markdown 文本，不要 JSON，不要代码块。
+
+---
+
+## 五、结构模板（三选一，严禁混搭）
+
+### 【模板 A：有匹配商品】
+#####
+🌿 给你挑到几款合适的
+
+最近睡不好确实挺磨人，给你看看这几款助眠好物～
+
+#####
+🌱 酸枣仁安神软糖
+睡前嚼两颗，酸枣仁 + GABA 复方，适合想放松入睡的你。
+
+#####
+🌱 薰衣草助眠香薰
+天然精油扩香，营造睡前氛围，适合对气味敏感、不喜欢口服的人。
+
+💬 你更倾向吃的还是用的？我再帮你筛一筛～
+
+### 【模板 B：召回存在但不匹配】
+#####
+🍃 暂时没找到特别合适的
+
+你提到"安神"但指定了口服液剂型，目前召回里没有匹配的。
+你接受胶囊或软糖吗？我再帮你查一下～
+
+### 【模板 C：召回为空】
+#####
+🍃 还没找到对应商品
+
+可以再告诉我一下吗？比如想改善入睡难、易醒，还是睡眠浅？
+
+---
+
+## 六、反例（严禁）
+
+- 编造「召回商品列表」中不存在的商品
+- 输出"绝对有效""无副作用"
+- 推荐超过 3 款
+- 使用医疗诊断语言
+- 输出"根据知识库匹配结果"等后台技术表述</code></pre>
+
+<h4>用户提示词（User Prompt）</h4>
+<pre style="background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;font-size:12.5px;line-height:1.55;white-space:pre-wrap;font-family:Consolas,monospace"><code>&lt;用户意图&gt;
+意图关键词：{{keywords}}
+&lt;/用户意图&gt;
+
+&lt;用户约束&gt;
+{{constraints}}
+&lt;/用户约束&gt;
+
+&lt;召回商品列表&gt;
+{{recall_list}}
+&lt;/召回商品列表&gt;</code></pre>
+
+<div class="ok">
+<b>配置要点</b>：① 模型选豆包 2.0 Pro，Temperature <b>0.7</b>（导购话术需温度）；② 输入变量绑定：<code>keywords←意图提取.keywords</code>、<code>constraints←意图提取.constraints</code>、<code>recall_list←KB检索.outputList</code>；③ 输出变量命名 <code>reply_text</code>，供结束节点返回；④ 若先做 MVP 不要卡片，把第五节的模板改成纯文本段落即可，其余不变。
+</div>
 
 </body>
 </html>
