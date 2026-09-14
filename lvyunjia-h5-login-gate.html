@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>绿韵家 H5 · 未登录引导页 + 登录页</title>
+<style>
+:root{
+  --c-primary:#1AAD7C;
+  --c-primary-2:#0F8E63;
+  --c-text:#222;
+  --c-text-2:#666;
+  --c-text-3:#999;
+  --c-line:#EEE;
+  --c-line-2:#F0F0F0;
+  --c-bg:#F5F6F8;
+  --c-card:#FFF;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--c-text);font-size:13px}
+.phone{position:relative;width:375px;height:812px;margin:20px auto;background:#fff;border-radius:32px;box-shadow:0 12px 40px rgba(0,0,0,.15);overflow:hidden}
+.page{position:absolute;inset:0;overflow-y:auto;background:#fff;display:none}
+.page.active{display:block;-webkit-animation:fade .25s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+.nav{position:sticky;top:0;left:0;right:0;height:44px;display:flex;align-items:center;justify-content:center;background:#fff;border-bottom:1px solid var(--c-line);z-index:5;font-size:15px;font-weight:600}
+.nav .back{position:absolute;left:12px;top:0;height:44px;display:flex;align-items:center;color:var(--c-text);font-size:22px}
+
+.btn-primary{display:block;width:100%;height:44px;border-radius:22px;background:var(--c-primary);color:#fff;font-size:15px;font-weight:600;border:none;cursor:pointer;line-height:44px;text-align:center}
+.btn-primary:active{background:var(--c-primary-2)}
+.btn-ghost{display:block;width:100%;height:44px;border-radius:22px;background:#fff;color:var(--c-text-2);font-size:15px;border:1px solid var(--c-line);cursor:pointer;line-height:42px;text-align:center}
+
+.toast{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.active{opacity:1}
+
+/* ===== 未登录引导页 ===== */
+.gate{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 32px;text-align:center}
+.gate .art{margin-bottom:28px}
+.gate .ttl{font-size:18px;font-weight:600;color:var(--c-text)}
+.gate .sub{margin-top:10px;font-size:13px;color:var(--c-text-3);line-height:1.7}
+.gate .acts{margin-top:36px;width:100%}
+
+/* ===== 登录页 ===== */
+.login{padding:0 24px}
+.login .brand{padding:26px 0 6px;font-size:22px;font-weight:700;color:var(--c-text)}
+.login .brand-sub{font-size:13px;color:var(--c-text-3);margin-bottom:22px}
+
+.seg{display:flex;background:#F5F6F8;border-radius:10px;padding:3px;margin-bottom:22px}
+.seg .s{flex:1;text-align:center;height:34px;line-height:34px;font-size:14px;color:var(--c-text-2);border-radius:8px;cursor:pointer}
+.seg .s.on{background:#fff;color:var(--c-text);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+
+.frow{height:50px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--c-line)}
+.frow .fpre{font-size:15px;color:var(--c-text);flex-shrink:0}
+.frow .finp{flex:1;min-width:0;border:none;outline:none;background:transparent;height:48px;font-size:15px;color:var(--c-text);font-family:inherit}
+.frow .finp::placeholder{color:#BFBFBF;font-size:14px}
+.frow .fbtn{flex-shrink:0;height:30px;line-height:30px;padding:0 12px;border-radius:15px;border:1px solid var(--c-primary);color:var(--c-primary);background:#fff;font-size:13px;cursor:pointer}
+.frow .fbtn.plain{border:1px solid var(--c-line-2);color:var(--c-text-2)}
+.login .submit{margin-top:30px}
+
+/* ===== 登录成功落地页 ===== */
+.done{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 32px;text-align:center}
+.done .ok{width:64px;height:64px;border-radius:50%;background:var(--c-primary);display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+.done .ttl{font-size:18px;font-weight:600}
+.done .sub{margin-top:10px;font-size:13px;color:var(--c-text-3);line-height:1.7}
+.done .acts{margin-top:32px;width:100%}
+
+/* ===== 复制源码工具条 ===== */
+.copy-bar{position:sticky;top:0;left:0;right:0;z-index:9999;background:#1f1f2e;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 16px;box-shadow:0 2px 10px rgba(0,0,0,.2);font-family:inherit}
+.copy-bar__title{display:flex;flex-direction:column;gap:2px;min-width:0}
+.copy-bar__name{font-size:13px;font-weight:700;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.copy-bar__hint{font-size:11px;color:#a6b0c8}
+.copy-bar__actions{display:flex;gap:8px;flex-shrink:0}
+.copy-btn{padding:7px 14px;border:none;border-radius:18px;background:linear-gradient(135deg,#07c160,#06ad56);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:transform .1s,box-shadow .2s}
+.copy-btn--ghost{background:transparent;border:1px solid rgba(255,255,255,.4);font-weight:600}
+.copy-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(7,193,96,.35)}
+.copy-btn:active{transform:translateY(0)}
+.copy-btn.copied{background:linear-gradient(135deg,#059669,#047857)}
+.copy-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1f1f2e;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.25);opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999}
+.copy-toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="copy-bar">
+  <div class="copy-bar__title">
+    <div class="copy-bar__name">绿韵家 H5 · 未登录引导页 + 登录页</div>
+    <div class="copy-bar__hint">单文件原型 · 可整份或逐页复制源码</div>
+  </div>
+  <div class="copy-bar__actions">
+    <button class="copy-btn" id="copyCurrentPage" data-label="复制当前页" onclick="copyCurrentPage()">复制当前页</button>
+    <button class="copy-btn copy-btn--ghost" id="copyAllSource" data-label="复制全部源码" onclick="copyAllSource()">复制全部源码</button>
+  </div>
+</div>
+<div class="copy-toast" id="copyToast"></div>
+
+<div class="phone">
+
+  <!-- ========== 1. 未登录引导页 ========== -->
+  <div class="page active" id="pageGate" data-title="未登录引导页">
+    <div class="gate">
+      <div class="art">
+        <svg width="180" height="180" viewBox="0 0 180 180">
+          <circle cx="90" cy="90" r="70" fill="#E9F8F2"/>
+          <circle cx="90" cy="90" r="52" fill="#D3F1E4"/>
+          <rect x="52" y="58" width="76" height="66" rx="10" fill="#fff"/>
+          <circle cx="90" cy="82" r="13" fill="#1AAD7C" opacity=".15"/>
+          <circle cx="90" cy="77" r="5" fill="#1AAD7C"/>
+          <path d="M81 90a9 9 0 0 1 18 0v2H81z" fill="#1AAD7C"/>
+          <rect x="64" y="102" width="52" height="5" rx="2.5" fill="#EEE"/>
+          <rect x="72" y="112" width="36" height="5" rx="2.5" fill="#F2F2F2"/>
+          <circle cx="120" cy="118" r="16" fill="#1AAD7C"/>
+          <rect x="113" y="116" width="14" height="11" rx="3" fill="#fff"/>
+          <path d="M116 116v-3a4 4 0 0 1 8 0v3" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="ttl">登录后查看完整内容</div>
+      <div class="sub">购物车、订单、会员权益等<br>需要登录后才能查看</div>
+      <div class="acts">
+        <button class="btn-primary" id="btnGoLogin" onclick="go('pageLogin')">去登录</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 2. 登录页 ========== -->
+  <div class="page" id="pageLogin" data-title="登录页">
+    <div class="nav">
+      <div class="back" id="btnLoginBack" onclick="go('pageGate')">‹</div>
+      登录
+    </div>
+    <div class="login">
+      <div class="brand">欢迎登录绿韵家</div>
+      <div class="brand-sub">未注册的手机号将自动创建账号</div>
+
+      <div class="seg">
+        <div class="s on" id="tabCode" onclick="switchTab('code')">验证码登录</div>
+        <div class="s" id="tabPwd" onclick="switchTab('pwd')">密码登录</div>
+      </div>
+
+      <div id="formCode">
+        <div class="frow">
+          <span class="fpre">+86</span>
+          <input class="finp" id="inputPhone" type="tel" placeholder="请输入手机号">
+          <span class="fbtn" id="btnSendCode" onclick="sendCode()">获取验证码</span>
+        </div>
+        <div class="frow">
+          <input class="finp" id="inputSmsCode" type="tel" placeholder="请输入验证码">
+        </div>
+      </div>
+
+      <div id="formPwd" style="display:none">
+        <div class="frow">
+          <input class="finp" id="inputAccount" type="text" placeholder="请输入手机号 / 用户名">
+        </div>
+        <div class="frow">
+          <input class="finp" id="inputPassword" type="password" placeholder="请输入密码">
+          <span class="fbtn plain" id="btnTogglePwd" onclick="togglePwd()">显示</span>
+        </div>
+      </div>
+
+      <div class="submit">
+        <button class="btn-primary" id="btnSubmitLogin" onclick="submitLogin()">登录</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 3. 登录成功落地页（演示用） ========== -->
+  <div class="page" id="pageAuthed" data-title="登录成功-落地页">
+    <div class="nav">
+      <div class="back" id="btnAuthedBack" onclick="go('pageLogin')">‹</div>
+      我的
+    </div>
+    <div class="done">
+      <div class="ok">
+        <svg width="30" height="30" viewBox="0 0 30 30">
+          <path d="M7 15.5l5.2 5.2L23 10" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="ttl">登录成功</div>
+      <div class="sub">已返回你之前浏览的页面<br>此页仅用于演示登录后的落地状态</div>
+      <div class="acts">
+        <button class="btn-ghost" id="btnBackToGate" onclick="go('pageGate')">回到未登录引导页</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ===== 页面切换 ===== */
+function go(id){
+  var pages = document.querySelectorAll('.page');
+  for(var i=0;i<pages.length;i++){ pages[i].classList.remove('active'); }
+  document.getElementById(id).classList.add('active');
+}
+
+/* ===== 全局 Toast ===== */
+var toastTimer = null;
+function toast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('active');
+  if(toastTimer){ clearTimeout(toastTimer); }
+  toastTimer = setTimeout(function(){ t.classList.remove('active'); }, 1500);
+}
+
+/* ===== 登录方式切换 ===== */
+var loginMode = 'code';
+function switchTab(m){
+  loginMode = m;
+  document.getElementById('tabCode').classList.toggle('on', m === 'code');
+  document.getElementById('tabPwd').classList.toggle('on', m === 'pwd');
+  document.getElementById('formCode').style.display = (m === 'code') ? 'block' : 'none';
+  document.getElementById('formPwd').style.display = (m === 'pwd') ? 'block' : 'none';
+}
+
+/* ===== 获取验证码 ===== */
+function sendCode(){
+  var phone = document.getElementById('inputPhone').value.trim();
+  if(!phone){ toast('请输入手机号'); return; }
+  if(!/^1\d{10}$/.test(phone)){ toast('手机号格式不正确'); return; }
+  toast('验证码已发送至 ' + phone.slice(0,3) + '****' + phone.slice(7));
+}
+
+/* ===== 密码显示 / 隐藏 ===== */
+function togglePwd(){
+  var inp = document.getElementById('inputPassword');
+  var btn = document.getElementById('btnTogglePwd');
+  if(inp.type === 'password'){ inp.type = 'text'; btn.textContent = '隐藏'; }
+  else { inp.type = 'password'; btn.textContent = '显示'; }
+}
+
+/* ===== 提交登录 ===== */
+function submitLogin(){
+  if(loginMode === 'code'){
+    var phone = document.getElementById('inputPhone').value.trim();
+    var code = document.getElementById('inputSmsCode').value.trim();
+    if(!phone){ toast('请输入手机号'); return; }
+    if(!code){ toast('请输入验证码'); return; }
+  } else {
+    var account = document.getElementById('inputAccount').value.trim();
+    var pwd = document.getElementById('inputPassword').value.trim();
+    if(!account){ toast('请输入手机号 / 用户名'); return; }
+    if(!pwd){ toast('请输入密码'); return; }
+  }
+  toast('登录成功');
+  go('pageAuthed');
+}
+
+/* ========== 复制源码到墨刀（proto-c 标准组件，函数名 __proto 前缀防撞名） ========== */
+function __protoGetStyle(){ var s=document.querySelector('head style'); return s?s.innerHTML:''; }
+function __protoActivePage(){
+  return document.querySelector('.phone .page.active, .phone .view.active')
+      || document.querySelector('.page.active, .view.active')
+      || document.querySelector('.page, .view')
+      || document.querySelector('.phone > *');
+}
+function __protoBuildStandalone(pageEl, title){
+  var style = __protoGetStyle();
+  var phoneCls = (pageEl && pageEl.closest && pageEl.closest('.phone')) ? ' class="phone"' : '';
+  var inner = pageEl ? pageEl.outerHTML : document.body.innerHTML;
+  return '<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n<meta charset="utf-8">\n<title>'
+       + (title||'原型单页') + '</title>\n<style>\n' + style + '\n</style>\n</head>\n<body>\n<div'
+       + phoneCls + '>\n' + inner + '\n</div>\n</body>\n</html>';
+}
+function __protoCopy(text, btnId, okMsg){
+  function toast2(msg){ var t=document.getElementById('copyToast'); if(t){ t.textContent=msg; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},1800); } }
+  function done(ok){
+    var b=document.getElementById(btnId);
+    if(ok){ if(b){ b.textContent='✓ 已复制'; b.classList.add('copied'); setTimeout(function(){ b.textContent=b.getAttribute('data-label')||'复制'; b.classList.remove('copied'); },1800); } toast2(okMsg); }
+    else { toast2('复制失败，请手动复制源码'); }
+  }
+  function fb(t){ try{ var ta=document.createElement('textarea'); ta.value=t; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.top='-9999px'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); var ok=document.execCommand('copy'); document.body.removeChild(ta); return ok; }catch(e){ return false; } }
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(function(){done(true);}).catch(function(){done(fb(text));}); }
+  else { done(fb(text)); }
+}
+function copyCurrentPage(){
+  var page = __protoActivePage();
+  var title = (page && page.getAttribute('data-title')) || document.title || '原型单页';
+  var html = __protoBuildStandalone(page, title);
+  __protoCopy(html, 'copyCurrentPage', '已复制当前页，粘贴到墨刀即可');
+}
+function copyAllSource(){
+  var src = window.__PROTO_SOURCE__ || ('<!DOCTYPE html>\n' + document.documentElement.outerHTML);
+  __protoCopy(src, 'copyAllSource', '已复制整份源码，粘贴到墨刀即可运行');
+}
+window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+</script>
+</body>
+</html>
