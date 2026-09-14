@@ -40,7 +40,7 @@
   <img src="lvyunjia-ai-workflow-swimlane-flow.png" alt="「帮我买」端到端泳道总览（4 泳道）">
   <figcaption>图 1 · 「帮我买」分支端到端泳道（4 泳道：用户与APP端 / APP前端代码 / Coze工作流 / 知识库·后端API）</figcaption>
   <div class="chain">
-    一行速览：<b>入口卡片(4 入口) → setMode() 写死 analysis_type=buy → ② IF(analysis_type) 分流 → ③ parse/意图抽取 LLM(出 product_info) → ③.5 意图提取(Code) → ③.6 IF(is_product) → ④ KB检索(product, topK=5) + 商品卡片API → ⑤ 说明文案/生成商品推荐 LLM → ⑥ 汇总+结束 → APP 按分隔符拆分、话术与卡片分离渲染</b>
+    一行速览：<b>入口卡片(4 入口) → setMode() 写死 analysis_type=buy → ② IF(analysis_type) 分流 → ③ parse/意图抽取 LLM(出 product_info) → ③.5 意图提取(Code) → ③.6 IF(is_product) → ④ KB检索(product, topK=5) + 商品卡片API → ⑤ 生成商品推荐回复 LLM → ⑥ 汇总+结束 → APP 按分隔符拆分、话术与卡片分离渲染</b>
   </div>
 </figure>
 <!-- 图 1 渲染源（mermaid · flowchart TB 横泳道）。
@@ -90,7 +90,7 @@ flowchart TB
   <img src="lvyunjia-ai-workflow-swimlane-seq.png" alt="「帮我买」单轮时序图">
   <figcaption>图 2 · 「帮我买」单轮时序（以用户说"想买助眠的"为例）</figcaption>
   <div class="chain">
-    一行速览：<b>用户点击入口 → APP setMode('buy') 写死 analysis_type=buy → 调工作流 → ② IF 走 buy 分支 → ③ parse_buy_query 抽 product_info → KB检索 + 商品卡片API → ⑤ 说明文案 LLM 生成话术 → 返回 reply_text + card_list → APP 拆分渲染 → 用户点卡片跳商品详情</b>
+    一行速览：<b>用户点击入口 → APP setMode('buy') 写死 analysis_type=buy → 调工作流 → ② IF 走 buy 分支 → ③ parse_buy_query 抽 product_info → KB检索 + 商品卡片API → ⑤ 生成商品推荐回复 LLM 生成话术 → 返回 reply_text + card_list → APP 拆分渲染 → 用户点卡片跳商品详情</b>
   </div>
 </figure>
 <!-- 图 2 渲染源（mermaid · sequenceDiagram）——改图后请用 skill 渲染器重渲为 PNG：
@@ -148,10 +148,10 @@ sequenceDiagram
   <tr><td>① 开始</td><td>Start</td><td>6 变量：USER_INPUT / CONVERSATION_NAME / user_id / user_images / conversation_id / <b>analysis_type</b></td><td>inputs</td></tr>
   <tr><td>② IF 选择器（意图分流）</td><td>Condition</td><td><code>analysis_type</code> == buy/choose/save（⚠️ 统一 choose，见第三章）；否则兜底</td><td>三分支</td></tr>
   <tr><td>③ parse_buy_query</td><td>LLM</td><td>抽 <code>keywords / constraints / follow_up_question</code>，<b>不判断意图、不输出 category</b>；开会话历史 5~6 轮（详见第八章）</td><td>parse_output（JSON）</td></tr>
-  <tr><td>③.5 意图提取</td><td>Code</td><td>解析 parse_output，补 <code>query</code>=keywords.join(' ') 供检索，判 <code>is_product</code>=keywords.length&gt;0（详见第十一章 11.2）</td><td>keywords / constraints / follow_up / is_product / query</td></tr>
+  <tr><td>③.5 意图提取</td><td>Code</td><td>解析 parse_output，补 <code>query</code>=keywords.join(' ') 供检索，判 <code>is_product</code>=keywords.length&gt;0（详见第十章 10.1）</td><td>keywords / constraints / follow_up / is_product / query</td></tr>
   <tr><td>③.6 IF 选择器（产品判断）</td><td>Condition</td><td><code>is_product</code> == true → 产品分支（查 KB）；否则 → 非产品分支（结束返回 follow_up）</td><td>两分支</td></tr>
   <tr><td>④ KB 检索</td><td>Knowledge（火山）</td><td>query = <code>意图提取.query</code>，召回 top_k=5，来源=火山知识库 <code>product</code></td><td>outputList</td></tr>
-  <tr><td>⑤ 生成商品推荐回复</td><td>LLM</td><td>输入 keywords/constraints/recall_list，按模板生成导购回复（详见第十一章 11.3）</td><td>reply_text</td></tr>
+  <tr><td>⑤ 生成商品推荐回复</td><td>LLM</td><td>输入 keywords/constraints/recall_list，按模板生成导购回复（详见第十章 10.3）</td><td>reply_text</td></tr>
   <tr><td>⑥ 结束</td><td>Output</td><td>产品分支返回 <code>reply_text</code>；非产品分支返回 <code>follow_up_question</code></td><td>推送给 APP</td></tr>
 </table>
 
@@ -168,8 +168,8 @@ sequenceDiagram
   <tr><td><code>analysis_type</code></td><td>String</td><td>APP 前端（按钮写死）</td><td>Coze 开始 → IF 选择器</td></tr>
   <tr><td><code>contextProduct</code></td><td>String</td><td>APP 前端（跨模式保留）</td><td>Coze parse（复用）</td></tr>
   <tr><td><code>product_info</code></td><td>JSON</td><td>Coze parse_buy_query</td><td>KB检索 + 卡片API</td></tr>
-  <tr><td><code>kb_context</code></td><td>String</td><td>KB检索</td><td>说明文案 LLM</td></tr>
-  <tr><td><code>reply_text</code></td><td>String</td><td>说明文案 LLM</td><td>APP 话术渲染</td></tr>
+  <tr><td><code>kb_context</code></td><td>String</td><td>KB检索</td><td>生成商品推荐回复 LLM</td></tr>
+  <tr><td><code>reply_text</code></td><td>String</td><td>生成商品推荐回复 LLM</td><td>APP 话术渲染</td></tr>
   <tr><td><code>card_list</code></td><td>JSON数组</td><td>商品卡片API</td><td>APP 卡片渲染</td></tr>
 </table>
 <p>分隔符约定：话术与卡片之间用 <code>##########CARD##########</code> 分隔（沿用现有约定，前端需确认拆分逻辑）。</p>
@@ -340,7 +340,7 @@ sequenceDiagram
   <tr><td>parse_buy_query 输出 keywords</td><td>LLM</td><td>只捞用户原话语义词（"睡不着""失眠"），<b>不输出 category</b></td></tr>
   <tr><td>🆕 知识库检索节点</td><td>工作流</td><td>query = keywords，召回带「所属分类」字段的产品文档</td></tr>
   <tr><td>🆕 提取类目（代码节点）</td><td>工作流</td><td>遍历召回结果，取「所属分类」<b>最后一级</b>（按 <code>/</code> split 取末段，如 <code>增强免疫</code>），出现最多的作为 category 输出</td></tr>
-  <tr><td>说明文案 LLM</td><td>LLM</td><td>输入加 <code>{{提取类目.category}}</code> 组织话术侧重</td></tr>
+  <tr><td>生成商品推荐回复 LLM</td><td>LLM</td><td>输入加 <code>{{提取类目.category}}</code> 组织话术侧重</td></tr>
 </table>
 <p><b>一句话</b>：category 是知识库召回的副产品，不是 LLM 猜的。业务只抄后台路径，PM 不维护映射表（除非别名召回差，再补 9.1 的别名增强）。</p>
 
@@ -352,64 +352,12 @@ sequenceDiagram
   <tr><td>瘦身、控卡、减脂</td><td>体重管理</td></tr>
 </table>
 
-<h2>十、说明文案 LLM（早期设计 · 参考）</h2>
-<div class="warn"><b>演进说明</b>：本章为早期设计——假设 KB 召回后单独有一个「说明文案 LLM」只出话术、卡片由另一节点透传。当前实际落地已演进为「<b>生成商品推荐回复 LLM</b>」（第十一章）：KB 检索结果直接喂给一个 LLM 节点，融合话术 + 商品推荐一次性输出。本章保留作架构参考，<b>当前以第十一章为准配节点</b>。</div>
-<p>位置：在 <code>parse_buy_query</code> 之后、KB 检索与商品卡片召回完成之后。它只生成<b>话术文本</b>（<code>reply_text</code>），<b>不输出卡片</b>——卡片由「获取商品卡片」节点单独透传。</p>
-
-<h3>10.1 输入变量（来自上游）</h3>
-<table>
-  <tr><th>变量</th><th>来源</th><th>说明</th></tr>
-  <tr><td><code>category</code></td><td>提取类目节点</td><td>从 KB 召回结果「所属分类」字段提取的标准类目，用于组织话术侧重</td></tr>
-  <tr><td><code>keywords</code></td><td>parse_buy_query</td><td>召回关键词数组</td></tr>
-  <tr><td><code>constraints</code></td><td>parse_buy_query</td><td>价格/口感/形态/人群约束（null 不展示）</td></tr>
-  <tr><td><code>kb_context</code></td><td>知识库检索_2</td><td>召回的产品名称+功效片段</td></tr>
-  <tr><td>（固定）<code>intent = buy</code></td><td>本分支写死</td><td>不走 LLM 判断，直接按 buy 侧重生成</td></tr>
-</table>
-
-<h3>10.2 系统提示词（System Prompt）</h3>
-<pre style="background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;font-size:12.5px;line-height:1.55;white-space:pre-wrap;font-family:Consolas,monospace"><code>你是绿韵家 AI 健康生活助手，服务于「数智」板块的「帮我买」分支。
-
-## 任务
-结合商品知识库召回内容，用口语化、有温度的话术为用户介绍商品，并贴合购买意图组织内容。
-
-## 输入
-- 用户主类目：{{category}}
-- 用户关注词：{{keywords}}
-- 用户约束（可能为 null）：{{constraints}}
-- 商品知识（产品名称与功效，来自知识库召回）：{{kb_context}}
-
-## 话术侧重（buy 分支）
-- 逐款介绍卖点、核心功效、适用人群、当前价格（有划线价标优惠）；
-- 若用户给了价格/口感/形态约束，话术中点明"符合您说的 XX"；
-- 结尾软性引导"需要我直接帮你加购或看详情可以点卡片"。
-
-## 通用要求
-1. 先一句回应，再逐款介绍，不堆砌参数；
-2. 仅基于商品知识作答，禁止编造功效/价格；
-3. 涉及健康/服用建议，结尾加"以上建议仅供参考，具体请遵医嘱或商品说明"；
-4. 不输出卡片 JSON（卡片由「获取商品卡片」节点单独透传，本节点只出话术）。
-
-## 输出格式
-仅输出话术文本，不超过 120 字（移动端阅读）。</code></pre>
-
-<div class="ok">
-<b>配置要点</b>：① 模型选豆包 2.0 Pro，Temperature <b>0.7</b>（话术要有温度，比 parse 节点高）；② 输入变量绑定上游对应输出；③ 输出变量命名 <code>reply_text</code>，供「产品信息输出」节点拼接。
-</div>
-
-<h3>10.3 之后还差两个节点（当前被阻塞）</h3>
-<table>
-  <tr><th>节点</th><th>阻塞原因</th><th>你现在能做的</th></tr>
-  <tr><td>知识库检索_2（KB 召回）</td><td>需先在 Coze 建商品知识库并导入 21 列表，拿到 <code>dataset_id</code></td><td>先把 KB 表业务填了 → 建库导入 → 填 dataset_id</td></tr>
-  <tr><td>获取商品卡片（代码节点）</td><td>研发未给 API 域名与返回字段（见节点配置卡第五节占位清单）</td><td>先用 mock 返回空数组验证链路，拿到接口后替换域名+字段</td></tr>
-</table>
-<p>这两个节点拿到依赖后，我再给你逐节点出配置（KB 检索的 query 绑定 <code>keywords</code>、卡片代码节点的三种 intent 分支）。现在先把 <b>parse_buy_query</b> 和本 <b>说明文案 LLM</b> 配好，用 mock 卡片跑通「意图解析 → 话术生成」这一段。</p>
-
-<h2>十一、buy 分支当前实际节点（生成商品推荐回复 LLM）</h2>
-<p>本章是 2026-09-11 实际落地的节点链路，取代第十章早期设计。链路顺序：<br>
+<h2>十、buy 分支当前实际节点（生成商品推荐回复 LLM）</h2>
+<p>本章是 2026-09-11 实际落地的节点链路。链路顺序：<br>
 <code>② IF(analysis_type)</code> → <code>③ parse_buy_query</code> → <code>③.5 意图提取(代码)</code> → <code>③.6 IF(is_product)</code> → <code>④ KB 检索(火山)</code> → <code>⑤ 生成商品推荐回复 LLM</code> → <code>⑥ 结束</code>。<br>
 非产品分支（greeting/clarify/无关键词）在 <code>③.6</code> 直接走结束，返回 <code>follow_up_question</code>，不查 KB。</p>
 
-<h3>11.1 意图提取代码节点（③.5）</h3>
+<h3>10.1 意图提取代码节点（③.5）</h3>
 <p>为什么需要它：① LLM 输出 <code>keywords</code> 是数组，KB 检索的 <code>query</code> 要字符串，Coze 不能直接把数组喂检索；② IF 选择器无法直接展开 LLM JSON 子字段判断，需在代码节点里算 <code>is_product</code>。故在现有代码节点里多输出一个 <code>query</code> 字段即可，不用新增节点。</p>
 <pre style="background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;font-size:12.5px;line-height:1.55;white-space:pre-wrap;font-family:Consolas,monospace"><code>async function main({ params }) {
   const obj = JSON.parse(params.parse_output || '{}');
@@ -431,7 +379,7 @@ sequenceDiagram
   <tr><td><code>query</code></td><td>String</td><td>供 ④ KB 检索 <code>query</code> 绑定</td></tr>
 </table>
 
-<h3>11.2 KB 检索节点（④）</h3>
+<h3>10.2 KB 检索节点（④）</h3>
 <table>
   <tr><th>字段</th><th>配置</th></tr>
   <tr><td>知识库来源</td><td>火山知识库</td></tr>
@@ -441,7 +389,7 @@ sequenceDiagram
   <tr><td>输出</td><td><code>outputList</code>（Array&lt;Object&gt;）→ 供 ⑤ LLM 的 <code>recall_list</code></td></tr>
 </table>
 
-<h3>11.3 生成商品推荐回复 LLM（⑤ · 对齐泰小虎标准版）</h3>
+<h3>10.3 生成商品推荐回复 LLM（⑤ · 对齐泰小虎标准版）</h3>
 <p>把下面两段分别粘进 Coze 节点的<b>系统提示词</b>与<b>用户提示词</b>框。</p>
 
 <h4>系统提示词（System Prompt）</h4>
