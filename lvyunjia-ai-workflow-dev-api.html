@@ -29,7 +29,7 @@
 <body>
 
 <h1>绿韵家 Coze 工作流 · 后端对接文档</h1>
-<p class="muted">文档版本 V1.0 · 覆盖「帮我买 / 帮我选 / 帮我省」三入口 · 面向 App 后端，确保用户在 APP 的数据正确传入工作流</p>
+<p class="muted">文档版本 V1.1 · 覆盖「帮我买 / 帮我选 / 帮我省」三入口 · 面向 App 后端，确保用户在 APP 的数据正确传入工作流</p>
 
 <div class="ok">
 <b>一句话结论</b>：App 后端调用工作流时，把「用户本轮输入文本」+「入口类型（裸字符串 <code>buy</code>/<code>choose</code>/<code>save</code>）」+「会话 ID」+「用户 ID」+「图片（可选）」传给工作流开始节点即可。其余（意图解析、知识库召回、上下文拼接）全部由工作流内部完成，<b>不要自己拼历史、不要自己判断意图</b>。
@@ -127,7 +127,7 @@
   <li><b>conversation_id 必须稳定复用</b>：同一通会话的每一轮请求，传同一个 <code>conversation_id</code>。工作流 LLM 节点的"会话历史"开关会自动按此 ID 拉取历史（轮数 5~6 轮），App 端<b>不要自己拼历史对话</b>传进去。</li>
   <li><b>指代理解由工作流负责</b>：如第一轮问"助眠的有什么"，第二轮问"那个贵不贵"，工作流内部结合会话历史能指向同一商品，App 只需传第二轮文本 + 同一 conversation_id。</li>
   <li><b>新会话</b>：生成新的 conversation_id（建议 <code>conv_{userId}_{时间戳}</code> 或后端会话表主键）。</li>
-  <li><b>入口类型每轮都传</b>：<code>custom_variables</code> 在<b>每一轮</b>都带上（值不变也传）。意图由 App 会话层维护，不依赖 Coze 变量粘性，详见第十一节。</li>
+  <li><b>入口类型每轮都传</b>：<code>custom_variables</code> 在<b>每一轮</b>都带上（值不变也传）。意图由 App 会话层维护，不依赖 Coze 变量粘性，详见第十节。</li>
 </ul>
 
 <h2>六、图片传入</h2>
@@ -158,7 +158,7 @@
   <tr><td>5</td><td>自己拼 chatHistory 传进去</td><td>不要传历史，工作流内部按 conversation_id 自动管理（轮数 5~6）</td></tr>
   <tr><td>6</td><td>问候/闲聊当成异常</td><td>正常走"非产品分支"返回问候引导语，无需 App 特殊处理，只要 entry 传对</td></tr>
   <tr><td>7</td><td>意图识别放前端做</td><td>意图解析（keywords / is_product）由工作流 <code>parse_buy_query</code> + 代码节点完成，前端只传入口类型 + 文本</td></tr>
-  <tr><td>8</td><td>只在首次点入口传 <code>custom_variables</code>，后续轮次不传</td><td>每轮都传（值不变也传）；意图由 App 会话层维护，不依赖 Coze 变量粘性，详见第十一节</td></tr>
+  <tr><td>8</td><td>只在首次点入口传 <code>custom_variables</code>，后续轮次不传</td><td>每轮都传（值不变也传）；意图由 App 会话层维护，不依赖 Coze 变量粘性，详见第十节</td></tr>
 </table>
 
 <h2>九、联调 Checklist</h2>
@@ -172,7 +172,7 @@
   <li>☐ 工作流 API 模式下，App 能正确解析输出节点的 output 变量并渲染</li>
 </ul>
 
-<h2>十一、意图生命周期与失效规则（V1.1 新增）</h2>
+<h2>十、意图生命周期与失效规则（本期新增）</h2>
 <div class="ok">
 <b>核心模型：空 → 选了就一直传 → 直到被覆盖。</b> <code>current_intent</code>（即 <code>custom_variables</code>）是 App 会话层维护的状态，<b>不靠 Coze 平台粘性、不靠对话轮次</b>。
 </div>
@@ -190,15 +190,6 @@
   <li><b>LLM 上下文轮数建议 5 轮</b>：可在 Coze LLM 节点「对话历史轮数」配置（越大 token 越贵）。超轮后早期对话被丢弃，但意图与产品上下文不受影响——二者由 App 显式维护、每轮传入，不依赖 LLM 记忆。</li>
   <li><b>无意图兜底</b>：收到空意图 + 用户直接打字时，工作流走自由问答通道，由 LLM 猜意图；猜中后在卡片顶部给"猜你想【省】？"可切换 chips 让用户确认，猜不中再走兜底文案。</li>
 </ul>
-
-<h2>十、待后端确认的开放项</h2>
-<table>
-  <tr><th>项</th><th>说明</th><th>负责人</th></tr>
-  <tr><td>API Endpoint / Token</td><td>Coze 开放平台获取工作流 API 地址与鉴权 token（或 Bot 对话 API 的 bot_id / token）</td><td>研发</td></tr>
-  <tr><td>图片协议</td><td><code>user_images</code> 传公网 URL 还是 base64？以 Coze 节点约定为准</td><td>研发 + PM</td></tr>
-  <tr><td>调用模式</td><td>最终走 Bot 对话 API 还是工作流直调 API（影响返回解析方式）</td><td>研发</td></tr>
-  <tr><td>开始节点字段名</td><td>以 Coze 平台实际变量名为准，若有差异本文第三节需同步修订</td><td>PM + 研发</td></tr>
-</table>
 
 <div class="ok">
 <b>联调联系人</b>：工作流逻辑 / 提示词 / 分支路由问题找 PM（袁中天）；API 接入 / 返回值解析 / 字段映射问题后端直接按本文档执行，异常先核对第八节坑清单。
