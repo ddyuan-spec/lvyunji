@@ -491,16 +491,26 @@
       renderList(stations);
     }
 
-    /* ---------- 导出：沿用本表列结构 + 每条更换记录一列 ---------- */
+    /* ---------- 导出：沿用本表列结构 + 每条更换记录一列 ----------
+       口径（定稿）：
+       ① 条数无上限——列数 = 全部工作站中记录数最多的那一站的条数，按数据动态生成，
+          不做任何截断/取前 N 条，某站有多少条就导出多少条；
+       ② 全量导出——不受当前筛选条件、分页（10 条/页）影响，始终导出全部工作站的全部记录；
+       ③ 记录为空的工作站，滤芯记录列留空，不删行。 */
     function exportList() {
-      var maxN = 1;
-      stations.forEach(function (s) { if (s.records.length > maxN) { maxN = s.records.length; } });
+      var maxN = 0;
+      var totalN = 0;
+      stations.forEach(function (s) {
+        totalN += s.records.length;
+        if (s.records.length > maxN) { maxN = s.records.length; }
+      });
       var heads = ['编号', '账号', '联系人', '元气先锋ID', '华夏水机账号', '工作站信息', '工作站街道', '总取水量', '当日取水量', '状态', '创建时间'];
       for (var i = 1; i <= maxN; i++) { heads.push('更换滤芯记录' + i); }
 
       var rows = [heads];
       stations.forEach(function (s) {
         var line = [s.id, s.account, s.contact, s.yuanqi, s.huaxia, s.name, s.address, s.totalWater, s.todayWater, s.status === 1 ? '已认证' : '待审核', s.createdAt];
+        // 全量：逐条写入，不 slice，不设条数上限
         s.records.forEach(function (r) {
           line.push(r.date + '\n出水量：' + r.water + '\n滤芯型号：' + r.model);
         });
@@ -519,7 +529,7 @@
       a.click();
       document.body.removeChild(a);
       setTimeout(function () { URL.revokeObjectURL(a.href); }, 1500);
-      toast('已导出 ' + stations.length + ' 个工作站，滤芯记录最多 ' + maxN + ' 条');
+      toast('已导出 ' + stations.length + ' 个工作站、' + totalN + ' 条更换滤芯记录（全量，无条数上限）');
     }
 
     /* ---------- 更换滤芯管理 ---------- */
