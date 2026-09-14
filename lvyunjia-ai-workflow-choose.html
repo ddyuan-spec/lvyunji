@@ -78,6 +78,20 @@
 
 <h2>二、节点逐项配置（Coze 可直接照抄）</h2>
 
+<div class="ok">
+<b>先看这段 · ⑥ 知识库 与 ⑧ 选品接口 是两个完全不同的数据源，别混为一谈</b><br>
+「帮我选」里一共查了<b>两次东西</b>，职责是分离开的，这是看懂整章的前提：
+<table>
+  <tr><th>维度</th><th>⑥ KB 检索</th><th>⑧ 选品推荐接口</th></tr>
+  <tr><td>查的是谁</td><td>火山知识库 <code>product</code>（Coze 侧，向量召回，即常说的「向量库」）</td><td>绿韵家 App 后端 <code>POST /api/ai/recommend/choose</code></td></tr>
+  <tr><td>归谁管</td><td>Coze / 火山，我们只维护导入的表</td><td>我们自己的后端（第三章是给研发的规格）</td></tr>
+  <tr><td>作用</td><td><b>只当字典</b>：把「老人助眠喝啥」这类大白话翻译成<b>商品名 + 商品 ID</b></td><td>拿候选 ID/名称 + 用户筛选条件，<b>实时计算</b>价格、会员价、功效标签、适用人群、库存、匹配分</td></tr>
+  <tr><td>出不出价格</td><td><b>不出</b>（口径变更已锁：价格一律不取、不信）</td><td>出，<code>sale_price</code> / <code>member_price</code> / <code>stock_status</code></td></tr>
+</table>
+<b>为什么不直接用知识库出推荐结果？</b> 知识库是<b>离线导入的静态表</b>——价格会改、会员价要按 <code>user_id</code> 实时算、库存随时变。这些写进知识库，AI 就会答错价，是合规风险。所以分工是：<b>知识库负责「语义召回 / 翻译」（找候选），业务接口负责「实时决策」（定推荐）</b>，LLM 只把接口返回的真实属性组织成「为什么适合你」的话术，不自己造数据。<br>
+<b>当前两个没填平的坑（看不懂多半出在这）</b>：① 知识库那张表还没有「商品 ID」列（第五章待确认 #1），所以 ⑦ 实际只能按 <code>goods_name</code> 模糊匹配兜底，重名有误差；② 接口域名 <code>{LYJ_API_HOST}</code> 还是占位符，现在整条链路是用第四章 Mock 跑通的，接口未联调。
+</div>
+
 <h3>2.1 ③ parse_choose_query（LLM 节点）</h3>
 
 <table>
