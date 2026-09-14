@@ -43,7 +43,11 @@
     一行速览：<b>入口卡片(4 入口) → setMode() 写死 analysis_type=buy → ② IF(analysis_type) 分流 → ③ parse/意图抽取 LLM(出 product_info) → ③.5 意图提取(Code) → ③.6 IF(is_product) → ④ KB检索(product, topK=5) + 商品卡片API → ⑤ 说明文案/生成商品推荐 LLM → ⑥ 汇总+结束 → APP 按分隔符拆分、话术与卡片分离渲染</b>
   </div>
 </figure>
-<!-- 图 1 渲染源（mermaid · flowchart TB）——改图后请用 _mm_tmp/render_mermaid.py 重渲为 PNG，勿直接依赖客户端渲染：
+<!-- 图 1 渲染源（mermaid · flowchart TB 横泳道）。
+     改图流程：把本段存成 flow.mmd → 用 skill 渲染器重出 PNG：
+       python ~/.workbuddy/skills/prd-to-dingtalk/scripts/render_mermaid.py --mmd flow.mmd --out lvyunjia-ai-workflow-swimlane-flow.png
+     渲染方向用 TB（泳道横排、竖版可读）；原 LR 多泳道会成 6:1 超宽条，钉钉里不可读。
+     ⚠️ 勿改回 <div class="mermaid"> 客户端渲染——钉钉不跑 JS，只会显示裸文本。：
 flowchart TB
   subgraph U["用户与APP端"]
     U1["看到4入口卡片(看/买/省/选)"]
@@ -89,7 +93,9 @@ flowchart TB
     一行速览：<b>用户点击入口 → APP setMode('buy') 写死 analysis_type=buy → 调工作流 → ② IF 走 buy 分支 → ③ parse_buy_query 抽 product_info → KB检索 + 商品卡片API → ⑤ 说明文案 LLM 生成话术 → 返回 reply_text + card_list → APP 拆分渲染 → 用户点卡片跳商品详情</b>
   </div>
 </figure>
-<!-- 图 2 渲染源（mermaid · sequenceDiagram）——改图后请用 _mm_tmp/render_mermaid.py 重渲为 PNG：
+<!-- 图 2 渲染源（mermaid · sequenceDiagram）——改图后请用 skill 渲染器重渲为 PNG：
+        python ~/.workbuddy/skills/prd-to-dingtalk/scripts/render_mermaid.py --mmd seq.mmd --out lvyunjia-ai-workflow-swimlane-seq.png
+      ⚠️ 勿改回 <div class="mermaid"> 客户端渲染——钉钉不跑 JS，只会显示裸文本。：
 sequenceDiagram
   participant U as 用户
   participant FE as APP前端
