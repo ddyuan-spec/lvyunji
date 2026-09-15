@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>商家商品管理 - 绿韵家管理系统</title>
+  <style>
+    /* ============================================================
+       绿韵家管理系统 · 后台演示模板
+       模块：商品中心 / 商家管理 / 商品管理
+       页面：① 商家商品管理（列表） ② 商品详情（新增 / 编辑 / 查看）
+       说明：本文件按生产后台截图 1:1 复刻，后续功能在此模板上增量修改。
+       ============================================================ */
+    :root {
+      --primary: #FF5E69;        /* 主色（按钮 / 激活态） */
+      --primary-hover: #FF8A93;
+      --topbar: #2E2D41;         /* 顶栏深紫 */
+      --text: #404142;
+      --text-sub: #666666;
+      --text-hint: #999999;
+      --border: #E8E8E8;
+      --border-2: #DFE6EB;
+      --thead: #ECEFFA;          /* 表头 / 已选择条底色 */
+      --soft: #F7F9FD;           /* 隔行 / 分页条底色 */
+      --page: #EBEDF3;           /* 工作区底色 */
+      --grid: #EDEFF5;           /* 表格网格线 */
+      --link: #3D1EF7;           /* 操作列链接 */
+      --val: #6200F7;            /* 可内联编辑的数值（库存 / 排序） */
+      --box: #F9F9F9;            /* 卡片内浅灰容器（规格 / 图片说明） */
+      --red: #FF5E69;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px; color: var(--text); background: #fff; }
+
+    /* ---------- 顶栏 ---------- */
+    .topbar { height: 56px; background: var(--topbar); display: flex; align-items: center; padding: 0 20px; gap: 24px; color: #fff; }
+    .logo { font-size: 15px; font-weight: 500; letter-spacing: .5px; }
+    .collapse { display: flex; align-items: center; color: #cfd0d8; margin-left: 2px; }
+    .collapse svg { width: 18px; height: 18px; stroke: #cfd0d8; fill: none; stroke-width: 1.6; stroke-linecap: round; }
+    .tb-nav { display: flex; gap: 24px; font-size: 13px; }
+    .tb-nav span { color: #b9bac4; }
+    .tb-nav span.active { color: #fff; font-weight: 600; }
+    .tb-user { margin-left: auto; font-size: 13px; color: #e5e6ea; }
+
+    /* ---------- 主体 ---------- */
+    .app-body { display: flex; min-height: calc(100vh - 56px); align-items: stretch; }
+
+    /* ---------- 侧栏 ---------- */
+    .sidebar { width: 208px; flex: 0 0 208px; background: #fff; border-right: 1px solid var(--border); padding: 6px 0 28px; }
+    .menu-item { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 16px; font-size: 13px; color: var(--text); }
+    .menu-item .ico { width: 16px; height: 16px; flex: 0 0 16px; stroke: #8c8c8c; fill: none; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+    .menu-item .caret { margin-left: auto; color: #c3c3c3; font-size: 9px; }
+    .menu-item.open { background: var(--primary); color: #fff; }
+    .menu-item.open .ico { stroke: #fff; }
+    .menu-item.open .caret { color: #fff; }
+    .sub-chips { display: none; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px 12px 16px; }
+    .sub-chips.open { display: grid; }
+    .chip { height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid transparent; border-radius: 4px; background: #F7F8FA; color: var(--text-sub); font-size: 12px; white-space: nowrap; }
+    .chip.active { border-color: var(--primary); color: var(--primary); background: #fff; font-weight: 500; }
+
+    /* ---------- 工作区 ---------- */
+    .workspace { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--page); }
+    .page-tabs { height: 44px; flex: 0 0 44px; display: flex; align-items: center; gap: 8px; padding: 0 16px; background: #fff; border-bottom: 1px solid var(--border); overflow: hidden; }
+    .ptab { display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border: 1px solid var(--border); border-radius: 3px; color: var(--text-sub); font-size: 12px; background: #fff; white-space: nowrap; }
+    .ptab .x { color: #c8c8c8; font-size: 12px; }
+    .ptab.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .ptab.active .x { color: #fff; }
+    .ptab .dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+
+    /* 视图容器（全部写在 <main> 内） */
+    .view { display: none; flex: 1; padding: 8px 16px 0; }
+    .view.active { display: block; }
+
+    /* ---------- 卡片 ---------- */
+    .card { background: #fff; border-radius: 6px 6px 0 0; padding: 16px; }
+    .card-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 2px 0 14px; }
+    .card-title { font-size: 16px; font-weight: 600; color: #222; }
+    .head-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn { height: 30px; padding: 0 14px; border-radius: 3px; font-size: 12px; border: 1px solid transparent; cursor: pointer; font-family: inherit; white-space: nowrap; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-default { background: #fff; color: var(--text); border-color: var(--border-2); }
+    .btn-default:hover { border-color: var(--primary); color: var(--primary); }
+    .btn-lg { height: 34px; min-width: 212px; font-size: 13px; }
+
+    /* 列表页页签（全部 / 已上架 / 已下架） */
+    .ltabs { display: flex; gap: 26px; padding-bottom: 12px; }
+    .ltab { position: relative; font-size: 13px; color: var(--text-sub); padding-bottom: 8px; cursor: pointer; white-space: nowrap; }
+    .ltab.active { color: var(--primary); }
+    .ltab.active::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--primary); border-radius: 1px; }
+
+    /* ---------- 筛选 ---------- */
+    .filters { display: flex; flex-wrap: wrap; gap: 10px 12px; padding: 6px 0 16px; }
+    .f-input, .f-select { height: 32px; border: 1px solid var(--border-2); border-radius: 3px; padding: 0 10px; font-size: 12px; color: var(--text); width: 168px; outline: none; font-family: inherit; background: #fff; }
+    .f-select { width: 150px; }
+    .f-input:focus, .f-select:focus { border-color: var(--primary); }
+    .f-input::placeholder { color: #bfbfbf; }
+
+    /* ---------- 已选择条 ---------- */
+    .selbar { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 12px; background: var(--thead); margin: 0 -16px 0; }
+    .selbar .sel-txt { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #222; }
+    .selbar .sel-txt .bang { width: 15px; height: 15px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+    .selbar .btn-clear { height: 28px; padding: 0 10px; border: 1px solid var(--border-2); background: #fff; border-radius: 3px; font-size: 12px; color: var(--text-sub); display: flex; align-items: center; gap: 5px; cursor: pointer; font-family: inherit; }
+    .selbar .right { margin-left: auto; }
+
+    /* ---------- 表格 ---------- */
+    .tbl-wrap { overflow-x: auto; margin: 0 -16px; }
+    table { border-collapse: separate; border-spacing: 0; font-size: 12px; width: 100%; min-width: 1900px; }
+    th { background: var(--thead); color: var(--text); font-weight: 500; text-align: left; padding: 12px 12px; white-space: nowrap; border-bottom: 1px solid var(--grid); border-right: 1px solid var(--grid); }
+    td { padding: 12px 12px; color: var(--text); vertical-align: middle; line-height: 1.6; border-bottom: 1px solid var(--grid); border-right: 1px solid var(--grid); }
+    tbody tr:nth-child(even) td { background: var(--soft); }
+    th:first-child, td:first-child { border-left: 0; }
+    /* 操作列固定在最右 */
+    th.c-op, td.c-op { position: sticky; right: 0; z-index: 2; background: #fff; box-shadow: -6px 0 8px -6px rgba(0,0,0,.10); }
+    tbody tr:nth-child(even) td.c-op { background: var(--soft); }
+    thead th.c-op { background: var(--thead); z-index: 3; }
+    .c-chk { width: 46px; text-align: center; }
+    .c-id { width: 96px; }
+    .c-prod { width: 296px; }
+    .c-audit { width: 108px; }
+    .c-brand { width: 196px; }
+    .c-kb { width: 104px; }
+    .c-optype { width: 104px; }
+    .c-pstatus { width: 104px; }
+    .c-stock { width: 100px; }
+    .c-shop { width: 122px; }
+    .c-shoptype { width: 96px; }
+    .c-sort { width: 96px; }
+    .c-rec { width: 92px; }
+    .c-price { width: 96px; }
+    .c-time { width: 176px; }
+    .c-op { width: 236px; min-width: 236px; }
+    .prod { display: flex; align-items: center; gap: 10px; }
+    .prod img { width: 48px; height: 48px; flex: 0 0 48px; border-radius: 4px; display: block; object-fit: cover; }
+    .prod .pname { color: var(--text); }
+    .prod .ptype { color: var(--text-hint); font-size: 12px; margin-top: 2px; }
+    .cell2 { color: var(--text); line-height: 1.6; }
+    .numval { color: var(--val); display: inline-flex; align-items: center; gap: 3px; }
+    .numval svg { width: 12px; height: 12px; stroke: var(--val); fill: none; stroke-width: 1.2; }
+    .op { display: flex; flex-wrap: wrap; gap: 6px 12px; }
+    .op a { color: var(--link); cursor: pointer; text-decoration: none; white-space: nowrap; }
+    .op a:hover { text-decoration: underline; }
+    .sw { position: relative; display: inline-block; width: 40px; height: 20px; border-radius: 10px; background: #DDE0E6; cursor: pointer; transition: background .18s; vertical-align: middle; }
+    .sw::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: left .18s; box-shadow: 0 1px 2px rgba(0,0,0,.18); }
+    .sw.on { background: var(--primary); }
+    .sw.on::after { left: 22px; }
+    .sw.dis { opacity: .5; cursor: not-allowed; }
+    .circ { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid currentColor; font-size: 10px; line-height: 1; flex: 0 0 14px; }
+    .circ.solid { background: #2E2D41; color: #fff; border-color: #2E2D41; font-weight: 600; }
+    .circ.red { background: var(--primary); color: #fff; border-color: var(--primary); font-weight: 600; }
+
+    /* ---------- 分页 ---------- */
+    .pager { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 10px 16px; background: var(--soft); font-size: 12px; color: var(--text-sub); margin: 0 -16px; }
+    .pg { min-width: 26px; height: 26px; padding: 0 5px; border: 1px solid var(--border-2); background: #fff; border-radius: 3px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-sub); font-size: 12px; font-family: inherit; }
+    .pg.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .pg.dis { color: #c8c8c8; cursor: not-allowed; }
+    .pg-jump { display: flex; align-items: center; gap: 6px; margin-left: 6px; }
+    .pg-jump input { width: 40px; height: 26px; border: 1px solid var(--border-2); border-radius: 3px; text-align: center; font-size: 12px; font-family: inherit; outline: none; }
+    .pg-size { height: 26px; border: 1px solid var(--border-2); border-radius: 3px; padding: 0 6px; font-size: 12px; color: var(--text-sub); font-family: inherit; background: #fff; }
+
+    /* ============================================================
+       商品详情（新增 / 编辑 / 查看）
+       ============================================================ */
+    .dwrap { max-width: 1500px; margin: 8px auto 0; }
+    .dcard { background: #fff; border-radius: 6px; padding: 28px 20px; margin-bottom: 12px; }
+    .dcard:first-child { border-radius: 6px 6px 6px 6px; }
+    .sec-title { font-size: 14px; font-weight: 600; color: #222; display: flex; align-items: center; gap: 6px; }
+    .sec-title .circ { color: #8c8c8c; }
+    .sec-body { padding-top: 20px; }
+    .fr { display: flex; align-items: flex-start; margin-bottom: 20px; }
+    .fr:last-child { margin-bottom: 0; }
+    .fr > label { flex: 0 0 158px; width: 158px; padding-right: 8px; text-align: right; font-size: 13px; color: var(--text-sub); line-height: 32px; }
+    .fr .ctl { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .req::before { content: '*'; color: var(--primary); margin-right: 4px; }
+    .inp { height: 32px; border: 1px solid var(--border-2); border-radius: 3px; padding: 0 10px; font-size: 12px; font-family: inherit; color: var(--text); outline: none; background: #fff; }
+    .inp:focus { border-color: var(--primary); }
+    .inp::placeholder { color: #bfbfbf; }
+    .inp-w462 { width: 462px; }
+    .inp-w296 { width: 296px; }
+    /* 关键词：带下拉箭头的标签输入框 */
+    .inp-caret { padding-right: 28px; background: #fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23b9b9b9' stroke-width='1.3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center; }
+    /* 带日历图标的日期框 */
+    .inp-cal { padding-right: 28px; background: #fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13'%3E%3Crect x='1' y='2.4' width='11' height='9.6' rx='1' fill='none' stroke='%23b9b9b9'/%3E%3Cpath d='M1 5.4h11' stroke='%23b9b9b9'/%3E%3Cpath d='M4 1v2M9 1v2' stroke='%23b9b9b9' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 9px center; }
+    .sel { height: 32px; border: 1px solid var(--border-2); border-radius: 3px; padding: 0 28px 0 10px; font-size: 12px; font-family: inherit; color: var(--text); outline: none; background: #fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23b9b9b9' stroke-width='1.3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center; width: 462px; appearance: none; -webkit-appearance: none; }
+    .sel:focus { border-color: var(--primary); }
+    .cnt { color: var(--text-hint); font-size: 12px; margin-left: -46px; pointer-events: none; }
+    .cnt-in { position: relative; display: inline-flex; align-items: center; }
+    .cnt-in .cnt { position: absolute; right: 10px; }
+    .rdo { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text); margin-right: 22px; cursor: pointer; }
+    .rdo input { width: 14px; height: 14px; accent-color: var(--primary); margin: 0; }
+    .rdo.dis { color: #b9b9b9; cursor: not-allowed; }
+    .rdo .lock { width: 14px; height: 14px; fill: #9aa0ab; }
+    .step { display: inline-flex; align-items: center; height: 32px; border: 1px solid var(--border-2); border-radius: 3px; overflow: hidden; width: 196px; background: #fff; }
+    .step .pm { width: 34px; height: 100%; border: 0; background: #fff; color: var(--text-sub); font-size: 15px; cursor: pointer; font-family: inherit; flex: 0 0 34px; }
+    .step .pm:hover { color: var(--primary); }
+    .step input { flex: 1; min-width: 0; height: 100%; border: 0; border-left: 1px solid var(--border-2); border-right: 1px solid var(--border-2); text-align: center; font-size: 13px; font-family: inherit; outline: none; color: var(--text); }
+    .tip { display: inline-flex; align-items: center; height: 26px; padding: 0 10px; background: var(--box); border-radius: 3px; font-size: 12px; color: var(--text-hint); }
+    .ta { width: 296px; height: 82px; border: 1px solid var(--border-2); border-radius: 3px; padding: 8px 10px; font-size: 12px; font-family: inherit; color: var(--text); outline: none; resize: vertical; line-height: 1.6; }
+    .ta:focus { border-color: var(--primary); }
+    .ta::placeholder { color: #bfbfbf; }
+    .box { background: var(--box); border-radius: 4px; padding: 18px 16px 16px 18px; }
+    .box .fr > label { line-height: 32px; }
+    .linkbtn { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; color: var(--primary); cursor: pointer; }
+    .linkbtn:hover { text-decoration: underline; }
+    .ghost { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border: 1px solid var(--border-2); border-radius: 3px; background: #fff; font-size: 12px; color: var(--text-sub); cursor: pointer; font-family: inherit; }
+    .ghost:hover { border-color: var(--primary); color: var(--primary); }
+    .ghost .circ { color: #8c8c8c; }
+    .grid3 { display: grid; grid-template-columns: repeat(3, 372px); gap: 18px 0; }
+    .grid3 .fr { margin-bottom: 0; }
+    .grid3 .fr > label { flex: 0 0 96px; width: 96px; }
+    .money { display: inline-flex; align-items: stretch; height: 32px; border: 1px solid var(--border-2); border-radius: 3px; overflow: hidden; background: #fff; }
+    .money .pre { display: flex; align-items: center; justify-content: center; width: 26px; background: #F5F6F8; color: var(--text-sub); font-size: 12px; flex: 0 0 26px; }
+    .money input { width: 194px; border: 0; outline: none; padding: 0 10px; font-size: 12px; font-family: inherit; color: var(--text); }
+    .money input::placeholder { color: #bfbfbf; }
+    .up { width: 130px; height: 130px; border: 1px dashed #D6DAE3; border-radius: 4px; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .up:hover { border-color: var(--primary); }
+    .up span { font-size: 26px; color: #c9ced9; line-height: 1; font-weight: 300; }
+    .uphint { display: inline-flex; align-items: center; max-width: 480px; margin-top: 10px; padding: 8px 10px; background: var(--box); border-radius: 3px; font-size: 12px; color: var(--text-hint); line-height: 1.6; }
+    .addrbox { width: 480px; border: 1px solid var(--border-2); border-radius: 3px; padding: 12px 14px; }
+    .addrbox .ar { display: flex; gap: 12px; font-size: 13px; line-height: 2; }
+    .addrbox .ar span:first-child { flex: 0 0 62px; color: var(--text-hint); }
+    .tb-link { color: var(--link); cursor: pointer; font-size: 13px; }
+    .tb-link:hover { text-decoration: underline; }
+    .foot { position: sticky; bottom: 0; background: #fff; border-top: 1px solid var(--border); padding: 18px 0; display: flex; justify-content: center; gap: 26px; margin: 12px -16px 0; z-index: 5; }
+    .ro input, .ro select, .ro textarea { pointer-events: none; background: #FAFAFB; color: #6b6b6b; }
+    .ro .sw { pointer-events: none; }
+
+    /* ---------- Toast ---------- */
+    #toast { position: fixed; top: 78px; left: 50%; transform: translateX(-50%) scale(.96); background: rgba(0,0,0,.78); color: #fff; padding: 9px 18px; border-radius: 4px; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 4000; }
+    #toast.show { opacity: 1; transform: translateX(-50%) scale(1); }
+
+    /* ---------- 删除二次确认 ---------- */
+    .cf-mask { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; align-items: center; justify-content: center; z-index: 3900; }
+    .cf-mask.show { display: flex; }
+    .cf-box { width: 380px; background: #fff; border-radius: 4px; padding: 20px 20px 16px; box-shadow: 0 6px 22px rgba(0,0,0,.16); }
+    .cf-title { font-size: 15px; font-weight: 600; color: #222; margin-bottom: 10px; }
+    .cf-text { font-size: 13px; color: var(--text-sub); line-height: 1.8; margin-bottom: 20px; }
+    .cf-text em { font-style: normal; color: var(--text); font-weight: 500; }
+    .cf-actions { display: flex; justify-content: flex-end; gap: 8px; }
+  </style>
+</head>
+<body>
+  <!-- ================= 顶栏 ================= -->
+  <header class="topbar">
+    <span class="logo">绿韵家管理系统</span>
+    <span class="collapse" title="收起侧栏">
+      <svg viewBox="0 0 18 18"><path d="M10 3.5h6M10 9h6M10 14.5h6"/><path d="M6.5 5.5L3 9l3.5 3.5" fill="none"/></svg>
+    </span>
+    <nav class="tb-nav">
+      <span class="active">店铺</span>
+      <span>营销中心</span>
+      <span>结算中心</span>
+    </nav>
+    <span class="tb-user">袁</span>
+  </header>
+
+  <main class="app-body">
+    <!-- ================= 侧栏 ================= -->
+    <aside class="sidebar">
+      <div class="menu-item">
+        <svg class="ico" viewBox="0 0 14 14"><rect x="1.5" y="2.5" width="11" height="9" rx="1.2"/><path d="M4 5.6l1.8 1.6L8.4 4.6l2 1.8"/></svg>控制台<span class="caret">▾</span>
+      </div>
+      <div class="menu-item">
+        <svg class="ico" viewBox="0 0 14 14"><circle cx="4.7" cy="4.7" r="2.3" fill="#F2994A" stroke="none"/><circle cx="9.4" cy="4.7" r="2.3" fill="#8E5BF0" stroke="none"/><circle cx="4.7" cy="9.4" r="2.3" fill="#5B8DEF" stroke="none"/><circle cx="9.4" cy="9.4" r="2.3" fill="#EF5B8D" stroke="none"/></svg>商品中心<span class="caret">▾</span>
+      </div>
+      <div class="menu-item open" onclick="toggleGroup(this)">
+        <svg class="ico" viewBox="0 0 14 14"><path d="M2.2 6.4L7 2.6l4.8 3.8V12H2.2z"/><path d="M5.6 12V8.8h2.8V12"/></svg>商家管理<span class="caret">▾</span>
+      </div>
+      <div class="sub-chips open">
+        <span class="chip">全部商家</span>
+        <span class="chip">待审核商家</span>
+        <span class="chip">待审核商品</span>
+        <span class="chip active">商品管理</span>
+        <span class="chip">兑换码管理</span>
+        <span class="chip">本地生活分类</span>
+      </div>
+      <div class="menu-item"><svg class="ico" viewBox="0 0 14 14"><circle cx="7" cy="4.8" r="2.6"/><path d="M2.2 12.4c0-2.5 2.1-3.9 4.8-3.9s4.8 1.4 4.8 3.9"/></svg>会员中心<span class="caret">▾</span></div>
+      <div class="menu-item"><svg class="ico" viewBox="0 0 14 14"><rect x="2" y="2.5" width="10" height="9" rx="1"/><path d="M4.4 5.6h5.2M4.4 8.2h3"/></svg>交易中心<span class="caret">▾</span></div>
+      <div class="menu-item"><svg class="ico" viewBox="0 0 14 14"><rect x="2" y="2.8" width="10" height="8.4" rx="1"/><path d="M4.6 6.2l1.6 1.6 2.4-2.4"/></svg>售后中心<span class="caret">▾</span></div>
+      <div class="menu-item"><svg class="ico" viewBox="0 0 14 14"><rect x="1.8" y="2.8" width="10.4" height="8.4" rx="1"/><path d="M3.8 9.4l2.2-2.6 1.8 2 1.6-2 1.6 2"/></svg>数据中心<span class="caret">▾</span></div>
+      <div class="menu-item"><svg class="ico" viewBox="0 0 14 14"><path d="M2 6.2l5-3.7 5 3.7V12H2z"/><path d="M5.6 12V8.6h2.8V12"/><path d="M2 9.6h10"/></svg>运维中心<span class="caret">▾</span></div>
+      <div class="menu-item"><svg class="ico" viewBox="0 0 14 14"><path d="M7 1.8l1.3 3.1 3.1 1.3-3.1 1.3L7 10.6 5.7 7.5 2.6 6.2l3.1-1.3z"/><path d="M10.6 9.8l.5 1.2 1.2.5-1.2.5-.5 1.2-.5-1.2-1.2-.5 1.2-.5z"/></svg>AI工具管理<span class="caret">▾</span></div>
+    </aside>
+
+    <!-- ================= 工作区 ================= -->
+    <div class="workspace">
+      <div class="page-tabs">
+        <span class="ptab">首页报表<span class="x">×</span></span>
+        <span class="ptab">补水管理<span class="x">×</span></span>
+        <span class="ptab active" id="tabProduct"><i class="dot"></i>商家商品管理<span class="x">×</span></span>
+        <span class="ptab">订单管理<span class="x">×</span></span>
+        <span class="ptab">权益用户<span class="x">×</span></span>
+        <span class="ptab">商家管理<span class="x">×</span></span>
+        <span class="ptab">兑换码管理<span class="x">×</span></span>
+        <span class="ptab">商家待审核商品<span class="x">×</span></span>
+        <span class="ptab">热搜管理<span class="x">×</span></span>
+        <span class="ptab">换购活动<span class="x">×</span></span>
+        <span class="ptab">全部工作站<span class="x">×</span></span>
+        <span class="ptab" id="tabDetail" style="display:none"><i class="dot"></i><span id="tabDetailTxt">新增商品</span><span class="x">×</span></span>
+      </div>
+
+      <!-- ---------- 视图一：商家商品管理（列表） ---------- -->
+      <div class="view active" id="viewList">
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">商家商品管理</span>
+            <div class="head-actions">
+              <button class="btn btn-primary" onclick="searchList()">查询</button>
+              <button class="btn btn-primary" onclick="openDetail('add')">新增商品</button>
+              <button class="btn btn-default" onclick="resetSearch()">重置</button>
+            </div>
+          </div>
+
+          <div class="ltabs">
+            <span class="ltab active" data-tab="all" onclick="switchTab(this)">全部</span>
+            <span class="ltab" data-tab="on" onclick="switchTab(this)">已上架(275)</span>
+            <span class="ltab" data-tab="off" onclick="switchTab(this)">已下架(72)</span>
+          </div>
+
+          <div class="filters">
+            <select class="f-select" id="qShopType">
+              <option value="">商家类型</option>
+              <option>厂家</option>
+              <option>经销商</option>
+            </select>
+            <input class="f-input" type="text" id="qShop" placeholder="商家">
+            <input class="f-input" type="text" id="qName" placeholder="商品名">
+            <select class="f-select" id="qPtype">
+              <option value="">商品类型</option>
+              <option>实体商品</option>
+              <option>团购商品</option>
+              <option>水卡</option>
+            </select>
+            <select class="f-select" id="qKb">
+              <option value="">是否建立知识库</option>
+              <option value="1">是</option>
+              <option value="0">否</option>
+            </select>
+            <select class="f-select" id="qOptype">
+              <option value="">运营类型</option>
+              <option>团购</option>
+              <option>常规品</option>
+              <option>秒杀</option>
+              <option>新人特惠</option>
+              <option>惠民补贴</option>
+              <option>数字人</option>
+              <option>进阶套组</option>
+              <option>享商套餐</option>
+              <option>拼团商品</option>
+              <option>换购商品</option>
+              <option>兑换码商品</option>
+              <option>新人兑换码</option>
+            </select>
+          </div>
+
+          <div class="selbar">
+            <span class="sel-txt"><i class="bang">!</i>已选择 <span id="selCount">0</span> 项</span>
+            <button class="btn-clear" onclick="clearSelection()">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#9b9b9b" stroke-width="1.2"><path d="M2 3.5h8M4.6 3.5V2.4h2.8v1.1M3.2 3.5l.6 6.3h4.4l.6-6.3"/></svg>
+              清空选项
+            </button>
+            <span class="right">
+              <button class="btn btn-primary" onclick="batchDelete()">批量删除</button>
+            </span>
+          </div>
+
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th class="c-chk"><input type="checkbox" id="chkAll" onclick="toggleAll(this)"></th>
+                  <th class="c-id">商品编号</th>
+                  <th class="c-prod">商品信息</th>
+                  <th class="c-audit">审核状态</th>
+                  <th class="c-brand">品牌分类</th>
+                  <th class="c-kb">是否建立知识库</th>
+                  <th class="c-optype">运营类型</th>
+                  <th class="c-pstatus">商品状态</th>
+                  <th class="c-stock">库存</th>
+                  <th class="c-shop">商家</th>
+                  <th class="c-shoptype">商家类型</th>
+                  <th class="c-sort">排序</th>
+                  <th class="c-rec">推荐 <span class="circ solid" title="推荐到首页">i</span></th>
+                  <th class="c-price">销售价</th>
+                  <th class="c-time">销售时间</th>
+                  <th class="c-op">操作</th>
+                </tr>
+              </thead>
+              <tbody id="listBody"></tbody>
+            </table>
+          </div>
+
+          <div class="pager">
+            <span id="totalCount">共 347 条</span>
+            <select class="pg-size"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>
+            <button class="pg dis">‹</button>
+            <button class="pg active">1</button>
+            <button class="pg">2</button>
+            <button class="pg">3</button>
+            <button class="pg">4</button>
+            <button class="pg">5</button>
+            <button class="pg">6</button>
+            <button class="pg">···</button>
+            <button class="pg">35</button>
+            <button class="pg">›</button>
+            <div class="pg-jump"><span>前往</span><input type="text" value="1"><span>页</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---------- 视图二：商品详情（新增 / 编辑 / 查看） ---------- -->
+      <div class="view" id="viewDetail">
+        <div class="dwrap" id="detailForm">
+
+          <!-- 1. 基础信息 -->
+          <div class="dcard">
+            <div class="sec-title">基础信息</div>
+            <div class="sec-body">
+              <div class="fr">
+                <label for="dCategory">分类</label>
+                <div class="ctl">
+                  <select class="sel" id="dCategory">
+                    <option>生活服务 / 餐饮 / 餐饮优惠 / 兑换券</option>
+                    <option>生活服务</option>
+                    <option>餐饮</option>
+                    <option>餐饮优惠</option>
+                    <option>兑换券</option>
+                  </select>
+                </div>
+              </div>
+              <div class="fr">
+                <label for="dBrand">品牌</label>
+                <div class="ctl">
+                  <select class="sel" id="dBrand">
+                    <option value="">请选择品牌</option>
+                    <option>无品牌</option>
+                    <option>绿韵家</option>
+                  </select>
+                </div>
+              </div>
+              <div class="fr">
+                <label class="req" for="dName">商品名</label>
+                <div class="ctl">
+                  <span class="cnt-in">
+                    <input class="inp inp-w296" type="text" id="dName" maxlength="60" placeholder="请输入商品名" oninput="cntSync(this,'dNameCnt')">
+                    <span class="cnt" id="dNameCnt">0/60</span>
+                  </span>
+                </div>
+              </div>
+              <div class="fr">
+                <label class="req" for="dShop">商家</label>
+                <div class="ctl">
+                  <select class="sel" id="dShop">
+                    <option value="">请选择商家</option>
+                    <option>广东一段心香文化有限公司</option>
+                    <option>绿韵家官方自营</option>
+                    <option>北海康晟网络信息技术有限公司</option>
+                  </select>
+                </div>
+              </div>
+              <div class="fr">
+                <label>商品类型</label>
+                <div class="ctl">
+                  <label class="rdo"><input type="radio" name="dPtype" value="实体商品" checked>实体商品</label>
+                  <label class="rdo"><input type="radio" name="dPtype" value="团购商品">团购商品</label>
+                  <label class="rdo"><input type="radio" name="dPtype" value="水卡">水卡</label>
+                  <label class="rdo dis" title="暂未开放"><input type="radio" name="dPtype" value="海淘" disabled>海淘
+                    <svg class="lock" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6.4"/><path d="M7 3.6a2.1 2.1 0 012.1 2.1v1.1H4.9V5.7A2.1 2.1 0 017 3.6z" fill="#fff"/><rect x="4.4" y="6.2" width="5.2" height="4.2" rx=".7" fill="#fff"/></svg>
+                  </label>
+                  <label class="rdo dis" title="暂未开放"><input type="radio" name="dPtype" value="跨境" disabled>跨境
+                    <svg class="lock" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6.4"/><path d="M7 3.6a2.1 2.1 0 012.1 2.1v1.1H4.9V5.7A2.1 2.1 0 017 3.6z" fill="#fff"/><rect x="4.4" y="6.2" width="5.2" height="4.2" rx=".7" fill="#fff"/></svg>
+                  </label>
+                </div>
+              </div>
+              <div class="fr">
+                <label>运营类型</label>
+                <div class="ctl" id="dOptype">
+                  <label class="rdo"><input type="radio" name="dOptype" value="团购" checked>团购</label>
+                  <label class="rdo"><input type="radio" name="dOptype" value="常规品">常规品</label>
+                  <label class="rdo"><input type="radio" name="dOptype" value="秒杀">秒杀</label>
+                  <label class="rdo"><input type="radio" name="dOptype" value="新人特惠">新人特惠</label>
+                  <label class="rdo"><input type="radio" name="dOptype" value="惠民补贴">惠民补贴</label>
+                  <label class="rdo"><input type="radio" name="dOptype" value="数字人">数字人</label>
+                  <label class="rdo"><input type="radio" name="dOptype" value="进阶套组">进阶套组</label>
+                  <label class="rdo"><input type="radio" name="dOptype" value="享商套餐">享商套餐</label>
+                  <label class="rdo"><input type="radio" name="dOptype" value="拼团商品">拼团商品</label>
+                  <label class="rdo"><input type="radio" name="dOptype" value="换购商品">换购商品</label>
+                  <label class="rdo"><input type="radio" name="dOptype" value="兑换码商品">兑换码商品</label>
+                  <label class="rdo"><input type="radio" name="dOptype" value="新人兑换码">新人兑换码</label>
+                </div>
+              </div>
+              <div class="fr">
+                <label>是否使用优惠券</label>
+                <div class="ctl">
+                  <label class="rdo"><input type="radio" name="dCoupon" value="是">是</label>
+                  <label class="rdo"><input type="radio" name="dCoupon" value="否" checked>否</label>
+                </div>
+              </div>
+              <div class="fr">
+                <label>销售时间</label>
+                <div class="ctl">
+                  <input class="inp inp-cal" style="width:186px" type="text" id="dSaleStart" placeholder="开始日期">
+                  <span style="color:var(--text-sub)">至</span>
+                  <input class="inp inp-cal" style="width:186px" type="text" id="dSaleEnd" placeholder="结束日期">
+                </div>
+              </div>
+              <div class="fr">
+                <label for="dNo">商品货号</label>
+                <div class="ctl">
+                  <span class="cnt-in">
+                    <input class="inp inp-w296" type="text" id="dNo" maxlength="60" placeholder="请输入商品货号" oninput="cntSync(this,'dNoCnt')">
+                    <span class="cnt" id="dNoCnt">0/60</span>
+                  </span>
+                </div>
+              </div>
+              <div class="fr">
+                <label class="req" for="dMinBuy">起购数量</label>
+                <div class="ctl">
+                  <div class="step" data-min="1">
+                    <button class="pm" onclick="stepBy('dMinBuy',-1)">－</button>
+                    <input type="text" id="dMinBuy" value="1">
+                    <button class="pm" onclick="stepBy('dMinBuy',1)">＋</button>
+                  </div>
+                </div>
+              </div>
+              <div class="fr">
+                <label class="req" for="dMaxBuy">限购数量</label>
+                <div class="ctl">
+                  <div class="step" style="margin-right:26px">
+                    <button class="pm" onclick="stepBy('dMaxBuy',-1)">－</button>
+                    <input type="text" id="dMaxBuy" value="0">
+                    <button class="pm" onclick="stepBy('dMaxBuy',1)">＋</button>
+                  </div>
+                  <span class="tip">0为不限购</span>
+                  <label class="req" style="flex:0 0 auto;line-height:32px;padding-left:26px" for="dSort">商品排序</label>
+                  <div class="step">
+                    <button class="pm" onclick="stepBy('dSort',-1)">－</button>
+                    <input type="text" id="dSort" value="0">
+                    <button class="pm" onclick="stepBy('dSort',1)">＋</button>
+                  </div>
+                  <span class="tip">排序值越大越靠前</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. 商品标签 -->
+          <div class="dcard">
+            <div class="sec-title">商品标签 <span class="circ">i</span></div>
+            <div class="sec-body">
+              <div class="fr">
+                <label for="dKeywords">关键词</label>
+                <div class="ctl">
+                  <input class="inp inp-w462 inp-caret" type="text" id="dKeywords" placeholder='请输入关键词，确认输入完请按 "Enter" 键'>
+                </div>
+              </div>
+              <div class="fr">
+                <label for="dSellPoint">卖点</label>
+                <div class="ctl">
+                  <span class="cnt-in" style="align-items:flex-end">
+                    <textarea class="ta" id="dSellPoint" maxlength="60" placeholder="突出产品亮点，60字以内" oninput="cntSync(this,'dSellCnt')"></textarea>
+                    <span class="cnt" id="dSellCnt" style="bottom:8px;right:auto"></span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. 商品规格 -->
+          <div class="dcard">
+            <div class="sec-title">商品规格</div>
+            <div class="sec-body">
+              <div class="box">
+                <div class="fr">
+                  <label class="req" for="dSpecName">规格名1</label>
+                  <div class="ctl">
+                    <select class="sel" style="width:320px" id="dSpecName">
+                      <option value="">请选择规格</option>
+                      <option>颜色</option>
+                      <option>规格</option>
+                      <option>容量</option>
+                    </select>
+                    <span class="linkbtn" onclick="toast('添加规格图片')"><span class="circ red">+</span>添加规格图片</span>
+                  </div>
+                </div>
+                <div class="fr">
+                  <label></label>
+                  <div class="ctl">
+                    <input class="inp" style="width:320px" type="text" placeholder="请输入">
+                    <label style="flex:0 0 auto;line-height:32px;color:var(--text-sub);font-size:13px">购买级别（≥）：</label>
+                    <select class="sel" style="width:220px">
+                      <option>不限制</option>
+                      <option>1</option>
+                      <option>2</option>
+                      <option>3</option>
+                    </select>
+                    <button class="ghost" style="height:32px;width:36px;justify-content:center;padding:0" onclick="toast('新增一行规格值')">+</button>
+                  </div>
+                </div>
+                <div class="fr">
+                  <label></label>
+                  <div class="ctl">
+                    <input class="inp" style="width:320px" type="text" placeholder="请输入">
+                    <label style="flex:0 0 auto;line-height:32px;color:var(--text-sub);font-size:13px">购买级别（≥）：</label>
+                    <select class="sel" style="width:220px">
+                      <option>不限制</option>
+                      <option>1</option>
+                      <option>2</option>
+                      <option>3</option>
+                    </select>
+                    <button class="ghost" style="height:32px;width:36px;justify-content:center;padding:0" onclick="toast('新增一行规格值')">+</button>
+                    <span class="tb-link" onclick="toast('删除该规格值')">删除</span>
+                  </div>
+                </div>
+                <div class="fr" style="margin-bottom:0">
+                  <label></label>
+                  <div class="ctl">
+                    <button class="ghost" onclick="toast('添加子规格')"><span class="circ">+</span>添加子规格</button>
+                  </div>
+                </div>
+              </div>
+              <div class="box" style="margin-top:16px">
+                <div class="fr">
+                  <label class="req">规格名2</label>
+                  <div class="ctl">
+                    <select class="sel" style="width:320px">
+                      <option value="">请选择规格</option>
+                      <option>颜色</option>
+                      <option>规格</option>
+                      <option>容量</option>
+                    </select>
+                    <label class="rdo" style="margin:0 12px 0 6px"><input type="radio" name="dSpec2Img" value="1">添加规格图片</label>
+                    <span class="tb-link" onclick="toast('删除该规格')">删除</span>
+                  </div>
+                </div>
+                <div class="fr">
+                  <label></label>
+                  <div class="ctl">
+                    <input class="inp" style="width:320px" type="text" placeholder="请输入">
+                    <label style="flex:0 0 auto;line-height:32px;color:var(--text-sub);font-size:13px">购买级别（≥）：</label>
+                    <select class="sel" style="width:220px">
+                      <option>不限制</option>
+                      <option>1</option>
+                      <option>2</option>
+                      <option>3</option>
+                    </select>
+                    <button class="ghost" style="height:32px;width:36px;justify-content:center;padding:0" onclick="toast('新增一行规格值')">+</button>
+                  </div>
+                </div>
+                <div class="fr" style="margin-bottom:0">
+                  <label></label>
+                  <div class="ctl">
+                    <button class="ghost" onclick="toast('添加子规格')"><span class="circ">+</span>添加子规格</button>
+                  </div>
+                </div>
+              </div>
+              <div style="padding-top:16px">
+                <button class="ghost" onclick="toast('创建新规格')"><span class="circ">+</span>创建新规格</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. 规格售价与库存 -->
+          <div class="dcard">
+            <div class="sec-title">规格售价与库存</div>
+            <div class="sec-body">
+              <div class="grid3">
+                <div class="fr">
+                  <label for="dMarketPrice">市场价：</label>
+                  <div class="ctl">
+                    <span class="money"><span class="pre">¥</span><input type="text" id="dMarketPrice" placeholder="请输入市场价"></span>
+                  </div>
+                </div>
+                <div class="fr">
+                  <label for="dSalePrice">销售价：</label>
+                  <div class="ctl">
+                    <span class="money"><span class="pre">¥</span><input type="text" id="dSalePrice" placeholder="请输入销售价"></span>
+                  </div>
+                </div>
+                <div class="fr">
+                  <label for="dPoints">积分：</label>
+                  <div class="ctl">
+                    <input class="inp" style="width:220px" type="text" id="dPoints" placeholder="请输入积分">
+                  </div>
+                </div>
+                <div class="fr">
+                  <label for="dPvi">PVI值：</label>
+                  <div class="ctl">
+                    <span class="money"><span class="pre">¥</span><input type="text" id="dPvi" placeholder="请输入PVI值"></span>
+                  </div>
+                </div>
+                <div class="fr">
+                  <label for="dSupplyPrice">供应商价：</label>
+                  <div class="ctl">
+                    <span class="money"><span class="pre">¥</span><input type="text" id="dSupplyPrice" placeholder="请输入供应商价"></span>
+                  </div>
+                </div>
+                <div class="fr">
+                  <label for="dStock">库存：</label>
+                  <div class="ctl">
+                    <input class="inp" style="width:220px" type="text" id="dStock" placeholder="请输入可提供库存">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4.5 水卡设置（仅商品类型=水卡 时显示；发货模板 / 售后设置同时隐藏） -->
+          <div class="dcard" id="cardWater">
+            <div class="sec-title">水卡设置</div>
+            <div class="sec-body">
+              <div class="fr">
+                <label class="req" for="dCardDays">水卡有效期</label>
+                <div class="ctl">
+                  <span style="font-size:13px;color:var(--text-sub)">激活后</span>
+                  <input class="inp" style="width:120px" type="text" id="dCardDays" placeholder="请输入天数">
+                  <span style="font-size:13px;color:var(--text-sub)">天有效</span>
+                </div>
+              </div>
+              <div class="fr">
+                <label class="req" for="dDailyLimit">每日取水上限</label>
+                <div class="ctl">
+                  <input class="inp" style="width:220px" type="text" id="dDailyLimit" placeholder="请输入每日取水上限">
+                  <span style="font-size:13px;color:var(--text-sub)">L</span>
+                </div>
+              </div>
+              <div class="fr">
+                <label class="req" for="dMonthLimit">每月取水上限</label>
+                <div class="ctl">
+                  <input class="inp" style="width:220px" type="text" id="dMonthLimit" placeholder="请输入每月取水上限">
+                  <span style="font-size:13px;color:var(--text-sub)">L</span>
+                </div>
+              </div>
+              <div class="fr" style="margin-bottom:0">
+                <label class="req" for="dTotalWater">总水量</label>
+                <div class="ctl">
+                  <input class="inp" style="width:220px" type="text" id="dTotalWater" placeholder="请输入总水量">
+                  <span style="font-size:13px;color:var(--text-sub)">L</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. 商品参数 -->
+          <div class="dcard">
+            <div class="sec-title">商品参数</div>
+            <div class="sec-body">
+              <div class="fr" style="margin-bottom:14px">
+                <label style="flex:0 0 auto;width:auto;padding-right:18px">参数1</label>
+                <div class="ctl">
+                  <span style="font-size:13px;color:var(--text-sub);white-space:nowrap">自定义参数名</span>
+                  <input class="inp" style="width:160px" type="text" placeholder="请输入参数名">
+                  <input class="inp" style="width:160px" type="text" placeholder="请输入参数值">
+                  <span class="tb-link" onclick="toast('删除该参数')">删除</span>
+                </div>
+              </div>
+              <button class="ghost" onclick="toast('添加新参数')"><span class="circ">+</span>添加新参数</button>
+            </div>
+          </div>
+
+          <!-- 6. 商品详情 -->
+          <div class="dcard">
+            <div class="sec-title">商品详情</div>
+            <div class="sec-body">
+              <div class="fr">
+                <label class="req">商品主图：</label>
+                <div class="ctl" style="display:block">
+                  <div class="up" onclick="toast('上传商品主图')"><span>+</span></div>
+                  <div class="uphint">最多上传1张，单张图片需限制在800kb以内，建议尺寸：750*750 像素。</div>
+                </div>
+              </div>
+              <div class="fr">
+                <label>宽幅封面图：</label>
+                <div class="ctl" style="display:block">
+                  <div class="up" onclick="toast('上传宽幅封面图')"><span>+</span></div>
+                  <div class="uphint">最多上传1张，单张图片需限制在800kb以内，建议尺寸：780*465 像素。</div>
+                </div>
+              </div>
+              <div class="fr">
+                <label class="req">商品轮播图：</label>
+                <div class="ctl" style="display:block">
+                  <div class="up" onclick="toast('上传商品轮播图')"><span>+</span></div>
+                  <div class="uphint">最多上传9张，单张图片需限制在800kb以内，建议尺寸：640*640 像素。</div>
+                </div>
+              </div>
+              <div class="fr">
+                <label>分享图：</label>
+                <div class="ctl" style="display:block">
+                  <div class="up" onclick="toast('上传分享图')"><span>+</span></div>
+                  <div class="uphint">最多上传1张，单张图片需限制在800kb以内，建议尺寸：500 x 400 像素。</div>
+                </div>
+              </div>
+              <div class="fr" style="margin-bottom:0">
+                <label class="req">详情图：</label>
+                <div class="ctl" style="display:block">
+                  <button class="ghost" style="margin-bottom:12px" onclick="toast('预览详情图')">预览详情图</button>
+                  <div class="up" onclick="toast('上传详情图')"><span>+</span></div>
+                  <div class="uphint">1-20张，宽度500-1000，高度不能大于4000</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 7. 发货模板设置 -->
+          <div class="dcard" id="cardShip">
+            <div class="sec-title">发货模板设置</div>
+            <div class="sec-body">
+              <div class="fr" style="margin-bottom:10px">
+                <label></label>
+                <div class="ctl">
+                  <select class="sel" style="width:320px" id="dShipTpl">
+                    <option value="">请选择发货模板</option>
+                    <option>默认模板</option>
+                    <option>包邮模板</option>
+                  </select>
+                  <span class="tb-link" onclick="toast('新增发货模板')">新增</span>
+                  <span class="tb-link" onclick="toast('已刷新发货模板')">刷新</span>
+                  <span class="tb-link" onclick="toast('修改发货信息')">修改发货信息</span>
+                </div>
+              </div>
+              <div class="fr" style="margin-bottom:0">
+                <label></label>
+                <div class="ctl">
+                  <div class="uphint" style="margin-top:0;max-width:720px">请选择合适的发货模板，该商品将以您选中的模板进行运费的运算，若无合适的发货模板，请先新增，新增完成后点击刷新即可加载新的模板</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 8. 售后设置 -->
+          <div class="dcard" id="cardAfter">
+            <div class="sec-title">售后设置</div>
+            <div class="sec-body">
+              <div style="font-size:13px;font-weight:600;color:#222;margin-bottom:14px">售后信息</div>
+              <div class="fr" style="margin-bottom:6px">
+                <label>寄回地址</label>
+                <div class="ctl">
+                  <select class="sel" style="width:320px" id="dReturnAddr">
+                    <option>辣朵医生·玖度瘦</option>
+                  </select>
+                  <span class="tb-link" onclick="toast('新增寄回地址')">新增</span>
+                  <span class="tb-link" onclick="toast('已刷新寄回地址')">刷新</span>
+                  <span class="tb-link" onclick="toast('修改寄回地址')">修改寄回地址</span>
+                </div>
+              </div>
+              <div class="fr" style="margin-bottom:14px">
+                <label></label>
+                <div class="ctl">
+                  <div class="uphint" style="margin-top:0;max-width:660px">请选择合适的地址，该商品的售后会默认使用当前地址，若无合适的地址，请先新增，新增完成后点击刷新即可加载新的地址</div>
+                </div>
+              </div>
+              <div class="fr" style="margin-bottom:16px">
+                <label></label>
+                <div class="ctl">
+                  <div class="addrbox">
+                    <div class="ar"><span>收货人</span><span>芳芳</span></div>
+                    <div class="ar"><span>联系电话</span><span>18953627845</span></div>
+                    <div class="ar"><span>详细地址</span><span>湖南省长沙市雨花区长沙市雨花区韶山中路495号万博汇云谷19楼</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="fr" style="margin-bottom:0">
+                <label>支持七天无理由</label>
+                <div class="ctl">
+                  <span class="sw on" id="dSeven" onclick="toggleSw(this)"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 9. 其他设置 -->
+          <div class="dcard" id="cardOther" style="margin-bottom:0">
+            <div class="sec-title">其他设置</div>
+            <div class="sec-body">
+              <div class="fr" style="margin-bottom:14px">
+                <label>是否预售</label>
+                <div class="ctl">
+                  <label class="rdo"><input type="radio" name="dPresale" value="非预售" checked>非预售</label>
+                  <label class="rdo"><input type="radio" name="dPresale" value="时段预售">时段预售</label>
+                </div>
+              </div>
+              <div class="fr" style="margin-bottom:0">
+                <label></label>
+                <div class="ctl">
+                  <div class="uphint" style="margin-top:0;max-width:660px">可设置在消费者支付成功后N天内发货，如支付成功后5天内发货，可选3-10天，选择后显示支付成功天数</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="foot">
+            <button class="btn btn-default btn-lg" onclick="go('list')">取消</button>
+            <button class="btn btn-primary btn-lg" id="btnSave" onclick="saveDetail()">保存</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast"></div>
+
+  <!-- 删除二次确认（统一 confirmAction，所有删除入口复用） -->
+  <div class="cf-mask" id="cfMask">
+    <div class="cf-box">
+      <div class="cf-title" id="cfTitle">确认删除</div>
+      <div class="cf-text" id="cfText"></div>
+      <div class="cf-actions">
+        <button class="btn btn-default" onclick="closeConfirm()">取消</button>
+        <button class="btn btn-primary" id="cfOk">确认删除</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       样例数据（复刻截图 4 行）
+       ============================================================ */
+    var products = [
+      { id: 589, img: 'qr',   name: '惠民补贴+199换水卡', ptype: '实体商品', audit: '已通过', brand: '品牌:无品牌', category: '分类:个人护理/洗发护发/护发素', kb: '否', optype: '惠民补贴', status: '未上架', stock: 15752, shop: '广东一段心香文化有限公司', shopType: '厂家', sort: 99999, rec: false, price: 2250, saleStart: '2026-05-01 00:00', saleEnd: '2026-06-30 00:00' },
+      { id: 584, img: 'kit',  name: '惠民补贴套餐包13', ptype: '实体商品', audit: '已通过', brand: '品牌:无品牌', category: '分类:食品饮料/保健食品/增强免疫', kb: '否', optype: '惠民补贴', status: '已上架', stock: 7930, shop: '绿韵家官方自营', shopType: '厂家', sort: 30000, rec: false, price: 5000, saleStart: '2026-03-23 00:00', saleEnd: '2032-04-30 00:00' },
+      { id: 660, img: 'house', name: 'TEST-商品', ptype: '实体商品', audit: '已通过', brand: '品牌:无品牌', category: '分类:厨具/餐厨/餐具套装', kb: '否', optype: '常规品', status: '已上架', stock: 3937, shop: '北海康晟网络信息技术有限公司', shopType: '厂家', sort: 10001, rec: false, price: 50, saleStart: '', saleEnd: '' },
+      { id: 657, img: 'house', name: 'text-测试', ptype: '实体商品', audit: '已通过', brand: '品牌:无品牌', category: '分类:美妆护肤/香水彩妆/高光', kb: '否', optype: '常规品', status: '已上架', stock: 0, shop: '北海康晟网络信息技术有限公司', shopType: '厂家', sort: 10000, rec: false, price: 5, saleStart: '', saleEnd: '' },
+      { id: 700, img: 'kit', name: '绿韵家·悦享水卡（年卡）', ptype: '水卡', audit: '已通过', brand: '品牌:绿韵家', category: '分类:水卡/取水权益', kb: '否', optype: '常规品', status: '已上架', stock: 9999, shop: '绿韵家官方自营', shopType: '厂家', sort: 20000, rec: false, price: 199, saleStart: '', saleEnd: '', cardDays: 365, dailyLimit: 2, monthLimit: 60, totalWater: 720 }
+    ];
+    var selected = {};
+    var curMode = 'add';      // add / edit / view
+    var curId = null;
+
+    /* ============================================================
+       商品图占位（内联 SVG，避免外链）
+       ============================================================ */
+    function prodImg(kind) {
+      var svg;
+      if (kind === 'qr') {
+        /* 小程序太阳码：环形点阵 + 中心绿色猫头 */
+        var h = 7, dots = '';
+        function rnd() { h = (h * 1103515245 + 12345) >>> 0; return (h >>> 17) & 7; }
+        for (var a = 0; a < 360; a += 5) {
+          var rad = a * Math.PI / 180, rr = 27 + rnd() * 9;
+          var cx = 50 + rr * Math.cos(rad), cy = 50 + rr * Math.sin(rad), L = 1.6 + rnd() * 0.9;
+          dots += '<rect x="' + (cx - L / 2).toFixed(1) + '" y="' + (cy - L / 2).toFixed(1) + '" width="' + L.toFixed(1) + '" height="' + L.toFixed(1) + '" fill="#111"/>';
+        }
+        svg = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 100 100">'
+            + '<rect width="100" height="100" fill="#fff"/>' + dots
+            + '<rect x="33" y="33" width="34" height="34" rx="10" fill="#00C160"/>'
+            + '<path d="M41.5 43l-2.4-4.4 4.4 1.6zM58.5 43l2.4-4.4-4.4 1.6z" fill="#fff"/>'
+            + '<circle cx="50" cy="53" r="8.2" fill="#fff"/><circle cx="50" cy="53" r="4" fill="#00C160"/>'
+            + '<circle cx="78" cy="78" r="11" fill="#fff"/><circle cx="78" cy="78" r="9" fill="#00C160"/>'
+            + '<path d="M74.5 78a2 2 0 014 0 2 2 0 01-4 0z" fill="#fff"/><path d="M78 74.5a3.5 3.5 0 013.5 2" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round"/>'
+            + '</svg>';
+      } else if (kind === 'kit') {
+        /* 套餐包图：绿色背景 + 产品 + 价格条 */
+        svg = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 100 100">'
+            + '<rect width="100" height="100" fill="#E8F5EA"/>'
+            + '<rect x="16" y="16" width="26" height="40" rx="3" fill="#fff" stroke="#D6E3D8"/>'
+            + '<rect x="46" y="12" width="22" height="44" rx="3" fill="#FFF7E8" stroke="#EBDCC2"/>'
+            + '<rect x="8" y="40" width="24" height="26" rx="3" fill="#E4572E"/>'
+            + '<rect x="34" y="46" width="52" height="20" rx="3" fill="#2E5AAC"/>'
+            + '<rect x="66" y="34" width="22" height="32" rx="3" fill="#12326B"/>'
+            + '<rect x="0" y="70" width="100" height="30" fill="#1E7F3C"/>'
+            + '<text x="7" y="90" font-size="17" font-family="Arial" font-weight="700" fill="#fff">1599</text>'
+            + '<circle cx="8" cy="82" r="4" fill="#F5D14B"/><rect x="66" y="79" width="28" height="11" rx="5.5" fill="#fff"/>'
+            + '<text x="69" y="88" font-size="8" font-family="Arial" fill="#1E7F3C">立省18%</text>'
+            + '</svg>';
+      } else {
+        /* 默认图标：蓝色房子 */
+        svg = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 100 100">'
+            + '<rect width="100" height="100" fill="#fff"/>'
+            + '<path d="M50 12L88 44v48H12V44z" fill="#2F80ED"/>'
+            + '<path d="M50 57a13 13 0 0113 13v22H37V70a13 13 0 0113-13z" fill="#fff"/>'
+            + '</svg>';
+      }
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    }
+
+    /* ============================================================
+       公共
+       ============================================================ */
+    function toggleGroup(el) {
+      el.classList.toggle('open');
+      var chips = el.nextElementSibling;
+      if (chips && chips.classList.contains('sub-chips')) { chips.classList.toggle('open'); }
+    }
+    function toast(msg) {
+      var t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(function () { t.classList.remove('show'); }, 1800);
+    }
+    function go(view) {
+      var views = document.querySelectorAll('.view');
+      for (var i = 0; i < views.length; i++) { views[i].classList.remove('active'); }
+      document.getElementById('view' + view.charAt(0).toUpperCase() + view.slice(1)).classList.add('active');
+      var isDetail = view === 'detail';
+      document.getElementById('tabProduct').classList.toggle('active', !isDetail);
+      document.getElementById('tabDetail').style.display = isDetail ? '' : 'none';
+      document.getElementById('tabDetail').classList.toggle('active', isDetail);
+      document.getElementById('tabDetail').querySelector('span.x') && (document.getElementById('tabDetail').querySelector('span.x').style.color = isDetail ? '#fff' : '#c8c8c8');
+      document.getElementById('tabProduct').querySelector('.x').style.color = isDetail ? '#c8c8c8' : '#fff';
+      window.scrollTo(0, 0);
+    }
+    /* 删除类操作统一二次确认 */
+    function confirmAction(title, html, onOk) {
+      document.getElementById('cfTitle').textContent = title;
+      document.getElementById('cfText').innerHTML = html;
+      var ok = document.getElementById('cfOk');
+      ok.onclick = function () { closeConfirm(); onOk(); };
+      document.getElementById('cfMask').classList.add('show');
+    }
+    function closeConfirm() { document.getElementById('cfMask').classList.remove('show'); }
+    function cntSync(el, id) {
+      var box = document.getElementById(id);
+      if (box) { box.textContent = el.value.length + '/' + el.maxLength; }
+    }
+    function stepBy(id, d) {
+      var el = document.getElementById(id);
+      var v = parseInt(el.value, 10); if (isNaN(v)) { v = 0; }
+      v += d; if (v < 0) { v = 0; }
+      el.value = v;
+    }
+    function toggleSw(el) { el.classList.toggle('on'); }
+    /* 水卡类型联动：商品类型=水卡 时隐藏「发货模板设置」「售后设置」、显示「水卡设置」，其余类型反之 */
+    function syncWaterCards() {
+      var isCard = getRadio('dPtype') === '水卡';
+      var w = document.getElementById('cardWater');
+      var s = document.getElementById('cardShip');
+      var a = document.getElementById('cardAfter');
+      var o = document.getElementById('cardOther');
+      if (w) { w.style.display = isCard ? '' : 'none'; }
+      if (s) { s.style.display = isCard ? 'none' : ''; }
+      if (a) { a.style.display = isCard ? 'none' : ''; }
+      if (o) { o.style.display = isCard ? 'none' : ''; }
+    }
+
+    /* ============================================================
+       列表
+       ============================================================ */
+    function numCell(v) {
+      return '<span class="numval">' + v + '<svg viewBox="0 0 12 12"><path d="M8.2 1.6l2.2 2.2-6 6H2.2V7.6z"/><path d="M7.2 2.6l2.2 2.2"/></svg></span>';
+    }
+    function opsHtml(row) {
+      var list = row.status === '未上架'
+        ? ['查看', '编辑', '上架', '删除', '复制商品']
+        : ['查看', '下架', '复制商品'];
+      var html = list.map(function (name) {
+        if (name === '查看') { return '<a onclick="openDetail(\'view\',' + row.id + ')">' + name + '</a>'; }
+        if (name === '编辑') { return '<a onclick="openDetail(\'edit\',' + row.id + ')">' + name + '</a>'; }
+        if (name === '删除') { return '<a onclick="askDelete(' + row.id + ')">' + name + '</a>'; }
+        if (name === '上架' || name === '下架') { return '<a onclick="toggleStatus(' + row.id + ')">' + name + '</a>'; }
+        return '<a onclick="toast(\'' + name + '：' + row.id + '\')">' + name + '</a>';
+      }).join('');
+      html += '<a onclick="toast(\'完善知识库：' + row.id + '\')">完善知识库</a>';
+      return '<div class="op">' + html + '</div>';
+    }
+    function renderList(data) {
+      var body = document.getElementById('listBody');
+      body.innerHTML = '';
+      data.forEach(function (row) {
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td class="c-chk"><input type="checkbox" ' + (selected[row.id] ? 'checked' : '') + ' onclick="toggleRow(' + row.id + ',this)"></td>' +
+          '<td>' + row.id + '</td>' +
+          '<td><div class="prod"><img src="' + prodImg(row.img) + '" alt=""><div><div class="pname">' + row.name + '</div><div class="ptype">商品类型:' + row.ptype + '</div></div></div></td>' +
+          '<td>' + row.audit + '</td>' +
+          '<td><div class="cell2">' + row.brand + '</div><div class="cell2">' + row.category + '</div></td>' +
+          '<td>' + row.kb + '</td>' +
+          '<td>' + row.optype + '</td>' +
+          '<td>' + row.status + '</td>' +
+          '<td>' + numCell(row.stock) + '</td>' +
+          '<td>' + row.shop + '</td>' +
+          '<td>' + row.shopType + '</td>' +
+          '<td>' + numCell(row.sort) + '</td>' +
+          '<td><span class="sw' + (row.rec ? ' on' : '') + '" onclick="toggleRec(' + row.id + ',this)"></span></td>' +
+          '<td>' + row.price + '</td>' +
+          '<td>' + (row.saleStart ? row.saleStart + '<br>' + row.saleEnd : '-<br>-') + '</td>' +
+          '<td class="c-op">' + opsHtml(row) + '</td>';
+        body.appendChild(tr);
+      });
+      document.getElementById('totalCount').textContent = '共 ' + (data.length === products.length ? 347 : data.length) + ' 条';
+      syncSel();
+    }
+    function findProduct(id) {
+      for (var i = 0; i < products.length; i++) { if (products[i].id === id) { return products[i]; } }
+      return null;
+    }
+    function toggleRow(id, el) {
+      if (el.checked) { selected[id] = 1; } else { delete selected[id]; }
+      syncSel();
+    }
+    function toggleAll(el) {
+      products.forEach(function (r) { if (el.checked) { selected[r.id] = 1; } else { delete selected[r.id]; } });
+      renderList(products);
+    }
+    function clearSelection() { selected = {}; renderList(products); }
+    function syncSel() {
+      var n = Object.keys(selected).length;
+      document.getElementById('selCount').textContent = n;
+      document.getElementById('chkAll').checked = n > 0 && n === products.length;
+    }
+    function toggleRec(id, el) {
+      var p = findProduct(id);
+      if (!p) { return; }
+      p.rec = !p.rec;
+      el.classList.toggle('on', p.rec);
+      toast(p.rec ? '已设为推荐' : '已取消推荐');
+    }
+    function toggleStatus(id) {
+      var p = findProduct(id);
+      if (!p) { return; }
+      p.status = p.status === '已上架' ? '未上架' : '已上架';
+      renderList(products);
+      toast(p.status === '已上架' ? '已上架' : '已下架');
+    }
+    function askDelete(id) {
+      var p = findProduct(id);
+      if (!p) { return; }
+      confirmAction(
+        '确认删除该商品？',
+        '商品名：<em>' + p.name + '</em>（编号 ' + p.id + '）<br>删除后不可恢复，该商品将从列表中移除。',
+        function () {
+          products = products.filter(function (r) { return r.id !== id; });
+          delete selected[id];
+          renderList(products);
+          toast('已删除');
+        }
+      );
+    }
+    function batchDelete() {
+      var ids = Object.keys(selected);
+      if (!ids.length) { toast('请先勾选要删除的商品'); return; }
+      confirmAction(
+        '确认批量删除？',
+        '已选择 <em>' + ids.length + '</em> 个商品，删除后不可恢复。',
+        function () {
+          products = products.filter(function (r) { return !selected[r.id]; });
+          selected = {};
+          renderList(products);
+          toast('已批量删除 ' + ids.length + ' 个商品');
+        }
+      );
+    }
+    function switchTab(el) {
+      var tabs = document.querySelectorAll('.ltab');
+      for (var i = 0; i < tabs.length; i++) { tabs[i].classList.remove('active'); }
+      el.classList.add('active');
+      var t = el.getAttribute('data-tab');
+      var list = products.slice();
+      if (t === 'on') { list = list.filter(function (r) { return r.status === '已上架'; }); }
+      if (t === 'off') { list = list.filter(function (r) { return r.status === '未上架'; }); }
+      renderList(list);
+    }
+    function searchList() {
+      var name = document.getElementById('qName').value.trim();
+      var shop = document.getElementById('qShop').value.trim();
+      var st = document.getElementById('qShopType').value;
+      var kb = document.getElementById('qKb').value;
+      var op = document.getElementById('qOptype').value;
+      var list = products.slice();
+      if (name) { list = list.filter(function (r) { return r.name.indexOf(name) > -1; }); }
+      if (shop) { list = list.filter(function (r) { return r.shop.indexOf(shop) > -1; }); }
+      if (st) { list = list.filter(function (r) { return r.shopType === st; }); }
+      if (kb !== '') { list = list.filter(function (r) { return r.kb === (kb === '1' ? '是' : '否'); }); }
+      if (op) { list = list.filter(function (r) { return r.optype === op; }); }
+      renderList(list);
+      toast('查询完成，共 ' + list.length + ' 条');
+    }
+    function resetSearch() {
+      document.getElementById('qName').value = '';
+      document.getElementById('qShop').value = '';
+      document.getElementById('qShopType').selectedIndex = 0;
+      document.getElementById('qPtype').selectedIndex = 0;
+      document.getElementById('qKb').selectedIndex = 0;
+      document.getElementById('qOptype').selectedIndex = 0;
+      renderList(products);
+    }
+
+    /* ============================================================
+       详情页（新增 / 编辑 / 查看）
+       ============================================================ */
+    function setRadio(name, val) {
+      var list = document.getElementsByName(name);
+      for (var i = 0; i < list.length; i++) { list[i].checked = (list[i].value === val); }
+    }
+    function getRadio(name) {
+      var list = document.getElementsByName(name);
+      for (var i = 0; i < list.length; i++) { if (list[i].checked) { return list[i].value; } }
+      return '';
+    }
+    function setVal(id, v) { var el = document.getElementById(id); if (el) { el.value = v == null ? '' : v; } }
+
+    function openDetail(mode, id) {
+      curMode = mode; curId = id || null;
+      var p = (mode === 'add') ? null : findProduct(id);
+      /* 标题 */
+      var t = mode === 'add' ? '新增商品' : (mode === 'edit' ? '编辑商品' : '查看商品');
+      document.getElementById('tabDetailTxt').textContent = t;
+      /* 只读态 */
+      document.getElementById('detailForm').classList.toggle('ro', mode === 'view');
+      document.getElementById('btnSave').style.display = (mode === 'view') ? 'none' : '';
+      var cancel = document.querySelector('.foot .btn-default');
+      cancel.textContent = (mode === 'view') ? '返回' : '取消';
+      /* 回填 */
+      if (p) {
+        document.getElementById('dCategory').selectedIndex = 0;
+        document.getElementById('dBrand').selectedIndex = 0;
+        setVal('dName', p.name); cntSync(document.getElementById('dName'), 'dNameCnt');
+        document.getElementById('dShop').value = p.shop;
+        setRadio('dPtype', p.ptype);
+        setRadio('dOptype', p.optype);
+        setRadio('dCoupon', '否');
+        setVal('dSaleStart', p.saleStart ? p.saleStart.slice(0, 10) : '');
+        setVal('dSaleEnd', p.saleEnd ? p.saleEnd.slice(0, 10) : '');
+        setVal('dNo', ''); cntSync(document.getElementById('dNo'), 'dNoCnt');
+        setVal('dMinBuy', 1); setVal('dMaxBuy', 0); setVal('dSort', p.sort);
+        setVal('dMarketPrice', ''); setVal('dSalePrice', p.price); setVal('dPoints', '');
+        setVal('dPvi', ''); setVal('dSupplyPrice', ''); setVal('dStock', p.stock);
+        document.getElementById('dSeven').classList.toggle('on', true);
+        setRadio('dPresale', '非预售');
+        setVal('dCardDays', p.cardDays == null ? '' : p.cardDays);
+        setVal('dDailyLimit', p.dailyLimit == null ? '' : p.dailyLimit);
+        setVal('dMonthLimit', p.monthLimit == null ? '' : p.monthLimit);
+        setVal('dTotalWater', p.totalWater == null ? '' : p.totalWater);
+      } else {
+        document.getElementById('dCategory').selectedIndex = 0;
+        document.getElementById('dBrand').selectedIndex = 0;
+        setVal('dName', ''); cntSync(document.getElementById('dName'), 'dNameCnt');
+        document.getElementById('dShop').selectedIndex = 0;
+        setRadio('dPtype', '实体商品');
+        setRadio('dOptype', '团购');
+        setRadio('dCoupon', '否');
+        setVal('dSaleStart', ''); setVal('dSaleEnd', '');
+        setVal('dNo', ''); cntSync(document.getElementById('dNo'), 'dNoCnt');
+        setVal('dMinBuy', 1); setVal('dMaxBuy', 0); setVal('dSort', 0);
+        setVal('dMarketPrice', ''); setVal('dSalePrice', ''); setVal('dPoints', '');
+        setVal('dPvi', ''); setVal('dSupplyPrice', ''); setVal('dStock', '');
+        document.getElementById('dSeven').classList.add('on');
+        setRadio('dPresale', '非预售');
+        setVal('dCardDays', ''); setVal('dDailyLimit', ''); setVal('dMonthLimit', ''); setVal('dTotalWater', '');
+      }
+      syncWaterCards();
+      go('detail');
+    }
+    function saveDetail() {
+      var name = document.getElementById('dName').value.trim();
+      if (!name) { toast('请输入商品名'); return; }
+      toast(curMode === 'add' ? '已保存，商品创建成功' : '已保存');
+      go('list');
+    }
+
+    renderList(products);
+    /* 商品类型切换时联动水卡模块显隐 */
+    (function () {
+      var radios = document.querySelectorAll('input[name="dPtype"]');
+      for (var i = 0; i < radios.length; i++) { radios[i].addEventListener('change', syncWaterCards); }
+    })();
+    syncWaterCards();
+  </script>
+</body>
+</html>
