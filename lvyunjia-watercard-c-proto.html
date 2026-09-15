@@ -227,6 +227,109 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
 .od-info .r{display:flex;justify-content:space-between;padding:6px 0;font-size:12.5px;color:var(--c-text-2)}
 .od-info .r .v{color:var(--c-text)}
 .od-foot{padding:0 12px 24px}
+
+/* ===== 我的（p_me，按截图 1:1） ===== */
+.me-top{background:linear-gradient(180deg,#D7F1E3 0%,#EDF9F3 55%,#FFFFFF 100%);padding:8px 14px 0}
+.me-pill{width:40px;height:26px;border-radius:13px;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;color:var(--c-text);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.me-user{display:flex;align-items:center;gap:12px;padding:14px 0 20px;cursor:pointer}
+.me-user .qr{width:58px;height:58px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0;box-shadow:0 1px 5px rgba(0,0,0,.07)}
+.me-user .info{flex:1;min-width:0}
+.me-user .nm{font-size:17px;font-weight:700;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.me-user .lv{display:inline-flex;align-items:center;gap:4px;margin-top:7px;background:linear-gradient(90deg,#8B6CF6,#A98BFF);color:#fff;font-size:10.5px;padding:2px 9px;border-radius:9px;font-weight:600}
+.me-user .acc{font-size:11.5px;color:#8A8F99;margin-top:8px;display:flex;align-items:center;gap:6px}
+.me-user .acc .cp{color:#B9C0CB;font-size:12px;cursor:pointer}
+.me-user .arr{color:#C8C8C8;font-size:18px;flex-shrink:0}
+.me-body{background:#fff;padding-bottom:4px}
+.me-card{background:#fff;margin:0 12px 10px;border-radius:12px;padding:14px;box-shadow:0 1px 5px rgba(0,0,0,.035)}
+.me-card .hd{display:flex;align-items:center;justify-content:space-between}
+.me-card .hd .ttl{font-size:15.5px;font-weight:700;color:#1a1a1a}
+.me-card .hd .more{font-size:12.5px;color:#9AA0AA;cursor:pointer}
+.me-ord{display:flex;margin-top:16px}
+.me-ord .item{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer}
+.me-ord .item .ic{font-size:24px;line-height:1;position:relative}
+.me-ord .item .badge{position:absolute;top:-5px;right:-12px;min-width:15px;height:15px;border-radius:8px;background:var(--c-red-2);color:#fff;font-size:10px;line-height:15px;text-align:center;padding:0 4px;font-weight:600}
+.me-ord .item .lbl{font-size:11px;color:#5A6270;white-space:nowrap}
+.me-invite{display:flex;align-items:center;gap:10px;background:#fff;margin:0 12px 10px;border-radius:12px;padding:14px;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,.035)}
+.me-invite .info{flex:1;min-width:0}
+.me-invite .t{font-size:14.5px;font-weight:700;color:#1a1a1a}
+.me-invite .t em{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--c-primary);margin-left:5px;vertical-align:middle;font-style:normal}
+.me-invite .s{font-size:11.5px;color:#9AA0AA;margin-top:7px}
+.me-invite .gift{font-size:34px;line-height:1}
+.me-svc .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:18px 2px;margin-top:16px}
+.me-svc .item{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer}
+.me-svc .item .ic{font-size:22px;line-height:1}
+.me-svc .item .lbl{font-size:10.5px;color:#5A6270;white-space:nowrap;letter-spacing:-.4px}
+.me-recommend{padding:8px 12px 20px}
+
+/* ===== 猜你喜欢（我的页 / 订单详情共用） ===== */
+.rec-hd{font-size:14.5px;font-weight:700;color:#1a1a1a;padding:14px 2px 10px}
+.rec-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.rec-card{background:#fff;border-radius:10px;overflow:hidden;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,.035)}
+.rec-card .ri{height:118px;position:relative;display:flex;align-items:center;justify-content:center;font-size:46px;background:linear-gradient(135deg,#E8F6EE,#D2EEDF)}
+.rec-card .ri.k1{background:linear-gradient(135deg,#E8F6EE,#D2EEDF)}
+.rec-card .ri.k2{background:linear-gradient(135deg,#FFF3E6,#FFE3C9)}
+.rec-card .ri.k3{background:linear-gradient(135deg,#EAF1FF,#D9E6FF)}
+.rec-card .ri.k4{background:linear-gradient(135deg,#F2EDFF,#E4DBFF)}
+.rec-card .ri.k5{background:linear-gradient(135deg,#EAF8FB,#D6EFF6)}
+.rec-card .ri.k6{background:linear-gradient(135deg,#FFF0F2,#FFDDE3)}
+.rec-card .rn{font-size:12px;color:#1a1a1a;padding:8px 8px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec-card .rp{padding:0 8px 10px;font-size:14px;font-weight:800;color:var(--c-red-2)}
+
+/* ===== 我的订单列表（p_orders） ===== */
+.ord-top{background:linear-gradient(90deg,#5BC48D,#3EAE73);display:flex;align-items:center;gap:10px;padding:9px 12px;position:sticky;top:0;z-index:5}
+.ord-top .back{color:#fff;font-size:23px;line-height:1;cursor:pointer;padding:0 4px 0 0}
+.ord-top .sb{flex:1;height:32px;background:#fff;border-radius:16px;display:flex;align-items:center;gap:6px;padding:0 12px;overflow:hidden}
+.ord-top .sb input{flex:1;border:none;outline:none;background:transparent;font-size:12.5px;color:var(--c-text);font-family:inherit;min-width:0}
+.ord-top .sb input::placeholder{color:#B0B6BF}
+.ord-tabs{display:flex;background:#fff;overflow-x:auto;border-bottom:1px solid var(--c-line);position:sticky;top:50px;z-index:4}
+.ord-tabs::-webkit-scrollbar{display:none}
+.ord-tabs .ot{flex-shrink:0;padding:12px 13px 11px;font-size:13px;color:#5A6270;cursor:pointer;position:relative;white-space:nowrap}
+.ord-tabs .ot.on{color:var(--c-primary);font-weight:700}
+.ord-tabs .ot.on::after{content:"";position:absolute;left:50%;margin-left:-9px;bottom:5px;width:18px;height:2.5px;border-radius:2px;background:var(--c-primary)}
+.ord-list{background:#F4F5F7;padding:8px 0 24px;min-height:430px}
+.ord-card{background:#fff;margin:0 8px 9px;border-radius:10px;padding:13px 12px;cursor:pointer}
+.ord-card:active{background:#FCFCFD}
+.oc-hd{display:flex;align-items:center;justify-content:space-between;padding-bottom:11px}
+.oc-hd .no{font-size:12.5px;color:#3A4049}
+.oc-hd .st{font-size:12.5px;color:#9AA0AA}
+.oc-hd .st.warn{color:var(--c-orange)}
+.oc-goods{display:flex;gap:10px}
+.oc-goods .thumb{position:relative;width:66px;height:66px;border-radius:7px;background:linear-gradient(135deg,#DFF3E8,#C9EBD8);display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0;overflow:hidden}
+.oc-goods .thumb .pt{position:absolute;left:0;top:0;background:#1AAD7C;color:#fff;font-size:9.5px;line-height:1.6;padding:0 5px;border-radius:7px 0 7px 0}
+.oc-goods .info{flex:1;min-width:0}
+.oc-goods .info .n{font-size:13.5px;color:#1a1a1a;font-weight:600;line-height:1.4}
+.oc-goods .info .d{font-size:11px;color:#9AA0AA;margin-top:5px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.oc-goods .info .p{font-size:14px;font-weight:700;color:#1a1a1a;margin-top:6px}
+.oc-goods .qty{font-size:12.5px;color:#9AA0AA;align-self:flex-start;padding-top:2px}
+.oc-pay{font-size:11.5px;color:#9AA0AA;padding-top:12px}
+.oc-ft{display:flex;align-items:center;justify-content:flex-end;padding-top:6px}
+.oc-ft .sum{font-size:12px;color:#3A4049}
+.oc-ft .sum b{color:var(--c-red-2);font-size:14px;font-weight:700}
+.oc-acts{display:flex;justify-content:flex-end;gap:8px;padding-top:9px}
+.oc-acts button{height:29px;padding:0 14px;border-radius:15px;border:1px solid var(--c-primary);background:#fff;color:var(--c-primary);font-size:12.5px;cursor:pointer;font-family:inherit}
+.ord-empty{text-align:center;color:#A9AFB8;font-size:13px;padding:80px 0}
+.ord-empty .ic{font-size:44px;margin-bottom:14px;opacity:.45}
+
+/* ===== 已完成订单详情（p_order_detail，按截图 1:1） ===== */
+.od-tip{background:#F4F5F7;color:#8A9099;font-size:11.5px;padding:10px 14px;line-height:1.5}
+.od2-card{background:#fff;margin:10px 12px 0;border-radius:10px;padding:14px}
+.od2-goods{display:flex;gap:10px;padding-bottom:12px}
+.od2-goods .thumb{width:66px;height:66px;border-radius:7px;background:linear-gradient(135deg,#DFF3E8,#C9EBD8);display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0}
+.od2-goods .info{flex:1;min-width:0}
+.od2-goods .info .n{font-size:13.5px;font-weight:600;color:#1a1a1a;display:flex;align-items:center;gap:6px;line-height:1.4}
+.od2-goods .info .n i{font-style:normal;background:var(--c-self);color:#7A4B00;font-size:10px;padding:1px 5px;border-radius:3px;font-weight:600;flex-shrink:0}
+.od2-goods .info .chip{display:inline-block;border:1px solid var(--c-line);color:#7A828E;font-size:10.5px;padding:1px 7px;border-radius:3px;margin-top:7px}
+.od2-goods .info .p{font-size:14px;font-weight:700;color:#1a1a1a;margin-top:8px}
+.od2-goods .qty{font-size:12.5px;color:#9AA0AA;align-self:flex-end}
+.od2-card .r{display:flex;align-items:center;justify-content:space-between;padding:8px 0;font-size:12.5px;color:#5A6270;border-top:1px solid var(--c-line)}
+.od2-card .r .v{color:#1a1a1a}
+.od2-card .r .v.red{color:var(--c-red-2);font-weight:700}
+.od2-card .r .v .cp{font-style:normal;color:var(--c-primary);margin-left:8px;cursor:pointer}
+.od-remark2{background:#fff;margin:10px 12px 0;border-radius:10px;padding:14px}
+.od-remark2 .t{font-size:13px;color:#3A4049;font-weight:600}
+.od-remark2 .c{font-size:12.5px;color:#9AA0AA;margin-top:9px}
+.od-acts{display:flex;justify-content:flex-end;gap:9px;padding:6px 12px 26px}
+.od-acts button{height:34px;padding:0 20px;border-radius:17px;border:1px solid var(--c-primary);background:#fff;color:var(--c-primary);font-size:13.5px;cursor:pointer;font-family:inherit}
 </style>
 </head>
 <body>
@@ -260,10 +363,10 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
     <div class="goods" id="goodsGrid"></div>
     <div class="mall-top" onclick="backTop()">↑</div>
     <div class="tabbar">
-      <div class="t on"><div class="ic">🏠</div>首页</div>
-      <div class="t"><div class="ic">📊</div>数客</div>
-      <div class="t"><div class="ic">💬</div>消息</div>
-      <div class="t"><div class="ic">👤</div>我的</div>
+      <div class="t on" onclick="go('p_mall')"><div class="ic">🏠</div>首页</div>
+      <div class="t" onclick="toast('数智助手，敬请期待')"><div class="ic">📊</div>数智</div>
+      <div class="t" onclick="toast('消息中心，敬请期待')"><div class="ic">💬</div>消息</div>
+      <div class="t" onclick="go('p_me')"><div class="ic">👤</div>我的</div>
     </div>
   </div>
 
@@ -406,44 +509,122 @@ html,body{margin:0;padding:0;background:#dadde0;font-family:-apple-system,"PingF
       <div class="r"><span>支付方式</span><span class="v" id="okPay">储值支付</span></div>
     </div>
     <div class="ok-actions">
-      <button class="btn-primary" onclick="goOrderDetail()">查看我的订单</button>
+      <button class="btn-primary" onclick="goOrders('all')">查看我的订单</button>
       <button class="btn-outline-grey" onclick="go('p_mall')">返回首页</button>
     </div>
   </div>
 
-  <!-- ===================== 6. 订单详情 ===================== -->
-  <div class="page" id="p_order_detail" data-title="订单详情" style="background:var(--c-bg)">
-    <div class="nav"><div class="back" onclick="go('p_success')">‹</div>订单详情</div>
-    <div class="od-hero">
-      <div class="s">订单状态</div>
-      <div class="t">已完成</div>
-    </div>
-    <div class="od-card">
-      <div class="od-goods">
-        <div class="thumb">💳</div>
+  <!-- ===================== 6. 我的 ===================== -->
+  <div class="page" id="p_me" data-title="我的" style="background:var(--c-bg)">
+    <div class="me-top">
+      <div class="me-pill" onclick="go('p_mall')">‹</div>
+      <div class="me-user" onclick="toast('个人资料')">
+        <div class="qr">🔳</div>
         <div class="info">
-          <div class="n" id="odName">惠民补贴水卡套餐包1</div>
-          <div class="d" id="odSpec">水卡 ¥2000 面额 + 5L 水袋×7（自提）</div>
-          <div class="p" id="odPrice">¥1578.00 <s style="font-size:11px;color:#999;font-weight:400">¥3300</s></div>
+          <div class="nm">有幸12123</div>
+          <div class="lv">🦋 潜力达人</div>
+          <div class="acc">账号：18307448442 <span class="cp" onclick="event.stopPropagation();copyAccount()">⧉</span></div>
         </div>
-        <div style="font-size:12.5px;color:var(--c-text-3);align-self:flex-end" id="odQty">x1</div>
+        <div class="arr">›</div>
       </div>
-      <div class="r" style="padding-top:12px"><span>商品总价</span><span class="v" id="odGoodsTotal">¥1578</span></div>
-      <div class="r"><span>运费</span><span class="v">¥0</span></div>
-      <div class="r"><span>专享优惠</span><span class="v" id="odDiscount" style="color:var(--c-red-2)">- ¥360</span></div>
-      <div class="r"><span>余额抵扣</span><span class="v" id="odBal" style="color:var(--c-red-2)">- ¥0</span></div>
-      <div class="r"><span>实付金额</span><span class="v" id="odPaid" style="color:var(--c-red-2);font-weight:700">¥1218.00</span></div>
     </div>
-    <div class="od-ttl">订单信息</div>
-    <div class="od-info">
-      <div class="r"><span>订单编号</span><span class="v mono" id="odOrderNo">-</span></div>
-      <div class="r"><span>商品类型</span><span class="v">虚拟商品 · 无需发货</span></div>
-      <div class="r"><span>支付方式</span><span class="v" id="odPayMethod">储值支付</span></div>
+    <div class="me-body">
+      <div class="me-card">
+        <div class="hd"><span class="ttl">我的订单</span><span class="more" onclick="goOrders('all')">全部订单 ›</span></div>
+        <div class="me-ord">
+          <div class="item" onclick="goOrders('pending')"><div class="ic">🛍️</div><div class="lbl">待支付</div></div>
+          <div class="item" onclick="goOrders('toship')"><div class="ic">🚚<div class="badge">4</div></div><div class="lbl">待发货/核销</div></div>
+          <div class="item" onclick="goOrders('receiving')"><div class="ic">📦</div><div class="lbl">待收货</div></div>
+          <div class="item" onclick="goOrders('waitcomment')"><div class="ic">💬<div class="badge">2</div></div><div class="lbl">待评价</div></div>
+          <div class="item" onclick="goOrders('refund')"><div class="ic">↩️</div><div class="lbl">退货/售后</div></div>
+        </div>
+      </div>
+
+      <div class="me-invite" onclick="toast('邀请好友福利')">
+        <div class="info">
+          <div class="t">邀请好友·福利多多<em></em></div>
+          <div class="s">超多福利，等你来领取！</div>
+        </div>
+        <div class="gift">🎁</div>
+      </div>
+
+      <div class="me-card me-svc">
+        <div class="hd"><span class="ttl">我的服务</span></div>
+        <div class="grid">
+          <div class="item" onclick="toast('数商服务')"><div class="ic">🏪</div><div class="lbl">数商服务</div></div>
+          <div class="item" onclick="toast('水机管理')"><div class="ic">💧</div><div class="lbl">水机管理</div></div>
+          <div class="item" onclick="toast('我的权益')"><div class="ic">🛡️</div><div class="lbl">我的权益</div></div>
+          <div class="item" onclick="toast('我的邀请码')"><div class="ic">🎟️</div><div class="lbl">我的邀请码</div></div>
+          <div class="item" onclick="toast('优惠券')"><div class="ic">🎫</div><div class="lbl">优惠券</div></div>
+          <div class="item" onclick="toast('我的积分')"><div class="ic">⭐</div><div class="lbl">我的积分</div></div>
+          <div class="item" onclick="toast('收货地址')"><div class="ic">📍</div><div class="lbl">收货地址</div></div>
+          <div class="item" onclick="toast('我的收藏')"><div class="ic">🔖</div><div class="lbl">我的收藏</div></div>
+          <div class="item" onclick="toast('正在为您接入客服...')"><div class="ic">🎧</div><div class="lbl">联系客服</div></div>
+          <div class="item" onclick="toast('订单核销')"><div class="ic">📷</div><div class="lbl">订单核销</div></div>
+          <div class="item" onclick="toast('意见反馈')"><div class="ic">✉️</div><div class="lbl">意见反馈</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="me-recommend" id="meRec"></div>
+
+    <div style="height:70px"></div>
+    <div class="tabbar">
+      <div class="t" onclick="go('p_mall')"><div class="ic">🏠</div>首页</div>
+      <div class="t" onclick="toast('数智助手，敬请期待')"><div class="ic">📊</div>数智</div>
+      <div class="t" onclick="toast('消息中心，敬请期待')"><div class="ic">💬</div>消息</div>
+      <div class="t on"><div class="ic">👤</div>我的</div>
+    </div>
+  </div>
+
+  <!-- ===================== 7. 我的订单列表 ===================== -->
+  <div class="page" id="p_orders" data-title="我的订单" style="background:#F4F5F7">
+    <div class="ord-top">
+      <div class="back" onclick="go('p_me')">‹</div>
+      <div class="sb">🔍<input type="text" id="ordSearch" placeholder="搜索商品名称/订单号" oninput="onOrderSearch(this.value)"></div>
+    </div>
+    <div class="ord-tabs" id="ordTabs">
+      <div class="ot on" data-tab="all" onclick="switchOrderTab('all')">全部</div>
+      <div class="ot" data-tab="waitpay" onclick="switchOrderTab('waitpay')">代付订单</div>
+      <div class="ot" data-tab="pending" onclick="switchOrderTab('pending')">待付款</div>
+      <div class="ot" data-tab="toship" onclick="switchOrderTab('toship')">待发货/待核销</div>
+      <div class="ot" data-tab="receiving" onclick="switchOrderTab('receiving')">待收货</div>
+      <div class="ot" data-tab="done" onclick="switchOrderTab('done')">已完成</div>
+    </div>
+    <div class="ord-list" id="ordList"></div>
+  </div>
+
+  <!-- ===================== 8. 已完成订单详情 ===================== -->
+  <div class="page" id="p_order_detail" data-title="订单详情" style="background:#F4F5F7">
+    <div class="nav"><div class="back" onclick="backToOrders()">‹</div><span id="odNavTitle">已完成</span></div>
+    <div class="od-tip">虚拟商品无需收货地址，水卡权益已存入「我的水卡」</div>
+
+    <div class="od2-card">
+      <div class="od2-goods">
+        <div class="thumb" id="odThumb">💳</div>
+        <div class="info">
+          <div class="n"><i>自营</i><span id="odName">惠民补贴水卡套餐包1</span></div>
+          <div class="chip" id="odChip">水卡×1</div>
+          <div class="p" id="odPrice">¥1578.00</div>
+        </div>
+        <div class="qty" id="odQty">x1</div>
+      </div>
+      <div class="r"><span>商品总额(含运费)</span><span class="v red" id="odGoodsTotal">¥1578.00</span></div>
+      <div class="r"><span>实付款</span><span class="v red" id="odPaid">¥1218.00</span></div>
+      <div class="r"><span>订单编号</span><span class="v"><span id="odOrderNo">-</span><em class="cp" onclick="copyOrderNo()">复制</em></span></div>
       <div class="r"><span>下单时间</span><span class="v" id="odTime">-</span></div>
-      <div class="r"><span>订单备注</span><span class="v" id="odRemark">无</span></div>
     </div>
-    <div class="od-foot">
-      <button class="btn-outline-grey" onclick="toast('正在为您接入客服...')">联系客服</button>
+
+    <div class="od-remark2">
+      <div class="t">订单备注</div>
+      <div class="c" id="odRemark">暂无</div>
+    </div>
+
+    <div class="me-recommend" id="odRec"></div>
+
+    <div class="od-acts">
+      <button onclick="orderAction('评价')">评价</button>
+      <button onclick="orderAction('晒单')">晒单</button>
     </div>
   </div>
 
@@ -708,28 +889,34 @@ function doPay(){
   state.orderNo = genOrderNo();
   state.payText = state.pay === 'stored' ? '储值支付' : (state.pay === 'bank' ? '银行卡支付' : '找朋友支付');
   var d = new Date();
-  var timeTxt = d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+  var timeTxt = d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
   state.payTime = timeTxt;
+  var rk = $('cfRemark');
+  var remark = (rk && rk.value.trim()) ? rk.value.trim() : '';
+
+  /* 下单即入库：订单列表 / 已完成订单详情与本单同源，金额一致 */
+  var order = {
+    no: state.orderNo,
+    st: 'done',
+    name: state.goods.name,
+    spec: SPECS[state.spec],
+    chip: '水卡×' + state.qty,
+    price: state.goods.price,
+    qty: state.qty,
+    paid: r.payable,
+    thumb: state.goods.icon,
+    payMethod: state.payText,
+    payTime: timeTxt,
+    remark: remark
+  };
+  ORDERS.unshift(order);
+  state.lastOrder = order;
 
   $('okOrderNo').textContent = state.orderNo;
   $('okGoods').textContent = state.goods.name;
   $('okQty').textContent = state.qty + ' 张';
   $('okPaid').textContent = money(r.payable);
   $('okPay').textContent = state.payText;
-
-  $('odName').textContent = state.goods.name;
-  $('odSpec').textContent = SPECS[state.spec];
-  $('odQty').textContent = 'x' + state.qty;
-  $('odPrice').innerHTML = money(state.goods.price) + ' <s style="font-size:11px;color:#999;font-weight:400">' + money(state.goods.old) + '</s>';
-  $('odGoodsTotal').textContent = moneyShort(r.goodsTotal);
-  $('odDiscount').textContent = '- ' + moneyShort(r.discount);
-  $('odBal').textContent = '- ' + moneyShort(r.balUsed);
-  $('odPaid').textContent = money(r.payable);
-  $('odOrderNo').textContent = state.orderNo;
-  $('odPayMethod').textContent = state.payText;
-  $('odTime').textContent = timeTxt;
-  var rk = $('cfRemark');
-  $('odRemark').textContent = (rk && rk.value.trim()) ? rk.value.trim() : '无';
 
   if(cdTimer){ clearInterval(cdTimer); cdTimer = null; }
   go('p_success');
@@ -741,22 +928,187 @@ function genOrderNo(){
   var rnd = Math.floor(Math.random() * 9000) + 1000;
   return 'LYJ' + s + rnd;
 }
-function goOrderDetail(){ go('p_order_detail'); }
+/* ================= 订单数据（占位，待真实数据替换） ================= */
+var ORDER_STATUS = {
+  done:      { label: '已完成',     cls: '' },
+  cancelled: { label: '已取消',     cls: '' },
+  pending:   { label: '待付款',     cls: 'warn' },
+  toship:    { label: '待发货/核销', cls: 'warn' },
+  receiving: { label: '待收货',     cls: 'warn' },
+  waitpay:   { label: '代付订单',   cls: 'warn' }
+};
+var TAB_LABEL = {
+  all: '', waitpay: '代付订单 · ', pending: '待付款 · ', toship: '待发货/待核销 · ',
+  receiving: '待收货 · ', done: '已完成 · ', waitcomment: '待评价 · ', refund: '退货/售后 · '
+};
+var WC_SPEC = '水卡 ¥2000 面额 + 5L 水袋×7（自提）';
+var WC3_SPEC = '水卡 ¥3000 面额 + 5L 水袋×10（自提）';
+var ORDERS = [
+  { no:'606006', st:'cancelled', name:'惠民补贴水卡套餐包1', spec:WC_SPEC,  price:1578, qty:1, paid:1217.60, thumb:'💳' },
+  { no:'606005', st:'cancelled', name:'惠民补贴水卡套餐包1', spec:WC_SPEC,  price:1578, qty:1, paid:1217.61, thumb:'💳' },
+  { no:'606003', st:'cancelled', name:'惠民补贴水卡套餐包3', spec:WC3_SPEC, price:1518, qty:1, paid:1157.93, thumb:'💳' },
+  { no:'605944', st:'done', name:'惠民补贴水卡套餐包1', spec:WC_SPEC,  price:1578, qty:1, paid:1218.00, thumb:'💳', payTime:'2026-09-09 00:24:08' },
+  { no:'605943', st:'done', name:'惠民补贴水卡套餐包1', spec:WC_SPEC,  price:1578, qty:1, paid:1217.43, thumb:'💳', payTime:'2026-09-09 00:20:49' },
+  { no:'605942', st:'done', name:'惠民补贴水卡套餐包1', spec:WC_SPEC,  price:1578, qty:1, paid:1217.51, thumb:'💳', payTime:'2026-09-09 00:19:48' },
+  { no:'605941', st:'done', name:'惠民补贴水卡套餐包3', spec:WC3_SPEC, price:1518, qty:1, paid:1157.93, thumb:'💳', payTime:'2026-09-09 00:18:31' }
+];
+var ordTab = 'all';
+var ordKw = '';
+var odCurrentNo = '';
+
+/* ================= 我的订单列表 ================= */
+function findOrder(no){
+  for(var i=0;i<ORDERS.length;i++){ if(ORDERS[i].no === no){ return ORDERS[i]; } }
+  return null;
+}
+function goOrders(tab){
+  ordTab = tab || 'all';
+  ordKw = '';
+  var si = $('ordSearch');
+  if(si){ si.value = ''; }
+  markTab(ordTab);
+  go('p_orders');
+  renderOrders();
+}
+function switchOrderTab(k){
+  ordTab = k;
+  markTab(k);
+  renderOrders();
+}
+function markTab(k){
+  var els = document.querySelectorAll('#ordTabs .ot');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getAttribute('data-tab') === k){ els[i].classList.add('on'); }
+    else { els[i].classList.remove('on'); }
+  }
+}
+function onOrderSearch(v){
+  ordKw = (v || '').trim();
+  renderOrders();
+}
+function renderOrders(){
+  var box = $('ordList');
+  if(!box){ return; }
+  var list = [];
+  for(var i=0;i<ORDERS.length;i++){
+    var o = ORDERS[i];
+    if(ordTab !== 'all' && o.st !== ordTab){ continue; }
+    if(ordKw){
+      var kw = ordKw.toLowerCase();
+      if(o.no.indexOf(ordKw) < 0 && o.name.toLowerCase().indexOf(kw) < 0){ continue; }
+    }
+    list.push(o);
+  }
+  if(!list.length){
+    box.innerHTML = '<div class="ord-empty"><div class="ic">📭</div>'
+                  + (TAB_LABEL[ordTab] || '') + '暂无订单</div>';
+    return;
+  }
+  var html = '';
+  for(var j=0;j<list.length;j++){ html += orderCardHtml(list[j]); }
+  box.innerHTML = html;
+}
+function orderCardHtml(o){
+  var st = ORDER_STATUS[o.st] || { label: '', cls: '' };
+  var h = '<div class="ord-card" onclick="tapOrderCard(\'' + o.no + '\')">'
+        +   '<div class="oc-hd"><span class="no">订单号：' + o.no + '</span>'
+        +     '<span class="st ' + st.cls + '">' + st.label + '</span></div>'
+        +   '<div class="oc-goods">'
+        +     '<div class="thumb"><span>' + (o.thumb || '💳') + '</span>'
+        +       '<span class="pt">' + moneyShort(o.price) + '</span></div>'
+        +     '<div class="info">'
+        +       '<div class="n">' + o.name + '</div>'
+        +       '<div class="d">' + o.spec + '</div>'
+        +       '<div class="p">' + money(o.price) + '</div>'
+        +     '</div>'
+        +     '<div class="qty">x' + o.qty + '</div>'
+        +   '</div>'
+        +   (o.payTime ? '<div class="oc-pay">支付时间：' + o.payTime + '</div>' : '')
+        +   '<div class="oc-ft"><div class="sum">共' + o.qty + '件，实付款：<b>' + money(o.paid) + '</b></div></div>'
+        +   '<div class="oc-acts">'
+        +     '<button onclick="event.stopPropagation();toast(\'正在为您接入客服...\')">联系客服</button>'
+        +     (o.st === 'done' ? '<button onclick="event.stopPropagation();orderAction(\'评价\')">评价</button>' : '')
+        +   '</div>'
+        + '</div>';
+  return h;
+}
+function tapOrderCard(no){
+  var o = findOrder(no);
+  if(!o){ toast('订单不存在'); return; }
+  renderOrderDetail(o);
+  go('p_order_detail');
+}
+
+/* ================= 已完成订单详情 ================= */
+function renderOrderDetail(o){
+  odCurrentNo = o.no;
+  var st = ORDER_STATUS[o.st] || { label: '已完成' };
+  $('odNavTitle').textContent = st.label;
+  $('odThumb').textContent = o.thumb || '💳';
+  $('odName').textContent = o.name;
+  $('odChip').textContent = o.chip || ('水卡×' + o.qty);
+  $('odPrice').textContent = money(o.price);
+  $('odQty').textContent = 'x' + o.qty;
+  $('odGoodsTotal').textContent = money(o.price * o.qty);
+  $('odPaid').textContent = money(o.paid);
+  $('odOrderNo').textContent = o.no;
+  $('odTime').textContent = o.payTime || '—';
+  $('odRemark').textContent = o.remark || '暂无';
+  var rec = $('odRec');
+  if(rec){ rec.innerHTML = recommendHtml(); }
+}
+function backToOrders(){ go('p_orders'); }
+function orderAction(t){ toast('已进入「' + t + '」流程（演示）'); }
+function copyOrderNo(){
+  if(!odCurrentNo){ return; }
+  copyText(odCurrentNo, '订单号已复制：' + odCurrentNo);
+}
+function copyAccount(){ copyText('18307448442', '账号已复制'); }
+function copyText(text, okMsg){
+  function fb(){
+    try{
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly','');
+      ta.style.position = 'fixed'; ta.style.top = '-9999px'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    }catch(e){ return false; }
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){ toast(okMsg); })
+      .catch(function(){ toast(fb() ? okMsg : '复制失败，请长按选择复制'); });
+  } else {
+    toast(fb() ? okMsg : '复制失败，请长按选择复制');
+  }
+}
+
+/* ================= 猜你喜欢 ================= */
+function recommendHtml(){
+  var picks = [GOODS[0], GOODS[1]];
+  var h = '<div class="rec-hd">猜你喜欢</div><div class="rec-grid">';
+  for(var i=0;i<picks.length;i++){
+    var g = picks[i];
+    h += '<div class="rec-card" onclick="tapGoods(\'' + g.id + '\')">'
+      +    '<div class="ri ' + g.k + '">' + g.icon + '</div>'
+      +    '<div class="rn">' + g.name + '</div>'
+      +    '<div class="rp">' + money(g.price) + '</div>'
+      +  '</div>';
+  }
+  return h + '</div>';
+}
 
 /* ================= 初始化 ================= */
 renderGoods();
 renderSpecs();
+renderOrders();
+var meRec = $('meRec');
+if(meRec){ meRec.innerHTML = recommendHtml(); }
 var catEls = document.querySelectorAll('.cats .c');
 for(var ci=0; ci<catEls.length; ci++){
   catEls[ci].addEventListener('click', function(){
     for(var j=0;j<catEls.length;j++){ catEls[j].classList.remove('on'); }
-    this.classList.add('on');
-  });
-}
-var tabEls = document.querySelectorAll('.tabbar .t');
-for(var ti=0; ti<tabEls.length; ti++){
-  tabEls[ti].addEventListener('click', function(){
-    for(var k=0;k<tabEls.length;k++){ tabEls[k].classList.remove('on'); }
     this.classList.add('on');
   });
 }
