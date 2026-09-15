@@ -57,12 +57,12 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <body>
 <div class="wrap">
 
-<h1>绿韵家App · 新人激活码礼包 PRD <span class="sub">V3.3 · 2026-09-07 · 后台简化：B19 改为订单详情内展示邀请码状态、删除「生成途径」字段、删除独立邀请码管理页 + C 端 13 屏重截（内容裁切）</span></h1>
+<h1>绿韵家App · 新人激活码礼包 PRD <span class="sub">V3.4 · 2026-09-15 · <span style="background:#fff1f0">补齐「核销邀请码同步绑定推荐人」逻辑</span>：新增 §3.1 Flow B 步骤 11、§3.5 推荐关系绑定规则、§C13 核销后置动作、§B19 核销人字段、AC-15/AC-16</span></h1>
 
 <div class="meta-grid">
   <div class="b"><div class="k">项目名称</div><div class="v">绿韵家App · 新人激活码礼包</div></div>
   <div class="b"><div class="k">文档状态</div><div class="v">评审中（V1.0 已废，本版为新基线）</div></div>
-  <div class="b"><div class="k">版本号</div><div class="v">V3.3</div></div>
+  <div class="b"><div class="k">版本号</div><div class="v">V3.4</div></div>
   <div class="b"><div class="k">产品负责人</div><div class="v">袁中天（产品）</div></div>
   <div class="b"><div class="k">技术 Owner</div><div class="v">⚠️ 待确认 @技术组</div></div>
   <div class="b"><div class="k">测试 Owner</div><div class="v">⚠️ 待确认 @测试组</div></div>
@@ -128,6 +128,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <thead><tr><th>版本</th><th>日期</th><th>修订人</th><th>修订内容</th><th>状态</th></tr></thead>
 <tr><td>V1.0</td><td>2026-09-01</td><td>袁中天</td><td>旧版 PRD（仅文字，无原型截图；含图生图内容）</td><td>废</td></tr>
 <tr><td>V2.0</td><td>2026-09-03</td><td>袁中天</td><td>基于已确认的 C 端 + 商家后台双端原型重写；剔除图生图/AI 商业化内容；18 张原型截图入正文；§四按页面拆解至按钮级</td><td>评审中</td></tr><tr><td>V3.0</td><td>2026-09-07</td><td>袁中天</td><td>C 端原型按墨刀 12 屏 1:1 更新为 V4（p_gift_intro 双 Tab 聚合页取代原 p_invite_detail 独立页；补会员价 ¥35；兑换流程 code-modal 对齐）；本 PRD 同步 §C2/C3 合并为聚合页、§C4 补会员价、FAB 导航修正</td><td>评审中</td></tr><tr><td>V3.2</td><td>2026-09-07</td><td>袁中天</td><td>① 修流程图「双 FAB」错描述（实为单 FAB → 双 Tab）；② C 端 13 屏按内容尺寸重截（裁掉空白）推 GitHub；③ 后台按「沿用现有 + 仅列新增数据」重写：B16 商品管理仅加商品类型=兑换券、B17 新增商品仅加兑换商品设置+会员价、B18 订单管理仅加订单类型（9-04 裁定删订单管理「生成邀请码」按钮）；④ 新增 B19 邀请码管理页（hub 菜单 + code 表 + 退款失效异常处理）</td><td>评审中</td></tr><tr><td>V3.3</td><td>2026-09-07</td><td>袁中天</td><td>① 后台 B19 重写：删除独立「邀请码管理」页，改为订单详情（viewOrderDetail）内嵌「邀请码状态」表格；② 删除邀请码表「生成途径」字段与 code 表 gen_way 字段；③ 删除后台「+ 生成邀请码」入口、埋点 admin_gen_invite_done、AC-11、极限值防重、待确认⑧；④ 邀请码表状态列统一为「兑换状态」（未兑换/已兑换）</td><td>评审中</td></tr>
+<tr><td>V3.4</td><td>2026-09-15</td><td>袁中天</td><td><span style="background:#fff1f0">补齐「核销邀请码同步绑定推荐人」逻辑（此前全文缺失）</span>：① §3.1 Flow B 新增步骤 11「推荐关系写入」；② 新增 §3.5 推荐关系绑定规则（推荐人取自码生成人、已有推荐人不更换、本期不含奖励）；③ §3.2 信息架构补码生成人 / <code>recommendId</code>；④ §3.3 邀请码状态机核销后置条件补绑定动作；⑤ §4.0 影响范围「会员中心」行补 <code>recommendId</code> 联动；⑥ §C13 核销成功后置动作补推荐关系写入，并明确弹窗文案不变；⑦ §C14 明确兑换订单详情不展示推荐人；⑧ §B19 19.1 code 表新增 <code>used_by_user_id</code>（核销人）；⑨ §5.3 安全补推荐关系写入的事务一致性；⑩ §5.4 埋点 <code>code_redeem_done</code> 增 <code>bind_referrer</code> 参数；⑪ 新增 AC-15 / AC-16；⑫ §九 新增待确认 ⑬⑭、已确认口径新增推荐关系 3 条</td><td>评审中</td></tr>
 </table>
 
 <!-- ============ 二 ============ -->
@@ -336,9 +337,14 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
   <span class="node judge">9. 校验：码存在/未使用/未过期/本人未兑换过</span>
   <span class="arrow">→</span>
   <span class="node end">10. 核销成功 → 写兑换订单 + _user.activated=true + 系统按规则生成 5L×7 袋水权益订单 + updateFab 隐藏新人礼包 FAB</span>
+  <span class="arrow">→</span>
+  <span class="node end" style="background:#fff1f0;border-color:#ffa39e;color:#a8071a">11. 推荐关系写入：本人 <code>recommendId</code> 为根 → 绑定码生成人为推荐人；已有推荐人 → 不更换（规则详见 §3.5）</span>
 </div>
 <div class="callout">
 <b>Flow B 异常分支</b>：步骤 9 校验失败（码不存在/已使用/已过期/本人已兑换）→ Toast 明确原因，邀请码停留在 code-modal，可重输；网络异常 → Toast「网络异常，请稍后重试」，订单状态保持待提交。
+</div>
+<div class="callout warn" style="border-left-color:#ffa39e;background:#fff1f0;color:#a8071a">
+<b>Flow B 补充分支 · 推荐关系（V3.4 新增）</b>：步骤 11 的推荐关系写入<strong>不参与核销成败判定</strong>——无论用户是否已有推荐人、绑定是否发生，核销本身照常成功，兑换订单与水权益订单照常生成。推荐关系写入失败（含并发冲突）不阻断主流程，由后端记录重试，不向 C 端报错。
 </div>
 
 <h4>异常分支</h4>
@@ -356,17 +362,17 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <thead><tr><th>层</th><th>实体</th><th>字段</th></tr></thead>
 <tr><td rowspan="3">前端展示层</td><td>会员订单（member）</td><td>订单号、邀请码数量、实付金额、支付时间、订单状态</td></tr>
 <tr><td>兑换订单（exchange）</td><td>订单号、邀请码、收货人、收货地址、商品明细、抵扣金额、实付金额、状态</td></tr>
-<tr><td>邀请码</td><td>码值、生成时间、状态（未使用/已使用）、使用时间、关联订单</td></tr>
+<tr><td>邀请码</td><td>码值、生成时间、状态（未使用/已使用）、使用时间、关联订单、<span style="background:#fff1f0">生成人（核销后推荐关系的推荐人来源）</span></td></tr>
 <tr><td rowspan="2">后端配置层</td><td>商品（礼包 SKU）</td><td>名称、规格、价格、库存、商品类型、上下架状态；<b>价格由后台商品管理配置</b></td></tr>
 <tr><td>水权益订单</td><td>用户 ID、关联兑换订单、生效时间（首取水后 30 天）、剩余袋数、累计已取袋数</td></tr>
-<tr><td>数据层</td><td>邀请码表（code）/ 订单表（order）/ 商品表（goods）/ 地址表（address）/ 水权益表（water_bag）</td><td>详细字段 ⚠️ 待确认 @技术组</td></tr>
+<tr><td>数据层</td><td>邀请码表（code）/ 订单表（order）/ 商品表（goods）/ 地址表（address）/ 水权益表（water_bag）/ 用户表（user）</td><td>详细字段 ⚠️ 待确认 @技术组；<span style="background:#fff1f0">推荐关系复用用户表既有 <code>recommendId</code> 字段（根用户 <code>FINAL_RECOMMENDID</code> = 未绑定），不新建推荐关系实体</span></td></tr>
 </table>
 
 <h3>3.3 状态机：邀请码</h3>
 <table>
 <thead><tr><th>起始状态</th><th>触发动作</th><th>前置/后置条件</th><th>目标状态</th></tr></thead>
 <tr><td>（购买生成）</td><td>创建码</td><td>邀请码订单（member）支付成功</td><td>未使用</td></tr>
-<tr><td>未使用</td><td>核销</td><td>码有效 + 提交账号未兑换过 + 码未过期</td><td>已使用</td></tr>
+<tr><td>未使用</td><td>核销</td><td>码有效 + 提交账号未兑换过 + 码未过期<br><span style="background:#fff1f0">后置（V3.4）：写核销人 <code>used_by_user_id</code>；核销人未绑定推荐人（<code>recommendId</code> 为根）→ 同事务写入推荐人 = 码生成人；已绑定推荐人 → 保持原值不覆盖</span></td><td>已使用</td></tr>
 <tr><td>未使用</td><td>过期</td><td>超过有效期（⚠️ 待确认 @业务组：有效期多久）</td><td>已过期</td></tr>
 <tr><td>已使用</td><td>—</td><td>不可回退；关联兑换订单不可取消</td><td>（终态）</td></tr>
 <tr><td>已过期</td><td>—</td><td>不可核销；前端展示为灰色不可用</td><td>（终态）</td></tr>
@@ -388,6 +394,44 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 ③ T0+23 到期提醒是否需要？
 </div>
 
+<h3 id="s35">3.5 推荐关系绑定规则 <span class="section-mark" style="background:#d9363e">V3.4 新增</span></h3>
+
+<div class="callout warn" style="border-left-color:#ffa39e;background:#fff1f0;color:#a8071a">
+<b>规则一句话</b>：用户凭邀请码核销成功时 —— <b>若其尚未绑定推荐人，则自动把该邀请码的生成人绑定为其推荐人；若已有推荐人，则保持原推荐人不变、不做更换</b>。
+</div>
+
+<h4>3.5.1 绑定口径</h4>
+<table>
+<thead><tr><th>维度</th><th>规则</th><th>说明</th></tr></thead>
+<tr><td>推荐人来源</td><td>该邀请码的<b>生成人</b>（<code>code.user_id</code>，即购买 / 生成该码的会员）</td><td>不要求用户在核销流程中手填推荐人 ——「谁给的码，谁就是推荐人」</td></tr>
+<tr><td>触发时点</td><td>邀请码核销成功的<b>同一事务</b>内</td><td>与码状态置 <code>used</code>、兑换订单落库、水权益订单创建同批提交</td></tr>
+<tr><td>触发条件</td><td>核销人 <code>recommendId</code> 为根用户（<code>FINAL_RECOMMENDID</code>，即未绑定推荐人）</td><td>与首页「绑定推荐人」弹窗的判定条件一致，口径统一</td></tr>
+<tr><td>已有推荐人</td><td><b>不更换</b>、不覆盖、不追溯</td><td>以条件更新实现（仅当 <code>recommendId</code> 为根时才写），规避并发覆盖</td></tr>
+<tr><td>用户侧感知</td><td><b>静默</b>：不弹提示、不新增 Toast，code-modal 文案与视觉不变</td><td>避免打断「兑换成功」的正向反馈；本条为纯后端行为</td></tr>
+<tr><td>绑定后的连带效果</td><td>首页「绑定推荐人」引导弹窗（触发条件 = <code>recommendId</code> 为根）自然不再触发</td><td>复用既有弹窗机制，不改造弹窗本身</td></tr>
+<tr><td>本期不做</td><td>推荐奖励（积分 / 返券 / 佣金）、推荐关系解绑与转移、被推荐人明细列表</td><td>本期仅沉淀关系数据；奖励规则后续版本另立需求</td></tr>
+</table>
+
+<h4>3.5.2 复用既有能力（不新造概念）</h4>
+<table>
+<thead><tr><th>既有资产</th><th>位置</th><th>本需求如何用</th></tr></thead>
+<tr><td>用户表 <code>recommendId</code></td><td>既有用户实体字段</td><td>直接写入，<b>不新建推荐关系实体</b></td></tr>
+<tr><td>根用户标记 <code>FINAL_RECOMMENDID</code></td><td>既有常量</td><td>作为「是否已绑定推荐人」的判定依据</td></tr>
+<tr><td>绑定推荐人页 / 组件</td><td><code>/subPackage/other/view/bind-recommend</code>、<code>components/change-recommend/change-recommend.vue</code></td><td>不改动；本需求由服务端写入，不经该页面</td></tr>
+<tr><td>首页「绑定推荐人」弹窗</td><td>弹窗调度器优先级第 2 位</td><td>不改动；绑定发生后自然不再弹出</td></tr>
+<tr><td>后台会员中心「推荐人」列 +「修改推荐人」</td><td>商家后台会员中心</td><td>不改动；运营可在此查看结果并人工修正</td></tr>
+</table>
+
+<h4>3.5.3 边界与异常</h4>
+<table>
+<thead><tr><th>场景</th><th>处理</th></tr></thead>
+<tr><td>核销人已有推荐人</td><td>核销照常成功；推荐关系保持原值；不提示、不记异常</td></tr>
+<tr><td>码生成人 = 核销人本人</td><td>已由前置校验拦截（<code>_user.activated=true</code> 时 FAB 隐藏，每个账号终身限兑 1 次），不构成自荐绑定场景</td></tr>
+<tr><td>推荐关系写入失败 / 并发冲突</td><td><b>不阻断核销主流程</b>：核销与兑换订单照常成功，关系写入失败由后端记录并重试，C 端不报错</td></tr>
+<tr><td>邀请码订单退款致码失效</td><td>码置 <code>expired</code> 后不可核销，不产生新的推荐关系；<b>已发生的推荐关系不回滚</b>（与 §B19 19.2「权益不追溯」口径一致）</td></tr>
+<tr><td>码生成人已注销 / 被禁用</td><td>⚠️ 待确认 @技术组：是否仍写入该 <code>recommendId</code>，或跳过绑定（见 §九 ⑭）</td></tr>
+</table>
+
 <!-- ============ 四 ============ -->
 <h2 id="s4">四、功能需求详情（按页面拆解）</h2>
 
@@ -400,7 +444,7 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <tr><td rowspan="4">业务模块</td><td>商品中心 → 商品管理</td><td>改动</td><td>商品类型新增「兑换商品」枚举；新增「兑换商品设置」（B16 / B17）；礼包价格、库存、上下架均在此配置</td></tr>
 <tr><td>交易 → 订单管理</td><td>改动</td><td>订单类型新增「邀请码订单」「兑换订单」；新增类型筛选与按类型导出（B18）</td></tr>
 <tr><td>交易 → 订单管理 · 订单详情</td><td>改动</td><td>邀请码订单详情页新增「邀请码状态」表格；与订单商品信息同一屏展示，不新增后台菜单（B19）</td></tr>
-<tr><td>会员中心</td><td>改动</td><td>用户表新增 <code>activated</code>（是否已激活新人礼包）字段，用于 FAB 显隐与兑换资格校验</td></tr>
+<tr><td>会员中心</td><td>改动</td><td>用户表新增 <code>activated</code>（是否已激活新人礼包）字段，用于 FAB 显隐与兑换资格校验；<span style="background:#fff1f0">核销成功时联动写入核销人 <code>recommendId</code>（未绑定 → 写码生成人；已绑定 → 不覆盖），字段复用既有推荐人体系，不新增实体</span></td></tr>
 <tr><td>水权益（水袋）</td><td>新增</td><td>新增独立水权益订单实体与状态机（§3.4），不并进兑换订单商品行</td></tr>
 <tr><td rowspan="2">数据 / 实体</td><td>新增实体</td><td>新增</td><td>邀请码表（code）、水权益表（water_bag）</td></tr>
 <tr><td>存量实体</td><td>扩展</td><td>订单表（order）扩展订单类型；商品表（goods）扩展商品类型；用户表（user）扩展 activated</td></tr>
@@ -694,7 +738,8 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <li> <b>后端失败</b>：码不存在/已使用/已过期/本人已兑换 → Toast「邀请码无效，请重新输入」（具体失败原因由后端返回，前端不细分）
 </li>
 <li> <b>成功后置</b>：<code>_user.activated=true</code> → <code>updateFab()</code> 隐藏新人礼包 FAB；<code>addExchangeOrder(code)</code> 写入兑换订单；400ms 后跳 <code>go('p_order')</code>
-</li>
+<li> <span style="background:#fff1f0"><b>成功后置 · 推荐关系（V3.4 新增）</b></span>：核销成功同一事务内判断核销人推荐人状态 —— <code>recommendId</code> 为根用户（未绑定）→ 写入该邀请码生成人（<code>code.user_id</code>）为推荐人；<b>已有推荐人 → 保持原值不更换</b>。两种情况下核销均照常成功，<b>前端不弹任何提示、本弹窗文案与视觉不变</b>（规则详见 §3.5）
+</li></li>
 </ol>
 <li> 边界：<b>遮罩点击关闭</b> → <code>if(event.target===this) closeCodeModal()</code>（点弹窗外关闭，点弹窗内不关）
 <li> 异常：<b>前端防重</b>：提交中按钮 disabled + loading，避免双击发两次核销请求
@@ -719,9 +764,10 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 
 <h5>14.2.2 业务逻辑与边界条件</h5>
 <ul>
+<li> <span style="background:#fff1f0">边界（V3.4）：兑换订单详情<b>不展示推荐人信息</b></span> —— 推荐关系仅在后端沉淀，并在后台会员中心「推荐人」列与用户侧「我的 → 资料」体现，兑换订单卡与订单详情不新增任何展示项
 <li> 边界：5L 饮用水 × 7 袋<b>不在此订单卡展示</b>，由独立的水权益订单承载；用户到店取水时扫码触发水权益状态机的「待首取 → 已生效」
 <li> 「提醒发货」按钮 → Toast「已提醒发货」（本期仅前端 Toast，无实际 Push，；推送推送后接入具体通道 ⚠️ 待确认）
-</li></li></ul>
+</li></li></li></ul>
 
 <h3 id="p15"><span class="section-mark">C</span>15. 页面：我的订单（p_my_orders）</h3>
 <div class="screenshot"><img src="https://raw.githubusercontent.com/ddyuan-spec/lvyunji/gh-pages/newuser-gift-prd-assets/c_my_orders.png" alt="我的订单"></div>
@@ -810,7 +856,8 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <tr><td>status</td><td>状态</td><td>unused（未使用）/ used（已核销）/ expired（已失效）</td></tr>
 <tr><td>use_time</td><td>使用时间</td><td>核销成功时写入</td></tr>
 <tr><td>order_no</td><td>关联订单号</td><td>购买邀请码订单（member）/ 兑换订单（exchange）</td></tr>
-<tr><td>user_id</td><td>关联购买人</td><td>生成该码的会员 user_id</td></tr>
+<tr><td>user_id</td><td>关联购买人（= 生成人）</td><td>生成该码的会员 user_id；<span style="background:#fff1f0">该会员同时是核销后推荐关系中的推荐人来源</span></td></tr>
+<tr><td>used_by_user_id</td><td><span style="background:#fff1f0">核销人（V3.4 新增）</span></td><td>核销成功时写入；用于追溯「谁兑了哪张码」，并作为推荐关系写入前的 <code>recommendId</code> 判定对象</td></tr>
 </table>
 
 <h4>19.2 异常处理（仅本期明确一项）</h4>
@@ -838,8 +885,9 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <ul>
 <li> 邀请码仅本人可见；后端按用户身份校验，不能直接按码值查
 <li> 核销接口防重：后端幂等键 + 用户态校验，前端按钮 disabled 防抖
+<li> <span style="background:#fff1f0">推荐关系写入与核销同事务（V3.4）</span>：推荐人绑定与「码状态置 <code>used</code>」「兑换订单落库」「水权益订单创建」在同一事务内提交，避免出现「码已核销但推荐关系未写」或反之的脏数据；并发场景以「核销人 + 码」为幂等键，推荐关系采用条件更新（<b>仅当 <code>recommendId</code> 为根时才写</b>），从机制上禁止覆盖既有推荐人
 <li> 收货地址手机号展示脱敏（139****4568）
-</li></li></li></ul>
+</li></li></li></li></ul>
 
 <h3>5.4 埋点需求</h3>
 <p>本需求埋点事件与属性严格遵循 <a href="https://ddyuan-spec.github.io/taixiaohu/taixiaohu-tracking-spec.html">《泰小虎埋点规范 v2.3》</a>（在线查阅）。本期涉及事件清单（精简）：</p>
@@ -848,7 +896,8 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <tr><td>page_view</td><td>页面浏览</td><td>C 端</td><td>App/H5/小程序</td><td>进入页面</td><td>页面名称、来源页面</td><td>所有页面</td></tr>
 <tr><td>click</td><td>按钮点击</td><td>C 端</td><td>App/H5/小程序</td><td>点击核心按钮</td><td>按钮名称、所在页面</td><td>「立即激活」「立即购买」「确认支付」「确认购买」</td></tr>
 <tr><td>buy_invite_done</td><td>购买邀请码成功</td><td>C 端</td><td>App/H5/小程序</td><td>收银台支付回调成功</td><td>订单号、邀请码数量、实付金额、支付方式</td><td>对应 §C5 §C6</td></tr>
-<tr><td>code_redeem_done</td><td>邀请码核销成功</td><td>C 端</td><td>App/H5/小程序</td><td>code-modal 提交后端核销成功</td><td>邀请码、关联兑换订单号、礼包内容</td><td>对应 §C13 §C14</td></tr>
+<tr><td>code_redeem_done</td><td>邀请码核销成功</td><td>C 端</td><td>App/H5/小程序</td><td>code-modal 提交后端核销成功</td><td>邀请码、关联兑换订单号、礼包内容、<span style="background:#fff1f0">是否新绑定推荐人（<code>bind_referrer</code>=true/false）</span></td><td>对应 §C13 §C14；<span style="background:#fff1f0">V3.4 仅在本事件上加参数，不新增事件定义</span></td></tr>
+<tr><td colspan="6"><span style="background:#fff1f0">（V3.4 说明）推荐关系绑定本身<b>不新增独立埋点事件</b></span> —— 绑定是核销的伴随行为，通过在 <code>code_redeem_done</code> 上附加 <code>bind_referrer</code> 参数区分「新绑定 / 未更换」两种结果；推荐人侧的通知与激励上报不在本期范围</td></tr>
 <tr><td>code_redeem_fail</td><td>邀请码核销失败</td><td>C 端</td><td>App/H5/小程序</td><td>code-modal 提交后端核销失败</td><td>失败原因</td><td>对应 §C13</td></tr>
 <tr><td>copy_text</td><td>复制文本</td><td>C 端</td><td>App/H5/小程序</td><td>复制邀请码/地址</td><td>复制内容类型、内容长度</td><td>对应 §C7 §C13</td></tr>
 <tr><td>water_bag_create</td><td>水权益订单创建</td><td>C 端</td><td>App/H5/小程序</td><td>兑换订单核销成功</td><td>水权益订单号、关联兑换订单号、总袋数</td><td>对应 §3.4 状态机</td></tr>
@@ -876,6 +925,8 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <tr><td>AC-12</td><td>后台兑换订单筛选</td><td>viewOrders</td><td>点「兑换订单」二级筛选</td><td>只展示 data-type=exchange 的 3 条订单</td></tr>
 <tr><td>AC-13</td><td>非会员不能买邀请码</td><td>_user.level=guest</td><td>首页 → 新人礼包 FAB → 聚合页（购买 Tab） → 立即购买</td><td>后端校验会员等级失败 → Toast「该礼包为会员专享，请先开通会员」</td></tr>
 <tr><td>AC-14</td><td>水袋状态机过期清零</td><td>水权益订单状态=已生效，已过 30 天</td><td>用户尝试再次取水</td><td>扫码返回「权益已过期」</td></tr>
+<tr><td>AC-15</td><td><span style="background:#fff1f0">核销后自动绑定推荐人（V3.4）</span></td><td>用户 A 未绑定推荐人（<code>recommendId</code>=根用户）；用户 B 购买生成的邀请码 C</td><td>A 用码 C 完成核销（AC-03 流程）</td><td>A 核销照常成功（兑换订单 toship、实付 ¥0.00、水权益订单=待首取）；<b>A 的 <code>recommendId</code> 被写入为 B</b>；A 首页「绑定推荐人」弹窗不再触发；前端无任何额外提示</td></tr>
+<tr><td>AC-16</td><td><span style="background:#fff1f0">已有推荐人不更换（V3.4）</span></td><td>用户 A 已绑定推荐人 D；用户 B 生成的邀请码 C</td><td>A 用码 C 完成核销</td><td>核销照常成功（订单与水权益正常生成）；<b>A 的 <code>recommendId</code> 仍为 D，未被改写为 B</b>；无 Toast、无异常记录</td></tr>
 </table>
 
 <!-- ============ 七 ============ -->
@@ -932,8 +983,9 @@ code{background:#f5f6f8;padding:1px 6px;border-radius:3px;font-size:12px;color:#
 <li> 价格：由后台商品管理配置，当前业务占位 ¥49.9（不做会员折扣）
 <li> 礼包内容：益齿健牙膏×1 + 辅酶Q10×1（快递）；5L饮用水×7袋为独立水权益订单
 <li> 邀请码使用资格：不限新老，每个账号终身限兑 1 次
+<li> <span style="background:#fff1f0"><b>推荐关系（2026-09-15 确认）</b>：① 推荐人取自邀请码生成人（<code>code.user_id</code>），不由用户手填；② 核销时若核销人尚未绑定推荐人则自动绑定，已有推荐人则保持原值不更换；③ 用户侧静默处理 —— 不弹提示、核销弹窗文案与视觉不变；④ 本期仅沉淀推荐关系，不含推荐奖励（积分 / 返券 / 佣金），奖励规则后续版本另立需求；⑤ 复用既有 <code>recommendId</code> 体系，不新建推荐关系实体</span>
 <li> 兑换订单商品名：「惠民补贴套餐包（益齿健套装）」「新人礼包（实体商品组合）」为臆造，按用户 2026-09-03 确认，PRD 业务口径中礼包正式名为「新人礼包 - 益齿健套装」（C 端沿用，详情见 §C12）；实物订单页商品名以业务组口径为准（待 ⑫ 澄清）
-</li></li></li></li></ul>
+</li></li></li></li></li></ul>
 </div>
 
 <hr>
