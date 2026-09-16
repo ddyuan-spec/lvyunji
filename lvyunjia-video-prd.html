@@ -39,7 +39,7 @@
 </head>
 <body>
 
-<h1>图生视频 V0.1 PRD <span class="tag y">V0.1.1</span><span class="tag o">客户端 + 后台</span></h1>
+<h1>图生视频 V0.1.1 PRD <span class="tag o">C 端 + 后台</span></h1>
 
 <p class="meta">文档维护：袁中天　|　编写日期：2026-09-07（V0.1.1 更新 2026-09-08）　|　适用产品：绿韵家 App（H5 内嵌）+ 数商服务后台　|　依据素材：C 端原型截图（用户提供 zip）+ 后台原型 <code>lvyunjia-admin-video-proto.html</code>（已确认）+ C 端交互原型 <code>lvyunjia-video-c-proto.html</code> V0.9</p>
 
@@ -57,7 +57,7 @@
   <tr><td>本期范围</td><td>① C 端 H5「AI 创作-生视频」完整闭环 ② 灵感值消耗与积分抵扣逻辑 ③ 后台视频消耗配置、辅助提示词管理、生成日志视频维度</td></tr>
   <tr><td>不包含</td><td>数字人口播、模板化视频、图生视频接入外部平台分发的能力（后续 V0.2+ 评估）</td></tr>
   <tr><td>主要使用角色</td><td>C 端用户（普通会员、VIP / 高级会员 / 至尊达人 / 执行家）、商家运营、平台运营</td></tr>
-  <tr><td>关联文档</td><td><a href="lvyunjia-ai-generation-prd.html">lvyunjia-ai-generation-prd.html</a>（生图商业化 PRD V0.5.1）、<a href="lvyunjia-admin-video-proto.html">lvyunjia-admin-video-proto.html</a>（后台原型 V0.8）、<a href="lvyunjia-video-c-proto.html">lvyunjia-video-c-proto.html</a>（C 端原型 V0.5）</td></tr>
+  <tr><td>关联文档</td><td><a href="lvyunjia-ai-generation-prd.html">lvyunjia-ai-generation-prd.html</a>（生图商业化 PRD V0.5.1）、<a href="lvyunjia-admin-video-proto.html">lvyunjia-admin-video-proto.html</a>（后台原型 V0.8）、<a href="lvyunjia-video-c-proto.html">lvyunjia-video-c-proto.html</a>（C 端原型 V0.9）</td></tr>
 </table>
 
 <h2>二、项目背景与目标</h2>
@@ -84,7 +84,7 @@
   <tr><td>视频生成成功率</td><td>成功笔数 / 提交笔数</td><td>≥ 95%</td></tr>
   <tr><td>单次平均耗时</td><td>提交 → 成功中位数</td><td>5s ≤ 60s；10s ≤ 120s</td></tr>
   <tr><td>辅助提示词使用率</td><td>使用了至少 1 个辅助词的提交 / 总提交</td><td>≥ 50%</td></tr>
-  <tr><td>积分抵扣率</td><td>勾选积分抵扣 / 额度不足弹窗触发</td><td>运营观察，不设硬性目标</td></tr>
+  <tr><td>积分抵扣率</td><td>勾选积分抵扣 / 灵感值不足弹窗触发</td><td>运营观察，不设硬性目标</td></tr>
 </table>
 
 <h2>三、业务流程与架构</h2>
@@ -96,9 +96,9 @@
   <tr><td>AI 创作页（生图 / 生视频 双 Tab）</td><td>新增「生视频」Tab，参数区与生图互斥</td></tr>
   <tr><td>我的作品</td><td>列表项「类型」字段同时支持生图 / 生视频，沙漏状态=生成中</td></tr>
   <tr><td>作品详情</td><td>视频类作品展示 9:16 视频播放器，底部三按钮：生成视频（同款）/保存到相册/分享</td></tr>
-  <tr><td>额度不足弹窗</td><td>新增 600 积分抵 1 额度能力，附「不再提示自动用积分抵扣」勾选项</td></tr>
-  <tr><td>积分不足弹窗</td><td>额度不足弹窗点「购买额度」时，若用户积分 = 0 才出现，引导获取积分</td></tr>
-  <tr><td rowspan="4">后台（运营）</td><td>AI 工具消耗配置</td><td>新增「生视频」工具项：5s 基准 10 灵感值/次、10s 自动按 5s 基准 × 3</td></tr>
+  <tr><td>灵感值不足弹窗</td><td>新增 600 积分抵 1 次生成能力，附「不再提示自动用积分抵扣」勾选项</td></tr>
+  <tr><td>积分不足弹窗</td><td>灵感值不足弹窗点「购买灵感值」时，若用户积分 = 0 才出现，引导获取积分</td></tr>
+  <tr><td rowspan="4">后台（运营）</td><td>AI 工具消耗配置</td><td>新增「生视频」工具项：5s 基准 10 灵感值/次（10s 消耗见 §4.7）</td></tr>
   <tr><td>辅助提示词配置</td><td>分类支持「适用类型：生图 / 生视频」</td></tr>
   <tr><td>用户生成日志</td><td>「内容类型」新增生视频，列表新增「视频参数」列</td></tr>
   <tr><td>会员管理 / 调整灵感值 / 套餐管理 / 素材管理</td><td>无新字段，沿用 ai-generation PRD 既有定义</td></tr>
@@ -173,15 +173,15 @@
   <!-- 6 校验灵感值：标准菱形 -->
   <polygon points="450,420 520,455 450,490 380,455" fill="#FFF3E0" stroke="#FF9800" stroke-width="1.6"/>
   <text class="w" x="450" y="459" text-anchor="middle">灵感值 ≥ 10？</text>
-  <text class="s" x="450" y="510" text-anchor="middle" fill="#C62828">否 → 额度不足弹窗 ↓</text>
+  <text class="s" x="450" y="510" text-anchor="middle" fill="#C62828">否 → 灵感值不足弹窗 ↓</text>
 
-  <!-- 7 额度不足弹窗（用户泳道） -->
+  <!-- 7 灵感值不足弹窗（用户泳道） -->
   <line x1="380" y1="455" x2="270" y2="460" stroke="#C62828" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#ar)"/>
   <rect x="20" y="430" width="250" height="70" rx="7" fill="#FFEBEE" stroke="#C62828" stroke-width="1.4"/>
-  <text class="w" x="145" y="450" text-anchor="middle" fill="#C62828">额度不足弹窗</text>
+  <text class="w" x="145" y="450" text-anchor="middle" fill="#C62828">灵感值不足弹窗</text>
   <text class="s" x="32" y="468">· 取消（不扣减）</text>
-  <text class="s" x="32" y="484">· 600 积分抵 1 额度 ✓</text>
-  <text class="s" x="32" y="500">· 购买额度 → 跳套餐页</text>
+  <text class="s" x="32" y="484">· 600 积分抵 1 次生成 ✓</text>
+  <text class="s" x="32" y="500">· 购买灵感值 → 跳套餐页</text>
 
   <!-- 8 积分不足弹窗 -->
   <rect x="20" y="512" width="250" height="52" rx="7" fill="#FFF3E0" stroke="#E65100" stroke-width="1.4"/>
@@ -231,17 +231,18 @@
 
 <h3>3.3 信息架构</h3>
 <table>
-  <tr><th>端</th><th>页面</th><th>视图 id（参照原型）</th><th>关键字段</th></tr>
-  <tr><td>C 端</td><td>AI 创作页（生视频）</td><td><code>viewCreate</code>（mode=video）</td><td>首帧图、画面描述、时长、比例、生成音频、固定摄像头、辅助提示词、预计消耗</td></tr>
-  <tr><td>C 端</td><td>我的作品</td><td><code>viewMyWorks</code></td><td>灵感值账户（剩余/本月已用/我的作品）、生成记录列表（生图/生视频/生成中状态）</td></tr>
-  <tr><td>C 端</td><td>作品详情（视频类）</td><td><code>viewWorkDetail</code></td><td>视频播放器、标题、比例、生成视频（同款）/保存到相册/分享</td></tr>
-  <tr><td>C 端</td><td>分享面板</td><td><code>viewShare</code></td><td>微信好友 / 朋友圈 / 复制链接</td></tr>
-  <tr><td>C 端</td><td>额度不足弹窗</td><td><code>dialogInsufficientCredit</code></td><td>600 积分抵 1 额度、不再提示勾选</td></tr>
-  <tr><td>C 端</td><td>积分不足弹窗</td><td><code>dialogInsufficientPoint</code></td><td>提示文案、获取积分</td></tr>
-  <tr><td>后台</td><td>AI 工具消耗配置</td><td><code>viewCost</code> / <code>viewCostEdit</code></td><td>工具=生视频、每次消耗、10 秒消耗自动按 5s × 3</td></tr>
-  <tr><td>后台</td><td>辅助提示词配置</td><td><code>viewPromptConfig</code> / <code>viewPromptGroupEdit</code></td><td>分类、适用类型（生图/生视频）、词条</td></tr>
-  <tr><td>后台</td><td>用户生成日志</td><td><code>viewLog</code></td><td>用户/生成时间/内容类型/视频参数/提示词/消耗灵感值/结果/状态/操作</td></tr>
+  <tr><th>端</th><th>页面</th><th>关键字段</th></tr>
+  <tr><td>C 端</td><td>AI 创作页（生视频）</td><td>首帧图、画面描述、时长、比例、生成音频、固定摄像头、辅助提示词、预计消耗</td></tr>
+  <tr><td>C 端</td><td>我的作品</td><td>灵感值账户（剩余/本月已用/我的作品）、生成记录列表（生图/生视频/生成中状态）</td></tr>
+  <tr><td>C 端</td><td>作品详情（视频类）</td><td>视频播放器、标题、比例、生成视频（同款）/保存到相册/分享</td></tr>
+  <tr><td>C 端</td><td>分享面板</td><td>微信好友 / 朋友圈 / 复制链接</td></tr>
+  <tr><td>C 端</td><td>灵感值不足弹窗</td><td>600 积分抵 1 次生成、不再提示勾选</td></tr>
+  <tr><td>C 端</td><td>积分不足弹窗</td><td>提示文案、获取积分</td></tr>
+  <tr><td>后台</td><td>AI 工具消耗配置</td><td>工具=生视频、每次消耗、10 秒消耗自动按 5s × 3</td></tr>
+  <tr><td>后台</td><td>辅助提示词配置</td><td>分类、适用类型（生图/生视频）、词条</td></tr>
+  <tr><td>后台</td><td>用户生成日志</td><td>用户/生成时间/内容类型/视频参数/提示词/消耗灵感值/结果/状态/操作</td></tr>
 </table>
+<p class="meta">各页面对应的原型视图 ID（viewXxx / dialogXxx）见文末 <a href="#appendix-a">附录 A</a>。</p>
 
 <h3>3.4 状态机</h3>
 <h4>3.4.1 单条作品状态</h4>
@@ -311,17 +312,17 @@
 <ul>
   <li><b>生成中</b>：列表项图标=沙漏，标签 = 「生成中」+ 取消按钮（点击后状态变「已取消」并释放冻结灵感值）。</li>
   <li><b>已完成</b>：图标=胶片/花朵，标签 = 「生视频 · 9:16 · 2026-08-18 16:05」。</li>
-  <li><b>失败</b>：列表项置灰，标签 = 「生成失败」；toast 提示「生成失败，已返还灵感值」；<b>不提供重试按钮</b>；点击该列表项直接进入创作页（<b>不预填原首帧图、画面描述、参数</b>，由用户重新填写后再次提交）。已扣减的灵感值按退款规则返还（沿用 ai-generation PRD §4.1.5）。</li>
+  <li><b>失败（空状态）</b>：列表项置灰，标签 = 「生成失败」；toast 提示「生成失败，已返还灵感值」；<b>不提供重试按钮</b>；点击该列表项直接进入创作页（<b>不预填原首帧图、画面描述、参数</b>，由用户重新填写后再次提交）。已扣减的灵感值按退款规则返还（沿用 ai-generation PRD §4.1.5）。</li>
 </ul>
 
 <h2>四、功能需求详情</h2>
 
 <h3>4.1 数商服务 - 视频生成入口 <span class="tag y">C端</span></h3>
-<p>数商服务首页 AI 工具区第 4 位「视频生成」从占位变为可点击。点击进入 AI 创作页，<b>默认 mode = video</b>，用户可在顶部 Tab 切换生图/生视频。</p>
+<p>数商服务首页 AI 工具区第 4 位「视频生成」从占位变为可点击。点击进入 AI 创作页，<b>默认生视频模式（mode=video）</b>，用户可在顶部 Tab 切换生图/生视频。</p>
 <div class="shot-row">
   <div class="col"><img class="shot" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/shushang_service.png" alt="数商服务首页"><div class="shot-cap">图 4-1 数商服务首页（AI 工具区第 4 位「视频生成」入口）</div></div>
 </div>
-<div class="tip">通用 AI 工具区（素材库 / 我的作品 / 图片生成 / 视频生成）、个人头部（Hi 大不列颠蛋黄酥啊啊啊 / 至尊达人 / 执行家）、客户管理、活跃走势等模块本期无改动，沿用 ai-generation PRD §4.2。</div>
+<div class="tip">通用 AI 工具区（素材库 / 我的作品 / 图片生成 / 视频生成）、个人头部（Hi 用户昵称 / 至尊达人 / 执行家）、客户管理、活跃走势等模块本期无改动，沿用 ai-generation PRD §4.2。</div>
 
 <h3>4.2 AI 创作页 - 生视频模式 <span class="tag y">C端</span></h3>
 <p>原型：<code>代码组件 2.png</code>。该模式是本期核心新增，下文按字段逐项定义。</p>
@@ -373,7 +374,7 @@
   <tr><td>运镜 / 动态</td><td>缓慢推近、镜头环绕、人物走动、物体旋转、光影流动</td></tr>
 </table>
 <div class="note">
-<b>运营配置</b>：辅助提示词由后台 <code>viewPromptConfig / viewPromptGroupEdit</code> 维护。<br>
+<b>运营配置</b>：辅助提示词由后台配置维护（视图 ID 见<a href="#appendix-a">附录 A</a>）。<br>
 <b>字段</b>：分类名称、分类编码、<b>适用类型（生图 / 生视频）</b>、排序、状态、词条列表。<br>
 <b>规则</b>：C 端只拉取「适用类型 = 生视频」且「状态 = 启用」且「分类状态 = 启用」的分类与词条。同一词条可同时归属生图与生视频分类（按分类划分）。
 </div>
@@ -389,32 +390,32 @@
 <ol>
   <li>校验：画面描述非空。</li>
   <li>校验：当前用户灵感值 ≥ 本次预计消耗。</li>
-  <li>不足 → 触发「额度不足弹窗」<a href="#4.2.8">§4.2.8</a>；足够 → 走第 4 步。</li>
-  <li>冻结灵感值（防止并发超额），调用生视频接口，参数：mode=video、首帧图（选填）、拼好的 text、时长、比例、生成音频、固定摄像头、用户 id、灵感值消耗快照。</li>
+  <li>不足 → 触发「灵感值不足弹窗」<a href="#4.2.8">§4.2.8</a>；足够 → 走第 4 步。</li>
+  <li>冻结灵感值（防止并发超额），调用生视频接口，参数：生视频模式、首帧图（选填）、拼好的 text、时长、比例、生成音频、固定摄像头、用户 id、灵感值消耗快照。</li>
   <li>创建作品记录，状态 = 生成中，跳转「我的作品」页。</li>
-  <li>后端异步任务；前端每 5s 轮询或 WebSocket 推送任务状态；任务成功 → 更新作品为已完成并写生成日志。</li>
-  <li>任务失败 → 释放冻结灵感值并按退款规则返还，写失败日志。</li>
+  <li>后端异步任务；前端每 5s 轮询或服务端推送任务状态；任务成功 → 更新作品为已完成并写生成日志。</li>
+  <li>任务失败 → 释放冻结灵感值并按退款规则返还，写失败日志（失败态与空状态标准处理见 §3.4.1）。</li>
   <li>任务状态变更（完成/失败/离开页面期间完成）的前端通知与后台运行规则见 <a href="#4.2.10">§4.2.10</a>。</li>
 </ol>
 
-<h4 id="4.2.8">4.2.8 额度不足弹窗（本期新增）<span class="tag y">V0.1 定稿</span></h4>
-<p>原型：<code>额度不足.png</code>。当用户灵感值 < 本次预计消耗时触发。</p>
+<h4 id="4.2.8">4.2.8 灵感值不足弹窗（本期新增）<span class="tag y">V0.1 定稿</span></h4>
+<p>原型：灵感值不足弹窗（见下图）。当用户灵感值 < 本次预计消耗时触发。</p>
 <div class="shot-row">
-  <div class="col"><img class="shot" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/c_insufficient_credit.png" alt="额度不足弹窗"><div class="shot-cap">图 4-3 额度不足弹窗</div></div>
+  <div class="col"><img class="shot" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/c_insufficient_credit.png" alt="灵感值不足弹窗"><div class="shot-cap">图 4-3 灵感值不足弹窗</div></div>
 </div>
 <table>
   <tr><th>字段</th><th>规则</th></tr>
   <tr><td>图标</td><td>顶部居中闪电 ⚡</td></tr>
-  <tr><td>标题</td><td>「额度不足」</td></tr>
-  <tr><td>正文</td><td>「本次生成需要 <b>1</b> 个额度，是否用 <b>600</b> 积分兑换一次额度？」</td></tr>
+  <tr><td>标题</td><td>「灵感值不足」</td></tr>
+  <tr><td>正文</td><td>「本次生成需要消耗灵感值，是否用 <b>600</b> 积分兑换 1 次生成（约 10 灵感值）？」</td></tr>
   <tr><td>取消</td><td>关闭弹窗，<b>不</b>做任何扣减</td></tr>
-  <tr><td>购买额度</td><td>① 优先尝试积分抵扣：若用户当前积分 ≥ 600 且「不再提示」勾选有效（本期始终走提示，二期再做默认抵扣），弹「确认用 600 积分兑换？」→ 确认后扣 600 积分、+1 额度，继续提交；② 否则跳「购买灵感值」页（沿用 ai-generation PRD §4.1.4）</td></tr>
-  <tr><td>「额度不足不再提示自动用积分抵扣」</td><td>勾选项，勾选后本次会话内再次触发该弹窗直接走积分抵扣（不弹窗）。<b>会话级</b>，下次进入 App 重置。落库字段 user_pref.no_credit_popup，本期可不落库（仅前端 sessionStorage 即可），建议落库便于跨设备一致。</td></tr>
+  <tr><td>购买灵感值</td><td>① 优先尝试积分抵扣：若用户当前积分 ≥ 600，直接走积分抵扣（已勾选「不再提示」时不弹此确认框，沿用 §9-#2 落库跨设备一致），弹「确认用 600 积分兑换 1 次生成（≈10 灵感值）？」→ 确认后扣 600 积分、继续提交；② 否则跳「购买灵感值」页（沿用 ai-generation PRD §4.1.4）</td></tr>
+  <tr><td>「灵感值不足不再提示自动用积分抵扣」</td><td>勾选项，勾选后再次触发灵感值不足弹窗时直接走积分抵扣（不弹窗）。落库字段 <code>user_pref.no_credit_popup</code>，跨设备一致（详见 §9-#2）；本期不支持客户端取消，二期用户中心可设。</td></tr>
 </table>
-<div class="tip"><b>V0.1 定稿</b>：① 「600 积分 = 1 额度」为本期定稿，来源为<b>会员积分体系</b>（绿韵家会员积分/平台积分已打通，抵扣前不区分）；② 勾选「额度不足不再提示自动用积分抵扣」落库字段 <code>user_pref.no_credit_popup</code>，跨设备一致；取消按钮不扣减；用户拒绝 / 取消勾选后下次额度不足仍走提示流程。</div>
+<div class="tip"><b>定稿</b>：600 积分 ≈ 10 灵感值（兑换 1 次生成）、勾选「不再提示」落库跨设备一致，结论详见 §9-#1 / §9-#2。</div>
 
 <h4>4.2.9 积分不足弹窗</h4>
-<p>原型：<code>积分不足 .png</code>。当用户在额度不足弹窗点「购买额度」、但其当前积分 = 0 时触发（积分不足导致无法抵扣）。</p>
+<p>原型：<code>积分不足 .png</code>。当用户在灵感值不足弹窗点「购买灵感值」、但其当前积分 = 0 时触发（积分不足导致无法抵扣）。</p>
 <div class="shot-row">
   <div class="col"><img class="shot" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/c_insufficient_point.png" alt="积分不足弹窗"><div class="shot-cap">图 4-4 积分不足弹窗</div></div>
 </div>
@@ -427,13 +428,13 @@
 </table>
 
 <h4 id="4.2.10">4.2.10 生成状态通知与后台运行（本期新增）<span class="tag y">V0.9 原型同步</span></h4>
-<p>对应原型 <code>lvyunjia-video-c-proto.html</code> V0.9 新增的顶部浮窗与后台/中断机制（<b>V0.1.1 补录</b>）。原型用 localStorage 模拟任务态，本节按真实实现口径编写：生成任务状态由<b>服务端</b>管理（提交后异步执行，见 §4.2.7），C 端通过轮询/推送感知状态变更。</p>
+<p>对应原型 <code>lvyunjia-video-c-proto.html</code> V0.9 新增的顶部浮窗与后台/中断机制（<b>V0.1.1 补录</b>）。原型用前端本地存储模拟任务态，本节按真实实现口径编写：生成任务状态由<b>服务端</b>管理（提交后异步执行，见 §4.2.7），C 端通过轮询/推送感知状态变更。</p>
 <table>
   <tr><th>场景</th><th>交互规则</th></tr>
   <tr><td>顶部浮窗（通用）</td><td>生成状态变更时在页面顶部弹出浮窗：文案 + 点击区 +「×」关闭按钮；点击浮窗统一跳转「我的作品」；「×」仅关闭浮窗，不影响任务</td></tr>
   <tr><td>App 内前台生成完成</td><td>浮窗「您的视频已生成完成」，点击进入「我的作品」（可再进作品详情）</td></tr>
   <tr><td>离开页面 / 切后台期间完成</td><td>任务<b>不中断</b>（服务端继续执行）；用户重进时浮窗提示「视频已生成，立即查看」，点击进入「我的作品」</td></tr>
-  <tr><td>任务失败（前台感知或重进发现）</td><td>提示「生成失败」；灵感值按规则返还，toast「生成失败，已返还灵感值」；列表失败态与点击行为沿用 §4.3（无重试按钮，进创作页空状态）</td></tr>
+  <tr><td>任务失败（前台感知或重进发现）</td><td>提示「生成失败」；灵感值按规则返还，toast「生成失败，已返还灵感值」（失败态与空状态标准处理见 §3.4.1）</td></tr>
   <tr><td>主动取消</td><td>生成中在「我的作品」列表点「取消」终止任务并释放冻结灵感值（沿用 §4.3 / §7 #11）</td></tr>
 </table>
 <div class="tip"><b>边界说明</b>：原型中「退出并打断生成」为演示分支（模拟本地任务丢失）；真实实现中任务一旦提交即由服务端接管，<b>退出页面/App 不产生失败</b>，仅在服务端任务真实失败时走失败返还流程。</div>
@@ -452,7 +453,7 @@
   <tr><td>开始你的 AI 创作 / 新人首单 Banner</td><td>无差异（沿用）</td></tr>
   <tr><td>生成记录列表-图标</td><td>生图 = 🌸 / 🎨；生视频 = 🎬；生成中 = ⏳ 沙漏</td></tr>
   <tr><td>生成记录列表-类型字段</td><td>新增「生视频 · 9:16 · 2026-08-18 16:05」格式；类型前缀统一为生图 / 生视频</td></tr>
-  <tr><td>生成记录列表-操作</td><td>生成中：可点「取消」终止任务并释放冻结灵感值；已完成：可点「查看」进入作品详情；<b>失败：置灰展示「生成失败」+ toast「生成失败，已返还灵感值」；列表页不提供「重试」按钮，点击失败项直接进入 AI 创作页（空状态，不预填原首帧图、画面描述、参数）</b></td></tr>
+  <tr><td>生成记录列表-操作</td><td>生成中：可点「取消」终止任务并释放冻结灵感值；已完成：可点「查看」进入作品详情；<b>失败：置灰展示「生成失败」+ toast「生成失败，已返还灵感值」；列表页不提供「重试」按钮，点击失败项直接进入 AI 创作页（空状态，不预填原首帧图、画面描述、参数；标准处理见 §3.4.1）</b></td></tr>
 </table>
 
 <h3>4.4 作品详情 <span class="tag y">C端</span></h3>
@@ -466,7 +467,7 @@
   <tr><td>标题区</td><td>「AI 视频 · 9:16」+ 用户自定义标题（如「123」）</td></tr>
   <tr><td>底部 3 按钮</td><td>
     <ol>
-      <li><b>再次生成</b>（绿色主按钮）：回到 AI 创作页（生视频模式，<b>空状态</b>）——<b>不自动生成</b>、<b>不预填</b>原作品的首帧图、画面描述与视频参数，全部由用户重新填写/上传（与 §4.3 失败项点击进入创作页的口径一致）。原型佐证：新版 <code>作品详情.png</code> 按钮文案已由「生成视频」改为「再次生成」（<b>V0.1.1 修正</b>，替代前版「携带原 prompt + 视频参数」口径）。</li>
+      <li><b>再次生成</b>（绿色主按钮）：回到 AI 创作页（生视频模式，<b>空状态</b>）——<b>不自动生成</b>、<b>不预填</b>原作品的首帧图、画面描述与视频参数，全部由用户重新填写/上传（空状态规则见 §3.4.1）。原型佐证：新版 <code>作品详情.png</code> 按钮文案已由「生成视频」改为「再次生成」（<b>V0.1.1 修正</b>，替代前版「携带原 最终提示词 + 视频参数」口径）。</li>
       <li><b>保存到相册</b>：下载 MP4 到本地相册（需相册权限，无权限时弹原生授权）。</li>
       <li><b>分享</b>：打开分享面板 §4.5。</li>
     </ol>
@@ -486,58 +487,11 @@
 </table>
 
 <h3>4.6 后台本期增量总览 <span class="tag b">后台</span><span class="tag o">本期新增</span></h3>
-<p>后台仅 <b>3 个模块</b> 有字段变更（其余模块零改动，见 §4.10）。下表是本期后台改动的完整清单，逐项标注「新增字段 / 变更字段」及对应截图。</p>
-<table>
-  <tr><th style="width:16%;">模块（view id）</th><th style="width:16%;">本期新增/变更字段</th><th style="width:30%;">字段说明</th><th style="width:14%;">变更类型</th><th style="width:12%;">截图</th></tr>
-  <tr>
-    <td rowspan="2"><b>AI 工具消耗配置</b><br><code>viewCost</code><br><code>viewCostEdit</code></td>
-    <td>「工具」枚举 +「生视频」</td>
-    <td>原枚举仅「生图」；新增「生视频」作为独立计费工具，与生图分开配置与计价</td>
-    <td><span class="tag y">新增</span></td>
-    <td>图 4-9</td>
-  </tr>
-  <tr>
-    <td>「10 秒消耗」行（只读）</td>
-    <td>生图无时长概念，此行是生视频专属。值 = 5s 基准 × 3，<b>不可单独编辑</b>，随「每次消耗」自动联动</td>
-    <td><span class="tag y">新增</span></td>
-    <td>图 4-10</td>
-  </tr>
-  <tr>
-    <td rowspan="2"><b>辅助提示词配置</b><br><code>viewPromptConfig</code><br><code>viewPromptGroupEdit</code></td>
-    <td>「适用类型」列 + 筛选下拉</td>
-    <td>列表新增「适用类型」列展示，筛选区新增「全部类型 / 生图 / 生视频」下拉，便于按端检索词条</td>
-    <td><span class="tag y">新增</span></td>
-    <td>图 4-11</td>
-  </tr>
-  <tr>
-    <td>「适用类型」<b>单选 → 可多选</b>；「词条」标签编辑器</td>
-    <td>编辑页「适用类型」允许同时勾选生图 + 生视频（同一分类可服务两端）；「词条」支持逐个添加/删除并排序</td>
-    <td><span class="tag o">变更</span><br><span class="tag y">新增</span></td>
-    <td>图 4-12</td>
-  </tr>
-  <tr>
-    <td rowspan="2"><b>用户生成日志</b><br><code>viewLog</code></td>
-    <td>「内容类型」枚举 +「生视频」</td>
-    <td>与「生图」「素材下载」并列，用于按内容形态筛选/统计</td>
-    <td><span class="tag y">新增</span></td>
-    <td>图 4-13</td>
-  </tr>
-  <tr>
-    <td>「视频参数」列</td>
-    <td>生视频专属列，格式「5s · 9:16 · 音频开 · 摄像头关」；生图/素材下载类该列留空</td>
-    <td><span class="tag y">新增</span></td>
-    <td>图 4-13</td>
-  </tr>
-  <tr>
-    <td><b>其余 5 个模块</b><br>会员/调整/初始/套餐/素材</td>
-    <td colspan="3">本期 <b>零字段变更</b>，沿用 ai-generation PRD §4.4（详见 §4.10）</td>
-    <td>—</td>
-  </tr>
-</table>
-<div class="note">C 端本期增量（创作页生视频模式、额度不足积分抵扣、生成中状态、视频类详情与分享）见 §4.1–§4.5 及图 4-1 ~ 图 4-8。</div>
+<p>后台仅 <b>3 个模块</b> 有字段变更，详见各自章节：<b>AI 工具消耗配置</b>见 §4.7、<b>辅助提示词配置</b>见 §4.8、<b>用户生成日志</b>见 §4.9；其余 5 个模块（会员/调整/初始/套餐/素材）零改动，见 §4.10。各模块原型视图 ID 见<a href="#appendix-a">附录 A</a>。</p>
+<div class="note">C 端本期增量（创作页生视频模式、灵感值不足积分抵扣、生成中状态、视频类详情与分享）见 §4.1–§4.5 及图 4-1 ~ 图 4-8。</div>
 
 <h3>4.7 后台 - AI 工具消耗配置 <span class="tag b">后台</span></h3>
-<p>原型：<code>viewCost / viewCostEdit</code>。本期改动：<b>工具枚举 + 生视频、新增「10 秒消耗」只读行</b>。</p>
+<p>原型：AI 工具消耗配置页（视图 ID 见<a href="#appendix-a">附录 A</a>）。本期改动：<b>工具枚举 + 生视频、新增「10 秒消耗」只读行</b>。</p>
 <table>
   <tr><th>字段</th><th>规则</th><th style="width:14%;">本期状态</th></tr>
   <tr><td>工具</td><td>新增枚举值「生视频」，与「生图」并列，各自独立配置消耗</td><td><span class="tag y">新增</span></td></tr>
@@ -551,10 +505,10 @@
 <div class="fig"><img class="shot-admin" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/admin_cost.png" alt="AI 工具消耗配置 - 列表"><div class="fig-cap">图 4-9 AI 工具消耗配置 - 列表（「工具」枚举新增「生视频」）</div></div>
 <div class="fig"><img class="shot-admin" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/admin_cost_edit.png" alt="AI 工具消耗配置 - 新增"><div class="fig-cap">图 4-10 新增消耗配置（「10 秒消耗」只读行 = 5s 基准 × 3）</div></div>
 
-<div class="tip"><b>V0.1 定稿补充</b>：① <b>套餐（灵感值包）不区分生图/生视频</b>，统一按「灵感值」计量（C 端「购买灵感值」页与生图共用，详见 §5.2）；② 生视频<b>不单独享有首单优惠</b>，与生图共用 ai-generation PRD §4.1.2 的首单规则（一单一次，与用户维度对齐）。</div>
+<div class="tip"><b>定稿</b>：① <b>套餐（灵感值包）不区分生图/生视频</b>，统一按灵感值计量（详见 §9-#3）；② 生视频<b>不单独享首单优惠</b>，与生图共用首单规则（详见 §9-#3）。</div>
 
 <h3>4.8 后台 - 辅助提示词配置 <span class="tag b">后台</span></h3>
-<p>原型：<code>viewPromptConfig / viewPromptGroupEdit</code>。本期改动：<b>新增「适用类型」列与筛选、编辑页适用类型改多选、新增「词条」标签编辑器</b>。</p>
+<p>原型：辅助提示词配置页（视图 ID 见<a href="#appendix-a">附录 A</a>）。本期改动：<b>新增「适用类型」列与筛选、编辑页适用类型改多选、新增「词条」标签编辑器</b>。</p>
 <table>
   <tr><th>字段</th><th>规则</th><th style="width:14%;">本期状态</th></tr>
   <tr><td>分类名称</td><td>必填，如「运镜 / 动态」</td><td><span class="tag b">沿用</span></td></tr>
@@ -562,24 +516,24 @@
   <tr><td><b>适用类型</b></td><td>编辑页支持 <b>多选</b>：生图 / 生视频；列表页新增该列 + 筛选项「全部类型 / 生图 / 生视频」</td><td><span class="tag o">变更</span> <span class="tag y">新增</span></td></tr>
   <tr><td>排序</td><td>必填，数值越小越靠前</td><td><span class="tag b">沿用</span></td></tr>
   <tr><td>状态</td><td>启用 / 停用；停用后 C 端不再展示</td><td><span class="tag b">沿用</span></td></tr>
-  <tr><td><b>词条</b></td><td>标签式编辑器：逐个「添加」，可单个删除并调整顺序；V0.1 默认「运镜 / 动态」分类 5 个词条</td><td><span class="tag y">新增</span></td></tr>
+  <tr><td><b>词条</b></td><td>标签式编辑器：逐个「添加」，可单个删除并调整顺序；V0.1 默认词条见 §4.2.5</td><td><span class="tag y">新增</span></td></tr>
 </table>
 
 <div class="fig"><img class="shot-admin" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/admin_prompt_config.png" alt="辅助提示词配置 - 列表"><div class="fig-cap">图 4-11 辅助提示词配置 - 列表（新增「适用类型」列 + 筛选下拉）</div></div>
 <div class="fig"><img class="shot-admin" src="https://ddyuan-spec.github.io/lvyunji/_prd_imgs_video_v01/admin_prompt_group_edit.png" alt="辅助提示词配置 - 新增分类"><div class="fig-cap">图 4-12 新增/编辑分类（「适用类型」可多选 +「词条」标签编辑器）</div></div>
 
-<div class="tip">C 端只拉取「适用类型含生视频」且「分类 + 词条均启用」的数据。同一词条若同时属于生图与生视频分类，词条 ID 复用，C 端按所属分类展示。</div>
+<div class="tip">C 端拉取规则见 §4.2.5（适用类型含生视频且分类 + 词条均启用）。同一词条若同时属于生图与生视频分类，词条 ID 复用，C 端按所属分类展示。</div>
 
 <h3>4.9 后台 - 用户生成日志 <span class="tag b">后台</span></h3>
-<p>原型：<code>viewLog</code>。本期改动：<b>内容类型枚举 + 生视频、新增「视频参数」列</b>。</p>
+<p>原型：用户生成日志页（视图 ID 见<a href="#appendix-a">附录 A</a>）。本期改动：<b>内容类型枚举 + 生视频、新增「视频参数」列</b>。</p>
 <table>
   <tr><th>列</th><th>说明</th><th style="width:14%;">本期状态</th></tr>
   <tr><td>用户</td><td>头像 + 姓名 + 手机号（与生图共用查询）</td><td><span class="tag b">沿用</span></td></tr>
   <tr><td>生成时间</td><td>精确到秒</td><td><span class="tag b">沿用</span></td></tr>
   <tr><td><b>内容类型</b></td><td>新增枚举「生视频」，与「生图」「素材下载」并列</td><td><span class="tag y">新增</span></td></tr>
   <tr><td><b>视频参数</b></td><td>「内容类型 = 生视频」时展示，格式「5s · 9:16 · 音频开 · 摄像头关」；生图 / 素材下载类该列留空</td><td><span class="tag y">新增</span></td></tr>
-  <tr><td>提示词</td><td>完整 prompt（用户输入 + 已选辅助词拼接后的最终文本）</td><td><span class="tag b">沿用</span></td></tr>
-  <tr><td>消耗灵感值</td><td>本次实际扣减数（5s = 10 / 10s = 30；失败任务按退款规则展示）</td><td><span class="tag b">沿用</span></td></tr>
+  <tr><td>提示词</td><td>完整 最终提示词（用户输入 + 已选辅助词拼接后的最终文本）</td><td><span class="tag b">沿用</span></td></tr>
+  <tr><td>消耗灵感值</td><td>本次实际扣减数（取值见 §4.7；失败任务按退款规则展示）</td><td><span class="tag b">沿用</span></td></tr>
   <tr><td>结果</td><td>缩略图 / 视频首帧</td><td><span class="tag b">沿用</span></td></tr>
   <tr><td>状态</td><td>成功 / 失败 / 进行中</td><td><span class="tag b">沿用</span></td></tr>
   <tr><td>操作</td><td>查看结果 / 复制 URL</td><td><span class="tag b">沿用</span></td></tr>
@@ -595,13 +549,13 @@
 
 <h3>4.10 后台 - 通用模块（本期零改动，沿用）</h3>
 <div class="note">
-以下后台模块本期 <b>无字段变更</b>，沿用 <a href="lvyunjia-ai-generation-prd.html">lvyunjia-ai-generation-prd.html</a> §4.4 定义，仅在 C 端被生视频链路调用：
+以下后台模块本期 <b>无字段变更</b>，沿用 <a href="lvyunjia-ai-generation-prd.html">lvyunjia-ai-generation-prd.html</a> §4.4 定义，仅在 C 端被生视频链路调用（各模块视图 ID 见<a href="#appendix-a">附录 A</a>）：
 <ul>
-  <li><b>会员管理</b>（<code>viewMember</code>）：按灵感值余额/会员等级查询；生视频订单消耗计入累计灵感值</li>
-  <li><b>调整灵感值</b>（<code>viewAdjust</code>）：运营可对单个用户赠送/扣除灵感值，对生视频链路同等有效</li>
-  <li><b>初始用户灵感值配置</b>（<code>viewInit / viewInitEdit</code>）：新用户注册一次性发放的灵感值，不区分生图/生视频</li>
-  <li><b>套餐管理</b>（<code>viewPackage / viewPackageForm</code>）：生视频消耗通过同一钱包扣减，「购买灵感值」页与生图共用</li>
-  <li><b>素材管理</b>（<code>viewMaterial / viewMaterialCategory / viewCategoryForm</code>）：素材库本期不区分生图/生视频来源，V0.2+ 评估是否按用途拆分</li>
+  <li><b>会员管理</b>：按灵感值余额/会员等级查询；生视频订单消耗计入累计灵感值</li>
+  <li><b>调整灵感值</b>：运营可对单个用户赠送/扣除灵感值，对生视频链路同等有效</li>
+  <li><b>初始用户灵感值配置</b>：新用户注册一次性发放的灵感值，不区分生图/生视频</li>
+  <li><b>套餐管理</b>：生视频消耗通过同一钱包扣减，「购买灵感值」页与生图共用</li>
+  <li><b>素材管理</b>：素材库本期不区分生图/生视频来源，V0.2+ 评估是否按用途拆分</li>
 </ul>
 </div>
 
@@ -614,7 +568,7 @@
   <tr><td>提交生视频任务到跳转「我的作品」</td><td>≤ 500ms</td></tr>
   <tr><td>生视频任务：5s</td><td>中位数 ≤ 60s；95 分位 ≤ 90s</td></tr>
   <tr><td>生视频任务：10s</td><td>中位数 ≤ 120s；95 分位 ≤ 180s</td></tr>
-  <tr><td>「我的作品」轮询间隔</td><td>5s，长轮询或 WebSocket 推送</td></tr>
+  <tr><td>「我的作品」轮询间隔</td><td>5s，长轮询或服务端推送</td></tr>
 </table>
 
 <h3>5.2 安全</h3>
@@ -629,44 +583,44 @@
 <h3>5.3 兼容</h3>
 <table>
   <tr><th>端</th><th>范围</th></tr>
-  <tr><td>App</td><td>iOS 13+ / Android 8+</td></tr>
-  <tr><td>小程序</td><td>微信 iOS / Android 最新两版</td></tr>
-  <tr><td>H5</td><td>WebView 内 Chrome ≥ 80、Safari ≥ 13</td></tr>
-  <tr><td>视频格式</td><td>MP4 (H.264 / AAC)，9:16 / 16:9 / 1:1 / 3:4 输出</td></tr>
+  <tr><td>App</td><td>iOS / Android 主流版本（具体见附录 B）</td></tr>
+  <tr><td>小程序</td><td>微信最新两版（具体见附录 B）</td></tr>
+  <tr><td>H5</td><td>WebView 内核主流版本（具体见附录 B）</td></tr>
+  <tr><td>视频格式</td><td>MP4 格式，9:16 / 16:9 / 1:1 / 3:4 输出（编码约束见附录 B）</td></tr>
 </table>
 
 <h3>5.4 埋点需求</h3>
 <table>
-  <tr><th>事件</th><th>属性</th><th>触发</th></tr>
-  <tr><td>video_create_open</td><td>entry（数商服务/我的作品/分享回流）</td><td>进入生视频创作页</td></tr>
-  <tr><td>video_create_submit</td><td>duration, ratio, audio_on, camera_fixed, prompt_tag_count, prompt_len, has_first_frame</td><td>点击「生成视频」成功提交</td></tr>
-  <tr><td>video_create_fail_at_submit</td><td>reason（empty_prompt/insufficient_credit/risk_blocked）</td><td>提交校验失败</td></tr>
-  <tr><td>video_credit_popup_show</td><td>needed_credit, user_credit, user_point</td><td>额度不足弹窗展示</td></tr>
-  <tr><td>video_credit_popup_action</td><td>action（cancel/buy/point_redeem）, point_consumed</td><td>用户操作弹窗</td></tr>
-  <tr><td>video_task_success</td><td>duration, ratio, cost_credit, cost_ms</td><td>任务成功</td></tr>
-  <tr><td>video_task_fail</td><td>error_code, cost_ms</td><td>任务失败</td></tr>
-  <tr><td>video_share_click</td><td>channel（wx_friend/wx_moment/copy_link）</td><td>点击分享渠道</td></tr>
-  <tr><td>video_recreate_same</td><td>from_work_id</td><td>作品详情点「生成视频」</td></tr>
+  <tr><th>事件</th><th>属性</th><th>属性说明（中文）</th><th>触发</th></tr>
+  <tr><td>video_create_open</td><td>entry</td><td>来源：数商服务 / 我的作品 / 分享回流</td><td>进入生视频创作页</td></tr>
+  <tr><td>video_create_submit</td><td>duration, ratio, audio_on, camera_fixed, prompt_tag_count, prompt_len, has_first_frame</td><td>时长 / 比例 / 音频开关 / 固定摄像头 / 辅助词数量 / 描述字数 / 是否有首帧图</td><td>点击「生成视频」成功提交</td></tr>
+  <tr><td>video_create_fail_at_submit</td><td>reason</td><td>失败原因：empty_prompt 描述空 / insufficient_credit 灵感值不足 / risk_blocked 风控拦截</td><td>提交校验失败</td></tr>
+  <tr><td>video_credit_popup_show</td><td>needed_credit, user_credit, user_point</td><td>所需灵感值 / 用户当前灵感值 / 用户当前积分</td><td>灵感值不足弹窗展示</td></tr>
+  <tr><td>video_credit_popup_action</td><td>action, point_consumed</td><td>操作：cancel 取消 / buy 购买 / point_redeem 积分抵扣；本次消耗积分</td><td>用户操作弹窗</td></tr>
+  <tr><td>video_task_success</td><td>duration, ratio, cost_credit, cost_ms</td><td>时长 / 比例 / 消耗灵感值 / 耗时(ms)</td><td>任务成功</td></tr>
+  <tr><td>video_task_fail</td><td>error_code, cost_ms</td><td>错误码 / 耗时(ms)</td><td>任务失败</td></tr>
+  <tr><td>video_share_click</td><td>channel</td><td>渠道：wx_friend 微信好友 / wx_moment 朋友圈 / copy_link 复制链接</td><td>点击分享渠道</td></tr>
+  <tr><td>video_recreate_same</td><td>from_work_id</td><td>源作品 ID</td><td>作品详情点「再次生成」</td></tr>
 </table>
 
 <h2>六、验收标准</h2>
 <table>
   <tr><th>#</th><th>验收项</th><th>通过条件</th></tr>
-  <tr><td>1</td><td>数商服务首页「视频生成」入口可点</td><td>点击进入 AI 创作页，默认 mode=video，Tab 选中「生视频」</td></tr>
+  <tr><td>1</td><td>数商服务首页「视频生成」入口可点</td><td>点击进入 AI 创作页，默认生视频模式，Tab 选中「生视频」</td></tr>
   <tr><td>2</td><td>生视频参数完整可用</td><td>时长（5/10s）、比例（4 选 1）、生成音频、固定摄像头 4 个开关/单选均生效</td></tr>
   <tr><td>3</td><td>画面描述为空时不能提交</td><td>toast「请填写画面描述」且不进入任务流</td></tr>
-  <tr><td>4</td><td>辅助提示词可多选且拼入 prompt</td><td>提交时 prompt 文本 = 用户输入 + 已选词条（顿号连接），后台日志可见完整 prompt</td></tr>
-  <tr><td>5</td><td>灵感值不足触发额度不足弹窗</td><td>弹窗文案「本次生成需要 1 个额度，是否用 600 积分兑换一次额度？」完全一致</td></tr>
-  <tr><td>6</td><td>积分抵扣成功后继续提交</td><td>用户积分 -600，额度 +1，灵感值无变化（仍按 0 计算 → 仍不足，需先购买或用积分抵 1 额度后再扣灵感值）</td></tr>
-  <tr><td>7</td><td>「不再提示」勾选生效</td><td>勾选后本次会话再触发额度不足弹窗时直接走积分抵扣，不再弹窗；刷新/重登后恢复提示</td></tr>
-  <tr><td>8</td><td>积分不足弹窗正确触发</td><td>额度不足弹窗点「购买额度」且当前积分=0 时，弹积分不足弹窗</td></tr>
-  <tr><td>9</td><td>5s 视频消耗 10 灵感值，10s 消耗 30 灵感值</td><td>后台消耗配置变更 → C 端预计消耗实时刷新</td></tr>
+  <tr><td>4</td><td>辅助提示词可多选且拼入 最终提示词</td><td>提交时 最终提示词 文本 = 用户输入 + 已选词条（顿号连接），后台日志可见完整 最终提示词</td></tr>
+  <tr><td>5</td><td>灵感值不足弹出灵感值不足弹窗</td><td>弹窗文案「本次生成需要消耗灵感值，是否用 600 积分兑换 1 次生成（约 10 灵感值）？」完全一致</td></tr>
+  <tr><td>6</td><td>积分抵扣成功后继续提交</td><td>用户积分 -600，兑换 1 次生成（≈10 灵感值），灵感值余额不变（仍不足）→ 仍需先购买灵感值或用积分抵扣后扣减</td></tr>
+  <tr><td>7</td><td>「不再提示」勾选生效</td><td>勾选后本次会话再触发灵感值不足弹窗时直接走积分抵扣，不再弹窗；刷新/重登后恢复提示</td></tr>
+  <tr><td>8</td><td>积分不足弹窗正确触发</td><td>灵感值不足弹窗点「购买灵感值」且当前积分=0 时，弹积分不足弹窗</td></tr>
+  <tr><td>9</td><td>5s 视频消耗 10 灵感值、10s 消耗 30 灵感值（取值见 §4.7）</td><td>后台消耗配置变更 → C 端预计消耗实时刷新</td></tr>
   <tr><td>10</td><td>我的作品 - 生成中状态</td><td>沙漏图标 + 「生成中」标签 + 取消按钮；任务完成/失败时实时刷新</td></tr>
   <tr><td>11</td><td>作品详情 - 视频播放与三按钮</td><td>9:16 视频可播放；生成视频/保存到相册/分享 三按钮均可点击且符合定义</td></tr>
   <tr><td>12</td><td>分享落地为作品详情</td><td>微信好友/朋友圈/复制链接任一渠道，被点击用户进入作品详情页</td></tr>
   <tr><td>13</td><td>后台 - 视频参数列</td><td>用户生成日志中「内容类型=生视频」时展示视频参数列，文案与 PRD 一致</td></tr>
-  <tr><td>14</td><td>后台 - 辅助提示词分类适用类型</td><td>新增分类可指定「生图 / 生视频」，C 端只拉取「含生视频」的分类</td></tr>
-  <tr><td>15</td><td>任务失败正确释放灵感值</td><td>任务失败时已扣灵感值按退款规则返还，列表项标签「生成失败」+ toast 提示「生成失败，已返还灵感值」；列表页<b>不提供重试按钮</b>，点击失败项进入 AI 创作页（<b>空状态，不预填原首帧图、画面描述、参数</b>）</td></tr>
+  <tr><td>14</td><td>后台 - 辅助提示词分类适用类型</td><td>新增分类可指定「生图 / 生视频」，C 端拉取规则见 §4.2.5</td></tr>
+  <tr><td>15</td><td>任务失败正确释放灵感值</td><td>任务失败时已扣灵感值按退款规则返还，列表项标签「生成失败」+ toast 提示「生成失败，已返还灵感值」；列表页<b>不提供重试按钮</b>，点击失败项进入 AI 创作页（<b>空状态，不预填原首帧图、画面描述、参数</b>；标准处理见 §3.4.1）</td></tr>
 </table>
 
 <h2>七、关键边界设计检查清单</h2>
@@ -679,9 +633,9 @@
   <tr><td>5</td><td>用户卸载/重装 App</td><td>「不再提示」勾选走服务端落库字段（user_pref），跨设备一致</td></tr>
   <tr><td>6</td><td>首帧图含敏感内容</td><td>上传后做合规扫描，命中即拒绝并 toast「图片含违规内容，请重新上传」</td></tr>
   <tr><td>7</td><td>生视频被风控拦截</td><td>任务直接失败，已扣灵感值全数返还，文案「内容审核未通过」</td></tr>
-  <tr><td>8</td><td>生视频任务排队过长</td><td>提交后立即返回 task_id，C 端轮询；排队超 30s 时弹「任务较多，请稍候」</td></tr>
+  <tr><td>8</td><td>生视频任务排队过长</td><td>提交后立即返回任务 ID，C 端轮询；排队超 30s 时弹「任务较多，请稍候」</td></tr>
   <tr><td>9</td><td>积分刚好 = 600</td><td>允许抵扣成功后积分 = 0；不阻止抵扣</td></tr>
-  <tr><td>10</td><td>已勾选「不再提示」但用户后续取消勾选</td><td>V0.1 不支持取消（仅会话/落库字段置位），提供二期能力：用户中心 → 偏好设置</td></tr>
+  <tr><td>10</td><td>已勾选「不再提示」但用户后续取消勾选</td><td>勾选落库 <code>user_pref.no_credit_popup</code>，跨设备一致；V0.1 不支持客户端取消（仅置位），二期用户中心 → 偏好设置提供关闭</td></tr>
   <tr><td>11</td><td>10s 视频生成中点击「取消」</td><td>立即终止任务，释放冻结灵感值，作品状态=已取消</td></tr>
   <tr><td>12</td><td>分享到微信后被对方点击</td><td>落作品详情；未注册用户引导注册/登录后可见</td></tr>
 </table>
@@ -701,18 +655,46 @@
 <h2>九、待确认项汇总</h2>
 <table>
   <tr><th>#</th><th>待确认点</th><th>确认结论</th><th>确认人</th><th>状态</th></tr>
-  <tr><td>1</td><td>600 积分 = 1 额度 是否为本期定稿？积分来源？两套积分是否打通？</td><td><b>✅ 定稿</b>：600 积分 = 1 额度为本期定稿；来源为会员积分体系，会员积分 / 平台积分已打通</td><td>袁中天</td><td><span class="tag y">V0.1 定稿</span></td></tr>
-  <tr><td>2</td><td>「额度不足不再提示自动用积分抵扣」勾选是否落库 user_pref 跨设备一致？</td><td><b>✅ 定稿</b>：落库 <code>user_pref.no_credit_popup</code>，跨设备一致；取消勾选下次仍走提示</td><td>袁中天</td><td><span class="tag y">V0.1 定稿</span></td></tr>
+  <tr><td>1</td><td>600 积分 ≈ 10 灵感值（兑换 1 次生成） 是否为本期定稿？积分来源？两套积分是否打通？</td><td><b>✅ 定稿</b>：600 积分 ≈ 10 灵感值（兑换 1 次生成）为本期定稿；来源为会员积分体系，会员积分 / 平台积分已打通</td><td>袁中天</td><td><span class="tag y">V0.1 定稿</span></td></tr>
+  <tr><td>2</td><td>「灵感值不足不再提示自动用积分抵扣」勾选是否落库 user_pref 跨设备一致？</td><td><b>✅ 定稿</b>：落库 <code>user_pref.no_credit_popup</code>，跨设备一致；取消勾选下次仍走提示</td><td>袁中天</td><td><span class="tag y">V0.1 定稿</span></td></tr>
   <tr><td>3</td><td>生视频是否单独享首单优惠？套餐是否区分生图/生视频？</td><td><b>✅ 定稿</b>：生视频不单独享首单优惠，与生图共用首单规则；<b>套餐（灵感值包）不区分生图/生视频</b>，统一按灵感值计量</td><td>袁中天</td><td><span class="tag y">V0.1 定稿</span></td></tr>
   <tr><td>4</td><td>生视频是否走相同的水印策略（固定 true，C 端无开关）？</td><td><b>✅ 定稿</b>：固定水印，C 端无开关（与生图相同）</td><td>袁中天</td><td><span class="tag y">V0.1 定稿</span></td></tr>
   <tr><td>5</td><td>辅助提示词分类「运镜 / 动态」一期上线是否配齐 5 个词条（缓慢推近、镜头环绕、人物走动、物体旋转、光影流动）？</td><td><b>✅ 定稿</b>：一期上线即配齐 5 个词条，<b>先内置由运营维护</b>（后台 viewPromptGroupEdit 支持新增/编辑/上下线）</td><td>袁中天 / 运营</td><td><span class="tag y">V0.1 定稿</span></td></tr>
   <tr><td>6</td><td>10s 视频是否本期就开放给所有用户？或先灰度 VIP / 高级会员？</td><td><b>✅ 定稿</b>：<b>本期全量开放</b> 10s 视频（不灰度），所有用户均可使用 5s / 10s 两种时长</td><td>袁中天</td><td><span class="tag y">V0.1 定稿</span></td></tr>
-  <tr><td>7</td><td>作品详情「再次生成」同款带回什么？</td><td><b>✅ 定稿（V0.1.1 修正）</b>：<b>全空状态</b>——不自动带回首帧图、画面描述、视频参数，全部由用户重新填写/上传（原「仅携带 prompt + 视频参数」口径作废，与 §9 #8 失败项口径统一）</td><td>袁中天</td><td><span class="tag y">V0.1 定稿</span></td></tr>
+  <tr><td>7</td><td>作品详情「再次生成」同款带回什么？</td><td><b>✅ 定稿（V0.1.1 修正）</b>：<b>全空状态</b>——不自动带回首帧图、画面描述、视频参数，全部由用户重新填写/上传（原「仅携带 最终提示词 + 视频参数」口径作废，与 §9 #8 失败项口径统一）</td><td>袁中天</td><td><span class="tag y">V0.1 定稿</span></td></tr>
   <tr><td>8</td><td>生成视频任务「失败」文案与重试交互？</td><td><b>✅ 定稿</b>：作品列表项标签「生成失败」+ toast「生成失败，已返还灵感值」；<b>列表无重试按钮</b>，点击失败项进入 AI 创作页<b>（空状态，不预填原首帧图、画面描述、参数）</b></td><td>袁中天</td><td><span class="tag y">V0.1 定稿</span></td></tr>
 </table>
 
 <hr>
 <p class="meta">本 PRD 依据 C 端截图与后台原型 lvyunjia-admin-video-proto.html 编写。V0.1 首次发布，§9 全部 8 项已确认定稿；V0.1.1（2026-09-08）同步 C 端原型 V0.9 生成通知机制与「再次生成」全空状态定稿。后续按需补丁迭代。</p>
 
+
+<hr>
+<h2 id="appendix-a">附录 A · 原型视图 ID 映射</h2>
+<table>
+  <tr><th>视图 ID</th><th>中文页名</th></tr>
+  <tr><td><code>viewCreate</code></td><td>AI 创作页（生视频模式）</td></tr>
+  <tr><td><code>viewMyWorks</code></td><td>我的作品</td></tr>
+  <tr><td><code>viewWorkDetail</code></td><td>作品详情（视频类）</td></tr>
+  <tr><td><code>viewShare</code></td><td>分享面板</td></tr>
+  <tr><td><code>dialogInsufficientCredit</code></td><td>灵感值不足弹窗</td></tr>
+  <tr><td><code>dialogInsufficientPoint</code></td><td>积分不足弹窗</td></tr>
+  <tr><td><code>viewCost</code> / <code>viewCostEdit</code></td><td>AI 工具消耗配置</td></tr>
+  <tr><td><code>viewPromptConfig</code> / <code>viewPromptGroupEdit</code></td><td>辅助提示词配置</td></tr>
+  <tr><td><code>viewLog</code></td><td>用户生成日志</td></tr>
+  <tr><td><code>viewMember</code></td><td>会员管理</td></tr>
+  <tr><td><code>viewAdjust</code></td><td>调整灵感值</td></tr>
+  <tr><td><code>viewInit</code> / <code>viewInitEdit</code></td><td>初始用户灵感值配置</td></tr>
+  <tr><td><code>viewPackage</code> / <code>viewPackageForm</code></td><td>套餐管理</td></tr>
+  <tr><td><code>viewMaterial</code> / <code>viewMaterialCategory</code> / <code>viewCategoryForm</code></td><td>素材管理</td></tr>
+</table>
+
+<h2>附录 B · 技术约束</h2>
+<ul>
+  <li><b>前端本地存储</b>：原型用本地存储模拟任务态；「不再提示」勾选本期落库 <code>user_pref.no_credit_popup</code>，跨设备一致（详见 §9-#2）。</li>
+  <li><b>服务端推送</b>：任务状态通过轮询或服务端推送感知，非客户端长连接。</li>
+  <li><b>视频格式</b>：MP4，视频编码 H.264、音频编码 AAC；输出比例 9:16 / 16:9 / 1:1 / 3:4。</li>
+  <li><b>兼容范围</b>：App iOS / Android 主流版本；小程序微信最新两版；H5 WebView 内核主流版本。</li>
+</ul>
 </body>
 </html>
