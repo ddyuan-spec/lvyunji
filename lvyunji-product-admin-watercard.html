@@ -1411,13 +1411,23 @@
 
 
 
+
+
+
 <style id="__anno_css">.__anno-flag{position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#FFC53D;color:#5A3D00;font-size:11px;line-height:18px;text-align:center;cursor:pointer;z-index:99990;box-shadow:0 1px 4px rgba(0,0,0,.25);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;user-select:none;border:1.5px solid #fff}
 .__anno-flag[data-missing="1"]{background:#E04D4D;color:#fff;border-color:#fff}
 .__anno-flag[data-multi="1"]{background:#FF8F1F;color:#fff}
+.__anno-flag[data-pos="side"]{top:50%;left:calc(100% + 3px);right:auto;transform:translateY(-50%)}
 .__anno-bubble{position:fixed;z-index:99995;max-width:284px;background:#fff;border:1px solid #FF8F1F;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:12px;color:#333;line-height:1.6;overflow:hidden;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
 .__anno-bubble .b-head{display:flex;align-items:center;justify-content:space-between;padding:7px 11px;background:#FF8F1F;color:#fff;font-size:11px}
 .__anno-bubble .b-head .x{cursor:pointer;opacity:.9;font-size:15px;line-height:1}
 .__anno-bubble .b-body{padding:10px 12px;white-space:pre-wrap;word-break:break-word}
+.__anno-bubble .b-body .m-item{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid #f2e9d8}
+.__anno-bubble .b-body .m-item:last-child{border-bottom:none}
+.__anno-bubble .b-body .m-txt{flex:1;white-space:pre-wrap;word-break:break-word;cursor:pointer;min-width:0}
+.__anno-bubble .b-body .m-txt:hover{color:#B26A00}
+.__anno-bubble .b-body .m-del{flex:0 0 auto;height:20px;padding:0 9px;border:1px solid #e8d5b0;border-radius:10px;background:#fff;color:#B26A00;font-size:11px;cursor:pointer;font-family:inherit;line-height:1;white-space:nowrap}
+.__anno-bubble .b-body .m-del:hover{background:#FFF3E0;border-color:#FF8F1F;color:#8A4B00}
 .__anno-bubble .b-actions{display:flex;gap:8px;padding:0 12px 11px}
 .__anno-bubble textarea{width:256px;height:62px;border:1px solid #ddd;border-radius:6px;padding:8px;font-size:12px;font-family:inherit;resize:none;outline:none;display:block}
 .__anno-bubble textarea:focus{border-color:#FF8F1F}
@@ -1436,6 +1446,7 @@
 .__anno-list .item .n{display:inline-block;min-width:16px;height:16px;line-height:16px;text-align:center;background:#FFC53D;color:#5A3D00;border-radius:8px;font-size:10px;margin-right:6px;font-weight:600}
 .__anno-list .item .t{color:#aaa;font-size:11px;float:right}
 .__anno-list .item .v{color:#bbb;font-size:10px;margin-left:6px}
+.__anno-list .item .a{color:#7C5CFC;font-size:10px;margin-left:5px;background:#F3F0FF;border-radius:6px;padding:0 5px;white-space:nowrap}
 .__anno-mode-on,.__anno-mode-on *{cursor:crosshair!important}
 .__anno-hover{outline:2px dashed #7C5CFC!important;outline-offset:1px}
 .__anno-anchor{position:relative!important}
@@ -1515,11 +1526,36 @@
   function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
   function fmt(d){ function p(n){return (n<10?'0':'')+n;} return p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()); }
   function flash(el){ if(!el)return; var pv=el.style.outline; el.style.outline='3px solid #7C5CFC'; setTimeout(function(){ el.style.outline=pv; },1200); }
-  function blockOf(el){
-    var b = el.closest && el.closest('.card,.box,[data-anno],tr,li,section,article,form,td,th');
-    if (b) return b;
-    var p = el; while(p && p !== document.body){ var cs=getComputedStyle(p); if(cs.display!=='inline'&&p.offsetWidth>80&&p.offsetHeight>24) return p; p=p.parentElement; }
-    return el;
+  /* 角标挂载点：粒度从精到粗「三级降级」，核心是别一股脑跳到整张大卡/整行
+     ① [data-anno] 显式业务锚点（改版只要 key 还在就永不漂，最优先）
+     ② 小元素（单选项/按钮/输入框/链接/短文本等单行原子）→ 直接挂它自己，角标贴在「水卡」这个选项上
+     ③ 最近的「小容器」（行 .fr / 控件区 .ctl / 单元格 / 列表项…）→ 挂容器角
+     ④ 兜底：目标元素自己 */
+  var ATOM_RE = /^(label|button|a|input|select|textarea|img|svg|i|em|strong|code|span|td|th|dt|dd|li|p|h[1-6])$/;
+  var CONTAINER_SEL = '.fr,.ctl,.form-item,.el-form-item,.row,.item,.cell,.field,.col,tr,li,td,th,.box,.card,section,article,form';
+  function isAtom(el){
+    if (!el || !el.tagName || !el.getBoundingClientRect) return false;
+    if (!ATOM_RE.test(el.tagName.toLowerCase())) return false;
+    var r = el.getBoundingClientRect();
+    return r.height > 0 && r.height <= 44;   /* 限单行，避免把整块 <li>/<td> 当原子 */
+  }
+  function anchorOf(el){
+    if (!el || !el.closest) return el;
+    var k = el.closest('[data-anno]'); if (k) return k;
+    var core = el;
+    /* 点到 14px 的小圆点（input）时用包着它的 label（含「水卡」文字），角标才落在选项上 */
+    if (/^input$/i.test(el.tagName) && /^(radio|checkbox)$/i.test(el.type || '')) core = el.closest('label') || el;
+    if (isAtom(core)) return core;
+    var p = core.parentElement;
+    while (p && p !== document.body){
+      if (p.matches && p.matches(CONTAINER_SEL)){
+        var r = p.getBoundingClientRect();
+        if (r.height > 0 && r.height <= 220) return p;   /* 太高的容器（整页表单）不接 */
+        break;
+      }
+      p = p.parentElement;
+    }
+    return core;
   }
   function viewOf(el){ if(!el) return 'global'; var v = el.closest && el.closest('[data-view]'); if(v) return v.getAttribute('data-view'); v = el.closest && el.closest('.view,.page'); return v ? (v.id || 'global') : 'global'; }
 
@@ -1554,18 +1590,20 @@
         if (a.view === cv || a.view === 'global'){ (map.__miss = map.__miss || []).push(a); }
         return;
       }
-      var block = blockOf(el);
+      var block = anchorOf(el);
       if (!map.has(block)) map.set(block, []);
       map.get(block).push(a);
     });
     map.forEach(function(annos, block){
       if (block === '__miss') return;
-      if (block !== document){
+      if (block !== document && block.classList){
         block.classList.add('__anno-anchor');
-        if (getComputedStyle(block).position === 'static') block.classList.add('__anno-anchor');
       }
       var multi = annos.length > 1;
       var flag=document.createElement('div'); flag.className='__anno-flag';
+      /* 挂在极小元素（单选项小圆点等）上时改为右侧外挂，免得 18px 角标盖住元素本身 */
+      var br = block.getBoundingClientRect ? block.getBoundingClientRect() : null;
+      if (br && br.height > 0 && (br.height < 22 || br.width < 22)) flag.setAttribute('data-pos','side');
       if (multi) flag.setAttribute('data-multi','1');
       flag.textContent = multi ? annos.length : annos[0].no;
       if (multi){
@@ -1609,12 +1647,44 @@
     var head=document.createElement('div'); head.className='b-head'; head.innerHTML='<span>该位置 '+annos.length+' 条批注</span><span class="x">×</span>';
     var body=document.createElement('div'); body.className='b-body';
     annos.slice().sort(function(x,y){return x.no-y.no;}).forEach(function(a){
-      var p=document.createElement('div'); p.style.cssText='padding:6px 0;border-bottom:1px solid #f2e9d8;white-space:pre-wrap;cursor:pointer'; p.textContent='#'+a.no+' '+a.text;
-      p.addEventListener('click', function(){ openBubble(a.id, null); }); body.appendChild(p);
+      var row=document.createElement('div'); row.className='m-item';
+      var txt=document.createElement('div'); txt.className='m-txt'; txt.textContent='#'+a.no+' '+a.text;
+      txt.addEventListener('click', function(){ openBubble(a.id, null); });
+      var del=document.createElement('button'); del.className='m-del'; del.textContent='删除';
+      del.title='删除这条批注';
+      del.addEventListener('click', function(ev){ ev.stopPropagation(); ev.preventDefault(); removeAnno(a.id, block); });
+      row.appendChild(txt); row.appendChild(del); body.appendChild(row);
     });
-    b.appendChild(head); b.appendChild(body); document.body.appendChild(b);
+    var foot=document.createElement('div'); foot.className='b-actions';
+    var delAll=btn('删除全部 '+annos.length+' 条','ghost');
+    delAll.addEventListener('click', function(ev){
+      ev.stopPropagation();
+      if (!confirm('删除这 '+annos.length+' 条批注？')) return;
+      var ids=annos.map(function(x){ return x.id; });
+      data=data.filter(function(x){ return ids.indexOf(x.id)===-1; });
+      save(); closeBubble(); render(); toast('已删除 '+ids.length+' 条批注');
+    });
+    foot.appendChild(delAll);
+    b.appendChild(head); b.appendChild(body); b.appendChild(foot); document.body.appendChild(b);
     head.querySelector('.x').addEventListener('click',closeBubble);
-    var r=block.getBoundingClientRect(); b.style.left=Math.min(Math.max(r.left,8),window.innerWidth-284)+'px'; b.style.top=Math.min(r.bottom+6,window.innerHeight-200)+'px';
+    var r=block.getBoundingClientRect(); b.style.left=Math.min(Math.max(r.left,8),window.innerWidth-300)+'px'; b.style.top=Math.min(r.bottom+6,window.innerHeight-200)+'px';
+  }
+  /* 删一条。anchorEl 传入时（从合并面板删）删完把该锚点剩下的批注面板接着打开，方便连着删 */
+  function removeAnno(id, anchorEl){
+    var a=data.filter(function(x){return x.id===id;})[0]; if(!a) return;
+    if(!confirm('删除批注 #'+a.no+'？')) return;
+    data=data.filter(function(x){return x.id!==id;});
+    save(); render(); toast('已删除批注 #'+a.no);
+    if (anchorEl && document.body.contains(anchorEl)){
+      var rest=data.filter(function(x){
+        if (x.view && x.view!=='global' && x.view!==currentView()) return false;
+        var el=locate(x.sel, rootOf(x.view));
+        if (!el || !isVisible(el)) return false;
+        return anchorOf(el)===anchorEl;
+      });
+      if (rest.length>1) openMulti(anchorEl, rest);
+      else closeBubble();
+    } else closeBubble();
   }
   function renderList(){
     listPanel.innerHTML='';
@@ -1624,7 +1694,8 @@
     data.slice().sort(function(x,y){return x.no-y.no;}).forEach(function(a){
       var el=locate(a.sel, rootOf(a.view)); var miss = !el || !isVisible(el);
       var it=document.createElement('div'); it.className='item'+(miss?' miss':'');
-      it.innerHTML='<span class="n">'+a.no+'</span><span class="v">'+(a.view&&a.view!=='global'?'['+a.view+']':'')+'</span>'+esc(a.text)+'<span class="t">'+fmt(new Date(a.ts||Date.now()))+(miss?' 失联':'')+'</span>';
+      var atxt = el ? textOf(el).slice(0,12) : '';   /* 挂在哪：把锚点上的文字带出来，方便对号 */
+      it.innerHTML='<span class="n">'+a.no+'</span><span class="v">'+(a.view&&a.view!=='global'?'['+a.view+']':'')+'</span>'+esc(a.text)+(atxt?'<span class="a">'+esc(atxt)+'</span>':'')+'<span class="t">'+fmt(new Date(a.ts||Date.now()))+(miss?' 失联':'')+'</span>';
       it.addEventListener('click',function(){ var e2=locate(a.sel, rootOf(a.view)); if(e2){e2.scrollIntoView({block:'center'});flash(e2);} if(hidden){hidden=false;document.body.classList.remove('__anno-hidden');bHide.textContent='隐藏';} var f=document.querySelector('.__anno-flag[data-id="'+a.id+'"]'); if(f)openBubble(a.id,f); else if(miss) toast('该批注已失联，原型可能已改版'); });
       listPanel.appendChild(it);
     });
