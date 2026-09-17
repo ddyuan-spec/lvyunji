@@ -1587,6 +1587,11 @@
 
 
 
+
+
+
+
+
 <style id="__anno_css">/* v4：角标独立浮层。layer 在视口坐标下绝对定位（inset:0 fixed），
    子角标用 JS 按目标元素 rect 算 left/top，不进宿主 DOM。z-index 低于弹窗遮罩(3950)，
    弹窗开启时整层隐藏，不穿透。工具栏/气泡/列表面板保持超高 z-index 仍可操作。 */
@@ -1642,7 +1647,7 @@
 .__anno-tb button.__anno-locked{opacity:.45;cursor:not-allowed}
 .__anno-tb .__anno-hint{background:#E04D4D;color:#fff;cursor:default;font-size:11px;padding:0 9px}
 </style>
-<script id="__anno_seed" type="application/json">[{"id":"amu59sur4jl63","no":1,"view":"viewDetail","sel":"div#detailForm > div.dcard:nth-of-type(1) > div.sec-body:nth-of-type(2) > div.fr:nth-of-type(5) > div.ctl > label.rdo:nth-of-type(3)","text":"选中后隐藏了其他设置和售后设置，还有发货模板，增加了水卡设置，选中后下滑查看","ts":1789633873840,"valid":true}]</script>
+<script id="__anno_seed" type="application/json">[]</script>
 <script id="__anno_engine">
 (function(){
   "use strict";
@@ -1811,6 +1816,8 @@
       if(!el || !el.getBoundingClientRect){ o.flag.style.display='none'; return; }
       var r=el.getBoundingClientRect();
       if ((r.width===0 && r.height===0) || !isVisible(el)){ o.flag.style.display='none'; return; }
+      /* 方案A：元素完全滚出视口则隐藏角标，滚回再出现；避免 v4 的 clamp 把角标吸附钉在屏幕边缘 */
+      if (r.bottom < 0 || r.top > vh || r.right < 0 || r.left > vw){ o.flag.style.display='none'; return; }
       o.flag.style.display='';
       var left, top;
       if (o.pos==='side'){ left=r.right+3; top=r.top+r.height/2-9; }
@@ -2052,6 +2059,4 @@
   bHide.textContent = '隐藏';
 })();
 </script>
-
-
 </body></html>
