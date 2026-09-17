@@ -1127,7 +1127,10 @@ function __protoBuildStandalone(pageEl, title){
   var inner = pageEl ? pageEl.outerHTML : document.body.innerHTML;
   return '<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n<meta charset="utf-8">\n<title>'
        + (title||'原型单页') + '</title>\n<style>\n' + style + '\n</style>\n</head>\n<body>\n<div'
-       + phoneCls + '>\n' + inner + '\n</div>\n<style id="__anno_css">.__anno-flag{position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#FFC53D;color:#5A3D00;font-size:11px;line-height:18px;text-align:center;cursor:pointer;z-index:99990;box-shadow:0 1px 4px rgba(0,0,0,.25);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;user-select:none;border:1.5px solid #fff}
+       + phoneCls + '>\n' + inner + '\n</div>\n
+
+
+<style id="__anno_css">.__anno-flag{position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#FFC53D;color:#5A3D00;font-size:11px;line-height:18px;text-align:center;cursor:pointer;z-index:99990;box-shadow:0 1px 4px rgba(0,0,0,.25);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;user-select:none;border:1.5px solid #fff}
 .__anno-flag[data-missing="1"]{background:#E04D4D;color:#fff;border-color:#fff}
 .__anno-flag[data-multi="1"]{background:#FF8F1F;color:#fff}
 .__anno-bubble{position:fixed;z-index:99995;max-width:284px;background:#fff;border:1px solid #FF8F1F;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:12px;color:#333;line-height:1.6;overflow:hidden;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
