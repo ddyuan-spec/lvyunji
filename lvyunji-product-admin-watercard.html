@@ -220,6 +220,25 @@
     .addrbox { width: 480px; border: 1px solid var(--border-2); border-radius: 3px; padding: 12px 14px; }
     .addrbox .ar { display: flex; gap: 12px; font-size: 13px; line-height: 2; }
     .addrbox .ar span:first-child { flex: 0 0 62px; color: var(--text-hint); }
+    /* 水卡模板：选中后的信息卡 */
+    .tplbox { width: 480px; border: 1px solid var(--border-2); border-radius: 3px; padding: 12px 14px; }
+    .tplbox .trow { display: flex; gap: 12px; font-size: 13px; line-height: 2; }
+    .tplbox .trow span:first-child { flex: 0 0 84px; color: var(--text-hint); }
+    .tplbox .trow span:last-child { color: #222; font-weight: 600; }
+    /* 新增水卡模板弹窗 */
+    .wct-mask { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; align-items: center; justify-content: center; z-index: 3950; }
+    .wct-mask.show { display: flex; }
+    .wct-box { width: 900px; max-height: 84vh; background: #fff; border-radius: 4px; box-shadow: 0 6px 22px rgba(0,0,0,.16); display: flex; flex-direction: column; }
+    .wct-head { display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 20px; border-bottom: 1px solid var(--border); font-size: 15px; color: #222; flex: 0 0 48px; }
+    .wct-head .x { color: #999; font-size: 18px; line-height: 1; cursor: pointer; }
+    .wct-head .x:hover { color: #666; }
+    .wct-body { padding: 26px 30px 6px; overflow: auto; }
+    .wct-sub { font-size: 15px; font-weight: 600; color: #222; margin-bottom: 24px; }
+    .wct-body .fr { margin-bottom: 22px; }
+    .wct-body .fr > label { flex: 0 0 200px; width: 200px; }
+    .wct-foot { display: flex; justify-content: center; gap: 26px; padding: 18px 20px 22px; }
+    /* 水卡类型：商品规格锁 1 组，隐藏「添加子规格 / 创建新规格 / 多余规格值行」入口 */
+    .spec-locked .specLock { display: none !important; }
     .tb-link { color: var(--link); cursor: pointer; font-size: 13px; }
     .tb-link:hover { text-decoration: underline; }
     .foot { position: sticky; bottom: 0; background: #fff; border-top: 1px solid var(--border); padding: 18px 0; display: flex; justify-content: center; gap: 26px; margin: 12px -16px 0; z-index: 5; }
@@ -567,8 +586,8 @@
             </div>
           </div>
 
-          <!-- 3. 商品规格 -->
-          <div class="dcard">
+          <!-- 3. 商品规格（商品类型=水卡 时锁 1 组：1 规格 × 1 子规格，标记 specLock 的入口全部隐藏） -->
+          <div class="dcard" id="cardSpec">
             <div class="sec-title">商品规格</div>
             <div class="sec-body">
               <div class="box">
@@ -595,10 +614,10 @@
                       <option>2</option>
                       <option>3</option>
                     </select>
-                    <button class="ghost" style="height:32px;width:36px;justify-content:center;padding:0" onclick="toast('新增一行规格值')">+</button>
+                    <button class="ghost specLock" style="height:32px;width:36px;justify-content:center;padding:0" onclick="toast('新增一行规格值')">+</button>
                   </div>
                 </div>
-                <div class="fr">
+                <div class="fr specLock">
                   <label></label>
                   <div class="ctl">
                     <input class="inp" style="width:320px" type="text" placeholder="请输入">
@@ -613,7 +632,7 @@
                     <span class="tb-link" onclick="toast('删除该规格值')">删除</span>
                   </div>
                 </div>
-                <div class="fr" style="margin-bottom:0">
+                <div class="fr specLock" style="margin-bottom:0">
                   <label></label>
                   <div class="ctl">
                     <button class="ghost" onclick="toast('添加子规格')"><span class="circ">+</span>添加子规格</button>
@@ -631,7 +650,7 @@
                       <option>容量</option>
                     </select>
                     <label class="rdo" style="margin:0 12px 0 6px"><input type="radio" name="dSpec2Img" value="1">添加规格图片</label>
-                    <span class="tb-link" onclick="toast('删除该规格')">删除</span>
+                    <span class="tb-link specLock" onclick="toast('删除该规格')">删除</span>
                   </div>
                 </div>
                 <div class="fr">
@@ -645,17 +664,17 @@
                       <option>2</option>
                       <option>3</option>
                     </select>
-                    <button class="ghost" style="height:32px;width:36px;justify-content:center;padding:0" onclick="toast('新增一行规格值')">+</button>
+                    <button class="ghost specLock" style="height:32px;width:36px;justify-content:center;padding:0" onclick="toast('新增一行规格值')">+</button>
                   </div>
                 </div>
-                <div class="fr" style="margin-bottom:0">
+                <div class="fr specLock" style="margin-bottom:0">
                   <label></label>
                   <div class="ctl">
                     <button class="ghost" onclick="toast('添加子规格')"><span class="circ">+</span>添加子规格</button>
                   </div>
                 </div>
               </div>
-              <div style="padding-top:16px">
+              <div class="specLock" style="padding-top:16px">
                 <button class="ghost" onclick="toast('创建新规格')"><span class="circ">+</span>创建新规格</button>
               </div>
             </div>
@@ -710,33 +729,25 @@
           <div class="dcard" id="cardWater">
             <div class="sec-title">水卡设置</div>
             <div class="sec-body">
-              <div class="fr">
-                <label class="req" for="dCardDays">水卡有效期</label>
+              <div class="fr" style="margin-bottom:10px">
+                <label></label>
                 <div class="ctl">
-                  <span style="font-size:13px;color:var(--text-sub)">激活后</span>
-                  <input class="inp" style="width:120px" type="text" id="dCardDays" placeholder="请输入天数">
-                  <span style="font-size:13px;color:var(--text-sub)">天有效</span>
-                </div>
-              </div>
-              <div class="fr">
-                <label class="req" for="dDailyLimit">每日取水上限</label>
-                <div class="ctl">
-                  <input class="inp" style="width:220px" type="text" id="dDailyLimit" placeholder="请输入每日取水上限">
-                  <span style="font-size:13px;color:var(--text-sub)">L</span>
-                </div>
-              </div>
-              <div class="fr">
-                <label class="req" for="dMonthLimit">每月取水上限</label>
-                <div class="ctl">
-                  <input class="inp" style="width:220px" type="text" id="dMonthLimit" placeholder="请输入每月取水上限">
-                  <span style="font-size:13px;color:var(--text-sub)">L</span>
+                  <select class="sel" style="width:320px" id="dCardTpl" onchange="syncCardTpl()">
+                    <option value="">请选择水卡模板</option>
+                  </select>
+                  <span class="tb-link" onclick="openCardTpl()">新增</span>
                 </div>
               </div>
               <div class="fr" style="margin-bottom:0">
-                <label class="req" for="dTotalWater">总水量</label>
+                <label></label>
                 <div class="ctl">
-                  <input class="inp" style="width:220px" type="text" id="dTotalWater" placeholder="请输入总水量">
-                  <span style="font-size:13px;color:var(--text-sub)">L</span>
+                  <div class="uphint" style="margin-top:0;max-width:720px">请选择合适的水卡模板，该商品将以您选中的模板进行取水权益的配置，若无合适的水卡模板，请先新增</div>
+                </div>
+              </div>
+              <div class="fr" id="cardTplRow" style="margin-bottom:0;display:none;margin-top:20px">
+                <label></label>
+                <div class="ctl">
+                  <div class="tplbox" id="cardTplBox"></div>
                 </div>
               </div>
             </div>
@@ -912,6 +923,55 @@
     </div>
   </div>
 
+  <!-- 新增水卡模板弹窗 -->
+  <div class="wct-mask" id="wctMask">
+    <div class="wct-box">
+      <div class="wct-head">新增水卡信息<span class="x" onclick="closeCardTpl()">×</span></div>
+      <div class="wct-body">
+        <div class="wct-sub">新增水卡模板</div>
+        <div class="fr">
+          <label class="req" for="wcName">水卡模板名称:</label>
+          <div class="ctl">
+            <span class="cnt-in"><input class="inp inp-w462" type="text" id="wcName" maxlength="200" placeholder="请输入名称" oninput="cntSync(this,'wcNameCnt')"><span class="cnt" id="wcNameCnt">0/200</span></span>
+          </div>
+        </div>
+        <div class="fr">
+          <label class="req" for="wcDays">水卡有效期:</label>
+          <div class="ctl">
+            <span style="font-size:13px;color:var(--text-sub)">激活后</span>
+            <input class="inp" style="width:120px" type="text" id="wcDays" placeholder="请输入天数">
+            <span style="font-size:13px;color:var(--text-sub)">天有效</span>
+          </div>
+        </div>
+        <div class="fr">
+          <label class="req" for="wcDaily">每日取水上限:</label>
+          <div class="ctl">
+            <input class="inp" style="width:220px" type="text" id="wcDaily" placeholder="请输入每日取水上限">
+            <span style="font-size:13px;color:var(--text-sub)">L</span>
+          </div>
+        </div>
+        <div class="fr">
+          <label class="req" for="wcMonth">每月取水上限:</label>
+          <div class="ctl">
+            <input class="inp" style="width:220px" type="text" id="wcMonth" placeholder="请输入每月取水上限">
+            <span style="font-size:13px;color:var(--text-sub)">L</span>
+          </div>
+        </div>
+        <div class="fr" style="margin-bottom:0">
+          <label class="req" for="wcTotal">总水量:</label>
+          <div class="ctl">
+            <input class="inp" style="width:220px" type="text" id="wcTotal" placeholder="请输入总水量">
+            <span style="font-size:13px;color:var(--text-sub)">L</span>
+          </div>
+        </div>
+      </div>
+      <div class="wct-foot">
+        <button class="btn btn-default btn-lg" onclick="closeCardTpl()">取消</button>
+        <button class="btn btn-primary btn-lg" onclick="submitCardTpl()">确定</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     /* ============================================================
        样例数据（复刻截图 4 行）
@@ -1020,17 +1080,102 @@
       el.value = v;
     }
     function toggleSw(el) { el.classList.toggle('on'); }
-    /* 水卡类型联动：商品类型=水卡 时隐藏「发货模板设置」「售后设置」、显示「水卡设置」，其余类型反之 */
+    /* 水卡类型联动：商品类型=水卡 时隐藏「发货模板设置」「售后设置」、显示「水卡设置」，其余类型反之
+       同时：水卡的商品规格锁 1 组（1 规格 × 1 子规格），隐藏加子规格 / 建新规格 / 多余规格值行入口 */
     function syncWaterCards() {
       var isCard = getRadio('dPtype') === '水卡';
       var w = document.getElementById('cardWater');
       var s = document.getElementById('cardShip');
       var a = document.getElementById('cardAfter');
       var o = document.getElementById('cardOther');
+      var sp = document.getElementById('cardSpec');
       if (w) { w.style.display = isCard ? '' : 'none'; }
       if (s) { s.style.display = isCard ? 'none' : ''; }
       if (a) { a.style.display = isCard ? 'none' : ''; }
       if (o) { o.style.display = isCard ? 'none' : ''; }
+      if (sp) { sp.classList.toggle('spec-locked', isCard); }
+    }
+
+    /* ============================================================
+       水卡模板（新增 / 选择 / 展示；模板不可修改、不可删除）
+       ============================================================ */
+    var cardTpls = [
+      { name: '年卡模板', days: 365, daily: 2, month: 60, total: 720 },
+      { name: '月卡模板', days: 30, daily: 2, month: 30, total: 60 }
+    ];
+    function findCardTpl(name) {
+      for (var i = 0; i < cardTpls.length; i++) { if (cardTpls[i].name === name) { return cardTpls[i]; } }
+      return null;
+    }
+    function renderCardTplOptions() {
+      var sel = document.getElementById('dCardTpl');
+      if (!sel) { return; }
+      var keep = sel.value;
+      sel.innerHTML = '<option value="">请选择水卡模板</option>';
+      cardTpls.forEach(function (t) {
+        var o = document.createElement('option');
+        o.value = t.name; o.textContent = t.name;
+        sel.appendChild(o);
+      });
+      sel.value = findCardTpl(keep) ? keep : '';
+    }
+    /* 选中模板后展示对应的水卡信息 */
+    function syncCardTpl() {
+      var sel = document.getElementById('dCardTpl');
+      var row = document.getElementById('cardTplRow');
+      var box = document.getElementById('cardTplBox');
+      if (!sel || !row || !box) { return; }
+      var t = findCardTpl(sel.value);
+      if (!t) { row.style.display = 'none'; box.innerHTML = ''; return; }
+      box.innerHTML =
+        '<div class="trow"><span>水卡有效期</span><span>' + t.days + '天</span></div>' +
+        '<div class="trow"><span>每日取水上限</span><span>' + t.daily + 'L</span></div>' +
+        '<div class="trow"><span>每月取水上限</span><span>' + t.month + 'L</span></div>' +
+        '<div class="trow"><span>总水量</span><span>' + t.total + 'L</span></div>';
+      row.style.display = '';
+    }
+    function setCardTpl(name) {
+      var sel = document.getElementById('dCardTpl');
+      if (!sel) { return; }
+      sel.value = name || '';
+      syncCardTpl();
+    }
+    /* 商品已配置的水卡参数与哪个模板一致（用于编辑时回显） */
+    function matchCardTpl(p) {
+      for (var i = 0; i < cardTpls.length; i++) {
+        var t = cardTpls[i];
+        if (String(t.days) === String(p.cardDays) && String(t.daily) === String(p.dailyLimit) &&
+            String(t.month) === String(p.monthLimit) && String(t.total) === String(p.totalWater)) { return t; }
+      }
+      return null;
+    }
+    function openCardTpl() {
+      document.getElementById('wcName').value = '';
+      document.getElementById('wcDays').value = '';
+      document.getElementById('wcDaily').value = '';
+      document.getElementById('wcMonth').value = '';
+      document.getElementById('wcTotal').value = '';
+      document.getElementById('wcNameCnt').textContent = '0/200';
+      document.getElementById('wctMask').classList.add('show');
+    }
+    function closeCardTpl() { document.getElementById('wctMask').classList.remove('show'); }
+    function submitCardTpl() {
+      var name = document.getElementById('wcName').value.trim();
+      var days = document.getElementById('wcDays').value.trim();
+      var daily = document.getElementById('wcDaily').value.trim();
+      var month = document.getElementById('wcMonth').value.trim();
+      var total = document.getElementById('wcTotal').value.trim();
+      if (!name) { toast('请输入水卡模板名称'); return; }
+      if (!days) { toast('请输入水卡有效期'); return; }
+      if (!daily) { toast('请输入每日取水上限'); return; }
+      if (!month) { toast('请输入每月取水上限'); return; }
+      if (!total) { toast('请输入总水量'); return; }
+      if (findCardTpl(name)) { toast('该水卡模板名称已存在'); return; }
+      cardTpls.push({ name: name, days: days, daily: daily, month: month, total: total });
+      renderCardTplOptions();
+      closeCardTpl();
+      setCardTpl(name);
+      toast('已新增水卡模板');
     }
 
     /* ============================================================
@@ -1217,10 +1362,8 @@
         setVal('dPvi', ''); setVal('dSupplyPrice', ''); setVal('dStock', p.stock);
         document.getElementById('dSeven').classList.toggle('on', true);
         setRadio('dPresale', '非预售');
-        setVal('dCardDays', p.cardDays == null ? '' : p.cardDays);
-        setVal('dDailyLimit', p.dailyLimit == null ? '' : p.dailyLimit);
-        setVal('dMonthLimit', p.monthLimit == null ? '' : p.monthLimit);
-        setVal('dTotalWater', p.totalWater == null ? '' : p.totalWater);
+        var mt = matchCardTpl(p);
+        setCardTpl(mt ? mt.name : '');
       } else {
         document.getElementById('dCategory').selectedIndex = 0;
         document.getElementById('dBrand').selectedIndex = 0;
@@ -1236,7 +1379,7 @@
         setVal('dPvi', ''); setVal('dSupplyPrice', ''); setVal('dStock', '');
         document.getElementById('dSeven').classList.add('on');
         setRadio('dPresale', '非预售');
-        setVal('dCardDays', ''); setVal('dDailyLimit', ''); setVal('dMonthLimit', ''); setVal('dTotalWater', '');
+        setCardTpl('');
       }
       syncWaterCards();
       go('detail');
@@ -1254,7 +1397,195 @@
       var radios = document.querySelectorAll('input[name="dPtype"]');
       for (var i = 0; i < radios.length; i++) { radios[i].addEventListener('change', syncWaterCards); }
     })();
+    renderCardTplOptions();
+    syncCardTpl();
     syncWaterCards();
   </script>
+<!-- ===== 原型批注层 Annotation Overlay v1 ===== -->
+<style id="__anno_css">
+.__anno-flag{position:absolute;top:2px;right:2px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:#7C5CFC;color:#fff;font-size:10px;line-height:17px;text-align:center;cursor:pointer;z-index:99990;box-shadow:0 1px 4px rgba(0,0,0,.3);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;user-select:none}
+.__anno-flag[data-missing="1"]{background:#E04D4D}
+.__anno-bubble{position:fixed;z-index:99995;max-width:264px;background:#fff;border:1px solid #7C5CFC;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:12px;color:#333;line-height:1.6;overflow:hidden;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.__anno-bubble .b-head{display:flex;align-items:center;justify-content:space-between;padding:7px 11px;background:#7C5CFC;color:#fff;font-size:11px}
+.__anno-bubble .b-head .x{cursor:pointer;opacity:.9;font-size:15px;line-height:1}
+.__anno-bubble .b-body{padding:10px 12px;white-space:pre-wrap;word-break:break-word}
+.__anno-bubble .b-actions{display:flex;gap:8px;padding:0 12px 11px}
+.__anno-bubble textarea{width:240px;height:62px;border:1px solid #ddd;border-radius:6px;padding:8px;font-size:12px;font-family:inherit;resize:none;outline:none;display:block}
+.__anno-bubble textarea:focus{border-color:#7C5CFC}
+.__anno-bubble button{height:28px;padding:0 12px;border:none;border-radius:14px;background:#7C5CFC;color:#fff;font-size:12px;cursor:pointer;font-family:inherit}
+.__anno-bubble button.ghost{background:#eee;color:#555}
+.__anno-tb{position:fixed;right:16px;bottom:16px;z-index:99999;display:flex;align-items:center;gap:6px;background:#1f1f2e;padding:7px 9px;border-radius:26px;box-shadow:0 6px 20px rgba(0,0,0,.35);font-family:inherit}
+.__anno-tb button{height:30px;padding:0 11px;border:none;border-radius:15px;background:#33334a;color:#fff;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.__anno-tb button.on{background:#7C5CFC}
+.__anno-list{position:fixed;left:16px;top:16px;z-index:99998;width:284px;max-height:72vh;overflow:auto;background:#fff;border:1px solid #e3e3ec;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.18);font-family:inherit;display:none}
+.__anno-list .l-head{position:sticky;top:0;background:#1f1f2e;color:#fff;padding:9px 12px;font-size:13px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.__anno-list .l-head .x{cursor:pointer}
+.__anno-list .empty{padding:16px;color:#999;font-size:12px}
+.__anno-list .item{padding:9px 12px;border-bottom:1px solid #f0f0f4;cursor:pointer;font-size:12px;color:#333}
+.__anno-list .item:hover{background:#f6f5ff}
+.__anno-list .item .n{display:inline-block;min-width:16px;height:16px;line-height:16px;text-align:center;background:#7C5CFC;color:#fff;border-radius:8px;font-size:10px;margin-right:6px}
+.__anno-list .item .t{color:#aaa;font-size:11px;float:right}
+.__anno-mode-on,.__anno-mode-on *{cursor:crosshair!important}
+.__anno-hover{outline:2px dashed #7C5CFC!important;outline-offset:1px}
+.__anno-target{position:relative!important}
+.__anno-hidden .__anno-flag{display:none}
+</style>
+<script id="__anno_seed" type="application/json">[]</script>
+<script id="__anno_engine">
+(function(){
+  "use strict";
+  var fileKey = location.pathname.split('/').pop() || 'proto';
+  var LS_KEY = '__anno__' + fileKey;
+  var seed = [];
+  try { seed = JSON.parse((document.getElementById('__anno_seed')||{}).textContent || '[]'); } catch(e){ seed = []; }
+  var data;
+  try { data = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch(e){ data = null; }
+  if (!Array.isArray(data)) data = seed.slice();
+  var mode = false, visible = true, openId = null, hoverEl = null;
+  function uid(){ return 'a' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+  function save(){ try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch(e){} }
+  function toast(msg){ var t=document.createElement('div'); t.textContent=msg; t.style.cssText='position:fixed;left:50%;bottom:72px;transform:translateX(-50%);background:#1f1f2e;color:#fff;padding:9px 16px;border-radius:20px;font-size:12px;z-index:99999;box-shadow:0 4px 16px rgba(0,0,0,.3);font-family:inherit;max-width:80%;text-align:center'; document.body.appendChild(t); setTimeout(function(){ t.style.transition='opacity .3s'; t.style.opacity='0'; },2000); setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); },2400); }
+  function cssPath(el){
+    if (!el || el === document.body) return 'body';
+    var parts = []; var cur = el;
+    while (cur && cur !== document.body){
+      var tag = cur.tagName.toLowerCase();
+      if (cur.id){ parts.unshift(tag + '#' + cur.id); break; }
+      var cls = '';
+      if (cur.className && typeof cur.className === 'string'){
+        var cs = cur.className.trim().split(/\s+/).filter(function(c){ return c && c.indexOf('__anno')!==0; });
+        if (cs.length) cls = '.' + cs.join('.');
+      }
+      var parent = cur.parentNode;
+      if (parent){
+        var idx = Array.prototype.indexOf.call(parent.children, cur) + 1;
+        var sameTag = Array.prototype.filter.call(parent.children, function(ch){ return ch.tagName === cur.tagName; });
+        var suffix = (cls && sameTag.length > 1) ? cls + ':nth-of-type(' + idx + ')' : (cls || ':nth-of-type(' + idx + ')');
+        parts.unshift(tag + suffix);
+      } else { parts.unshift(tag + cls); }
+      cur = parent;
+    }
+    return 'body > ' + parts.join(' > ');
+  }
+  function locate(sel){ try { return document.querySelector(sel); } catch(e){ return null; } }
+  function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+  function fmt(d){ function p(n){return (n<10?'0':'')+n;} return p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()); }
+  function flash(el){ var pv=el.style.outline; el.style.outline='3px solid #7C5CFC'; setTimeout(function(){ el.style.outline=pv; },1200); }
+
+  var tb=document.createElement('div'); tb.className='__anno-tb'; document.body.appendChild(tb);
+  var listPanel=document.createElement('div'); listPanel.className='__anno-list'; document.body.appendChild(listPanel);
+  function btn(label,cls){ var b=document.createElement('button'); b.textContent=label; if(cls)b.className=cls; return b; }
+  var bMode=btn('✏️ 批注'), bList=btn('📋 列表'), bExport=btn('⬇ 导出'), bImport=btn('⬆ 导入'), bClear=btn('🗑 清空');
+  var importInput=document.createElement('input'); importInput.type='file'; importInput.accept='.json,application/json'; importInput.style.display='none'; document.body.appendChild(importInput);
+  tb.appendChild(bMode); tb.appendChild(bList); tb.appendChild(bExport); tb.appendChild(bImport); tb.appendChild(bClear); tb.appendChild(importInput);
+
+  function clearFlags(){ document.querySelectorAll('.__anno-flag').forEach(function(f){ if(f.parentNode) f.parentNode.removeChild(f); }); }
+  function closeBubble(){ var b=document.getElementById('__anno_bubble'); if(b&&b.parentNode)b.parentNode.removeChild(b); openId=null; }
+  function positionBubble(b,flag){ var r=flag.getBoundingClientRect(); var bw=b.offsetWidth,bh=b.offsetHeight; var left=r.left; if(left+bw>window.innerWidth-8)left=window.innerWidth-8-bw; if(left<8)left=8; var top=r.bottom+6; if(top+bh>window.innerHeight-8)top=r.top-bh-6; if(top<8)top=8; b.style.left=left+'px'; b.style.top=top+'px'; }
+
+  function render(){
+    clearFlags();
+    data.forEach(function(a,i){
+      var el=locate(a.sel);
+      var flag=document.createElement('div'); flag.className='__anno-flag'; flag.textContent=(i+1);
+      flag.setAttribute('data-id',a.id);
+      if(!el) flag.setAttribute('data-missing','1');
+      if(el){ el.classList.add('__anno-target'); el.appendChild(flag); }
+      else { flag.style.position='fixed'; flag.style.top='60px'; flag.style.right='16px'; flag.style.zIndex='99991'; document.body.appendChild(flag); }
+      flag.addEventListener('click',function(ev){ ev.stopPropagation(); if(!visible){visible=true;document.body.classList.remove('__anno-hidden');} toggleBubble(a.id,flag); });
+    });
+    document.body.classList.toggle('__anno-hidden', !visible);
+    if(listPanel.style.display==='block') renderList();
+  }
+  function toggleBubble(id,flag){
+    closeBubble();
+    if(openId===id){ openId=null; return; }
+    openId=id;
+    var a=data.filter(function(x){return x.id===id;})[0]; if(!a) return;
+    var b=document.createElement('div'); b.className='__anno-bubble'; b.id='__anno_bubble';
+    var head=document.createElement('div'); head.className='b-head'; head.innerHTML='<span>批注 #'+(data.indexOf(a)+1)+'</span><span class="x">×</span>';
+    var body=document.createElement('div'); body.className='b-body'; body.textContent=a.text;
+    var actions=document.createElement('div'); actions.className='b-actions';
+    var jump=btn('定位'), del=btn('删除','ghost'); actions.appendChild(jump); actions.appendChild(del);
+    b.appendChild(head); b.appendChild(body); b.appendChild(actions); document.body.appendChild(b);
+    head.querySelector('.x').addEventListener('click',closeBubble);
+    jump.addEventListener('click',function(){ var el=locate(a.sel); if(el){el.scrollIntoView({block:'center'});flash(el);} else toast('定位失败：原型可能已改版，请在批注模式下重新添加'); });
+    del.addEventListener('click',function(){ if(confirm('删除这条批注？')){ data=data.filter(function(x){return x.id!==id;}); save(); closeBubble(); render(); } });
+    positionBubble(b,flag);
+  }
+  function renderList(){
+    listPanel.innerHTML='';
+    var head=document.createElement('div'); head.className='l-head'; head.innerHTML='<span>批注列表 ('+data.length+')</span><span class="x">×</span>';
+    listPanel.appendChild(head);
+    if(!data.length){ var e=document.createElement('div'); e.className='empty'; e.textContent='暂无批注。开启「批注」模式后点击原型元素即可添加。'; listPanel.appendChild(e); }
+    data.forEach(function(a,i){
+      var it=document.createElement('div'); it.className='item';
+      it.innerHTML='<span class="n">'+(i+1)+'</span>'+esc(a.text)+'<span class="t">'+fmt(new Date(a.ts||Date.now()))+'</span>';
+      it.addEventListener('click',function(){ var el=locate(a.sel); if(el){el.scrollIntoView({block:'center'});flash(el);} if(!visible){visible=true;document.body.classList.remove('__anno-hidden');} var f=document.querySelector('.__anno-flag[data-id="'+a.id+'"]'); if(f)toggleBubble(a.id,f); });
+      listPanel.appendChild(it);
+    });
+    head.querySelector('.x').addEventListener('click',function(){ listPanel.style.display='none'; });
+    listPanel.style.display='block';
+  }
+
+  function setMode(on){
+    mode=on; visible=on;
+    document.body.classList.toggle('__anno-mode-on',on);
+    document.body.classList.toggle('__anno-hidden',!visible);
+    bMode.classList.toggle('on',on);
+    bMode.textContent = on ? '✏️ 批注中' : '✏️ 批注';
+    if(!on){ if(hoverEl){hoverEl.classList.remove('__anno-hover');hoverEl=null;} closeBubble(); }
+  }
+  function clearHover(){ if(hoverEl){ hoverEl.classList.remove('__anno-hover'); hoverEl=null; } }
+  document.addEventListener('mouseover',function(e){ if(!mode)return; var el=e.target; if(el.closest&&el.closest('.__anno-tb,.__anno-list,.__anno-bubble'))return; if(hoverEl&&hoverEl!==el)hoverEl.classList.remove('__anno-hover'); hoverEl=el; el.classList.add('__anno-hover'); });
+  document.addEventListener('mouseout',function(e){ if(!mode)return; if(hoverEl&&e.target===hoverEl)hoverEl.classList.remove('__anno-hover'); });
+  document.addEventListener('click',function(e){
+    if(!mode)return;
+    var t=e.target;
+    if(t.closest&&t.closest('.__anno-tb,.__anno-list,.__anno-bubble,.__anno-flag'))return;
+    e.preventDefault(); e.stopPropagation(); clearHover(); openEditor(t);
+  }, true);
+
+  function openEditor(el){
+    closeBubble();
+    var b=document.createElement('div'); b.className='__anno-bubble'; b.id='__anno_bubble';
+    var head=document.createElement('div'); head.className='b-head'; head.innerHTML='<span>新增批注</span><span class="x">×</span>';
+    var ta=document.createElement('textarea'); ta.placeholder='写下你的批注…（Enter 换行，保存即生效）';
+    var actions=document.createElement('div'); actions.className='b-actions';
+    var saveBtn=btn('保存'), cancelBtn=btn('取消','ghost'); actions.appendChild(saveBtn); actions.appendChild(cancelBtn);
+    b.appendChild(head); b.appendChild(ta); b.appendChild(actions); document.body.appendChild(b);
+    head.querySelector('.x').addEventListener('click',closeBubble);
+    cancelBtn.addEventListener('click',closeBubble);
+    saveBtn.addEventListener('click',function(){ var txt=ta.value.trim(); if(!txt){closeBubble();return;} data.push({id:uid(),sel:cssPath(el),text:txt,ts:Date.now()}); save(); closeBubble(); render(); toast('已添加批注 #'+data.length); });
+    var r=el.getBoundingClientRect();
+    b.style.left=Math.min(Math.max(r.left,8),window.innerWidth-264)+'px';
+    b.style.top=Math.min(r.bottom+6,window.innerHeight-150)+'px';
+    setTimeout(function(){ ta.focus(); },30);
+  }
+
+  bMode.addEventListener('click',function(){ setMode(!mode); });
+  bList.addEventListener('click',function(){ if(listPanel.style.display==='block')listPanel.style.display='none'; else renderList(); });
+  bExport.addEventListener('click',function(){
+    var json=JSON.stringify(data,null,2);
+    var blob=new Blob([json],{type:'application/json'}); var url=URL.createObjectURL(blob);
+    var a=document.createElement('a'); a.href=url; a.download=fileKey+'.anno.json'; a.click();
+    setTimeout(function(){URL.revokeObjectURL(url);},1000);
+    if(navigator.clipboard){ navigator.clipboard.writeText(json).catch(function(){}); }
+    toast('已导出并复制批注 JSON（可粘贴到文件 __anno_seed 内分享）');
+  });
+  bImport.addEventListener('click',function(){ importInput.click(); });
+  importInput.addEventListener('change',function(){
+    var f=importInput.files[0]; if(!f)return;
+    var rd=new FileReader();
+    rd.onload=function(){ try{ var arr=JSON.parse(rd.result); if(!Array.isArray(arr))throw new Error('不是数组'); if(confirm('导入方式：确定=替换现有批注，取消=合并')){ data=arr; } else { arr.forEach(function(x){ if(x&&x.id&&!data.some(function(d){return d.id===x.id;}))data.push(x); }); } save(); closeBubble(); render(); toast('已导入 '+arr.length+' 条批注'); }catch(err){ alert('解析失败：'+err.message); } };
+    rd.readAsText(f); importInput.value='';
+  });
+  bClear.addEventListener('click',function(){ if(confirm('清空全部批注？本地操作不可撤销。')){ data=[]; save(); closeBubble(); render(); toast('已清空'); } });
+  window.addEventListener('scroll',function(){ var b=document.getElementById('__anno_bubble'); if(b&&openId){ var f=document.querySelector('.__anno-flag[data-id="'+openId+'"]'); if(f)positionBubble(b,f); } }, true);
+
+  render();
+  setMode(false);
+})();
+</script>
 </body>
 </html>
