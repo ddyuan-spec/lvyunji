@@ -1426,6 +1426,9 @@
 
 
 
+
+
+
 <style id="__anno_css">/* v4：角标独立浮层。layer 在视口坐标下绝对定位（inset:0 fixed），
    子角标用 JS 按目标元素 rect 算 left/top，不进宿主 DOM。z-index 低于弹窗遮罩(3950)，
    弹窗开启时整层隐藏，不穿透。工具栏/气泡/列表面板保持超高 z-index 仍可操作。 */
@@ -1587,8 +1590,8 @@
   var tb=document.createElement('div'); tb.className='__anno-tb'; document.body.appendChild(tb);
   var listPanel=document.createElement('div'); listPanel.className='__anno-list'; document.body.appendChild(listPanel);
   function btn(label,cls){ var b=document.createElement('button'); b.textContent=label; if(cls)b.className=cls; return b; }
-  var bMode=btn('批注'), bHide=btn('隐藏'), bList=btn('列表'), bSave=btn('保存原型'), bClear=btn('清空');
-  tb.appendChild(bMode); tb.appendChild(bHide); tb.appendChild(bList); tb.appendChild(bSave); tb.appendChild(bClear);
+  var bMode=btn('批注'), bHide=btn('隐藏'), bList=btn('列表'), bSave=btn('保存原型'), bPush=btn('保存并推送'), bClear=btn('清空');
+  tb.appendChild(bMode); tb.appendChild(bHide); tb.appendChild(bList); tb.appendChild(bSave); tb.appendChild(bPush); tb.appendChild(bClear);
 
   /* ===== 角标独立浮层（z-index 低于弹窗遮罩，弹窗开启时整层隐藏，不穿透） ===== */
   var layer=document.createElement('div'); layer.id='__anno_layer'; document.body.appendChild(layer);
@@ -1823,22 +1826,40 @@
   bList.addEventListener('click',function(){ if(listPanel.style.display==='block')listPanel.style.display='none'; else renderList(); });
   /* 保存为带批注的完整 HTML：把当前批注写回 __anno_seed，导出整页（剔除运行时 UI）。
      用户覆盖回本地原型文件，WorkBuddy 直接把该 HTML 推 GitHub，无需 JSON 中转。 */
-  bSave.addEventListener('click',function(){
+  /* 构造带批注的完整 HTML（写回 __anno_seed + 剥离运行时 UI）。保存原型 / 保存并推送 共用 */
+  function buildAnnotatedHtml(){
     var out=data.map(function(a){ var el=locate(a.sel, rootOf(a.view)); return {id:a.id,no:a.no,view:a.view,sel:a.sel,text:a.text,ts:a.ts,valid:!!el&&isVisible(el)}; });
     var seedEl=document.getElementById('__anno_seed');
     if(!seedEl){ seedEl=document.createElement('script'); seedEl.type='application/json'; seedEl.id='__anno_seed'; document.head.appendChild(seedEl); }
     seedEl.textContent=JSON.stringify(out);
-    /* 剥离运行时 UI 节点，避免下次打开重复创建 */
     var detached=[];
     [layer, tb, listPanel, document.getElementById('__anno_bubble')].forEach(function(n){ if(n&&n.parentNode){ n.parentNode.removeChild(n); detached.push(n); } });
     document.querySelectorAll('[data-__pactive]').forEach(function(n){ n.removeAttribute('data-__pactive'); });
     var html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
-    /* 恢复运行时 UI，用户可继续批注 */
     detached.forEach(function(n){ document.body.appendChild(n); });
+    return html;
+  }
+  bSave.addEventListener('click',function(){
+    var html=buildAnnotatedHtml();
     var dlName=/\.html?$/i.test(fileKey)?fileKey:fileKey+'.html';
     download(dlName, html, 'text/html');
     if(navigator.clipboard){ navigator.clipboard.writeText(dlName).catch(function(){}); }
     toast('已保存带批注的原型：'+dlName+'（覆盖回本地原型文件，然后告诉我，我直接推 GitHub）');
+  });
+  /* 保存并推送：把带批注 HTML POST 给本地后台服务（anno_push_server.py），由其用 gh CLI 推 GitHub。
+     需先双击运行 anno_push_server；服务只在 127.0.0.1 监听，不外网暴露。 */
+  bPush.addEventListener('click',function(){
+    var old=bPush.textContent; bPush.disabled=true; bPush.textContent='推送中…';
+    var html=buildAnnotatedHtml();
+    var payload=JSON.stringify({file:fileKey, html:html, message:'批注保存并推送 ' + new Date().toLocaleString('zh-CN')});
+    fetch('http://127.0.0.1:8765/push', {method:'POST', headers:{'Content-Type':'application/json'}, body:payload})
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        bPush.disabled=false; bPush.textContent=old;
+        if(j && j.ok) toast('已推送到 GitHub ✓（本地原型也同步更新）');
+        else toast('推送失败：' + ((j&&(j.error||j.stderr))||'未知错误'));
+      })
+      .catch(function(){ bPush.disabled=false; bPush.textContent=old; toast('连不上本地服务，请先双击运行 anno_push_server'); });
   });
   bClear.addEventListener('click',function(){ if(confirm('清空全部批注？本地操作不可撤销（GitHub 上的种子需同步清理）。')){ data=[]; save(); closeBubble(); render(); toast('已清空'); } });
 
