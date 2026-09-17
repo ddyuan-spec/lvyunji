@@ -1166,10 +1166,19 @@ window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHT
 
 
 
-<style id="__anno_css">.__anno-flag{position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#FFC53D;color:#5A3D00;font-size:11px;line-height:18px;text-align:center;cursor:pointer;z-index:99990;box-shadow:0 1px 4px rgba(0,0,0,.25);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;user-select:none;border:1.5px solid #fff}
+
+
+
+
+
+
+<style id="__anno_css">/* v4：角标独立浮层。layer 在视口坐标下绝对定位（inset:0 fixed），
+   子角标用 JS 按目标元素 rect 算 left/top，不进宿主 DOM。z-index 低于弹窗遮罩(3950)，
+   弹窗开启时整层隐藏，不穿透。工具栏/气泡/列表面板保持超高 z-index 仍可操作。 */
+#__anno_layer{position:fixed;inset:0;pointer-events:none;z-index:1000;overflow:hidden}
+.__anno-flag{position:absolute;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#FFC53D;color:#5A3D00;font-size:11px;line-height:18px;text-align:center;cursor:pointer;z-index:1000;box-shadow:0 1px 4px rgba(0,0,0,.25);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;user-select:none;border:1.5px solid #fff;pointer-events:auto}
 .__anno-flag[data-missing="1"]{background:#E04D4D;color:#fff;border-color:#fff}
 .__anno-flag[data-multi="1"]{background:#FF8F1F;color:#fff}
-.__anno-flag[data-pos="side"]{top:50%;left:calc(100% + 3px);right:auto;transform:translateY(-50%)}
 .__anno-bubble{position:fixed;z-index:99995;max-width:284px;background:#fff;border:1px solid #FF8F1F;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:12px;color:#333;line-height:1.6;overflow:hidden;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
 .__anno-bubble .b-head{display:flex;align-items:center;justify-content:space-between;padding:7px 11px;background:#FF8F1F;color:#fff;font-size:11px}
 .__anno-bubble .b-head .x{cursor:pointer;opacity:.9;font-size:15px;line-height:1}
@@ -1188,21 +1197,32 @@ window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHT
 .__anno-tb{position:fixed;right:16px;bottom:16px;z-index:99999;display:flex;align-items:center;gap:6px;background:#1f1f2e;padding:7px 9px;border-radius:26px;box-shadow:0 6px 20px rgba(0,0,0,.35);font-family:inherit}
 .__anno-tb button{height:30px;padding:0 11px;border:none;border-radius:15px;background:#33334a;color:#fff;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap}
 .__anno-tb button.on{background:#7C5CFC}
-.__anno-list{position:fixed;left:16px;top:16px;z-index:99998;width:300px;max-height:74vh;overflow:auto;background:#fff;border:1px solid #e3e3ec;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.18);font-family:inherit}
-.__anno-list .l-head{position:sticky;top:0;background:#1f1f2e;color:#fff;padding:9px 12px;font-size:13px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.__anno-list{position:fixed;left:16px;top:16px;z-index:99998;width:320px;max-height:78vh;overflow:auto;background:#fff;border:1px solid #e3e3ec;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.18);font-family:inherit}
+.__anno-list .l-head{position:sticky;top:0;background:#1f1f2e;color:#fff;padding:9px 12px;font-size:13px;font-weight:600;display:flex;justify-content:space-between;align-items:center;z-index:1}
 .__anno-list .l-head .x{cursor:pointer}
+.__anno-list .l-bar{position:sticky;top:38px;background:#fff;padding:8px 12px;border-bottom:1px solid #f0f0f4;z-index:1}
+.__anno-list .l-bar .l-clean{height:26px;padding:0 10px;border:1px solid #E04D4D;background:#fff;color:#E04D4D;border-radius:13px;font-size:11px;cursor:pointer;font-family:inherit}
+.__anno-list .l-bar .l-clean:hover{background:#E04D4D;color:#fff}
 .__anno-list .empty{padding:16px;color:#999;font-size:12px}
-.__anno-list .item{padding:9px 12px;border-bottom:1px solid #f0f0f4;cursor:pointer;font-size:12px;color:#333}
+.__anno-list .item{padding:7px 12px 8px;border-bottom:1px solid #f0f0f4;cursor:pointer;font-size:12px;color:#333}
 .__anno-list .item:hover{background:#fff7e6}
+.__anno-list .item.miss{background:#FFF5F5}
+.__anno-list .item.miss:hover{background:#FFECEC}
+.__anno-list .item .i-main{display:flex;align-items:flex-start;gap:4px;flex-wrap:wrap}
+.__anno-list .item .n{display:inline-block;min-width:16px;height:16px;line-height:16px;text-align:center;background:#FFC53D;color:#5A3D00;border-radius:8px;font-size:10px;margin-right:6px;font-weight:600;flex:0 0 auto}
 .__anno-list .item.miss .n{background:#E04D4D;color:#fff}
-.__anno-list .item .n{display:inline-block;min-width:16px;height:16px;line-height:16px;text-align:center;background:#FFC53D;color:#5A3D00;border-radius:8px;font-size:10px;margin-right:6px;font-weight:600}
-.__anno-list .item .t{color:#aaa;font-size:11px;float:right}
+.__anno-list .item .t{color:#aaa;font-size:11px;margin-left:auto}
 .__anno-list .item .v{color:#bbb;font-size:10px;margin-left:6px}
 .__anno-list .item .a{color:#7C5CFC;font-size:10px;margin-left:5px;background:#F3F0FF;border-radius:6px;padding:0 5px;white-space:nowrap}
+.__anno-list .item .i-acts{display:flex;gap:6px;margin-top:6px;padding-left:22px}
+.__anno-list .item .i-acts .mini{height:22px;padding:0 9px;border:1px solid #e3e3ec;background:#fff;color:#555;border-radius:11px;font-size:11px;cursor:pointer;font-family:inherit;line-height:1}
+.__anno-list .item .i-acts .mini:hover{background:#f3f3f7}
+.__anno-list .item .i-acts .mini.danger{color:#E04D4D;border-color:#f0c4c4}
+.__anno-list .item .i-acts .mini.danger:hover{background:#E04D4D;color:#fff;border-color:#E04D4D}
 .__anno-mode-on,.__anno-mode-on *{cursor:crosshair!important}
+.__anno-relocating,.__anno-relocating *{cursor:crosshair!important}
 .__anno-hover{outline:2px dashed #7C5CFC!important;outline-offset:1px}
-.__anno-anchor{position:relative!important}
-.__anno-hidden .__anno-flag{display:none}
+.__anno-hidden .__anno-layer,.__anno-hidden #__anno_layer{display:none!important}
 .__anno-tb button:disabled{opacity:.45;cursor:not-allowed}
 .__anno-tb button.__anno-locked{opacity:.45;cursor:not-allowed}
 .__anno-tb .__anno-hint{background:#E04D4D;color:#fff;cursor:default;font-size:11px;padding:0 9px}
@@ -1211,7 +1231,10 @@ window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHT
 <script id="__anno_engine">
 (function(){
   "use strict";
-  var canAnnotate = /github\.io$/i.test(location.hostname) || location.search.indexOf('anno=1') !== -1;
+  /* v4：本地优先 —— 去掉 github.io/?anno=1 门禁，本地 file:// 直接可批注/同步。
+     角标改为独立浮层 #__anno_layer（z-index 低于弹窗遮罩），不再 appendChild 进宿主，
+     一次性消灭「select/input 宿主 0 尺寸不可见」「弹窗穿透」「飘到左上角」这一整类问题。 */
+  var canAnnotate = true;
   var fileKey = location.pathname.split('/').pop() || 'proto';
   var LS_KEY = '__anno__' + fileKey;
   var seed = [];
@@ -1220,7 +1243,7 @@ window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHT
   try { data = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch(e){ data = null; }
   if (!Array.isArray(data)) data = seed.slice();
   data.forEach(function(a,i){ if (typeof a.no !== 'number') a.no = i+1; if (typeof a.view !== 'string') a.view = 'global'; });
-  var mode = false, hidden = false, openId = null, hoverEl = null;
+  var mode = false, hidden = false, openId = null, hoverEl = null, relocating = null;
   function nextNo(){ var m=0; data.forEach(function(a){ if(a.no>m)m=a.no; }); return m+1; }
   function uid(){ return 'a' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
   function save(){ try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch(e){} }
@@ -1253,56 +1276,51 @@ window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHT
   }
   function currentView(){ var act = document.querySelector('.view.active, .page.active'); return act ? (act.id || 'global') : 'global'; }
   function rootOf(view){ if (!view || view === 'global') return document; var n = document.getElementById(view); return n || document; }
-  function isVisible(el){ if(!el) return false; var p=el; while(p){ if(getComputedStyle(p).display==='none')return false; p=p.parentElement; } return true; }
+  function isVisible(el){ if(!el) return false; var p=el; while(p){ if(p.style&&p.style.display==='none')return false; if(getComputedStyle(p).display==='none')return false; p=p.parentElement; } return true; }
   function textOf(el){ var t=''; try{ t=(el.innerText||el.textContent||'').replace(/\s+/g,' ').trim().slice(0,40); }catch(e){} return t; }
+  /* 定位时优先返回「可见」的那个；全不可见才返回 null（交给失联/重定位处理），避免命中隐藏重复节点被误判 */
   function locate(sel, root){
     if (!sel) return null;
-    /* 兼容性：视图隔离已在 render 中处理，这里统一用 document 作用域定位；
-       选择器带 id 锚点（如 div#viewX），document.querySelector 即可命中，不需要 root 限定。 */
     var base = String(sel);
-    while (/^\s*body\s*>\s*/.test(base)) base = base.replace(/^\s*body\s*>\s*/, ''); /* 老版本存 "body > #id..."（可能多层），逐层剥掉错前缀 */
+    while (/^\s*body\s*>\s*/.test(base)) base = base.replace(/^\s*body\s*>\s*/, ''); /* 兼容老版本错前缀 */
     var cands = [base];
-    /* 宽松回退：老版本 :nth-of-type 用的是「全部子元素序号」，在混合标签父级下会算错；
-       剥掉 :nth-of-type 后若仍能在页面内唯一定位，则接受，避免静默挂错元素。 */
     var sans = base.replace(/:nth-of-type\(\d+\)/g, '').replace(/:nth-child\(\d+\)/g, '');
     if (sans !== base) cands.push(sans);
     for (var i=0;i<cands.length;i++){
       var hits;
       try { hits = document.querySelectorAll(cands[i]); } catch(e){ hits = []; }
       if (!hits || hits.length === 0) continue;
-      if (i === 0) return hits[0];            /* 精确匹配：取首个 */
-      if (hits.length === 1) return hits[0];  /* 宽松匹配：仅当根作用域内唯一，防止误挂到隔壁元素 */
+      if (hits.length === 1) return hits[0];
+      /* 多命中：优先可见的；都没有可见则返回 null（失联） */
+      for (var j=0;j<hits.length;j++){ if (isVisible(hits[j])) return hits[j]; }
+      return null;
     }
     return null;
   }
   function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
   function fmt(d){ function p(n){return (n<10?'0':'')+n;} return p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()); }
   function flash(el){ if(!el)return; var pv=el.style.outline; el.style.outline='3px solid #7C5CFC'; setTimeout(function(){ el.style.outline=pv; },1200); }
-  /* 角标挂载点：粒度从精到粗「三级降级」，核心是别一股脑跳到整张大卡/整行
-     ① [data-anno] 显式业务锚点（改版只要 key 还在就永不漂，最优先）
-     ② 小元素（单选项/按钮/输入框/链接/短文本等单行原子）→ 直接挂它自己，角标贴在「水卡」这个选项上
-     ③ 最近的「小容器」（行 .fr / 控件区 .ctl / 单元格 / 列表项…）→ 挂容器角
-     ④ 兜底：目标元素自己 */
+  /* 角标挂载点：粒度从精到粗「三级降级」。v4 角标在独立浮层，宿主能否容纳子节点已无关紧要，
+     这里只决定「角标贴在哪个元素的角上」与「小元素右侧外挂」两种位置策略。 */
   var ATOM_RE = /^(label|button|a|input|select|textarea|img|svg|i|em|strong|code|span|td|th|dt|dd|li|p|h[1-6])$/;
   var CONTAINER_SEL = '.fr,.ctl,.form-item,.el-form-item,.row,.item,.cell,.field,.col,tr,li,td,th,.box,.card,section,article,form';
   function isAtom(el){
     if (!el || !el.tagName || !el.getBoundingClientRect) return false;
     if (!ATOM_RE.test(el.tagName.toLowerCase())) return false;
     var r = el.getBoundingClientRect();
-    return r.height > 0 && r.height <= 44;   /* 限单行，避免把整块 <li>/<td> 当原子 */
+    return r.height > 0 && r.height <= 44;   /* 限单行 */
   }
   function anchorOf(el){
     if (!el || !el.closest) return el;
     var k = el.closest('[data-anno]'); if (k) return k;
     var core = el;
-    /* 点到 14px 的小圆点（input）时用包着它的 label（含「水卡」文字），角标才落在选项上 */
     if (/^input$/i.test(el.tagName) && /^(radio|checkbox)$/i.test(el.type || '')) core = el.closest('label') || el;
     if (isAtom(core)) return core;
     var p = core.parentElement;
     while (p && p !== document.body){
       if (p.matches && p.matches(CONTAINER_SEL)){
         var r = p.getBoundingClientRect();
-        if (r.height > 0 && r.height <= 220) return p;   /* 太高的容器（整页表单）不接 */
+        if (r.height > 0 && r.height <= 220) return p;
         break;
       }
       p = p.parentElement;
@@ -1311,22 +1329,19 @@ window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHT
   }
   function viewOf(el){ if(!el) return 'global'; var v = el.closest && el.closest('[data-view]'); if(v) return v.getAttribute('data-view'); v = el.closest && el.closest('.view,.page'); return v ? (v.id || 'global') : 'global'; }
 
+  /* ===== 工具栏 / 列表面板（这些保持在超高 z-index，弹窗开启时仍可操作） ===== */
   var tb=document.createElement('div'); tb.className='__anno-tb'; document.body.appendChild(tb);
   var listPanel=document.createElement('div'); listPanel.className='__anno-list'; document.body.appendChild(listPanel);
   function btn(label,cls){ var b=document.createElement('button'); b.textContent=label; if(cls)b.className=cls; return b; }
   var bMode=btn('批注'), bHide=btn('隐藏'), bList=btn('列表'), bExport=btn('导出'), bImport=btn('导入'), bSync=btn('同步'), bClear=btn('清空');
   var importInput=document.createElement('input'); importInput.type='file'; importInput.accept='.json,application/json'; importInput.style.display='none'; document.body.appendChild(importInput);
   tb.appendChild(bMode); tb.appendChild(bHide); tb.appendChild(bList); tb.appendChild(bExport); tb.appendChild(bImport); tb.appendChild(bSync); tb.appendChild(bClear); tb.appendChild(importInput);
-  if (!canAnnotate) {
-    bMode.disabled = true; bMode.title = '请先推送到 GitHub 再批注';
-    bSync.disabled = true; bSync.title = '请先推送到 GitHub 再同步';
-    bMode.classList.add('__anno-locked'); bSync.classList.add('__anno-locked');
-    var hint = btn('⚠ 推GitHub后可批注', '__anno-hint'); hint.disabled = true; tb.insertBefore(hint, bMode);
-  }
 
-  function clearFlags(){ document.querySelectorAll('.__anno-flag').forEach(function(f){ if(f.parentNode)f.parentNode.removeChild(f); }); document.querySelectorAll('.__anno-anchor').forEach(function(a){ a.classList.remove('__anno-anchor'); }); }
+  /* ===== 角标独立浮层（z-index 低于弹窗遮罩，弹窗开启时整层隐藏，不穿透） ===== */
+  var layer=document.createElement('div'); layer.id='__anno_layer'; document.body.appendChild(layer);
+  var flagEls = [];   /* {flag, el, pos} —— 用于滚动/resize 时重算坐标 */
+  function clearFlags(){ flagEls=[]; while(layer.firstChild) layer.removeChild(layer.firstChild); }
   function closeBubble(){ var b=document.getElementById('__anno_bubble'); if(b&&b.parentNode)b.parentNode.removeChild(b); openId=null; }
-  function positionBubble(b,flag){ var r=flag.getBoundingClientRect(); var bw=b.offsetWidth,bh=b.offsetHeight; var left=r.left; if(left+bw>window.innerWidth-8)left=window.innerWidth-8-bw; if(left<8)left=8; var top=r.bottom+6; if(top+bh>window.innerHeight-8)top=r.top-bh-6; if(top<8)top=8; b.style.left=left+'px'; b.style.top=top+'px'; }
 
   function render(){
     clearFlags();
@@ -1334,12 +1349,12 @@ window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHT
     if (hidden) return;
     var cv = currentView();
     var map = new Map();
+    var miss = [];
     data.forEach(function(a){
       if (a.view && a.view !== 'global' && a.view !== cv) return;
-      var root = rootOf(a.view);
-      var el = locate(a.sel, root);
+      var el = locate(a.sel, rootOf(a.view));
       if (!el || !isVisible(el)){
-        if (a.view === cv || a.view === 'global'){ (map.__miss = map.__miss || []).push(a); }
+        if (a.view === cv || a.view === 'global'){ miss.push(a); }
         return;
       }
       var block = anchorOf(el);
@@ -1347,15 +1362,10 @@ window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHT
       map.get(block).push(a);
     });
     map.forEach(function(annos, block){
-      if (block === '__miss') return;
-      if (block !== document && block.classList){
-        block.classList.add('__anno-anchor');
-      }
       var multi = annos.length > 1;
       var flag=document.createElement('div'); flag.className='__anno-flag';
-      /* 挂在极小元素（单选项小圆点等）上时改为右侧外挂，免得 18px 角标盖住元素本身 */
       var br = block.getBoundingClientRect ? block.getBoundingClientRect() : null;
-      if (br && br.height > 0 && (br.height < 22 || br.width < 22)) flag.setAttribute('data-pos','side');
+      var pos = (br && br.height > 0 && (br.height < 22 || br.width < 22)) ? 'side' : 'corner';
       if (multi) flag.setAttribute('data-multi','1');
       flag.textContent = multi ? annos.length : annos[0].no;
       if (multi){
@@ -1364,20 +1374,51 @@ window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHT
         flag.setAttribute('data-id', annos[0].id);
         flag.addEventListener('click', function(ev){ ev.stopPropagation(); openBubble(annos[0].id, flag); });
       }
-      if (block === document){ flag.style.position='fixed'; flag.style.top='60px'; flag.style.right='16px'; flag.style.zIndex='99991'; document.body.appendChild(flag); }
-      else block.appendChild(flag);
+      layer.appendChild(flag);
+      flagEls.push({flag:flag, el:block, pos:pos});
     });
-    if (map.__miss) renderMissing(map.__miss);
-  }
-  function renderMissing(arr){
-    arr.forEach(function(a,i){
+    /* 失联角标：固定堆在右上角（红底），点击展开 */
+    miss.forEach(function(a,i){
       var flag=document.createElement('div'); flag.className='__anno-flag'; flag.setAttribute('data-missing','1');
       flag.textContent = a.no;
-      flag.style.position='fixed'; flag.style.top=(60+i*22)+'px'; flag.style.right='16px'; flag.style.zIndex='99991';
+      flag.style.left='auto'; flag.style.right='16px'; flag.style.top=(60+i*22)+'px';
       flag.addEventListener('click', function(ev){ ev.stopPropagation(); openBubble(a.id, null); });
-      document.body.appendChild(flag);
+      layer.appendChild(flag);
+    });
+    positionFlags();
+  }
+  /* 按元素实时 rect 计算角标坐标；元素不可见/0尺寸则隐藏。弹窗开启时整层隐藏。 */
+  function positionFlags(){
+    if (modalOpen()){ layer.style.display='none'; return; }
+    layer.style.display='';
+    var vw=window.innerWidth, vh=window.innerHeight;
+    flagEls.forEach(function(o){
+      var el=o.el;
+      if(!el || !el.getBoundingClientRect){ o.flag.style.display='none'; return; }
+      var r=el.getBoundingClientRect();
+      if ((r.width===0 && r.height===0) || !isVisible(el)){ o.flag.style.display='none'; return; }
+      o.flag.style.display='';
+      var left, top;
+      if (o.pos==='side'){ left=r.right+3; top=r.top+r.height/2-9; }
+      else { left=r.right-9; top=r.top-9; }
+      if (left<4) left=4; if (top<4) top=4;
+      if (left>vw-22) left=vw-22; if (top>vh-22) top=vh-22;
+      o.flag.style.left=left+'px'; o.flag.style.top=top+'px';
     });
   }
+  function modalOpen(){
+    var sel='.__anno_layer,.cf-mask,.cf-modal,.wct-mask,.wct-modal,.mask,.modal,.dialog,.overlay,.popup,[class*="mask"],[class*="modal"],[class*="dialog"],[class*="overlay"],[class*="popup"]';
+    var ms=document.querySelectorAll(sel);
+    for (var i=0;i<ms.length;i++){
+      var m=ms[i];
+      if(m.id==='__anno_layer')continue;
+      if(getComputedStyle(m).display==='none') continue;
+      var r=m.getBoundingClientRect();
+      if(r.width>0 && r.height>0) return true;   /* fixed 定位模态 offsetParent 为 null，改用尺寸判定可见 */
+    }
+    return false;
+  }
+
   function openBubble(id, flag){
     closeBubble();
     var a=data.filter(function(x){return x.id===id;})[0]; if(!a) return;
@@ -1389,9 +1430,10 @@ window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHT
     var jump=btn('定位','ghost'), del=btn('删除','ghost'); actions.appendChild(jump); actions.appendChild(del);
     b.appendChild(head); b.appendChild(body); b.appendChild(actions); document.body.appendChild(b);
     head.querySelector('.x').addEventListener('click',closeBubble);
-    jump.addEventListener('click',function(){ var el=locate(a.sel, rootOf(a.view)); if(el){ el.scrollIntoView({block:'center'}); flash(el); } else toast('定位失败：原型可能已改版，请在批注模式下重新添加或删除'); });
-    del.addEventListener('click',function(){ if(confirm('删除这条批注？')){ data=data.filter(function(x){return x.id!==id;}); save(); closeBubble(); render(); } });
-    if(flag) positionBubble(b,flag);
+    jump.addEventListener('click',function(){ var el=locate(a.sel, rootOf(a.view)); if(el){ el.scrollIntoView({block:'center'}); flash(el); } else toast('定位失败：原型可能已改版，请「重定位」或删除'); });
+    del.addEventListener('click',function(){ removeAnno(a.id, null); });
+    if(flag){ var r=flag.getBoundingClientRect(); var bw=b.offsetWidth,bh=b.offsetHeight; var left=r.left; if(left+bw>window.innerWidth-8)left=window.innerWidth-8-bw; if(left<8)left=8; var top=r.bottom+6; if(top+bh>window.innerHeight-8)top=r.top-bh-6; if(top<8)top=8; b.style.left=left+'px'; b.style.top=top+'px'; }
+    else { b.style.left=Math.min(Math.max(window.innerWidth/2-142,8),window.innerWidth-300)+'px'; b.style.top='90px'; }
   }
   function openMulti(block, annos){
     closeBubble(); openId='__multi';
@@ -1404,7 +1446,7 @@ window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHT
       txt.addEventListener('click', function(){ openBubble(a.id, null); });
       var del=document.createElement('button'); del.className='m-del'; del.textContent='删除';
       del.title='删除这条批注';
-      del.addEventListener('click', function(ev){ ev.stopPropagation(); ev.preventDefault(); removeAnno(a.id, block); });
+      del.addEventListener('click', function(ev){ ev.stopPropagation(); ev.preventDefault(); removeAnno(a.id, null); });
       row.appendChild(txt); row.appendChild(del); body.appendChild(row);
     });
     var foot=document.createElement('div'); foot.className='b-actions';
@@ -1421,41 +1463,77 @@ window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHT
     head.querySelector('.x').addEventListener('click',closeBubble);
     var r=block.getBoundingClientRect(); b.style.left=Math.min(Math.max(r.left,8),window.innerWidth-300)+'px'; b.style.top=Math.min(r.bottom+6,window.innerHeight-200)+'px';
   }
-  /* 删一条。anchorEl 传入时（从合并面板删）删完把该锚点剩下的批注面板接着打开，方便连着删 */
+  /* 删一条 */
   function removeAnno(id, anchorEl){
     var a=data.filter(function(x){return x.id===id;})[0]; if(!a) return;
     if(!confirm('删除批注 #'+a.no+'？')) return;
     data=data.filter(function(x){return x.id!==id;});
     save(); render(); toast('已删除批注 #'+a.no);
-    if (anchorEl && document.body.contains(anchorEl)){
-      var rest=data.filter(function(x){
-        if (x.view && x.view!=='global' && x.view!==currentView()) return false;
-        var el=locate(x.sel, rootOf(x.view));
-        if (!el || !isVisible(el)) return false;
-        return anchorOf(el)===anchorEl;
-      });
-      if (rest.length>1) openMulti(anchorEl, rest);
-      else closeBubble();
-    } else closeBubble();
+    closeBubble();
   }
+  /* 重定位：进入拾取模式，下一步点击原型元素即把该批注锚点换到新位置（编号/文字不变） */
+  function startRelocate(id){
+    relocating=id; mode=false; document.body.classList.remove('__anno-mode-on'); bMode.classList.remove('on'); bMode.textContent='批注';
+    document.body.classList.add('__anno-relocating');
+    var a=data.filter(function(x){return x.id===id;})[0];
+    toast('点击正确的元素，把批注 #'+(a?a.no:'?')+' 重新定位到这里');
+  }
+  document.addEventListener('click', function(e){
+    if(!relocating) return;
+    var t=e.target;
+    if(t.closest && t.closest('.__anno-tb,.__anno-list,.__anno-bubble')) return;
+    e.preventDefault(); e.stopPropagation();
+    var a=data.filter(function(x){return x.id===relocating;})[0];
+    if(a){ a.sel=cssPath(t); a.view=viewOf(t); a.valid=true; save(); }
+    relocating=null; document.body.classList.remove('__anno-relocating');
+    closeBubble(); render(); toast('已重新定位');
+  }, true);
+
   function renderList(){
     listPanel.innerHTML='';
-    var head=document.createElement('div'); head.className='l-head'; head.innerHTML='<span>批注列表 ('+data.length+')</span><span class="x">×</span>';
+    var lost = data.filter(function(a){ var el=locate(a.sel, rootOf(a.view)); return !el || !isVisible(el); });
+    var head=document.createElement('div'); head.className='l-head';
+    head.innerHTML='<span>批注列表 ('+data.length+(lost.length?' · 失联 '+lost.length:'')+')</span><span class="x">×</span>';
     listPanel.appendChild(head);
+    if (lost.length){
+      var bar=document.createElement('div'); bar.className='l-bar';
+      var cleanBtn=btn('清理失联 ('+lost.length+')','l-clean');
+      cleanBtn.addEventListener('click', function(){
+        if(!confirm('删除这 '+lost.length+' 条失联批注？')) return;
+        var ids=lost.map(function(x){return x.id;});
+        data=data.filter(function(x){return ids.indexOf(x.id)===-1;});
+        save(); renderList(); render(); toast('已清理 '+ids.length+' 条失联批注');
+      });
+      bar.appendChild(cleanBtn);
+      listPanel.appendChild(bar);
+    }
     if(!data.length){ var e=document.createElement('div'); e.className='empty'; e.textContent='暂无批注。开启「批注」模式后点击原型元素即可添加。'; listPanel.appendChild(e); }
     data.slice().sort(function(x,y){return x.no-y.no;}).forEach(function(a){
       var el=locate(a.sel, rootOf(a.view)); var miss = !el || !isVisible(el);
       var it=document.createElement('div'); it.className='item'+(miss?' miss':'');
-      var atxt = el ? textOf(el).slice(0,12) : '';   /* 挂在哪：把锚点上的文字带出来，方便对号 */
-      it.innerHTML='<span class="n">'+a.no+'</span><span class="v">'+(a.view&&a.view!=='global'?'['+a.view+']':'')+'</span>'+esc(a.text)+(atxt?'<span class="a">'+esc(atxt)+'</span>':'')+'<span class="t">'+fmt(new Date(a.ts||Date.now()))+(miss?' 失联':'')+'</span>';
-      it.addEventListener('click',function(){ var e2=locate(a.sel, rootOf(a.view)); if(e2){e2.scrollIntoView({block:'center'});flash(e2);} if(hidden){hidden=false;document.body.classList.remove('__anno-hidden');bHide.textContent='隐藏';} var f=document.querySelector('.__anno-flag[data-id="'+a.id+'"]'); if(f)openBubble(a.id,f); else if(miss) toast('该批注已失联，原型可能已改版'); });
+      var row=document.createElement('div'); row.className='i-main';
+      var atxt = el ? textOf(el).slice(0,12) : '';
+      row.innerHTML='<span class="n">'+a.no+'</span><span class="v">'+(a.view&&a.view!=='global'?'['+a.view+']':'')+'</span>'+esc(a.text)+(atxt?'<span class="a">'+esc(atxt)+'</span>':'')+'<span class="t">'+fmt(new Date(a.ts||Date.now()))+(miss?' 失联':'')+'</span>';
+      row.addEventListener('click',function(){ var e2=locate(a.sel, rootOf(a.view)); if(e2){e2.scrollIntoView({block:'center'});flash(e2);} if(hidden){hidden=false;document.body.classList.remove('__anno-hidden');bHide.textContent='隐藏';} var f=document.querySelector('.__anno-flag[data-id="'+a.id+'"]'); if(f)openBubble(a.id,f); else if(miss) toast('该批注已失联，可「重定位」或删除'); });
+      it.appendChild(row);
+      var acts=document.createElement('div'); acts.className='i-acts';
+      if (miss){
+        var reBtn=btn('重定位','mini'); reBtn.addEventListener('click', function(ev){ ev.stopPropagation(); startRelocate(a.id); });
+        acts.appendChild(reBtn);
+      } else {
+        var jBtn=btn('定位','mini'); jBtn.addEventListener('click', function(ev){ ev.stopPropagation(); var e2=locate(a.sel, rootOf(a.view)); if(e2){e2.scrollIntoView({block:'center'});flash(e2);} });
+        acts.appendChild(jBtn);
+      }
+      var dBtn=btn('删除','mini danger'); dBtn.addEventListener('click', function(ev){ ev.stopPropagation(); removeAnno(a.id, null); });
+      acts.appendChild(dBtn);
+      it.appendChild(acts);
       listPanel.appendChild(it);
     });
     head.querySelector('.x').addEventListener('click',function(){ listPanel.style.display='none'; });
     listPanel.style.display='block';
   }
   function setMode(on){
-    mode=on;
+    mode=on; relocating=null; document.body.classList.remove('__anno-relocating');
     document.body.classList.toggle('__anno-mode-on',on);
     bMode.classList.toggle('on',on);
     bMode.textContent = on ? '批注中' : '批注';
@@ -1487,7 +1565,7 @@ window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHT
     b.style.top=Math.min(r.bottom+6,window.innerHeight-150)+'px';
     setTimeout(function(){ ta.focus(); },30);
   }
-  bMode.addEventListener('click',function(){ if(!canAnnotate){toast('请先推送到 GitHub 再批注');return;} setMode(!mode); });
+  bMode.addEventListener('click',function(){ setMode(!mode); });
   bHide.addEventListener('click',function(){ hidden=!hidden; document.body.classList.toggle('__anno-hidden',hidden); bHide.textContent=hidden?'显示':'隐藏'; render(); });
   bList.addEventListener('click',function(){ if(listPanel.style.display==='block')listPanel.style.display='none'; else renderList(); });
   bExport.addEventListener('click',function(){
@@ -1495,14 +1573,16 @@ window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHT
     var json=JSON.stringify(out,null,2);
     download(fileKey+'.anno.json', json);
     if(navigator.clipboard){ navigator.clipboard.writeText(json).catch(function(){}); }
-    toast('已导出批注 JSON（含定位校验状态），可粘贴回文件 __anno_seed');
+    toast('已导出批注 JSON（下载到本地，可交给 WorkBuddy 同步到 GitHub）');
   });
-  bSync.addEventListener('click',function(){ if(!canAnnotate){toast('请先推送到 GitHub 再同步');return;}
+  bSync.addEventListener('click',function(){
+    /* 本地 file:// 浏览器无法直接写回源文件：导出 JSON 到本地，交给 WorkBuddy 写回 __anno_seed 并推 GitHub */
+    var out=data.map(function(a){ var el=locate(a.sel, rootOf(a.view)); return {id:a.id,no:a.no,view:a.view,sel:a.sel,text:a.text,ts:a.ts,valid:!!el&&isVisible(el)}; });
+    var json=JSON.stringify(out,null,2);
     var seedEl=document.getElementById('__anno_seed'); if(seedEl) seedEl.textContent=JSON.stringify(data);
-    var json=JSON.stringify(data,null,2);
     download(fileKey+'.anno.json', json);
     if(navigator.clipboard){ navigator.clipboard.writeText(json).catch(function(){}); }
-    toast('已写回种子并导出 JSON；将导出的文件交给 WorkBuddy「同步批注到 GitHub」即可');
+    toast('已导出批注 JSON（下载到本地）。把该文件交给 WorkBuddy「同步批注到 GitHub」即可');
   });
   bImport.addEventListener('click',function(){ importInput.click(); });
   importInput.addEventListener('change',function(){
@@ -1512,7 +1592,13 @@ window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHT
     rd.readAsText(f); importInput.value='';
   });
   bClear.addEventListener('click',function(){ if(confirm('清空全部批注？本地操作不可撤销（GitHub 上的种子需同步清理）。')){ data=[]; save(); closeBubble(); render(); toast('已清空'); } });
-  window.addEventListener('scroll',function(){ var b=document.getElementById('__anno_bubble'); if(b&&openId&&openId!=='__multi'){ var f=document.querySelector('.__anno-flag[data-id="'+openId+'"]'); if(f)positionBubble(b,f); } }, true);
+
+  /* 滚动/resize/视图切换 → 角标重算坐标；弹窗开启 → 浮层隐藏 */
+  var _pt;
+  function posThrottled(){ clearTimeout(_pt); _pt=setTimeout(positionFlags, 30); }
+  window.addEventListener('scroll', posThrottled, true);
+  window.addEventListener('resize', posThrottled);
+  window.addEventListener('scroll', function(){ var b=document.getElementById('__anno_bubble'); if(b&&openId&&openId!=='__multi'){ var f=document.querySelector('.__anno-flag[data-id="'+openId+'"]'); if(f){ var r=f.getBoundingClientRect(); var bw=b.offsetWidth,bh=b.offsetHeight; var left=r.left; if(left+bw>window.innerWidth-8)left=window.innerWidth-8-bw; if(left<8)left=8; var top=r.bottom+6; if(top+bh>window.innerHeight-8)top=r.top-bh-6; if(top<8)top=8; b.style.left=left+'px'; b.style.top=top+'px'; } } }, true);
   var _vt;
   function renderThrottled(){ clearTimeout(_vt); _vt=setTimeout(render, 40); }
   document.addEventListener('anno:viewchange', renderThrottled);
@@ -1527,8 +1613,12 @@ window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHT
       }
     }
     if(hit) renderThrottled();
+    posThrottled();
   });
   vo.observe(document.body, {attributes:true, attributeFilter:['class'], subtree:true});
+  /* 弹窗显隐也触发浮层显示/隐藏 */
+  var vmodal=new MutationObserver(function(){ posThrottled(); });
+  vmodal.observe(document.body, {attributes:true, attributeFilter:['style','class'], subtree:true});
 
   render();
   bHide.textContent = '隐藏';
