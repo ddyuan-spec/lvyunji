@@ -237,8 +237,10 @@
     .wct-body .fr { margin-bottom: 22px; }
     .wct-body .fr > label { flex: 0 0 200px; width: 200px; }
     .wct-foot { display: flex; justify-content: center; gap: 26px; padding: 18px 20px 22px; }
-    /* 水卡类型：商品规格锁 1 组，隐藏「添加子规格 / 创建新规格 / 多余规格值行」入口 */
+    /* 水卡类型：商品规格锁成单个商品规格 —— 隐藏「规格名2 整块 / 添加子规格 / 创建新规格 / 第 2 行规格值 / 行尾 +」入口；
+       字段本身仍可填（规格名 / 规格值 / 购买级别） */
     .spec-locked .specLock { display: none !important; }
+    .spec-locked #specValRow1 { margin-bottom: 0; }
     .tb-link { color: var(--link); cursor: pointer; font-size: 13px; }
     .tb-link:hover { text-decoration: underline; }
     .foot { position: sticky; bottom: 0; background: #fff; border-top: 1px solid var(--border); padding: 18px 0; display: flex; justify-content: center; gap: 26px; margin: 12px -16px 0; z-index: 5; }
@@ -586,7 +588,8 @@
             </div>
           </div>
 
-          <!-- 3. 商品规格（商品类型=水卡 时锁 1 组：1 规格 × 1 子规格，标记 specLock 的入口全部隐藏） -->
+          <!-- 3. 商品规格（商品类型=水卡 时锁成单个商品规格：只留「规格名1」1 行规格值，字段可填；
+               规格名2 整块、添加子规格、创建新规格、行尾「+」、第 2 行规格值（含删除）全部隐藏 —— 标记 specLock） -->
           <div class="dcard" id="cardSpec">
             <div class="sec-title">商品规格</div>
             <div class="sec-body">
@@ -603,7 +606,7 @@
                     <span class="linkbtn" onclick="toast('添加规格图片')"><span class="circ red">+</span>添加规格图片</span>
                   </div>
                 </div>
-                <div class="fr">
+                <div class="fr" id="specValRow1">
                   <label></label>
                   <div class="ctl">
                     <input class="inp" style="width:320px" type="text" placeholder="请输入">
@@ -639,7 +642,7 @@
                   </div>
                 </div>
               </div>
-              <div class="box" style="margin-top:16px">
+              <div class="box specLock" style="margin-top:16px">
                 <div class="fr">
                   <label class="req">规格名2</label>
                   <div class="ctl">
@@ -1081,7 +1084,8 @@
     }
     function toggleSw(el) { el.classList.toggle('on'); }
     /* 水卡类型联动：商品类型=水卡 时隐藏「发货模板设置」「售后设置」、显示「水卡设置」，其余类型反之
-       同时：水卡的商品规格锁 1 组（1 规格 × 1 子规格），隐藏加子规格 / 建新规格 / 多余规格值行入口 */
+       同时：水卡的商品规格锁成单个商品规格（1 规格名 × 1 行规格值，字段可填不可增删），
+       隐藏规格名2 整块 / 加子规格 / 建新规格 / 第 2 行规格值 / 行尾 + 入口 */
     function syncWaterCards() {
       var isCard = getRadio('dPtype') === '水卡';
       var w = document.getElementById('cardWater');
