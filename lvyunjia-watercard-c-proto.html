@@ -1133,6 +1133,39 @@ function __protoBuildStandalone(pageEl, title){
 
 
 
+
+
+
+</body>\n</html>';
+}
+function __protoCopy(text, btnId, okMsg){
+  function ctoast(msg){ var t=document.getElementById('copyToast'); if(t){ t.textContent=msg; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},1800); } }
+  function done(ok){
+    var b=document.getElementById(btnId);
+    if(ok){ if(b){ b.textContent='✓ 已复制'; b.classList.add('copied'); setTimeout(function(){ b.textContent=b.getAttribute('data-label')||'复制'; b.classList.remove('copied'); },1800); } ctoast(okMsg); }
+    else { ctoast('复制失败，请手动复制源码'); }
+  }
+  function fb(t){ try{ var ta=document.createElement('textarea'); ta.value=t; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.top='-9999px'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); var ok=document.execCommand('copy'); document.body.removeChild(ta); return ok; }catch(e){ return false; } }
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(function(){done(true);}).catch(function(){done(fb(text));}); }
+  else { done(fb(text)); }
+}
+function copyCurrentPage(){
+  var page = __protoActivePage();
+  var title = (page && page.getAttribute('data-title'))
+           || (page && page.querySelector && page.querySelector('.nav') && page.querySelector('.nav').textContent)
+           || document.title || '原型单页';
+  var html = __protoBuildStandalone(page, title);
+  __protoCopy(html, 'copyCurrentPage', '已复制当前页，粘贴到墨刀即可');
+}
+function copyAllSource(){
+  var src = window.__PROTO_SOURCE__ || ('<!DOCTYPE html>\n' + document.documentElement.outerHTML);
+  __protoCopy(src, 'copyAllSource', '已复制整份源码，粘贴到墨刀即可运行');
+}
+window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+</script>
+
+
+
 <style id="__anno_css">.__anno-flag{position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#FFC53D;color:#5A3D00;font-size:11px;line-height:18px;text-align:center;cursor:pointer;z-index:99990;box-shadow:0 1px 4px rgba(0,0,0,.25);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;user-select:none;border:1.5px solid #fff}
 .__anno-flag[data-missing="1"]{background:#E04D4D;color:#fff;border-color:#fff}
 .__anno-flag[data-multi="1"]{background:#FF8F1F;color:#fff}
@@ -1501,35 +1534,5 @@ function __protoBuildStandalone(pageEl, title){
   bHide.textContent = '隐藏';
 })();
 </script>
-</body>\n</html>';
-}
-function __protoCopy(text, btnId, okMsg){
-  function ctoast(msg){ var t=document.getElementById('copyToast'); if(t){ t.textContent=msg; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},1800); } }
-  function done(ok){
-    var b=document.getElementById(btnId);
-    if(ok){ if(b){ b.textContent='✓ 已复制'; b.classList.add('copied'); setTimeout(function(){ b.textContent=b.getAttribute('data-label')||'复制'; b.classList.remove('copied'); },1800); } ctoast(okMsg); }
-    else { ctoast('复制失败，请手动复制源码'); }
-  }
-  function fb(t){ try{ var ta=document.createElement('textarea'); ta.value=t; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.top='-9999px'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); var ok=document.execCommand('copy'); document.body.removeChild(ta); return ok; }catch(e){ return false; } }
-  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(function(){done(true);}).catch(function(){done(fb(text));}); }
-  else { done(fb(text)); }
-}
-function copyCurrentPage(){
-  var page = __protoActivePage();
-  var title = (page && page.getAttribute('data-title'))
-           || (page && page.querySelector && page.querySelector('.nav') && page.querySelector('.nav').textContent)
-           || document.title || '原型单页';
-  var html = __protoBuildStandalone(page, title);
-  __protoCopy(html, 'copyCurrentPage', '已复制当前页，粘贴到墨刀即可');
-}
-function copyAllSource(){
-  var src = window.__PROTO_SOURCE__ || ('<!DOCTYPE html>\n' + document.documentElement.outerHTML);
-  __protoCopy(src, 'copyAllSource', '已复制整份源码，粘贴到墨刀即可运行');
-}
-window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-</script>
-
-
-
 </body>
 </html>
