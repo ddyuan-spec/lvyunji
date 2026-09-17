@@ -1172,6 +1172,9 @@ window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHT
 
 
 
+
+
+
 <style id="__anno_css">/* v4：角标独立浮层。layer 在视口坐标下绝对定位（inset:0 fixed），
    子角标用 JS 按目标元素 rect 算 left/top，不进宿主 DOM。z-index 低于弹窗遮罩(3950)，
    弹窗开启时整层隐藏，不穿透。工具栏/气泡/列表面板保持超高 z-index 仍可操作。 */
@@ -1248,7 +1251,7 @@ window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHT
   function uid(){ return 'a' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
   function save(){ try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch(e){} }
   function toast(msg){ var t=document.createElement('div'); t.textContent=msg; t.style.cssText='position:fixed;left:50%;bottom:72px;transform:translateX(-50%);background:#1f1f2e;color:#fff;padding:9px 16px;border-radius:20px;font-size:12px;z-index:99999;box-shadow:0 4px 16px rgba(0,0,0,.3);font-family:inherit;max-width:80%;text-align:center'; document.body.appendChild(t); setTimeout(function(){ t.style.transition='opacity .3s'; t.style.opacity='0'; },2200); setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); },2600); }
-  function download(name, text){ var blob=new Blob([text],{type:'application/json'}); var url=URL.createObjectURL(blob); var a=document.createElement('a'); a.href=url; a.download=name; a.click(); setTimeout(function(){URL.revokeObjectURL(url);},1000); }
+  function download(name, text, mime){ var blob=new Blob([text],{type:mime||'application/json'}); var url=URL.createObjectURL(blob); var a=document.createElement('a'); a.href=url; a.download=name; a.click(); setTimeout(function(){URL.revokeObjectURL(url);},1000); }
 
   /* 定位：修正同标签序号 bug + 视图隔离 */
   function cssPath(el){
@@ -1333,9 +1336,8 @@ window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHT
   var tb=document.createElement('div'); tb.className='__anno-tb'; document.body.appendChild(tb);
   var listPanel=document.createElement('div'); listPanel.className='__anno-list'; document.body.appendChild(listPanel);
   function btn(label,cls){ var b=document.createElement('button'); b.textContent=label; if(cls)b.className=cls; return b; }
-  var bMode=btn('批注'), bHide=btn('隐藏'), bList=btn('列表'), bExport=btn('导出'), bImport=btn('导入'), bSync=btn('同步'), bClear=btn('清空');
-  var importInput=document.createElement('input'); importInput.type='file'; importInput.accept='.json,application/json'; importInput.style.display='none'; document.body.appendChild(importInput);
-  tb.appendChild(bMode); tb.appendChild(bHide); tb.appendChild(bList); tb.appendChild(bExport); tb.appendChild(bImport); tb.appendChild(bSync); tb.appendChild(bClear); tb.appendChild(importInput);
+  var bMode=btn('批注'), bHide=btn('隐藏'), bList=btn('列表'), bSave=btn('保存原型'), bClear=btn('清空');
+  tb.appendChild(bMode); tb.appendChild(bHide); tb.appendChild(bList); tb.appendChild(bSave); tb.appendChild(bClear);
 
   /* ===== 角标独立浮层（z-index 低于弹窗遮罩，弹窗开启时整层隐藏，不穿透） ===== */
   var layer=document.createElement('div'); layer.id='__anno_layer'; document.body.appendChild(layer);
@@ -1568,28 +1570,24 @@ window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHT
   bMode.addEventListener('click',function(){ setMode(!mode); });
   bHide.addEventListener('click',function(){ hidden=!hidden; document.body.classList.toggle('__anno-hidden',hidden); bHide.textContent=hidden?'显示':'隐藏'; render(); });
   bList.addEventListener('click',function(){ if(listPanel.style.display==='block')listPanel.style.display='none'; else renderList(); });
-  bExport.addEventListener('click',function(){
+  /* 保存为带批注的完整 HTML：把当前批注写回 __anno_seed，导出整页（剔除运行时 UI）。
+     用户覆盖回本地原型文件，WorkBuddy 直接把该 HTML 推 GitHub，无需 JSON 中转。 */
+  bSave.addEventListener('click',function(){
     var out=data.map(function(a){ var el=locate(a.sel, rootOf(a.view)); return {id:a.id,no:a.no,view:a.view,sel:a.sel,text:a.text,ts:a.ts,valid:!!el&&isVisible(el)}; });
-    var json=JSON.stringify(out,null,2);
-    download(fileKey+'.anno.json', json);
-    if(navigator.clipboard){ navigator.clipboard.writeText(json).catch(function(){}); }
-    toast('已导出批注 JSON（下载到本地，可交给 WorkBuddy 同步到 GitHub）');
-  });
-  bSync.addEventListener('click',function(){
-    /* 本地 file:// 浏览器无法直接写回源文件：导出 JSON 到本地，交给 WorkBuddy 写回 __anno_seed 并推 GitHub */
-    var out=data.map(function(a){ var el=locate(a.sel, rootOf(a.view)); return {id:a.id,no:a.no,view:a.view,sel:a.sel,text:a.text,ts:a.ts,valid:!!el&&isVisible(el)}; });
-    var json=JSON.stringify(out,null,2);
-    var seedEl=document.getElementById('__anno_seed'); if(seedEl) seedEl.textContent=JSON.stringify(data);
-    download(fileKey+'.anno.json', json);
-    if(navigator.clipboard){ navigator.clipboard.writeText(json).catch(function(){}); }
-    toast('已导出批注 JSON（下载到本地）。把该文件交给 WorkBuddy「同步批注到 GitHub」即可');
-  });
-  bImport.addEventListener('click',function(){ importInput.click(); });
-  importInput.addEventListener('change',function(){
-    var f=importInput.files[0]; if(!f)return;
-    var rd=new FileReader();
-    rd.onload=function(){ try{ var arr=JSON.parse(rd.result); if(!Array.isArray(arr))throw new Error('不是数组'); if(confirm('导入方式：确定=替换现有批注，取消=合并')){ data=arr; } else { arr.forEach(function(x){ if(x&&x.id&&!data.some(function(d){return d.id===x.id;}))data.push(x); }); } data.forEach(function(a,i){ if(typeof a.no!=='number')a.no=i+1; if(typeof a.view!=='string')a.view='global'; }); save(); closeBubble(); render(); toast('已导入 '+arr.length+' 条批注'); }catch(err){ alert('解析失败：'+err.message); } };
-    rd.readAsText(f); importInput.value='';
+    var seedEl=document.getElementById('__anno_seed');
+    if(!seedEl){ seedEl=document.createElement('script'); seedEl.type='application/json'; seedEl.id='__anno_seed'; document.head.appendChild(seedEl); }
+    seedEl.textContent=JSON.stringify(out);
+    /* 剥离运行时 UI 节点，避免下次打开重复创建 */
+    var detached=[];
+    [layer, tb, listPanel, document.getElementById('__anno_bubble')].forEach(function(n){ if(n&&n.parentNode){ n.parentNode.removeChild(n); detached.push(n); } });
+    document.querySelectorAll('[data-__pactive]').forEach(function(n){ n.removeAttribute('data-__pactive'); });
+    var html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+    /* 恢复运行时 UI，用户可继续批注 */
+    detached.forEach(function(n){ document.body.appendChild(n); });
+    var dlName=/\.html?$/i.test(fileKey)?fileKey:fileKey+'.html';
+    download(dlName, html, 'text/html');
+    if(navigator.clipboard){ navigator.clipboard.writeText(dlName).catch(function(){}); }
+    toast('已保存带批注的原型：'+dlName+'（覆盖回本地原型文件，然后告诉我，我直接推 GitHub）');
   });
   bClear.addEventListener('click',function(){ if(confirm('清空全部批注？本地操作不可撤销（GitHub 上的种子需同步清理）。')){ data=[]; save(); closeBubble(); render(); toast('已清空'); } });
 
