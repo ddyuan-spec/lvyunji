@@ -1085,7 +1085,7 @@
   </div>
 
   <!-- 新增水卡模板弹窗 -->
-  <div class="wct-mask" id="wctMask">
+  <div class="wct-mask" id="wctMask" data-open="openCardTpl()">
     <div class="wct-box">
       <div class="wct-head">新增水卡信息<span class="x" onclick="closeCardTpl()">×</span></div>
       <div class="wct-body">
@@ -1592,6 +1592,9 @@
 
 
 
+
+
+
 <style id="__anno_css">/* v4：角标独立浮层。layer 在视口坐标下绝对定位（inset:0 fixed），
    子角标用 JS 按目标元素 rect 算 left/top，不进宿主 DOM。z-index 低于弹窗遮罩(3950)，
    弹窗开启时整层隐藏，不穿透。工具栏/气泡/列表面板保持超高 z-index 仍可操作。 */
@@ -1647,7 +1650,179 @@
 .__anno-tb button.__anno-locked{opacity:.45;cursor:not-allowed}
 .__anno-tb .__anno-hint{background:#E04D4D;color:#fff;cursor:default;font-size:11px;padding:0 9px}
 </style>
-<script id="__anno_seed" type="application/json">[]</script>
+<script id="__anno_seed" type="application/json">[
+{
+"id": "ak1x001",
+"no": 1,
+"view": "viewDetail",
+"sel": "input[name=\"dPtype\"][value=\"水卡\"]",
+"text": "选择项（新增）：水卡\n选中『水卡』后联动：显示「水卡设置」、隐藏「发货模板设置」「售后设置」「其他设置」，并将「商品规格」锁定为单个商品规格",
+"ts": 1789641808912,
+"valid": true
+},
+{
+"id": "ak2x002",
+"no": 2,
+"view": "viewDetail",
+"sel": "#dSpecName",
+"text": "选择项：商品类型=水卡 时锁定为「规格名1」单规格\n字段仍可填可改；其余规格结构（规格名2、添加子规格、创建新规格、第2行规格值及行尾+/-删除）全部隐藏",
+"ts": 1789641808912,
+"valid": true
+},
+{
+"id": "ak3x003",
+"no": 3,
+"view": "viewDetail",
+"sel": "#specValRow1 input.inp",
+"text": "输入项：规格名1 对应的规格值\n仅保留 1 行，可填可改",
+"ts": 1789641808912,
+"valid": true
+},
+{
+"id": "ak4x004",
+"no": 4,
+"view": "viewDetail",
+"sel": "#specValRow1 select",
+"text": "选择项：该规格值的购买级别门槛\n默认「不限制」，可改",
+"ts": 1789641808912,
+"valid": true
+},
+{
+"id": "ak5x005",
+"no": 5,
+"view": "viewDetail",
+"sel": "#cardSpec .linkbtn",
+"text": "功能入口：为该规格上传图片\n水卡类型下保留，点击 toast「添加规格图片」",
+"ts": 1789641808912,
+"valid": true
+},
+{
+"id": "ak6x006",
+"no": 6,
+"view": "viewDetail",
+"sel": "#dCardTpl",
+"text": "选择项：引用水卡模板\n选中后自动带出 水卡有效期/每日取水上限/每月取水上限/总水量 到下方信息卡；新增模板后自动进入此下拉，无需刷新",
+"ts": 1789641808912,
+"valid": true
+},
+{
+"id": "ak7x007",
+"no": 7,
+"view": "viewDetail",
+"sel": "#cardWater .tb-link",
+"text": "功能入口：打开「新增水卡模板」弹窗\n调用 openCardTpl() 显示 #wctMask 并清空表单；新增完成后模板自动进入下拉并选中",
+"ts": 1789641808912,
+"valid": true
+},
+{
+"id": "ak8x008",
+"no": 8,
+"view": "viewDetail",
+"sel": "#cardWater .uphint",
+"text": "不可编辑\n显示：水卡设置卡片内提示文案常显\n说明：引导用户选择合适的水卡模板，若无合适模板先新增",
+"ts": 1789641808912,
+"valid": true
+},
+{
+"id": "ak9x009",
+"no": 9,
+"view": "viewDetail",
+"sel": ".tplbox .trow:nth-of-type(1)",
+"text": "不可编辑\n显示：选中水卡模板后展示\n引用后自动带出信息：由所选「水卡模板」带出，展示水卡有效期（天）",
+"ts": 1789641808912,
+"valid": true
+},
+{
+"id": "ak10x010",
+"no": 10,
+"view": "viewDetail",
+"sel": ".tplbox .trow:nth-of-type(2)",
+"text": "不可编辑\n显示：选中水卡模板后展示\n引用后自动带出信息：由所选「水卡模板」带出，展示每日取水上限（L）",
+"ts": 1789641808912,
+"valid": true
+},
+{
+"id": "ak11x011",
+"no": 11,
+"view": "viewDetail",
+"sel": ".tplbox .trow:nth-of-type(3)",
+"text": "不可编辑\n显示：选中水卡模板后展示\n引用后自动带出信息：由所选「水卡模板」带出，展示每月取水上限（L）",
+"ts": 1789641808912,
+"valid": true
+},
+{
+"id": "ak12x012",
+"no": 12,
+"view": "viewDetail",
+"sel": ".tplbox .trow:nth-of-type(4)",
+"text": "不可编辑\n显示：选中水卡模板后展示\n引用后自动带出信息：由所选「水卡模板」带出，展示总水量（L）",
+"ts": 1789641808912,
+"valid": true
+},
+{
+"id": "ak13x013",
+"no": 13,
+"view": "global",
+"sel": "#wcName",
+"text": "可编辑\n输入限制：最多 200 字（带 0/200 计数）\n水卡模板名称，提交时校验非空且唯一（重名拦截）",
+"ts": 1789641808912,
+"valid": true
+},
+{
+"id": "ak14x014",
+"no": 14,
+"view": "global",
+"sel": "#wcDays",
+"text": "可编辑\n输入限制：正整数（单位：天）\n水卡有效期：激活后 N 天有效；提交时校验非空",
+"ts": 1789641808912,
+"valid": true
+},
+{
+"id": "ak15x015",
+"no": 15,
+"view": "global",
+"sel": "#wcDaily",
+"text": "可编辑\n输入限制：数值（单位：L）\n每日取水上限；提交时校验非空",
+"ts": 1789641808912,
+"valid": true
+},
+{
+"id": "ak16x016",
+"no": 16,
+"view": "global",
+"sel": "#wcMonth",
+"text": "可编辑\n输入限制：数值（单位：L）\n每月取水上限；提交时校验非空",
+"ts": 1789641808912,
+"valid": true
+},
+{
+"id": "ak17x017",
+"no": 17,
+"view": "global",
+"sel": "#wcTotal",
+"text": "可编辑\n输入限制：数值（单位：L）\n总水量；提交时校验非空",
+"ts": 1789641808912,
+"valid": true
+},
+{
+"id": "ak18x018",
+"no": 18,
+"view": "global",
+"sel": "#wctMask .btn-primary",
+"text": "功能说明：校验并保存水卡模板，关闭弹窗\n功能实现：校验 5 字段均非空、模板名称唯一（findCardTpl 查重），写入模板列表，重渲 #dCardTpl 选项并自动选中、回填信息卡；模板不可修改、不可删除",
+"ts": 1789641808912,
+"valid": true
+},
+{
+"id": "ak19x019",
+"no": 19,
+"view": "global",
+"sel": "#wctMask .btn-default",
+"text": "功能说明：关闭弹窗，不保存\n功能实现：调用 closeCardTpl() 移除 #wctMask 的 show 状态",
+"ts": 1789641808912,
+"valid": true
+}
+]</script>
 <script id="__anno_engine">
 (function(){
   "use strict";
@@ -1697,6 +1872,10 @@
   function currentView(){ var act = document.querySelector('.view.active, .page.active'); return act ? (act.id || 'global') : 'global'; }
   function rootOf(view){ if (!view || view === 'global') return document; var n = document.getElementById(view); return n || document; }
   function isVisible(el){ if(!el) return false; var p=el; while(p){ if(p.style&&p.style.display==='none')return false; if(getComputedStyle(p).display==='none')return false; p=p.parentElement; } return true; }
+  /* 弹窗感知：判定元素所属弹窗容器、弹窗是否打开（用于「关闭的弹窗内字段不显示角标、打开时仅显示该弹窗内字段角标」） */
+  var MODAL_SEL = '.cf-mask,.cf-modal,.wct-mask,.wct-modal,.mask,.modal,.dialog,.overlay,.popup';
+  function modalOf(el){ if(!el || !el.closest) return null; try { return el.closest(MODAL_SEL); } catch(e){ return null; } }
+  function isModalOpen(m){ if(!m) return false; if(getComputedStyle(m).display==='none') return false; var r=m.getBoundingClientRect(); return (r.width>0 && r.height>0); }
   function textOf(el){ var t=''; try{ t=(el.innerText||el.textContent||'').replace(/\s+/g,' ').trim().slice(0,40); }catch(e){} return t; }
   /* 定位时优先返回「可见」的那个；全不可见才返回 null（交给失联/重定位处理），避免命中隐藏重复节点被误判 */
   function locate(sel, root){
@@ -1748,6 +1927,18 @@
     return core;
   }
   function viewOf(el){ if(!el) return 'global'; var v = el.closest && el.closest('[data-view]'); if(v) return v.getAttribute('data-view'); v = el.closest && el.closest('.view,.page'); return v ? (v.id || 'global') : 'global'; }
+  /* 列表/气泡「定位」：弹窗内字段批注自动打开对应弹窗再高亮字段（data-open 钩子） */
+  function revealAnno(a){
+    var el=locate(a.sel, rootOf(a.view));
+    if(!el){ toast('定位失败：原型可能已改版，请「重定位」或删除'); return; }
+    var m=modalOf(el);
+    function go(){ el.scrollIntoView({block:'center'}); flash(el); }
+    if (m && !isModalOpen(m)){
+      var openFn=m.getAttribute('data-open');
+      if(openFn){ try{ (new Function(openFn))(); }catch(e){} setTimeout(function(){ renderThrottled(); setTimeout(go, 40); }, 40); return; }
+    }
+    go();
+  }
 
   /* ===== 工具栏 / 列表面板（这些保持在超高 z-index，弹窗开启时仍可操作） ===== */
   var tb=document.createElement('div'); tb.className='__anno-tb'; document.body.appendChild(tb);
@@ -1772,7 +1963,15 @@
     data.forEach(function(a){
       if (a.view && a.view !== 'global' && a.view !== cv) return;
       var el = locate(a.sel, rootOf(a.view));
-      if (!el || !isVisible(el)){
+      if (!el){ /* 元素彻底找不到 → 失联 */
+        if (a.view === cv || a.view === 'global'){ miss.push(a); }
+        return;
+      }
+      var m = modalOf(el);
+      if (m && !isModalOpen(m)){ /* 在「关闭的弹窗」内 → 延后显示，不算失联、也不画角标 */
+        return;
+      }
+      if (!isVisible(el)){ /* 其它不可见原因 → 失联 */
         if (a.view === cv || a.view === 'global'){ miss.push(a); }
         return;
       }
@@ -1806,10 +2005,12 @@
     });
     positionFlags();
   }
-  /* 按元素实时 rect 计算角标坐标；元素不可见/0尺寸则隐藏。弹窗开启时整层隐藏。 */
+  /* 按元素实时 rect 计算角标坐标；元素不可见/0尺寸则隐藏。
+     弹窗感知：打开某弹窗时，仅显示「该弹窗内」字段的角标，弹窗外（被遮住）的角标隐藏；
+     关闭的弹窗内字段角标不显示、也不算失联。 */
   function positionFlags(){
-    if (modalOpen()){ layer.style.display='none'; return; }
     layer.style.display='';
+    var anyOpen = modalOpen();
     var vw=window.innerWidth, vh=window.innerHeight;
     flagEls.forEach(function(o){
       var el=o.el;
@@ -1851,7 +2052,7 @@
     var jump=btn('定位','ghost'), del=btn('删除','ghost'); actions.appendChild(jump); actions.appendChild(del);
     b.appendChild(head); b.appendChild(body); b.appendChild(actions); document.body.appendChild(b);
     head.querySelector('.x').addEventListener('click',closeBubble);
-    jump.addEventListener('click',function(){ var el=locate(a.sel, rootOf(a.view)); if(el){ el.scrollIntoView({block:'center'}); flash(el); } else toast('定位失败：原型可能已改版，请「重定位」或删除'); });
+    jump.addEventListener('click',function(){ revealAnno(a); });
     del.addEventListener('click',function(){ removeAnno(a.id, null); });
     if(flag){ var r=flag.getBoundingClientRect(); var bw=b.offsetWidth,bh=b.offsetHeight; var left=r.left; if(left+bw>window.innerWidth-8)left=window.innerWidth-8-bw; if(left<8)left=8; var top=r.bottom+6; if(top+bh>window.innerHeight-8)top=r.top-bh-6; if(top<8)top=8; b.style.left=left+'px'; b.style.top=top+'px'; }
     else { b.style.left=Math.min(Math.max(window.innerWidth/2-142,8),window.innerWidth-300)+'px'; b.style.top='90px'; }
@@ -1930,12 +2131,12 @@
     }
     if(!data.length){ var e=document.createElement('div'); e.className='empty'; e.textContent='暂无批注。开启「批注」模式后点击原型元素即可添加。'; listPanel.appendChild(e); }
     data.slice().sort(function(x,y){return x.no-y.no;}).forEach(function(a){
-      var el=locate(a.sel, rootOf(a.view)); var miss = !el || !isVisible(el);
+      var el=locate(a.sel, rootOf(a.view)); var m=el?modalOf(el):null; var miss = !el || ((!m)&&!isVisible(el)) || (m&&isModalOpen(m)&&!isVisible(el));
       var it=document.createElement('div'); it.className='item'+(miss?' miss':'');
       var row=document.createElement('div'); row.className='i-main';
       var atxt = el ? textOf(el).slice(0,12) : '';
       row.innerHTML='<span class="n">'+a.no+'</span><span class="v">'+(a.view&&a.view!=='global'?'['+a.view+']':'')+'</span>'+esc(a.text)+(atxt?'<span class="a">'+esc(atxt)+'</span>':'')+'<span class="t">'+fmt(new Date(a.ts||Date.now()))+(miss?' 失联':'')+'</span>';
-      row.addEventListener('click',function(){ var e2=locate(a.sel, rootOf(a.view)); if(e2){e2.scrollIntoView({block:'center'});flash(e2);} if(hidden){hidden=false;document.body.classList.remove('__anno-hidden');bHide.textContent='隐藏';} var f=document.querySelector('.__anno-flag[data-id="'+a.id+'"]'); if(f)openBubble(a.id,f); else if(miss) toast('该批注已失联，可「重定位」或删除'); });
+      row.addEventListener('click',function(){ revealAnno(a); if(hidden){hidden=false;document.body.classList.remove('__anno-hidden');bHide.textContent='隐藏';} var f=document.querySelector('.__anno-flag[data-id="'+a.id+'"]'); if(f)openBubble(a.id,f); else if(miss) toast('该批注已失联，可「重定位」或删除'); });
       it.appendChild(row);
       var acts=document.createElement('div'); acts.className='i-acts';
       if (miss){
