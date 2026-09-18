@@ -1815,11 +1815,19 @@
   function closeBubble(){ var b=document.getElementById('__anno_bubble'); if(b&&b.parentNode)b.parentNode.removeChild(b); openId=null; }
 
   /* 分类：ok=可见可标；hidden-modal=弹窗关闭内(延后不显示)；pending=因交互未激活而隐藏/未生成(待激活灰标)；lost=锚点彻底失效(红标失联) */
+  function anyOpenModal(){
+    try {
+      var ms = document.querySelectorAll(MODAL_SEL);
+      for (var i=0;i<ms.length;i++){ if (isModalOpen(ms[i])) return true; }
+    } catch(e){}
+    return false;
+  }
   function classify(a){
     var el = locate(a.sel, rootOf(a.view));
     if (el){
       var m = modalOf(el);
-      /* 弹窗开启时：弹窗内的字段照常显示角标（贴字段右上角），仅弹窗未开才跳过 */
+      /* 弹窗开启时：只显示弹窗内部的角标，弹窗外的背景角标隐藏（避免穿透遮罩浮到弹窗上） */
+      if (anyOpenModal() && (!m || !isModalOpen(m))) return 'hidden-modal';
       if (m && !isModalOpen(m)) return 'hidden-modal';
       if (isVisible(el)) return 'ok';
       return 'pending';
@@ -2155,6 +2163,12 @@
   render(); renderList();
   /* 条件字段/弹窗可能有动画，延迟一次重渲染确保角标贴到真实可见字段上 */
   setTimeout(function(){ render(); renderList(); }, 120);
+  /* 监听弹窗开/关（style/class 变化），自动重渲染，保证背景/弹窗内角标正确隔离 */
+  try {
+    var _modals = document.querySelectorAll(MODAL_SEL);
+    var _mo = new MutationObserver(function(){ renderThrottled(); });
+    for (var _i=0; _i<_modals.length; _i++){ _mo.observe(_modals[_i], {attributes:true, attributeFilter:['style','class']}); }
+  } catch(e){}
   bHide.textContent = '隐藏';
 })();
 
