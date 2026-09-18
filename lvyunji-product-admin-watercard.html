@@ -420,7 +420,70 @@
 .ZL32C_XdLL8UQRZ3zObd {
   overflow: visible !important;
 }
-</style></head>
+</style>
+
+<style>
+/* proto-annotation v4 (patched: file-seed priority + auto-activate) */
+/* v4：角标独立浮层。layer 在视口坐标下绝对定位（inset:0 fixed），
+   子角标用 JS 按目标元素 rect 算 left/top，不进宿主 DOM。z-index 低于弹窗遮罩(3950)，
+   弹窗开启时整层隐藏，不穿透。工具栏/气泡/列表面板保持超高 z-index 仍可操作。 */
+#__anno_layer{position:fixed;inset:0;pointer-events:none;z-index:4000;overflow:hidden}
+.__anno-flag{position:absolute;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#FFC53D;color:#5A3D00;font-size:11px;line-height:18px;text-align:center;cursor:pointer;z-index:1000;box-shadow:0 1px 4px rgba(0,0,0,.25);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;user-select:none;border:1.5px solid #fff;pointer-events:auto}
+.__anno-flag[data-missing="1"]{background:#E04D4D;color:#fff;border-color:#fff}
+.__anno-flag.__anno-pending{background:#8C8C99;color:#fff;border-color:#fff}
+.__anno-flag[data-multi="1"]{background:#FF8F1F;color:#fff}
+.__anno-bubble{position:fixed;z-index:99995;max-width:284px;background:#fff;border:1px solid #FF8F1F;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:12px;color:#333;line-height:1.6;overflow:hidden;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.__anno-bubble .b-head{display:flex;align-items:center;justify-content:space-between;padding:7px 11px;background:#FF8F1F;color:#fff;font-size:11px}
+.__anno-bubble .b-head .x{cursor:pointer;opacity:.9;font-size:15px;line-height:1}
+.__anno-bubble .b-body{padding:10px 12px;white-space:pre-wrap;word-break:break-word}
+.__anno-bubble .b-body .m-item{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid #f2e9d8}
+.__anno-bubble .b-body .m-item:last-child{border-bottom:none}
+.__anno-bubble .b-body .m-txt{flex:1;white-space:pre-wrap;word-break:break-word;cursor:pointer;min-width:0}
+.__anno-bubble .b-body .m-txt:hover{color:#B26A00}
+.__anno-bubble .b-body .m-del{flex:0 0 auto;height:20px;padding:0 9px;border:1px solid #e8d5b0;border-radius:10px;background:#fff;color:#B26A00;font-size:11px;cursor:pointer;font-family:inherit;line-height:1;white-space:nowrap}
+.__anno-bubble .b-body .m-del:hover{background:#FFF3E0;border-color:#FF8F1F;color:#8A4B00}
+.__anno-bubble .b-actions{display:flex;gap:8px;padding:0 12px 11px}
+.__anno-bubble textarea{width:256px;height:62px;border:1px solid #ddd;border-radius:6px;padding:8px;font-size:12px;font-family:inherit;resize:none;outline:none;display:block}
+.__anno-bubble textarea:focus{border-color:#FF8F1F}
+.__anno-bubble button{height:28px;padding:0 12px;border:none;border-radius:14px;background:#FF8F1F;color:#fff;font-size:12px;cursor:pointer;font-family:inherit}
+.__anno-bubble button.ghost{background:#eee;color:#555}
+.__anno-tb{position:fixed;right:16px;bottom:16px;z-index:99999;display:flex;align-items:center;gap:6px;background:#1f1f2e;padding:7px 9px;border-radius:26px;box-shadow:0 6px 20px rgba(0,0,0,.35);font-family:inherit}
+.__anno-tb button{height:30px;padding:0 11px;border:none;border-radius:15px;background:#33334a;color:#fff;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.__anno-tb button.on{background:#7C5CFC}
+.__anno-list{position:fixed;left:16px;top:16px;z-index:99998;width:320px;max-height:78vh;overflow:auto;background:#fff;border:1px solid #e3e3ec;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.18);font-family:inherit}
+.__anno-list .l-head{position:sticky;top:0;background:#1f1f2e;color:#fff;padding:9px 12px;font-size:13px;font-weight:600;display:flex;justify-content:space-between;align-items:center;z-index:1}
+.__anno-list .l-head .x{cursor:pointer}
+.__anno-list .l-bar{position:sticky;top:38px;background:#fff;padding:8px 12px;border-bottom:1px solid #f0f0f4;z-index:1}
+.__anno-list .l-bar .l-clean{height:26px;padding:0 10px;border:1px solid #E04D4D;background:#fff;color:#E04D4D;border-radius:13px;font-size:11px;cursor:pointer;font-family:inherit}
+.__anno-list .l-bar .l-clean:hover{background:#E04D4D;color:#fff}
+.__anno-list .empty{padding:16px;color:#999;font-size:12px}
+.__anno-list .item{padding:7px 12px 8px;border-bottom:1px solid #f0f0f4;cursor:pointer;font-size:12px;color:#333}
+.__anno-list .item:hover{background:#fff7e6}
+.__anno-list .item.miss{background:#FFF5F5}
+.__anno-list .item.miss:hover{background:#FFECEC}
+.__anno-list .item .i-main{display:flex;align-items:flex-start;gap:4px;flex-wrap:wrap}
+.__anno-list .item .n{display:inline-block;min-width:16px;height:16px;line-height:16px;text-align:center;background:#FFC53D;color:#5A3D00;border-radius:8px;font-size:10px;margin-right:6px;font-weight:600;flex:0 0 auto}
+.__anno-list .item.miss .n{background:#E04D4D;color:#fff}
+.__anno-list .item .t{color:#aaa;font-size:11px;margin-left:auto}
+.__anno-list .item .v{color:#bbb;font-size:10px;margin-left:6px}
+.__anno-list .item .a{color:#7C5CFC;font-size:10px;margin-left:5px;background:#F3F0FF;border-radius:6px;padding:0 5px;white-space:nowrap}
+.__anno-list .item .i-acts{display:flex;gap:6px;margin-top:6px;padding-left:22px}
+.__anno-list .item .i-acts .mini{height:22px;padding:0 9px;border:1px solid #e3e3ec;background:#fff;color:#555;border-radius:11px;font-size:11px;cursor:pointer;font-family:inherit;line-height:1}
+.__anno-list .item .i-acts .mini:hover{background:#f3f3f7}
+.__anno-list .item .i-acts .mini.danger{color:#E04D4D;border-color:#f0c4c4}
+.__anno-list .item .i-acts .mini.danger:hover{background:#E04D4D;color:#fff;border-color:#E04D4D}
+.__anno-mode-on,.__anno-mode-on *{cursor:crosshair!important}
+.__anno-relocating,.__anno-relocating *{cursor:crosshair!important}
+.__anno-hover{outline:2px dashed #7C5CFC!important;outline-offset:1px}
+.__anno-hidden .__anno-layer,.__anno-hidden #__anno_layer{display:none!important}
+.__anno-tb button:disabled{opacity:.45;cursor:not-allowed}
+.__anno-tb button.__anno-locked{opacity:.45;cursor:not-allowed}
+.__anno-tb .__anno-hint{background:#E04D4D;color:#fff;cursor:default;font-size:11px;padding:0 9px}
+
+</style>
+</head>
+
+
 <body class="">
   <!-- ================= 顶栏 ================= -->
   <header class="topbar">
@@ -645,7 +708,7 @@
                 <div class="ctl">
                   <label class="rdo"><input type="radio" name="dPtype" value="实体商品" checked="">实体商品</label>
                   <label class="rdo"><input type="radio" name="dPtype" value="团购商品">团购商品</label>
-                  <label class="rdo"><input type="radio" name="dPtype" value="水卡">水卡</label>
+                  <label class="rdo"><input type="radio" name="dPtype" value="水卡" data-anno="ak01x001">水卡</label>
                   <label class="rdo dis" title="暂未开放"><input type="radio" name="dPtype" value="海淘" disabled="">海淘
                     <svg class="lock" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6.4"></circle><path d="M7 3.6a2.1 2.1 0 012.1 2.1v1.1H4.9V5.7A2.1 2.1 0 017 3.6z" fill="#fff"></path><rect x="4.4" y="6.2" width="5.2" height="4.2" rx=".7" fill="#fff"></rect></svg>
                   </label>
@@ -757,21 +820,21 @@
                 <div class="fr">
                   <label class="req" for="dSpecName">规格名1</label>
                   <div class="ctl">
-                    <select class="sel" style="width:320px" id="dSpecName">
+                    <select class="sel" style="width:320px" id="dSpecName" data-anno="ak02x002">
                       <option value="">请选择规格</option>
                       <option>颜色</option>
                       <option>规格</option>
                       <option>容量</option>
                     </select>
-                    <span class="linkbtn" onclick="toast('添加规格图片')"><span class="circ red">+</span>添加规格图片</span>
+                    <span class="linkbtn" onclick="toast('添加规格图片')" data-anno="ak05x005"><span class="circ red">+</span>添加规格图片</span>
                   </div>
                 </div>
                 <div class="fr" id="specValRow1">
                   <label></label>
                   <div class="ctl">
-                    <input class="inp" style="width:320px" type="text" placeholder="请输入">
+                    <input class="inp" style="width:320px" type="text" placeholder="请输入" data-anno="ak03x003">
                     <label style="flex:0 0 auto;line-height:32px;color:var(--text-sub);font-size:13px" class="">购买级别（≥）：</label>
-                    <select class="sel" style="width:220px">
+                    <select class="sel" style="width:220px" data-anno="ak04x004">
                       <option>不限制</option>
                       <option>1</option>
                       <option>2</option>
@@ -895,14 +958,14 @@
               <div class="fr" style="margin-bottom:10px">
                 <label></label>
                 <div class="ctl">
-                  <select class="sel" style="width:320px" id="dCardTpl" onchange="syncCardTpl()"><option value="">请选择水卡模板</option><option value="年卡模板">年卡模板</option><option value="月卡模板">月卡模板</option></select>
-                  <span class="tb-link" onclick="openCardTpl()">新增</span>
+                  <select class="sel" style="width:320px" id="dCardTpl" onchange="syncCardTpl()" data-anno="ak06x006"><option value="">请选择水卡模板</option><option value="年卡模板">年卡模板</option><option value="月卡模板">月卡模板</option></select>
+                  <span class="tb-link" onclick="openCardTpl()" data-anno="ak07x007">新增</span>
                 </div>
               </div>
               <div class="fr" style="margin-bottom:0">
                 <label></label>
                 <div class="ctl">
-                  <div class="uphint" style="margin-top:0;max-width:720px">请选择合适的水卡模板，该商品将以您选中的模板进行取水权益的配置，若无合适的水卡模板，请先新增</div>
+                  <div class="uphint" style="margin-top:0;max-width:720px" data-anno="ak08x008">请选择合适的水卡模板，该商品将以您选中的模板进行取水权益的配置，若无合适的水卡模板，请先新增</div>
                 </div>
               </div>
               <div class="fr" id="cardTplRow" style="margin-bottom:0;display:none;margin-top:20px">
@@ -1093,42 +1156,42 @@
         <div class="fr">
           <label class="req" for="wcName">水卡模板名称:</label>
           <div class="ctl">
-            <span class="cnt-in"><input class="inp inp-w462" type="text" id="wcName" maxlength="200" placeholder="请输入名称" oninput="cntSync(this,'wcNameCnt')"><span class="cnt" id="wcNameCnt">0/200</span></span>
+            <span class="cnt-in"><input class="inp inp-w462" type="text" id="wcName" maxlength="200" placeholder="请输入名称" oninput="cntSync(this,'wcNameCnt')" data-anno="ak13x013"><span class="cnt" id="wcNameCnt">0/200</span></span>
           </div>
         </div>
         <div class="fr">
           <label class="req" for="wcDays">水卡有效期:</label>
           <div class="ctl">
             <span style="font-size:13px;color:var(--text-sub)">激活后</span>
-            <input class="inp" style="width:120px" type="text" id="wcDays" placeholder="请输入天数">
+            <input class="inp" style="width:120px" type="text" id="wcDays" placeholder="请输入天数" data-anno="ak14x014">
             <span style="font-size:13px;color:var(--text-sub)">天有效</span>
           </div>
         </div>
         <div class="fr">
           <label class="req" for="wcDaily">每日取水上限:</label>
           <div class="ctl">
-            <input class="inp" style="width:220px" type="text" id="wcDaily" placeholder="请输入每日取水上限">
+            <input class="inp" style="width:220px" type="text" id="wcDaily" placeholder="请输入每日取水上限" data-anno="ak15x015">
             <span style="font-size:13px;color:var(--text-sub)">L</span>
           </div>
         </div>
         <div class="fr">
           <label class="req" for="wcMonth">每月取水上限:</label>
           <div class="ctl">
-            <input class="inp" style="width:220px" type="text" id="wcMonth" placeholder="请输入每月取水上限">
+            <input class="inp" style="width:220px" type="text" id="wcMonth" placeholder="请输入每月取水上限" data-anno="ak16x016">
             <span style="font-size:13px;color:var(--text-sub)">L</span>
           </div>
         </div>
         <div class="fr" style="margin-bottom:0">
           <label class="req" for="wcTotal">总水量:</label>
           <div class="ctl">
-            <input class="inp" style="width:220px" type="text" id="wcTotal" placeholder="请输入总水量">
+            <input class="inp" style="width:220px" type="text" id="wcTotal" placeholder="请输入总水量" data-anno="ak17x017">
             <span style="font-size:13px;color:var(--text-sub)">L</span>
           </div>
         </div>
       </div>
       <div class="wct-foot">
-        <button class="btn btn-default btn-lg" onclick="closeCardTpl()">取消</button>
-        <button class="btn btn-primary btn-lg" onclick="submitCardTpl()">确定</button>
+        <button class="btn btn-default btn-lg" onclick="closeCardTpl()" data-anno="ak19x019">取消</button>
+        <button class="btn btn-primary btn-lg" onclick="submitCardTpl()" data-anno="ak18x018">确定</button>
       </div>
     </div>
   </div>
@@ -1290,10 +1353,10 @@
       var t = findCardTpl(sel.value);
       if (!t) { row.style.display = 'none'; box.innerHTML = ''; return; }
       box.innerHTML =
-        '<div class="trow"><span>水卡有效期</span><span>' + t.days + '天</span></div>' +
-        '<div class="trow"><span>每日取水上限</span><span>' + t.daily + 'L</span></div>' +
-        '<div class="trow"><span>每月取水上限</span><span>' + t.month + 'L</span></div>' +
-        '<div class="trow"><span>总水量</span><span>' + t.total + 'L</span></div>';
+        '<div class="trow" data-anno="ak09x009"><span>水卡有效期</span><span>' + t.days + '天</span></div>' +
+        '<div class="trow" data-anno="ak10x010"><span>每日取水上限</span><span>' + t.daily + 'L</span></div>' +
+        '<div class="trow" data-anno="ak11x011"><span>每月取水上限</span><span>' + t.month + 'L</span></div>' +
+        '<div class="trow" data-anno="ak12x012"><span>总水量</span><span>' + t.total + 'L</span></div>';
       row.style.display = '';
     }
     function setCardTpl(name) {
@@ -1595,235 +1658,15 @@
 
 
 
-<style id="__anno_css">/* v4：角标独立浮层。layer 在视口坐标下绝对定位（inset:0 fixed），
-   子角标用 JS 按目标元素 rect 算 left/top，不进宿主 DOM。z-index 低于弹窗遮罩(3950)，
-   弹窗开启时整层隐藏，不穿透。工具栏/气泡/列表面板保持超高 z-index 仍可操作。 */
-#__anno_layer{position:fixed;inset:0;pointer-events:none;z-index:1000;overflow:hidden}
-.__anno-flag{position:absolute;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#FFC53D;color:#5A3D00;font-size:11px;line-height:18px;text-align:center;cursor:pointer;z-index:1000;box-shadow:0 1px 4px rgba(0,0,0,.25);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;user-select:none;border:1.5px solid #fff;pointer-events:auto}
-.__anno-flag[data-missing="1"]{background:#E04D4D;color:#fff;border-color:#fff}
-.__anno-flag[data-multi="1"]{background:#FF8F1F;color:#fff}
-.__anno-bubble{position:fixed;z-index:99995;max-width:284px;background:#fff;border:1px solid #FF8F1F;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:12px;color:#333;line-height:1.6;overflow:hidden;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
-.__anno-bubble .b-head{display:flex;align-items:center;justify-content:space-between;padding:7px 11px;background:#FF8F1F;color:#fff;font-size:11px}
-.__anno-bubble .b-head .x{cursor:pointer;opacity:.9;font-size:15px;line-height:1}
-.__anno-bubble .b-body{padding:10px 12px;white-space:pre-wrap;word-break:break-word}
-.__anno-bubble .b-body .m-item{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid #f2e9d8}
-.__anno-bubble .b-body .m-item:last-child{border-bottom:none}
-.__anno-bubble .b-body .m-txt{flex:1;white-space:pre-wrap;word-break:break-word;cursor:pointer;min-width:0}
-.__anno-bubble .b-body .m-txt:hover{color:#B26A00}
-.__anno-bubble .b-body .m-del{flex:0 0 auto;height:20px;padding:0 9px;border:1px solid #e8d5b0;border-radius:10px;background:#fff;color:#B26A00;font-size:11px;cursor:pointer;font-family:inherit;line-height:1;white-space:nowrap}
-.__anno-bubble .b-body .m-del:hover{background:#FFF3E0;border-color:#FF8F1F;color:#8A4B00}
-.__anno-bubble .b-actions{display:flex;gap:8px;padding:0 12px 11px}
-.__anno-bubble textarea{width:256px;height:62px;border:1px solid #ddd;border-radius:6px;padding:8px;font-size:12px;font-family:inherit;resize:none;outline:none;display:block}
-.__anno-bubble textarea:focus{border-color:#FF8F1F}
-.__anno-bubble button{height:28px;padding:0 12px;border:none;border-radius:14px;background:#FF8F1F;color:#fff;font-size:12px;cursor:pointer;font-family:inherit}
-.__anno-bubble button.ghost{background:#eee;color:#555}
-.__anno-tb{position:fixed;right:16px;bottom:16px;z-index:99999;display:flex;align-items:center;gap:6px;background:#1f1f2e;padding:7px 9px;border-radius:26px;box-shadow:0 6px 20px rgba(0,0,0,.35);font-family:inherit}
-.__anno-tb button{height:30px;padding:0 11px;border:none;border-radius:15px;background:#33334a;color:#fff;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap}
-.__anno-tb button.on{background:#7C5CFC}
-.__anno-list{position:fixed;left:16px;top:16px;z-index:99998;width:320px;max-height:78vh;overflow:auto;background:#fff;border:1px solid #e3e3ec;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.18);font-family:inherit}
-.__anno-list .l-head{position:sticky;top:0;background:#1f1f2e;color:#fff;padding:9px 12px;font-size:13px;font-weight:600;display:flex;justify-content:space-between;align-items:center;z-index:1}
-.__anno-list .l-head .x{cursor:pointer}
-.__anno-list .l-bar{position:sticky;top:38px;background:#fff;padding:8px 12px;border-bottom:1px solid #f0f0f4;z-index:1}
-.__anno-list .l-bar .l-clean{height:26px;padding:0 10px;border:1px solid #E04D4D;background:#fff;color:#E04D4D;border-radius:13px;font-size:11px;cursor:pointer;font-family:inherit}
-.__anno-list .l-bar .l-clean:hover{background:#E04D4D;color:#fff}
-.__anno-list .empty{padding:16px;color:#999;font-size:12px}
-.__anno-list .item{padding:7px 12px 8px;border-bottom:1px solid #f0f0f4;cursor:pointer;font-size:12px;color:#333}
-.__anno-list .item:hover{background:#fff7e6}
-.__anno-list .item.miss{background:#FFF5F5}
-.__anno-list .item.miss:hover{background:#FFECEC}
-.__anno-list .item .i-main{display:flex;align-items:flex-start;gap:4px;flex-wrap:wrap}
-.__anno-list .item .n{display:inline-block;min-width:16px;height:16px;line-height:16px;text-align:center;background:#FFC53D;color:#5A3D00;border-radius:8px;font-size:10px;margin-right:6px;font-weight:600;flex:0 0 auto}
-.__anno-list .item.miss .n{background:#E04D4D;color:#fff}
-.__anno-list .item .t{color:#aaa;font-size:11px;margin-left:auto}
-.__anno-list .item .v{color:#bbb;font-size:10px;margin-left:6px}
-.__anno-list .item .a{color:#7C5CFC;font-size:10px;margin-left:5px;background:#F3F0FF;border-radius:6px;padding:0 5px;white-space:nowrap}
-.__anno-list .item .i-acts{display:flex;gap:6px;margin-top:6px;padding-left:22px}
-.__anno-list .item .i-acts .mini{height:22px;padding:0 9px;border:1px solid #e3e3ec;background:#fff;color:#555;border-radius:11px;font-size:11px;cursor:pointer;font-family:inherit;line-height:1}
-.__anno-list .item .i-acts .mini:hover{background:#f3f3f7}
-.__anno-list .item .i-acts .mini.danger{color:#E04D4D;border-color:#f0c4c4}
-.__anno-list .item .i-acts .mini.danger:hover{background:#E04D4D;color:#fff;border-color:#E04D4D}
-.__anno-mode-on,.__anno-mode-on *{cursor:crosshair!important}
-.__anno-relocating,.__anno-relocating *{cursor:crosshair!important}
-.__anno-hover{outline:2px dashed #7C5CFC!important;outline-offset:1px}
-.__anno-hidden .__anno-layer,.__anno-hidden #__anno_layer{display:none!important}
-.__anno-tb button:disabled{opacity:.45;cursor:not-allowed}
-.__anno-tb button.__anno-locked{opacity:.45;cursor:not-allowed}
-.__anno-tb .__anno-hint{background:#E04D4D;color:#fff;cursor:default;font-size:11px;padding:0 9px}
-</style>
-<script id="__anno_seed" type="application/json">[
-{
-"id": "ak1x001",
-"no": 1,
-"view": "viewDetail",
-"sel": "input[name=\"dPtype\"][value=\"水卡\"]",
-"text": "选择项（新增）：水卡\n选中『水卡』后联动：显示「水卡设置」、隐藏「发货模板设置」「售后设置」「其他设置」，并将「商品规格」锁定为单个商品规格",
-"ts": 1789641808912,
-"valid": true
-},
-{
-"id": "ak2x002",
-"no": 2,
-"view": "viewDetail",
-"sel": "#dSpecName",
-"text": "选择项：商品类型=水卡 时锁定为「规格名1」单规格\n字段仍可填可改；其余规格结构（规格名2、添加子规格、创建新规格、第2行规格值及行尾+/-删除）全部隐藏",
-"ts": 1789641808912,
-"valid": true
-},
-{
-"id": "ak3x003",
-"no": 3,
-"view": "viewDetail",
-"sel": "#specValRow1 input.inp",
-"text": "输入项：规格名1 对应的规格值\n仅保留 1 行，可填可改",
-"ts": 1789641808912,
-"valid": true
-},
-{
-"id": "ak4x004",
-"no": 4,
-"view": "viewDetail",
-"sel": "#specValRow1 select",
-"text": "选择项：该规格值的购买级别门槛\n默认「不限制」，可改",
-"ts": 1789641808912,
-"valid": true
-},
-{
-"id": "ak5x005",
-"no": 5,
-"view": "viewDetail",
-"sel": "#cardSpec .linkbtn",
-"text": "功能入口：为该规格上传图片\n水卡类型下保留，点击 toast「添加规格图片」",
-"ts": 1789641808912,
-"valid": true
-},
-{
-"id": "ak6x006",
-"no": 6,
-"view": "viewDetail",
-"sel": "#dCardTpl",
-"text": "选择项：引用水卡模板\n选中后自动带出 水卡有效期/每日取水上限/每月取水上限/总水量 到下方信息卡；新增模板后自动进入此下拉，无需刷新",
-"ts": 1789641808912,
-"valid": true
-},
-{
-"id": "ak7x007",
-"no": 7,
-"view": "viewDetail",
-"sel": "#cardWater .tb-link",
-"text": "功能入口：打开「新增水卡模板」弹窗\n调用 openCardTpl() 显示 #wctMask 并清空表单；新增完成后模板自动进入下拉并选中",
-"ts": 1789641808912,
-"valid": true
-},
-{
-"id": "ak8x008",
-"no": 8,
-"view": "viewDetail",
-"sel": "#cardWater .uphint",
-"text": "不可编辑\n显示：水卡设置卡片内提示文案常显\n说明：引导用户选择合适的水卡模板，若无合适模板先新增",
-"ts": 1789641808912,
-"valid": true
-},
-{
-"id": "ak9x009",
-"no": 9,
-"view": "viewDetail",
-"sel": ".tplbox .trow:nth-of-type(1)",
-"text": "不可编辑\n显示：选中水卡模板后展示\n引用后自动带出信息：由所选「水卡模板」带出，展示水卡有效期（天）",
-"ts": 1789641808912,
-"valid": true
-},
-{
-"id": "ak10x010",
-"no": 10,
-"view": "viewDetail",
-"sel": ".tplbox .trow:nth-of-type(2)",
-"text": "不可编辑\n显示：选中水卡模板后展示\n引用后自动带出信息：由所选「水卡模板」带出，展示每日取水上限（L）",
-"ts": 1789641808912,
-"valid": true
-},
-{
-"id": "ak11x011",
-"no": 11,
-"view": "viewDetail",
-"sel": ".tplbox .trow:nth-of-type(3)",
-"text": "不可编辑\n显示：选中水卡模板后展示\n引用后自动带出信息：由所选「水卡模板」带出，展示每月取水上限（L）",
-"ts": 1789641808912,
-"valid": true
-},
-{
-"id": "ak12x012",
-"no": 12,
-"view": "viewDetail",
-"sel": ".tplbox .trow:nth-of-type(4)",
-"text": "不可编辑\n显示：选中水卡模板后展示\n引用后自动带出信息：由所选「水卡模板」带出，展示总水量（L）",
-"ts": 1789641808912,
-"valid": true
-},
-{
-"id": "ak13x013",
-"no": 13,
-"view": "global",
-"sel": "#wcName",
-"text": "可编辑\n输入限制：最多 200 字（带 0/200 计数）\n水卡模板名称，提交时校验非空且唯一（重名拦截）",
-"ts": 1789641808912,
-"valid": true
-},
-{
-"id": "ak14x014",
-"no": 14,
-"view": "global",
-"sel": "#wcDays",
-"text": "可编辑\n输入限制：正整数（单位：天）\n水卡有效期：激活后 N 天有效；提交时校验非空",
-"ts": 1789641808912,
-"valid": true
-},
-{
-"id": "ak15x015",
-"no": 15,
-"view": "global",
-"sel": "#wcDaily",
-"text": "可编辑\n输入限制：数值（单位：L）\n每日取水上限；提交时校验非空",
-"ts": 1789641808912,
-"valid": true
-},
-{
-"id": "ak16x016",
-"no": 16,
-"view": "global",
-"sel": "#wcMonth",
-"text": "可编辑\n输入限制：数值（单位：L）\n每月取水上限；提交时校验非空",
-"ts": 1789641808912,
-"valid": true
-},
-{
-"id": "ak17x017",
-"no": 17,
-"view": "global",
-"sel": "#wcTotal",
-"text": "可编辑\n输入限制：数值（单位：L）\n总水量；提交时校验非空",
-"ts": 1789641808912,
-"valid": true
-},
-{
-"id": "ak18x018",
-"no": 18,
-"view": "global",
-"sel": "#wctMask .btn-primary",
-"text": "功能说明：校验并保存水卡模板，关闭弹窗\n功能实现：校验 5 字段均非空、模板名称唯一（findCardTpl 查重），写入模板列表，重渲 #dCardTpl 选项并自动选中、回填信息卡；模板不可修改、不可删除",
-"ts": 1789641808912,
-"valid": true
-},
-{
-"id": "ak19x019",
-"no": 19,
-"view": "global",
-"sel": "#wctMask .btn-default",
-"text": "功能说明：关闭弹窗，不保存\n功能实现：调用 closeCardTpl() 移除 #wctMask 的 show 状态",
-"ts": 1789641808912,
-"valid": true
-}
-]</script>
-<script id="__anno_engine">
+
+
+
+
+
+
+<script id="__anno_seed" type="application/json">[{"id":"ak01x001","no":1,"view":"viewDetail","sel":"[data-anno=\"ak01x001\"]","text":"选择项（新增）：水卡\n选中『水卡』后联动：显示「水卡设置」、隐藏「发货模板设置」「售后设置」「其他设置」，并将「商品规格」锁定为单个商品规格","ts":1695000000000,"valid":true},{"id":"ak02x002","no":2,"view":"viewDetail","sel":"[data-anno=\"ak02x002\"]","text":"选择项：商品类型=水卡 时锁定为「规格名1」单规格\n字段仍可填可改；其余规格结构（规格名2、添加子规格、创建新规格、第2行规格值及行尾+/-删除）全部隐藏","ts":1695000000000,"valid":true},{"id":"ak03x003","no":3,"view":"viewDetail","sel":"[data-anno=\"ak03x003\"]","text":"输入项：规格名1 对应的规格值\n仅保留 1 行，可填可改","ts":1695000000000,"valid":true},{"id":"ak04x004","no":4,"view":"viewDetail","sel":"[data-anno=\"ak04x004\"]","text":"选择项：该规格值的购买级别门槛\n默认「不限制」，可改","ts":1695000000000,"valid":true},{"id":"ak05x005","no":5,"view":"viewDetail","sel":"[data-anno=\"ak05x005\"]","text":"功能入口：为该规格上传图片\n水卡类型下保留，点击 toast「添加规格图片」","ts":1695000000000,"valid":true},{"id":"ak06x006","no":6,"view":"viewDetail","sel":"[data-anno=\"ak06x006\"]","text":"选择项：引用水卡模板\n选中后自动带出 水卡有效期/每日取水上限/每月取水上限/总水量 到下方信息卡；新增模板后自动进入此下拉，无需刷新","ts":1695000000000,"valid":true,"activates":"watercard","fallback":"#cardWater"},{"id":"ak07x007","no":7,"view":"viewDetail","sel":"[data-anno=\"ak07x007\"]","text":"功能入口：打开「新增水卡模板」弹窗\n调用 openCardTpl() 显示 #wctMask 并清空表单；新增完成后模板自动进入下拉并选中","ts":1695000000000,"valid":true,"activates":"watercard","fallback":"#cardWater"},{"id":"ak08x008","no":8,"view":"viewDetail","sel":"[data-anno=\"ak08x008\"]","text":"不可编辑\n显示：水卡设置卡片内提示文案常显\n说明：引导用户选择合适的水卡模板，若无合适模板先新增","ts":1695000000000,"valid":true,"activates":"watercard","fallback":"#cardWater"},{"id":"ak09x009","no":9,"view":"viewDetail","sel":"[data-anno=\"ak09x009\"]","text":"不可编辑\n显示：选中水卡模板后展示\n引用后自动带出信息：由所选「水卡模板」带出，展示水卡有效期（天）","ts":1695000000000,"valid":true,"activates":"template","fallback":"#cardTplBox"},{"id":"ak10x010","no":10,"view":"viewDetail","sel":"[data-anno=\"ak10x010\"]","text":"不可编辑\n显示：选中水卡模板后展示\n引用后自动带出信息：由所选「水卡模板」带出，展示每日取水上限（L）","ts":1695000000000,"valid":true,"activates":"template","fallback":"#cardTplBox"},{"id":"ak11x011","no":11,"view":"viewDetail","sel":"[data-anno=\"ak11x011\"]","text":"不可编辑\n显示：选中水卡模板后展示\n引用后自动带出信息：由所选「水卡模板」带出，展示每月取水上限（L）","ts":1695000000000,"valid":true,"activates":"template","fallback":"#cardTplBox"},{"id":"ak12x012","no":12,"view":"viewDetail","sel":"[data-anno=\"ak12x012\"]","text":"不可编辑\n显示：选中水卡模板后展示\n引用后自动带出信息：由所选「水卡模板」带出，展示总水量（L）","ts":1695000000000,"valid":true,"activates":"template","fallback":"#cardTplBox"},{"id":"ak13x013","no":13,"view":"global","sel":"[data-anno=\"ak13x013\"]","text":"可编辑\n输入限制：最多 200 字（带 0/200 计数）\n水卡模板名称，提交时校验非空且唯一（重名拦截）","ts":1695000000000,"valid":true,"fallback":"#wctMask"},{"id":"ak14x014","no":14,"view":"global","sel":"[data-anno=\"ak14x014\"]","text":"可编辑\n输入限制：正整数（单位：天）\n水卡有效期：激活后 N 天有效；提交时校验非空","ts":1695000000000,"valid":true,"fallback":"#wctMask"},{"id":"ak15x015","no":15,"view":"global","sel":"[data-anno=\"ak15x015\"]","text":"可编辑\n输入限制：数值（单位：L）\n每日取水上限；提交时校验非空","ts":1695000000000,"valid":true,"fallback":"#wctMask"},{"id":"ak16x016","no":16,"view":"global","sel":"[data-anno=\"ak16x016\"]","text":"可编辑\n输入限制：数值（单位：L）\n每月取水上限；提交时校验非空","ts":1695000000000,"valid":true,"fallback":"#wctMask"},{"id":"ak17x017","no":17,"view":"global","sel":"[data-anno=\"ak17x017\"]","text":"可编辑\n输入限制：数值（单位：L）\n总水量；提交时校验非空","ts":1695000000000,"valid":true,"fallback":"#wctMask"},{"id":"ak18x018","no":18,"view":"global","sel":"[data-anno=\"ak18x018\"]","text":"功能说明：校验并保存水卡模板，关闭弹窗\n功能实现：校验 5 字段均非空、模板名称唯一（findCardTpl 查重），写入模板列表，重渲 #dCardTpl 选项并自动选中、回填信息卡；模板不可修改、不可删除","ts":1695000000000,"valid":true,"fallback":"#wctMask"},{"id":"ak19x019","no":19,"view":"global","sel":"[data-anno=\"ak19x019\"]","text":"功能说明：关闭弹窗，不保存\n功能实现：调用 closeCardTpl() 移除 #wctMask 的 show 状态","ts":1695000000000,"valid":true,"fallback":"#wctMask"}]</script>
+<script>
+
 (function(){
   "use strict";
   /* v4：本地优先 —— 去掉 github.io/?anno=1 门禁，本地 file:// 直接可批注/同步。
@@ -1834,9 +1677,14 @@
   var LS_KEY = '__anno__' + fileKey;
   var seed = [];
   try { seed = JSON.parse((document.getElementById('__anno_seed')||{}).textContent || '[]'); } catch(e){ seed = []; }
-  var data;
-  try { data = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch(e){ data = null; }
-  if (!Array.isArray(data)) data = seed.slice();
+  var _cached;
+  try { _cached = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch(e){ _cached = null; }
+  /* 文件 seed 优先：仅当缓存是数组且与文件 seed 的 id 集合一致（合法编辑）时才用缓存；
+     否则用文件 seed，避免旧缓存覆盖修复后的 seed 导致“打开即失联”。 */
+  var _sameIds = Array.isArray(_cached) && _cached.length === seed.length &&
+    seed.every(function(s){ return _cached.some(function(c){ return c.id === s.id && c.sel === s.sel; }); });
+  var data = (Array.isArray(_cached) && _sameIds) ? _cached.slice() : seed.slice();
+  if (!(Array.isArray(_cached) && _sameIds)) { try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch(e){} }
   data.forEach(function(a,i){ if (typeof a.no !== 'number') a.no = i+1; if (typeof a.view !== 'string') a.view = 'global'; });
   var mode = false, hidden = false, openId = null, hoverEl = null, relocating = null;
   function nextNo(){ var m=0; data.forEach(function(a){ if(a.no>m)m=a.no; }); return m+1; }
@@ -1930,13 +1778,26 @@
   /* 列表/气泡「定位」：弹窗内字段批注自动打开对应弹窗再高亮字段（data-open 钩子） */
   function revealAnno(a){
     var el=locate(a.sel, rootOf(a.view));
-    if(!el){ toast('定位失败：原型可能已改版，请「重定位」或删除'); return; }
-    var m=modalOf(el);
-    function go(){ el.scrollIntoView({block:'center'}); flash(el); }
-    if (m && !isModalOpen(m)){
-      var openFn=m.getAttribute('data-open');
-      if(openFn){ try{ (new Function(openFn))(); }catch(e){} setTimeout(function(){ renderThrottled(); setTimeout(go, 40); }, 40); return; }
+    var m = el ? modalOf(el) : null;
+    if ((!el) || (m && !isModalOpen(m))){
+      /* 待激活：自动触发对应交互（选水卡/选模板/开弹窗）让字段出现后再定位 */
+      var act=a.activates;
+      if(act==='watercard'){ var r=document.querySelector('input[name="dPtype"][value="水卡"]'); if(r){ r.checked=true; if(typeof syncWaterCards==='function') syncWaterCards(); } }
+      else if(act==='template'){ var sel=document.getElementById('dCardTpl'); if(sel){ sel.value=sel.value||'年卡模板'; if(typeof syncCardTpl==='function') syncCardTpl(); } }
+      var targetM = m || (a.view==='global' ? document.getElementById('wctMask') : null);
+      if(targetM){ var of=targetM.getAttribute('data-open'); if(of){ try{ (new Function(of))(); }catch(e){} } }
+      renderThrottled();
+      setTimeout(function(){
+        var el2=locate(a.sel, rootOf(a.view));
+        if(!el2){ toast('定位失败：原型可能已改版，请「重定位」或删除'); return; }
+        var m2=modalOf(el2);
+        function go(){ el2.scrollIntoView({block:'center'}); flash(el2); }
+        if(m2 && !isModalOpen(m2)){ var of2=m2.getAttribute('data-open'); if(of2){ try{ (new Function(of2))(); }catch(e){} } setTimeout(function(){ renderThrottled(); setTimeout(go,40); },40); return; }
+        go();
+      }, 180);
+      return;
     }
+    function go(){ el.scrollIntoView({block:'center'}); flash(el); }
     go();
   }
 
@@ -1953,6 +1814,20 @@
   function clearFlags(){ flagEls=[]; while(layer.firstChild) layer.removeChild(layer.firstChild); }
   function closeBubble(){ var b=document.getElementById('__anno_bubble'); if(b&&b.parentNode)b.parentNode.removeChild(b); openId=null; }
 
+  /* 分类：ok=可见可标；hidden-modal=弹窗关闭内(延后不显示)；pending=因交互未激活而隐藏/未生成(待激活灰标)；lost=锚点彻底失效(红标失联) */
+  function classify(a){
+    var el = locate(a.sel, rootOf(a.view));
+    if (el){
+      var m = modalOf(el);
+      /* 弹窗开启时：弹窗内的字段照常显示角标（贴字段右上角），仅弹窗未开才跳过 */
+      if (m && !isModalOpen(m)) return 'hidden-modal';
+      if (isVisible(el)) return 'ok';
+      return 'pending';
+    }
+    var fb = a.fallback ? locate(a.fallback, rootOf(a.view)) : null;
+    if (fb) return 'pending';
+    return 'lost';
+  }
   function render(){
     clearFlags();
     document.body.classList.toggle('__anno-hidden', hidden);
@@ -1960,24 +1835,20 @@
     var cv = currentView();
     var map = new Map();
     var miss = [];
+    var pending = [];
     data.forEach(function(a){
       if (a.view && a.view !== 'global' && a.view !== cv) return;
-      var el = locate(a.sel, rootOf(a.view));
-      if (!el){ /* 元素彻底找不到 → 失联 */
-        if (a.view === cv || a.view === 'global'){ miss.push(a); }
+      var c = classify(a);
+      if (c === 'hidden-modal') return;
+      if (c === 'ok'){
+        var el = locate(a.sel, rootOf(a.view));
+        var block = anchorOf(el);
+        if (!map.has(block)) map.set(block, []);
+        map.get(block).push(a);
         return;
       }
-      var m = modalOf(el);
-      if (m && !isModalOpen(m)){ /* 在「关闭的弹窗」内 → 延后显示，不算失联、也不画角标 */
-        return;
-      }
-      if (!isVisible(el)){ /* 其它不可见原因 → 失联 */
-        if (a.view === cv || a.view === 'global'){ miss.push(a); }
-        return;
-      }
-      var block = anchorOf(el);
-      if (!map.has(block)) map.set(block, []);
-      map.get(block).push(a);
+      if (c === 'pending'){ pending.push(a); return; }
+      if (c === 'lost'){ miss.push(a); return; }
     });
     map.forEach(function(annos, block){
       var multi = annos.length > 1;
@@ -1995,11 +1866,19 @@
       layer.appendChild(flag);
       flagEls.push({flag:flag, el:block, pos:pos});
     });
-    /* 失联角标：固定堆在右上角（红底），点击展开 */
+    /* 待激活角标（灰标）：因交互未激活而隐藏/未生成，点击自动展开对应交互后定位 */
+    pending.forEach(function(a,i){
+      var flag=document.createElement('div'); flag.className='__anno-flag __anno-pending'; flag.setAttribute('data-pending','1');
+      flag.textContent = a.no;
+      flag.style.left='auto'; flag.style.right='16px'; flag.style.top=(60+i*22)+'px';
+      flag.addEventListener('click', function(ev){ ev.stopPropagation(); openBubble(a.id, null); });
+      layer.appendChild(flag);
+    });
+    /* 失联角标：固定堆在右上角（红底），仅锚点彻底失效才出现 */
     miss.forEach(function(a,i){
       var flag=document.createElement('div'); flag.className='__anno-flag'; flag.setAttribute('data-missing','1');
       flag.textContent = a.no;
-      flag.style.left='auto'; flag.style.right='16px'; flag.style.top=(60+i*22)+'px';
+      flag.style.left='auto'; flag.style.right='16px'; flag.style.top=(60+pending.length+i*22)+'px';
       flag.addEventListener('click', function(ev){ ev.stopPropagation(); openBubble(a.id, null); });
       layer.appendChild(flag);
     });
@@ -2113,7 +1992,7 @@
 
   function renderList(){
     listPanel.innerHTML='';
-    var lost = data.filter(function(a){ var el=locate(a.sel, rootOf(a.view)); return !el || !isVisible(el); });
+    var lost = data.filter(function(a){ return classify(a)==='lost'; });
     var head=document.createElement('div'); head.className='l-head';
     head.innerHTML='<span>批注列表 ('+data.length+(lost.length?' · 失联 '+lost.length:'')+')</span><span class="x">×</span>';
     listPanel.appendChild(head);
@@ -2131,17 +2010,22 @@
     }
     if(!data.length){ var e=document.createElement('div'); e.className='empty'; e.textContent='暂无批注。开启「批注」模式后点击原型元素即可添加。'; listPanel.appendChild(e); }
     data.slice().sort(function(x,y){return x.no-y.no;}).forEach(function(a){
-      var el=locate(a.sel, rootOf(a.view)); var m=el?modalOf(el):null; var miss = !el || ((!m)&&!isVisible(el)) || (m&&isModalOpen(m)&&!isVisible(el));
-      var it=document.createElement('div'); it.className='item'+(miss?' miss':'');
+      var c=classify(a);
+      var el = locate(a.sel, rootOf(a.view));
+      var it=document.createElement('div'); it.className='item'+(c==='lost'?' miss':(c==='pending'?' pending':''));
       var row=document.createElement('div'); row.className='i-main';
       var atxt = el ? textOf(el).slice(0,12) : '';
-      row.innerHTML='<span class="n">'+a.no+'</span><span class="v">'+(a.view&&a.view!=='global'?'['+a.view+']':'')+'</span>'+esc(a.text)+(atxt?'<span class="a">'+esc(atxt)+'</span>':'')+'<span class="t">'+fmt(new Date(a.ts||Date.now()))+(miss?' 失联':'')+'</span>';
-      row.addEventListener('click',function(){ revealAnno(a); if(hidden){hidden=false;document.body.classList.remove('__anno-hidden');bHide.textContent='隐藏';} var f=document.querySelector('.__anno-flag[data-id="'+a.id+'"]'); if(f)openBubble(a.id,f); else if(miss) toast('该批注已失联，可「重定位」或删除'); });
+      var tag = c==='lost'?' 失联':(c==='pending'?' 待激活':'');
+      row.innerHTML='<span class="n">'+a.no+'</span><span class="v">'+(a.view&&a.view!=='global'?'['+a.view+']':'')+'</span>'+esc(a.text)+(atxt?'<span class="a">'+esc(atxt)+'</span>':'')+'<span class="t">'+fmt(new Date(a.ts||Date.now()))+tag+'</span>';
+      row.addEventListener('click',function(){ revealAnno(a); if(hidden){hidden=false;document.body.classList.remove('__anno-hidden');bHide.textContent='隐藏';} var f=document.querySelector('.__anno-flag[data-id="'+a.id+'"]'); if(f)openBubble(a.id,f); else if(c==='lost') toast('该批注已失联，可「重定位」或删除'); });
       it.appendChild(row);
       var acts=document.createElement('div'); acts.className='i-acts';
-      if (miss){
+      if (c==='lost'){
         var reBtn=btn('重定位','mini'); reBtn.addEventListener('click', function(ev){ ev.stopPropagation(); startRelocate(a.id); });
         acts.appendChild(reBtn);
+      } else if (c==='pending'){
+        var loBtn=btn('定位','mini'); loBtn.addEventListener('click', function(ev){ ev.stopPropagation(); revealAnno(a); });
+        acts.appendChild(loBtn);
       } else {
         var jBtn=btn('定位','mini'); jBtn.addEventListener('click', function(ev){ ev.stopPropagation(); var e2=locate(a.sel, rootOf(a.view)); if(e2){e2.scrollIntoView({block:'center'});flash(e2);} });
         acts.appendChild(jBtn);
@@ -2256,8 +2140,23 @@
   var vmodal=new MutationObserver(function(){ posThrottled(); });
   vmodal.observe(document.body, {attributes:true, attributeFilter:['style','class'], subtree:true});
 
-  render();
+  /* 自动展开：初始化即把条件字段渲染出来，浮窗角标直接贴在字段上 —— 打开即全见、0 失联 */
+  (function autoActivate(){
+    try {
+      var r=document.querySelector('input[name="dPtype"][value="水卡"]');
+      if(r){ r.checked=true; if(typeof syncWaterCards==='function') syncWaterCards(); }
+      var sel=document.getElementById('dCardTpl');
+      if(sel){ sel.value=sel.value||'年卡模板'; if(typeof syncCardTpl==='function') syncCardTpl(); }
+      /* 弹窗内批注：自动打开对应弹窗让字段渲染（关闭弹窗时角标自然随隐藏，不算失联） */
+      var m=document.getElementById('wctMask');
+      if(m && !m.classList.contains('show')){ var of=m.getAttribute('data-open'); if(of){ try{ (new Function(of))(); }catch(e){} } }
+    } catch(e){}
+  })();
+  render(); renderList();
+  /* 条件字段/弹窗可能有动画，延迟一次重渲染确保角标贴到真实可见字段上 */
+  setTimeout(function(){ render(); renderList(); }, 120);
   bHide.textContent = '隐藏';
 })();
+
 </script>
 </body></html>
