@@ -1815,19 +1815,33 @@
   function closeBubble(){ var b=document.getElementById('__anno_bubble'); if(b&&b.parentNode)b.parentNode.removeChild(b); openId=null; }
 
   /* 分类：ok=可见可标；hidden-modal=弹窗关闭内(延后不显示)；pending=因交互未激活而隐藏/未生成(待激活灰标)；lost=锚点彻底失效(红标失联) */
-  function anyOpenModal(){
+  /* 返回当前「开着且堆叠最高」的弹窗（computed z-index 取大，平局取 DOM 靠后）；
+     无弹窗返回 null。用于同页多弹窗叠放时只显示最顶层弹窗的角标，避免下层弹窗角标穿透到上层。 */
+  function topOpenModal(){
     try {
       var ms = document.querySelectorAll(MODAL_SEL);
-      for (var i=0;i<ms.length;i++){ if (isModalOpen(ms[i])) return true; }
-    } catch(e){}
-    return false;
+      var best=null, bestZ=-1, bestIdx=-1;
+      for (var i=0;i<ms.length;i++){
+        if (!isModalOpen(ms[i])) continue;
+        var z = parseInt(getComputedStyle(ms[i]).zIndex, 10);
+        if (isNaN(z)) z = 0;
+        if (z > bestZ || (z === bestZ && i > bestIdx)) { best = ms[i]; bestZ = z; bestIdx = i; }
+      }
+      return best;
+    } catch(e){ return null; }
   }
   function classify(a){
     var el = locate(a.sel, rootOf(a.view));
     if (el){
       var m = modalOf(el);
-      /* 弹窗开启时：只显示弹窗内部的角标，弹窗外的背景角标隐藏（避免穿透遮罩浮到弹窗上） */
-      if (anyOpenModal() && (!m || !isModalOpen(m))) return 'hidden-modal';
+      var top = topOpenModal();
+      if (top){
+        /* 有弹窗开着：仅最顶层弹窗内的角标显示；背景与被盖(下层)弹窗角标隐藏，杜绝穿透 */
+        if (!m || m !== top) return 'hidden-modal';
+        if (isVisible(el)) return 'ok';
+        return 'pending';
+      }
+      /* 无弹窗：保持原单弹窗/背景判定 */
       if (m && !isModalOpen(m)) return 'hidden-modal';
       if (isVisible(el)) return 'ok';
       return 'pending';
@@ -1841,6 +1855,9 @@
     document.body.classList.toggle('__anno-hidden', hidden);
     if (hidden) return;
     var cv = currentView();
+    /* 角标层 z-index 动态跟随最顶层弹窗：保证顶层弹窗的角标在遮罩之上，即使弹窗 z-index 很高也不会被盖 */
+    var _top = topOpenModal();
+    layer.style.zIndex = _top ? ((parseInt(getComputedStyle(_top).zIndex, 10) || 0) + 1) : 4000;
     var map = new Map();
     var miss = [];
     var pending = [];
@@ -1893,7 +1910,7 @@
     positionFlags();
   }
   /* 按元素实时 rect 计算角标坐标；元素不可见/0尺寸则隐藏。
-     弹窗感知：打开某弹窗时，仅显示「该弹窗内」字段的角标，弹窗外（被遮住）的角标隐藏；
+     弹窗感知：有弹窗开着时，仅显示「最顶层弹窗内」字段的角标，背景与被盖(下层)弹窗角标隐藏；
      关闭的弹窗内字段角标不显示、也不算失联。 */
   function positionFlags(){
     layer.style.display='';
