@@ -1121,6 +1121,25 @@
                 <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v" onclick="goMember('Perf')">805</span></span>
                 <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v" onclick="goMember('Perf')">3600</span></span>
               </div>
+              <div class="perf-line">
+                <span class="pl-title">自购（v值）</span>
+                <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v" onclick="goMember('Perf')">0</span></span>
+                <span class="pl-item"><span class="pl-k">本月自购</span><span class="pl-v" onclick="goMember('Perf')">0</span><span class="pl-more" onclick="toast('查看往期')">查看往期</span></span>
+                <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v" onclick="goMember('Perf')">12.5</span></span>
+                <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v" onclick="goMember('Perf')">4380.1</span></span>
+              </div>
+              <div class="perf-line">
+                <span class="pl-title">直推（v值）</span>
+                <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v" onclick="goMember('Perf')">0</span></span>
+                <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v" onclick="goMember('Perf')">268.3</span></span>
+                <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v" onclick="goMember('Perf')">1200</span></span>
+              </div>
+              <div class="perf-line">
+                <span class="pl-title">推广（v值）</span>
+                <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v" onclick="goMember('Perf')">0</span></span>
+                <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v" onclick="goMember('Perf')">268.3</span></span>
+                <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v" onclick="goMember('Perf')">1200</span></span>
+              </div>
             </div>
           </div>
 
@@ -1224,6 +1243,7 @@
                   <th style="width:180px">下单时间</th>
                   <th style="width:200px">下单人员</th>
                   <th style="width:120px">订单结算PV</th>
+                  <th style="width:120px">订单结算v值</th>
                   <th style="width:160px">业绩类型</th>
                   <th style="width:120px">结算状态</th>
                   <th style="width:110px">是否分佣</th>
@@ -1803,16 +1823,16 @@
     }
 
     var mmPerfOrders = [
-      { no: '605947', time: '2026-09-09 10:58:09', buyer: '木子酱123', account: '17388970728', pv: '2.00', type: '-', status: '未分佣', comm: '否', desc: '-' },
-      { no: '605947', time: '2026-09-09 10:58:09', buyer: '木子酱123', account: '17388970728', pv: '2.00', type: '-', status: '未分佣', comm: '否', desc: '-' },
-      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', type: '直推-已结算', status: '已结算', comm: '是', desc: '【产生退款】20260806TEST-商品订单编号|605856|用户|有幸12123|自购分享奖励' },
-      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', type: '推广-已结算', status: '已结算', comm: '是', desc: '【产生退款】20260806TEST-商品订单编号|605856|用户|有幸12123|自购分享奖励' },
-      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', type: '直推-已退款', status: '已结算', comm: '是', desc: '20260806TEST-商品订单编号|605856|用户|有幸12123|自购分享奖励' },
-      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', type: '推广-已退款', status: '已结算', comm: '是', desc: '【产生退款】20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴' },
-      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', type: '直推-已结算', status: '已结算', comm: '是', desc: '20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴' },
-      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', type: '推广-已退款', status: '已结算', comm: '是', desc: '20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴' },
-      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', type: '直推-已退款', status: '已结算', comm: '是', desc: '20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴' },
-      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', type: '推广-已退款', status: '已结算', comm: '是', desc: '20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴' }
+      { no: '605947', time: '2026-09-09 10:58:09', buyer: '木子酱123', account: '17388970728', pv: '2.00', vv: '1.80', type: '-', status: '未分佣', comm: '否', desc: '-' },
+      { no: '605947', time: '2026-09-09 10:58:09', buyer: '木子酱123', account: '17388970728', pv: '2.00', vv: '1.80', type: '-', status: '未分佣', comm: '否', desc: '-' },
+      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', vv: '45.00', type: '直推-已结算', status: '已结算', comm: '是', desc: '【产生退款】20260806TEST-商品订单编号|605856|用户|有幸12123|自购分享奖励' },
+      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', vv: '45.00', type: '推广-已结算', status: '已结算', comm: '是', desc: '【产生退款】20260806TEST-商品订单编号|605856|用户|有幸12123|自购分享奖励' },
+      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', vv: '45.00', type: '直推-已退款', status: '已结算', comm: '是', desc: '20260806TEST-商品订单编号|605856|用户|有幸12123|自购分享奖励' },
+      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', vv: '45.00', type: '推广-已退款', status: '已结算', comm: '是', desc: '【产生退款】20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴' },
+      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', vv: '45.00', type: '直推-已结算', status: '已结算', comm: '是', desc: '20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴' },
+      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', vv: '45.00', type: '推广-已退款', status: '已结算', comm: '是', desc: '20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴' },
+      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', vv: '45.00', type: '直推-已退款', status: '已结算', comm: '是', desc: '20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴' },
+      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', vv: '45.00', type: '推广-已退款', status: '已结算', comm: '是', desc: '20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴' }
     ];
     var mmPerfSel = {};
     function mmRenderPerfList(data) {
@@ -1826,6 +1846,7 @@
           '<td>' + o.time + '</td>' +
           '<td>' + o.buyer + '<br>' + o.account + '</td>' +
           '<td>' + o.pv + '</td>' +
+          '<td>' + (o.vv ? o.vv : '-') + '</td>' +
           '<td>' + o.type + '</td>' +
           '<td>' + o.status + '</td>' +
           '<td>' + o.comm + '</td>' +
