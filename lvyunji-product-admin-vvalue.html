@@ -211,6 +211,16 @@
     .ghost { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border: 1px solid var(--border-2); border-radius: 3px; background: #fff; font-size: 12px; color: var(--text-sub); cursor: pointer; font-family: inherit; }
     .ghost:hover { border-color: var(--primary); color: var(--primary); }
     .ghost .circ { color: #8c8c8c; }
+    /* 商品规格（按截图 1:1 静态版） */
+    .spec-box { background: var(--box); border-radius: 4px; padding: 24px 20px 20px; }
+    .spec-row { display: flex; align-items: center; margin-bottom: 16px; }
+    .spec-row:last-child { margin-bottom: 0; }
+    .spec-lab { flex: 0 0 76px; text-align: right; font-size: 13px; color: var(--text-sub); line-height: 32px; }
+    .spec-bl { font-size: 13px; color: var(--text-sub); line-height: 32px; margin: 0 10px 0 14px; white-space: nowrap; }
+    .spec-thumb { position: relative; width: 52px; height: 52px; border-radius: 4px; background: #EDEFF5; display: flex; align-items: center; justify-content: center; margin-left: 14px; }
+    .spec-thumb i { font-style: normal; font-size: 10px; color: #c3c7cf; line-height: 1.2; text-align: center; }
+    .spec-thumb .del { position: absolute; top: -7px; right: -7px; width: 16px; height: 16px; border-radius: 50%; background: #2E2D41; color: #fff; font-size: 10px; line-height: 16px; text-align: center; }
+    .spec-plus { width: 52px; height: 52px; border: 1px dashed var(--border-2); border-radius: 4px; background: #fff; color: #8c8c8c; font-size: 16px; display: flex; align-items: center; justify-content: center; margin-left: 14px; }
     .grid3 { display: grid; grid-template-columns: repeat(3, 372px); gap: 18px 0; }
     .grid3 .fr { margin-bottom: 0; }
     .grid3 .fr > label { flex: 0 0 96px; width: 96px; }
@@ -574,42 +584,48 @@
           <div class="dcard">
             <div class="sec-title">商品规格</div>
             <div class="sec-body">
-              <div class="box">
-                <div class="fr">
-                  <label class="req" for="dSpecName">规格名1</label>
-                  <div class="ctl">
-                    <select class="sel" style="width:320px" id="dSpecName">
-                      <option value="">请选择规格</option>
-                      <option>颜色</option>
-                      <option>规格</option>
-                      <option>容量</option>
-                    </select>
-                    <span class="linkbtn" onclick="toast('添加规格图片')"><span class="circ red">+</span>添加规格图片</span>
-                  </div>
+              <div class="spec-box">
+                <div class="spec-row">
+                  <label class="spec-lab req" for="dSpecName">规格名1</label>
+                  <select class="sel" style="width:300px;margin-left:12px" id="dSpecName">
+                    <option selected>自定义规格名</option>
+                    <option>颜色</option>
+                    <option>规格</option>
+                    <option>容量</option>
+                  </select>
+                  <input class="inp" style="width:270px" type="text" value="1213">
+                  <span class="linkbtn" style="margin-left:14px"><span class="circ red">+</span>添加规格图片</span>
                 </div>
-                <div class="fr">
-                  <label></label>
-                  <div class="ctl">
-                    <input class="inp" style="width:320px" type="text" placeholder="请输入">
-                    <label style="flex:0 0 auto;line-height:32px;color:var(--text-sub);font-size:13px">购买级别 (x)：</label>
-                    <select class="sel" style="width:220px">
-                      <option>不限制</option>
-                      <option>1</option>
-                      <option>2</option>
-                      <option>3</option>
-                    </select>
-                    <button class="ghost" style="height:32px;width:36px;justify-content:center;padding:0" onclick="toast('新增一行规格值')">+</button>
-                  </div>
+                <div class="spec-row">
+                  <input class="inp" style="width:300px;margin-left:88px" type="text" value="12321">
+                  <span class="spec-bl">购买级别 (z)</span>
+                  <select class="sel" style="width:230px"><option>不限制</option><option>1</option><option>2</option><option>3</option></select>
+                  <span class="spec-thumb"><i>上传图片</i><span class="del">×</span></span>
                 </div>
-                <div class="fr" style="margin-bottom:0">
-                  <label></label>
-                  <div class="ctl">
-                    <button class="ghost" onclick="addSubSpec()"><span class="circ">+</span>添加子规格</button>
-                  </div>
+                <div class="spec-row">
+                  <input class="inp" style="width:300px;margin-left:88px" type="text" value="+199换购水卡">
+                  <span class="spec-bl">购买级别 (z)</span>
+                  <select class="sel" style="width:230px"><option>不限制</option><option>1</option><option>2</option><option>3</option></select>
+                  <span class="spec-plus">+</span>
+                </div>
+                <div class="spec-row">
+                  <input class="inp" style="width:300px;margin-left:88px" type="text" value="+299换购水卡">
+                  <span class="spec-bl">购买级别 (z)</span>
+                  <select class="sel" style="width:230px"><option>不限制</option><option>1</option><option>2</option><option>3</option></select>
+                  <span class="spec-plus">+</span>
+                </div>
+                <div class="spec-row">
+                  <input class="inp" style="width:300px;margin-left:88px" type="text" value="+599换购水卡">
+                  <span class="spec-bl">购买级别 (z)</span>
+                  <select class="sel" style="width:230px"><option>不限制</option><option>1</option><option>2</option><option>3</option></select>
+                  <span class="spec-plus">+</span>
+                </div>
+                <div class="spec-row" style="margin-top:20px">
+                  <button class="ghost" style="margin-left:88px"><span class="circ">+</span>添加子规格</button>
                 </div>
               </div>
               <div style="padding-top:16px">
-                <button class="ghost" onclick="toast('创建新规格')"><span class="circ">+</span>创建新规格</button>
+                <button class="ghost"><span class="circ">+</span>创建新规格</button>
               </div>
             </div>
           </div>
@@ -629,9 +645,9 @@
                       <th>销售价</th>
                       <th>积分</th>
                       <th>PV值</th>
+                      <th>V值</th>
                       <th>供应商价</th>
                       <th>库存</th>
-                      <th>V值</th>
                       <th>商品编码</th>
                     </tr>
                   </thead>
@@ -643,9 +659,9 @@
                       <td><input class="inp sp-sale" style="width:84px" value="4500"></td>
                       <td><input class="inp sp-points" style="width:72px" value="0"></td>
                       <td><input class="inp sp-pv" style="width:84px" value="4500"></td>
+                      <td><input class="inp sp-vv" style="width:84px" value="" oninput="filterV(this)"></td>
                       <td><input class="inp sp-supply" style="width:84px" value="1"></td>
                       <td><input class="inp sp-stock" style="width:84px" value="7832"></td>
-                      <td><input class="inp sp-vv" style="width:84px" value="" oninput="filterV(this)"></td>
                       <td><input class="inp" style="width:110px" value=""></td>
                     </tr>
                     <tr>
@@ -655,9 +671,9 @@
                       <td><input class="inp sp-sale" style="width:84px" value="9000"></td>
                       <td><input class="inp sp-points" style="width:72px" value="0"></td>
                       <td><input class="inp sp-pv" style="width:84px" value="9000"></td>
+                      <td><input class="inp sp-vv" style="width:84px" value="" oninput="filterV(this)"></td>
                       <td><input class="inp sp-supply" style="width:84px" value="1"></td>
                       <td><input class="inp sp-stock" style="width:84px" value="7960"></td>
-                      <td><input class="inp sp-vv" style="width:84px" value="" oninput="filterV(this)"></td>
                       <td><input class="inp" style="width:110px" value=""></td>
                     </tr>
                     <tr>
@@ -667,9 +683,9 @@
                       <td><input class="inp sp-sale" style="width:84px" value="2250"></td>
                       <td><input class="inp sp-points" style="width:72px" value="0"></td>
                       <td><input class="inp sp-pv" style="width:84px" value="2250"></td>
+                      <td><input class="inp sp-vv" style="width:84px" value="" oninput="filterV(this)"></td>
                       <td><input class="inp sp-supply" style="width:84px" value="1"></td>
                       <td><input class="inp sp-stock" style="width:84px" value="7952"></td>
-                      <td><input class="inp sp-vv" style="width:84px" value="" oninput="filterV(this)"></td>
                       <td><input class="inp" style="width:110px" value=""></td>
                     </tr>
                     <tr>
@@ -679,9 +695,9 @@
                       <td><input class="inp sp-sale" style="width:84px" value="3250"></td>
                       <td><input class="inp sp-points" style="width:72px" value="0"></td>
                       <td><input class="inp sp-pv" style="width:84px" value="3250"></td>
+                      <td><input class="inp sp-vv" style="width:84px" value="" oninput="filterV(this)"></td>
                       <td><input class="inp sp-supply" style="width:84px" value="10"></td>
                       <td><input class="inp sp-stock" style="width:84px" value="3976"></td>
-                      <td><input class="inp sp-vv" style="width:84px" value="" oninput="filterV(this)"></td>
                       <td><input class="inp" style="width:110px" value=""></td>
                     </tr>
                   </tbody>
@@ -693,9 +709,9 @@
                       <td><input class="inp sku-in" style="width:84px" id="b_sale" placeholder="销售价"></td>
                       <td><input class="inp sku-in" style="width:72px" id="b_points" placeholder="积分"></td>
                       <td><input class="inp sku-in" style="width:84px" id="b_pv" placeholder="PV值"></td>
+                      <td><input class="inp sku-in" style="width:84px" id="b_vv" placeholder="V值" oninput="filterV(this)"></td>
                       <td><input class="inp sku-in" style="width:84px" id="b_supply" placeholder="供应商价"></td>
                       <td><input class="inp sku-in" style="width:84px" id="b_stock" placeholder="库存"></td>
-                      <td><input class="inp sku-in" style="width:84px" id="b_vv" placeholder="V值" oninput="filterV(this)"></td>
                       <td><button class="btn btn-primary" onclick="batchSet()">批量设置</button></td>
                     </tr>
                   </tfoot>
@@ -1024,24 +1040,6 @@
       var v = (el.value || '').replace(/[^0-9]/g, '');
       if (v !== '') { var n = parseInt(v, 10); if (n > 99999) { n = 99999; } v = String(n); }
       el.value = v;
-    }
-    // 添加子规格 = 往库存表加一行
-    function addSubSpec() {
-      var base = (document.getElementById('dSpecName') || {}).value || '新规格';
-      var n = document.querySelectorAll('#skuBody tr').length + 1;
-      var tr = document.createElement('tr');
-      tr.innerHTML = '<td class="c-chk"><input type="checkbox" class="sku-chk"></td>'
-        + '<td><input class="inp" style="width:120px" value="' + base + ' ' + n + '"></td>'
-        + '<td><input class="inp sp-market" style="width:84px" value=""></td>'
-        + '<td><input class="inp sp-sale" style="width:84px" value=""></td>'
-        + '<td><input class="inp sp-points" style="width:72px" value="0"></td>'
-        + '<td><input class="inp sp-pv" style="width:84px" value=""></td>'
-        + '<td><input class="inp sp-supply" style="width:84px" value=""></td>'
-        + '<td><input class="inp sp-stock" style="width:84px" value=""></td>'
-        + '<td><input class="inp sp-vv" style="width:84px" value="" oninput="filterV(this)"></td>'
-        + '<td><input class="inp" style="width:110px" value=""></td>';
-      document.getElementById('skuBody').appendChild(tr);
-      toast('已添加子规格（新增一行库存）');
     }
     // 批量设置：把非空字段覆盖到所有规格行
     function batchSet() {
