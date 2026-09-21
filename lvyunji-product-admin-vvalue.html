@@ -228,6 +228,8 @@
     .money .pre { display: flex; align-items: center; justify-content: center; width: 26px; background: #F5F6F8; color: var(--text-sub); font-size: 12px; flex: 0 0 26px; }
     .money input { width: 194px; border: 0; outline: none; padding: 0 10px; font-size: 12px; font-family: inherit; color: var(--text); }
     .money input::placeholder { color: #bfbfbf; }
+    input:disabled { background: #f5f6f8; cursor: not-allowed; }
+    .money input:disabled { background: #f5f6f8; }
     .up { width: 130px; height: 130px; border: 1px dashed #D6DAE3; border-radius: 4px; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
     .up:hover { border-color: var(--primary); }
     .up span { font-size: 26px; color: #c9ced9; line-height: 1; font-weight: 300; }
@@ -722,43 +724,43 @@
                 <div class="fr">
                   <label for="dMarketPrice">市场价：</label>
                   <div class="ctl">
-                    <span class="money"><span class="pre">¥</span><input type="text" id="dMarketPrice" placeholder="请输入市场价"></span>
+                    <span class="money"><span class="pre">¥</span><input type="text" id="dMarketPrice" placeholder="请输入市场价" disabled></span>
                   </div>
                 </div>
                 <div class="fr">
                   <label for="dSalePrice">销售价：</label>
                   <div class="ctl">
-                    <span class="money"><span class="pre">¥</span><input type="text" id="dSalePrice" placeholder="请输入销售价"></span>
+                    <span class="money"><span class="pre">¥</span><input type="text" id="dSalePrice" placeholder="请输入销售价" disabled></span>
                   </div>
                 </div>
                 <div class="fr">
                   <label for="dPoints">积分：</label>
                   <div class="ctl">
-                    <input class="inp" style="width:220px" type="text" id="dPoints" placeholder="请输入积分">
+                    <input class="inp" style="width:220px" type="text" id="dPoints" placeholder="请输入积分" disabled>
                   </div>
                 </div>
                 <div class="fr">
                   <label for="dPvi">PV值：</label>
                   <div class="ctl">
-                    <span class="money"><span class="pre">¥</span><input type="text" id="dPvi" placeholder="请输入PV值"></span>
+                    <span class="money"><span class="pre">¥</span><input type="text" id="dPvi" placeholder="请输入PV值" disabled></span>
                   </div>
                 </div>
                 <div class="fr">
                   <label for="dVvalue">V值：</label>
                   <div class="ctl">
-                    <input class="inp" style="width:220px" type="text" id="dVvalue" placeholder="请输入V值（0~99999正整数）" oninput="filterV(this)">
+                    <input class="inp" style="width:220px" type="text" id="dVvalue" placeholder="请输入V值（0~99999正整数）" disabled>
                   </div>
                 </div>
                 <div class="fr">
                   <label for="dSupplyPrice">供应商价：</label>
                   <div class="ctl">
-                    <span class="money"><span class="pre">¥</span><input type="text" id="dSupplyPrice" placeholder="请输入供应商价"></span>
+                    <span class="money"><span class="pre">¥</span><input type="text" id="dSupplyPrice" placeholder="请输入供应商价" disabled></span>
                   </div>
                 </div>
                 <div class="fr">
                   <label for="dStock">库存：</label>
                   <div class="ctl">
-                    <input class="inp" style="width:220px" type="text" id="dStock" placeholder="请输入可提供库存">
+                    <input class="inp" style="width:220px" type="text" id="dStock" placeholder="请输入可提供库存" disabled>
                   </div>
                 </div>
               </div>
@@ -1041,11 +1043,13 @@
       if (v !== '') { var n = parseInt(v, 10); if (n > 99999) { n = 99999; } v = String(n); }
       el.value = v;
     }
-    // 批量设置：把非空字段覆盖到所有规格行
+    // 批量设置：把非空字段覆盖到所有规格行，并同步到下方单规格字段区（禁用展示）
     function batchSet() {
       var map = [
-        ['b_market', 'sp-market'], ['b_sale', 'sp-sale'], ['b_points', 'sp-points'],
-        ['b_pv', 'sp-pv'], ['b_supply', 'sp-supply'], ['b_stock', 'sp-stock'], ['b_vv', 'sp-vv']
+        ['b_market', 'sp-market', 'dMarketPrice'], ['b_sale', 'sp-sale', 'dSalePrice'],
+        ['b_points', 'sp-points', 'dPoints'], ['b_pv', 'sp-pv', 'dPvi'],
+        ['b_supply', 'sp-supply', 'dSupplyPrice'], ['b_stock', 'sp-stock', 'dStock'],
+        ['b_vv', 'sp-vv', 'dVvalue']
       ];
       var done = 0;
       for (var i = 0; i < map.length; i++) {
@@ -1053,6 +1057,8 @@
         if (v !== '') {
           var cells = document.querySelectorAll('#skuBody .' + map[i][1]);
           for (var j = 0; j < cells.length; j++) { cells[j].value = v; }
+          var sync = document.getElementById(map[i][2]);
+          if (sync) { sync.value = v; }
           done++;
         }
       }
