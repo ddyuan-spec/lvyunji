@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>会员中心 - 绿韵家管理系统</title>
+  <style>
+    /* ============================================================
+       绿韵家管理系统 · 后台演示模板
+       模块：会员中心
+       页面：① 会员中心（列表） ② 会员详情 ③ 业绩详情订单
+       说明：框架/设计 token 沿用商品后台唯一设计模板 lvyunji-product-admin.html，
+            内容按会员中心 5 张后台截图 1:1 复刻。
+       ============================================================ */
+    :root {
+      --primary: #FF5E69;        /* 主色（按钮 / 激活态） */
+      --primary-hover: #FF8A93;
+      --topbar: #2E2D41;         /* 顶栏深紫 */
+      --text: #404142;
+      --text-sub: #666666;
+      --text-hint: #999999;
+      --border: #E8E8E8;
+      --border-2: #DFE6EB;
+      --thead: #ECEFFA;          /* 表头 / 已选择条底色 */
+      --soft: #F7F9FD;           /* 隔行 / 分页条底色 */
+      --page: #EBEDF3;           /* 工作区底色 */
+      --grid: #EDEFF5;           /* 表格网格线 */
+      --link: #3D1EF7;           /* 操作列链接 */
+      --val: #6200F7;            /* 可内联编辑的数值 */
+      --box: #F9F9F9;            /* 卡片内浅灰容器 */
+      --red: #FF5E69;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px; color: var(--text); background: #fff; }
+
+    /* ---------- 顶栏 ---------- */
+    .topbar { height: 56px; background: var(--topbar); display: flex; align-items: center; padding: 0 20px; gap: 24px; color: #fff; }
+    .logo { font-size: 15px; font-weight: 500; letter-spacing: .5px; }
+    .collapse { display: flex; align-items: center; color: #cfd0d8; margin-left: 2px; }
+    .collapse svg { width: 18px; height: 18px; stroke: #cfd0d8; fill: none; stroke-width: 1.6; stroke-linecap: round; }
+    .tb-nav { display: flex; gap: 24px; font-size: 13px; }
+    .tb-nav span { color: #b9bac4; }
+    .tb-nav span.active { color: #fff; font-weight: 600; }
+    .tb-user { margin-left: auto; font-size: 13px; color: #e5e6ea; }
+
+    /* ---------- 主体 ---------- */
+    .app-body { display: flex; min-height: calc(100vh - 56px); align-items: stretch; }
+
+    /* ---------- 侧栏 ---------- */
+    .sidebar { width: 208px; flex: 0 0 208px; background: #fff; border-right: 1px solid var(--border); padding: 6px 0 28px; }
+    .menu-item { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 16px; font-size: 13px; color: var(--text); cursor: pointer; }
+    .menu-item .ico { width: 16px; height: 16px; flex: 0 0 16px; stroke: #8c8c8c; fill: none; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+    .menu-item .caret { margin-left: auto; color: #c3c3c3; font-size: 9px; }
+    .menu-item.open { background: var(--primary); color: #fff; }
+    .menu-item.open .ico { stroke: #fff; }
+    .menu-item.open .caret { color: #fff; }
+    .sub-chips { display: none; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px 12px 16px; }
+    .sub-chips.open { display: grid; }
+    .chip { height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid transparent; border-radius: 4px; background: #F7F8FA; color: var(--text-sub); font-size: 12px; white-space: nowrap; cursor: pointer; }
+    .chip:hover { color: var(--primary); }
+    .chip.active { border-color: var(--primary); color: var(--primary); background: #fff; font-weight: 500; }
+
+    /* ---------- 工作区 ---------- */
+    .workspace { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--page); }
+    .page-tabs { height: 44px; flex: 0 0 44px; display: flex; align-items: center; gap: 8px; padding: 0 16px; background: #fff; border-bottom: 1px solid var(--border); overflow: hidden; }
+    .ptab { display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border: 1px solid var(--border); border-radius: 3px; color: var(--text-sub); font-size: 12px; background: #fff; white-space: nowrap; cursor: pointer; }
+    .ptab .x { color: #c8c8c8; font-size: 12px; }
+    .ptab.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .ptab.active .x { color: #fff; }
+
+    .view { display: none; flex: 1; padding: 8px 16px 0; }
+    .view.active { display: block; }
+
+    /* ---------- 卡片 ---------- */
+    .card { background: #fff; border-radius: 6px 6px 0 0; padding: 16px; }
+    .card-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 2px 0 14px; }
+    .card-title { font-size: 16px; font-weight: 600; color: #222; }
+    .head-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn { height: 30px; padding: 0 14px; border-radius: 3px; font-size: 12px; border: 1px solid transparent; cursor: pointer; font-family: inherit; white-space: nowrap; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-default { background: #fff; color: var(--text); border-color: var(--border-2); }
+    .btn-default:hover { border-color: var(--primary); color: var(--primary); }
+    .btn-xs { height: 22px; padding: 0 8px; font-size: 12px; }
+
+    /* ---------- 筛选 ---------- */
+    .filters { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; padding: 6px 0 16px; }
+    .f-input, .f-select { height: 32px; border: 1px solid var(--border-2); border-radius: 3px; padding: 0 10px; font-size: 12px; color: var(--text); width: 168px; outline: none; font-family: inherit; background: #fff; }
+    .f-select { width: 150px; }
+    .f-input:focus, .f-select:focus { border-color: var(--primary); }
+    .f-input::placeholder { color: #bfbfbf; }
+    .f-expand { display: inline-flex; align-items: center; gap: 3px; height: 32px; color: var(--text-sub); font-size: 12px; cursor: pointer; }
+    .f-expand:hover { color: var(--primary); }
+
+    /* ---------- 表格 ---------- */
+    .tbl-wrap { overflow-x: auto; margin: 0 -16px; }
+    table { border-collapse: separate; border-spacing: 0; font-size: 12px; width: 100%; }
+    th { background: var(--thead); color: var(--text); font-weight: 500; text-align: left; padding: 10px 12px; white-space: nowrap; border-bottom: 1px solid var(--grid); border-right: 1px solid var(--grid); }
+    td { padding: 10px 12px; color: var(--text); vertical-align: middle; line-height: 1.5; border-bottom: 1px solid var(--grid); border-right: 1px solid var(--grid); }
+    tbody tr:nth-child(even) td { background: var(--soft); }
+    th:first-child, td:first-child { border-left: 0; }
+    th:last-child, td:last-child { border-right: 0; }
+    .c-chk { width: 46px; text-align: center; }
+    .avt { width: 40px; height: 40px; border-radius: 50%; flex: 0 0 40px; display: block; }
+    .mem { display: flex; align-items: center; gap: 10px; }
+    .mem .mname { color: var(--text); font-weight: 500; }
+    .mem .mphone { color: var(--text-hint); font-size: 12px; margin-top: 2px; }
+    .tag { display: inline-block; height: 22px; line-height: 22px; padding: 0 8px; border-radius: 3px; background: #F0F1F5; color: var(--text-sub); font-size: 12px; }
+    .op { display: flex; flex-wrap: wrap; gap: 6px 10px; }
+    .op a { color: var(--link); cursor: pointer; text-decoration: none; white-space: nowrap; }
+    .op a:hover { text-decoration: underline; }
+    .sw { position: relative; display: inline-block; width: 40px; height: 20px; border-radius: 10px; background: #DDE0E6; cursor: pointer; transition: background .18s; vertical-align: middle; }
+    .sw::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: left .18s; box-shadow: 0 1px 2px rgba(0,0,0,.18); }
+    .sw.on { background: var(--primary); }
+    .sw.on::after { left: 22px; }
+
+    /* ---------- 分页 ---------- */
+    .pager { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 10px 16px; background: var(--soft); font-size: 12px; color: var(--text-sub); margin: 0 -16px; }
+    .pg { min-width: 26px; height: 26px; padding: 0 5px; border: 1px solid var(--border-2); background: #fff; border-radius: 3px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-sub); font-size: 12px; font-family: inherit; }
+    .pg.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .pg.dis { color: #c8c8c8; cursor: not-allowed; }
+    .pg-jump { display: flex; align-items: center; gap: 6px; margin-left: 6px; }
+    .pg-jump input { width: 40px; height: 26px; border: 1px solid var(--border-2); border-radius: 3px; text-align: center; font-size: 12px; font-family: inherit; outline: none; }
+    .pg-size { height: 26px; border: 1px solid var(--border-2); border-radius: 3px; padding: 0 6px; font-size: 12px; color: var(--text-sub); font-family: inherit; background: #fff; }
+
+    /* ============================================================
+       会员详情
+       ============================================================ */
+    .dwrap { max-width: 1500px; margin: 8px auto 0; }
+    .dcard { background: #fff; border-radius: 6px; padding: 22px 20px; margin-bottom: 12px; }
+    .dcard:first-child { border-radius: 6px 6px 6px 6px; }
+    .sec-title { font-size: 14px; font-weight: 600; color: #222; display: flex; align-items: center; gap: 6px; margin-bottom: 18px; }
+    .sec-title .tt-act { margin-left: auto; display: flex; gap: 8px; }
+    /* 基础信息三列网格 */
+    .infog { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 24px; }
+    .infog .fr { display: flex; align-items: flex-start; gap: 8px; }
+    .infog .fr > label { flex: 0 0 80px; text-align: right; font-size: 13px; color: var(--text-sub); line-height: 24px; }
+    .infog .fr .val { line-height: 24px; font-size: 13px; color: var(--text); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .addtag { display: inline-flex; align-items: center; gap: 3px; height: 22px; padding: 0 8px; border: 1px dashed #c9ced9; border-radius: 3px; color: var(--text-hint); font-size: 12px; cursor: pointer; background: #fff; }
+    .addtag:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* TA 的资产（白底无框，每行 3 项 key-value） */
+    .asset-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 40px; padding: 4px 0; }
+    .asset { display: flex; flex-direction: column; }
+    .asset .a-label { font-size: 12px; color: var(--text-hint); }
+    .asset .a-val { display: flex; align-items: baseline; gap: 10px; margin-top: 8px; }
+    .asset .a-num { font-size: 18px; font-weight: 600; color: #222; }
+    .asset .a-detail { margin-left: auto; font-size: 12px; color: var(--link); cursor: pointer; white-space: nowrap; }
+    .asset .a-detail:hover { text-decoration: underline; }
+
+    /* TA 的业绩（白底无框，三分类竖排 key-value，数值可点红字） */
+    .perf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 40px; }
+    .perf-col .pc-title { font-size: 13px; font-weight: 600; color: #222; margin-bottom: 12px; }
+    .perf-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 12px; }
+    .perf-row .pk { color: var(--text-sub); }
+    .perf-row .pv { margin-left: auto; color: var(--red); font-weight: 600; cursor: pointer; }
+    .perf-row .pv:hover { text-decoration: underline; }
+    .perf-row .pmore { color: var(--link); cursor: pointer; font-size: 12px; white-space: nowrap; }
+    .perf-row .pmore:hover { text-decoration: underline; }
+
+    /* TA 的团队 */
+    .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .team { display: flex; align-items: center; gap: 16px; }
+    .team-name { font-size: 13px; color: var(--text); }
+    .team-detail { color: var(--link); cursor: pointer; font-size: 12px; }
+    .team-detail:hover { text-decoration: underline; }
+
+    /* 面包屑 */
+    .crumb { display: flex; align-items: center; gap: 6px; padding: 2px 0 14px; font-size: 13px; color: var(--text-sub); }
+    .crumb a { color: var(--link); cursor: pointer; }
+    .crumb a:hover { text-decoration: underline; }
+    .crumb .sep { color: #c3c3c3; }
+
+    /* ---------- Toast ---------- */
+    #toast { position: fixed; top: 78px; left: 50%; transform: translateX(-50%) scale(.96); background: rgba(0,0,0,.78); color: #fff; padding: 9px 18px; border-radius: 4px; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 4000; }
+    #toast.show { opacity: 1; transform: translateX(-50%) scale(1); }
+
+    /* ---------- 删除二次确认 ---------- */
+    .cf-mask { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; align-items: center; justify-content: center; z-index: 3900; }
+    .cf-mask.show { display: flex; }
+    .cf-box { width: 380px; background: #fff; border-radius: 4px; padding: 20px 20px 16px; box-shadow: 0 6px 22px rgba(0,0,0,.16); }
+    .cf-title { font-size: 15px; font-weight: 600; color: #222; margin-bottom: 10px; }
+    .cf-text { font-size: 13px; color: var(--text-sub); line-height: 1.8; margin-bottom: 20px; }
+    .cf-text em { font-style: normal; color: var(--text); font-weight: 500; }
+    .cf-actions { display: flex; justify-content: flex-end; gap: 8px; }
+  </style>
+</head>
+<body>
+  <!-- ================= 顶栏 ================= -->
+  <header class="topbar">
+    <span class="logo">绿韵家管理系统</span>
+    <span class="collapse" title="收起侧栏">
+      <svg viewBox="0 0 18 18"><path d="M10 3.5h6M10 9h6M10 14.5h6"/><path d="M6.5 5.5L3 9l3.5 3.5" fill="none"/></svg>
+    </span>
+    <nav class="tb-nav">
+      <span class="active">店铺</span>
+      <span>营销中心</span>
+      <span>结算中心</span>
+    </nav>
+    <span class="tb-user">袁</span>
+  </header>
+
+  <main class="app-body">
+    <!-- ================= 侧栏 ================= -->
+    <aside class="sidebar">
+      <div class="menu-item"><svg class="ico" viewBox="0 0 14 14"><rect x="1.5" y="2.5" width="11" height="9" rx="1.2"/><path d="M4 5.6l1.8 1.6L8.4 4.6l2 1.8"/></svg>控制台<span class="caret">▾</span></div>
+      <div class="menu-item"><svg class="ico" viewBox="0 0 14 14"><circle cx="4.7" cy="4.7" r="2.3" fill="#F2994A" stroke="none"/><circle cx="9.4" cy="4.7" r="2.3" fill="#8E5BF0" stroke="none"/><circle cx="4.7" cy="9.4" r="2.3" fill="#5B8DEF" stroke="none"/><circle cx="9.4" cy="9.4" r="2.3" fill="#EF5B8D" stroke="none"/></svg>商品中心<span class="caret">▾</span></div>
+      <div class="menu-item"><svg class="ico" viewBox="0 0 14 14"><path d="M2.2 6.4L7 2.6l4.8 3.8V12H2.2z"/><path d="M5.6 12V8.8h2.8V12"/></svg>商家管理<span class="caret">▾</span></div>
+      <div class="menu-item open" onclick="toggleGroup(this)">
+        <svg class="ico" viewBox="0 0 14 14"><circle cx="7" cy="4.8" r="2.6"/><path d="M2.2 12.4c0-2.5 2.1-3.9 4.8-3.9s4.8 1.4 4.8 3.9"/></svg>会员中心<span class="caret">▾</span>
+      </div>
+      <div class="sub-chips open">
+        <span class="chip active" id="chipList" onclick="go('List')">会员管理</span>
+        <span class="chip" id="chipThird" onclick="toast('第三方解绑')">第三方解绑</span>
+        <span class="chip" id="chipReal" onclick="toast('实名认证')">实名认证</span>
+        <span class="chip" id="chipBlack" onclick="toast('黑名单')">黑名单</span>
+        <span class="chip" id="chipCancel" onclick="toast('注销管理')">注销管理</span>
+        <span class="chip" id="chipFeedback" onclick="toast('用户反馈')">用户反馈</span>
+        <span class="chip" id="chipKeep" onclick="toast('会员保底')">会员保底</span>
+      </div>
+      <div class="menu-item"><svg class="ico" viewBox="0 0 14 14"><rect x="2" y="2.5" width="10" height="9" rx="1"/><path d="M4.4 5.6h5.2M4.4 8.2h3"/></svg>交易中心<span class="caret">▾</span></div>
+      <div class="menu-item"><svg class="ico" viewBox="0 0 14 14"><rect x="2" y="2.8" width="10" height="8.4" rx="1"/><path d="M4.6 6.2l1.6 1.6 2.4-2.4"/></svg>售后中心<span class="caret">▾</span></div>
+      <div class="menu-item"><svg class="ico" viewBox="0 0 14 14"><rect x="1.8" y="2.8" width="10.4" height="8.4" rx="1"/><path d="M3.8 9.4l2.2-2.6 1.8 2 1.6-2 1.6 2"/></svg>数据中心<span class="caret">▾</span></div>
+      <div class="menu-item"><svg class="ico" viewBox="0 0 14 14"><path d="M2 6.2l5-3.7 5 3.7V12H2z"/><path d="M5.6 12V8.6h2.8V12"/><path d="M2 9.6h10"/></svg>运维中心<span class="caret">▾</span></div>
+      <div class="menu-item"><svg class="ico" viewBox="0 0 14 14"><path d="M7 1.8l1.3 3.1 3.1 1.3-3.1 1.3L7 10.6 5.7 7.5 2.6 6.2l3.1-1.3z"/><path d="M10.6 9.8l.5 1.2 1.2.5-1.2.5-.5 1.2-.5-1.2-1.2-.5 1.2-.5z"/></svg>AI工具管理<span class="caret">▾</span></div>
+    </aside>
+
+    <!-- ================= 工作区 ================= -->
+    <div class="workspace">
+      <div class="page-tabs">
+        <span class="ptab active" id="tabMemberList" onclick="go('List')">会员管理<span class="x" onclick="event.stopPropagation();toast('演示原型，标签不可关闭')">×</span></span>
+        <span class="ptab" id="tabMemberDetail" onclick="go('Detail')">会员详情<span class="x" onclick="event.stopPropagation();toast('演示原型，标签不可关闭')">×</span></span>
+        <span class="ptab" id="tabPerf" onclick="go('Perf')">业绩详情订单<span class="x" onclick="event.stopPropagation();toast('演示原型，标签不可关闭')">×</span></span>
+      </div>
+
+      <!-- ================= 视图一：会员中心（列表） ================= -->
+      <div class="view active" id="viewList">
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">会员中心</span>
+            <div class="head-actions">
+              <button class="btn btn-primary" onclick="searchList()">搜索</button>
+              <button class="btn btn-default" onclick="resetSearch()">重置</button>
+              <button class="btn btn-default" onclick="toast('导出会员列表')">导出</button>
+            </div>
+          </div>
+
+          <div class="filters">
+            <input class="f-input" type="text" id="qAccount" placeholder="用户账号">
+            <input class="f-input" type="text" id="qNick" placeholder="用户昵称">
+            <input class="f-input" type="text" id="qWx" placeholder="微生态账号">
+            <input class="f-input" type="text" id="qRef" placeholder="推荐人">
+            <select class="f-select" id="qLevel">
+              <option value="">会员等级</option>
+              <option>普通用户</option>
+              <option>VIP会员</option>
+              <option>高级会员</option>
+            </select>
+            <input class="f-input inp-cal" style="width:150px" type="text" id="qStart" placeholder="开始时间">
+            <span style="color:var(--text-sub)">至</span>
+            <input class="f-input inp-cal" style="width:150px" type="text" id="qEnd" placeholder="结束时间">
+            <span class="f-expand" onclick="toast('展开更多筛选条件')">展开 ▾</span>
+          </div>
+
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th class="c-chk"><input type="checkbox" id="chkAll" onclick="toggleAll(this)"></th>
+                  <th class="c-id">会员编号</th>
+                  <th class="c-info">会员信息</th>
+                  <th class="c-wx">微生态账号</th>
+                  <th class="c-level">会员等级</th>
+                  <th class="c-tmp">临时会员等级</th>
+                  <th class="c-yesexec">是否执行委</th>
+                  <th class="c-exec">执行委</th>
+                  <th class="c-ref">推荐人</th>
+                  <th class="c-insp">灵感值</th>
+                  <th class="c-tag">标签</th>
+                  <th class="c-real">实名认证状态</th>
+                  <th class="c-red">限制分红</th>
+                  <th class="c-dis">是否禁用</th>
+                  <th class="c-time">注册时间</th>
+                  <th class="c-op">操作</th>
+                </tr>
+              </thead>
+              <tbody id="listBody"></tbody>
+            </table>
+          </div>
+
+          <div class="pager">
+            <span id="totalCount">共 1470465 条</span>
+            <select class="pg-size"><option>10条/页</option><option>20条/页</option><option>50条/页</option><option>100条/页</option></select>
+            <button class="pg dis">‹</button>
+            <button class="pg active">1</button>
+            <button class="pg">2</button>
+            <button class="pg">3</button>
+            <button class="pg">4</button>
+            <button class="pg">5</button>
+            <button class="pg">6</button>
+            <button class="pg">···</button>
+            <button class="pg">17</button>
+            <button class="pg">›</button>
+            <div class="pg-jump"><span>前往</span><input type="text" value="1"><span>页</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= 视图二：会员详情 ================= -->
+      <div class="view" id="viewDetail">
+        <div class="dwrap">
+          <!-- 1. 基础信息 -->
+          <div class="dcard">
+            <div class="sec-title">基础信息</div>
+            <div class="infog">
+              <div class="fr"><label>昵称</label><div class="val">有幸12123</div></div>
+              <div class="fr"><label>手机号</label><div class="val">18307448442 <button class="btn btn-default btn-xs" onclick="toast('修改手机号')">修改手机号</button></div></div>
+              <div class="fr"><label>会员等级</label><div class="val">潜力达人 <button class="btn btn-default btn-xs" onclick="toast('调整等级')">调整</button><button class="btn btn-default btn-xs" onclick="toast('升级日志')">升级日志</button></div></div>
+              <div class="fr"><label>用户生日</label><div class="val">2025-11-25</div></div>
+              <div class="fr"><label>用户性别</label><div class="val">其他</div></div>
+              <div class="fr"><label>会员临时等级</label><div class="val">潜力达人 <button class="btn btn-default btn-xs" onclick="toast('调整临时等级')">调整</button><button class="btn btn-default btn-xs" onclick="toast('临时等级升级日志')">临时等级升级日志</button></div></div>
+              <div class="fr"><label>注册时间</label><div class="val">2025-11-25 13:53</div></div>
+              <div class="fr"><label>姓名</label><div class="val">宋健</div></div>
+              <div class="fr"><label>证件号码</label><div class="val">362202199612073015</div></div>
+              <div class="fr"><label>实名认证状态</label><div class="val">审核通过</div></div>
+              <div class="fr"><label>标签</label><div class="val"><span class="addtag" onclick="toast('添加标签')">+ 新增标签</span></div></div>
+              <div class="fr"></div>
+            </div>
+          </div>
+
+          <!-- 2. TA 的资产 -->
+          <div class="dcard">
+            <div class="sec-title">TA的资产</div>
+            <div class="asset-grid">
+              <div class="asset"><div class="a-label">奖金累计收入</div><div class="a-val"><span class="a-num">1058.75</span></div></div>
+              <div class="asset"><div class="a-label">奖金钱包</div><div class="a-val"><span class="a-num">9641</span><span class="a-detail" onclick="toast('查看明细：奖金钱包')">查看明细</span></div></div>
+              <div class="asset"><div class="a-label">待释放金额</div><div class="a-val"><span class="a-num">117.75</span><span class="a-detail" onclick="toast('查看明细：待释放金额')">查看明细</span></div></div>
+              <div class="asset"><div class="a-label">已提现</div><div class="a-val"><span class="a-num">0</span><span class="a-detail" onclick="toast('查看明细：已提现')">查看明细</span></div></div>
+              <div class="asset"><div class="a-label">提现申请中</div><div class="a-val"><span class="a-num">0</span><span class="a-detail" onclick="toast('查看明细：提现申请中')">查看明细</span></div></div>
+              <div class="asset"><div class="a-label">优惠券余额</div><div class="a-val"><span class="a-num">0</span><span class="a-detail" onclick="toast('查看明细：优惠券余额')">查看明细</span></div></div>
+              <div class="asset"><div class="a-label">电子币钱包</div><div class="a-val"><span class="a-num">99936.14</span><span class="a-detail" onclick="toast('查看明细：电子币钱包')">查看明细</span></div></div>
+              <div class="asset"><div class="a-label">可用积分</div><div class="a-val"><span class="a-num">672754.54</span><span class="a-detail" onclick="toast('查看明细：可用积分')">查看明细</span></div></div>
+              <div class="asset"><div class="a-label">待释放积分</div><div class="a-val"><span class="a-num">100</span><span class="a-detail" onclick="toast('查看明细：待释放积分')">查看明细</span></div></div>
+            </div>
+          </div>
+
+          <!-- 3. TA 的业绩 -->
+          <div class="dcard">
+            <div class="sec-title">TA的业绩
+              <span class="tt-act"><button class="btn btn-default" onclick="go('Perf')">查看明细业绩</button></span>
+            </div>
+            <div class="perf-grid">
+              <div class="perf-col">
+                <div class="pc-title">自购(PV)</div>
+                <div class="perf-row"><span class="pk">今日</span><span class="pv" onclick="go('Perf')">0</span></div>
+                <div class="perf-row"><span class="pk">本月自购</span><span class="pv" onclick="go('Perf')">0</span><span class="pmore" onclick="toast('查看往期')">查看往期</span></div>
+                <div class="perf-row"><span class="pk">待结算</span><span class="pv" onclick="go('Perf')">37.6</span></div>
+                <div class="perf-row"><span class="pk">已结算</span><span class="pv" onclick="go('Perf')">13119.3</span></div>
+              </div>
+              <div class="perf-col">
+                <div class="pc-title">直推(PV)</div>
+                <div class="perf-row"><span class="pk">今日</span><span class="pv" onclick="go('Perf')">0</span></div>
+                <div class="perf-row"><span class="pk">待结算</span><span class="pv" onclick="go('Perf')">805</span></div>
+                <div class="perf-row"><span class="pk">已结算</span><span class="pv" onclick="go('Perf')">3600</span></div>
+              </div>
+              <div class="perf-col">
+                <div class="pc-title">推广(PV)</div>
+                <div class="perf-row"><span class="pk">今日</span><span class="pv" onclick="go('Perf')">0</span></div>
+                <div class="perf-row"><span class="pk">待结算</span><span class="pv" onclick="go('Perf')">805</span></div>
+                <div class="perf-row"><span class="pk">已结算</span><span class="pv" onclick="go('Perf')">3600</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. TA 的团队 -->
+          <div class="dcard" style="margin-bottom:0">
+            <div class="sec-title">TA的团队</div>
+            <div class="team-grid">
+              <div class="team"><span class="team-name">直推团队</span><span class="team-detail" onclick="toast('查看直推团队明细')">查看明细</span></div>
+              <div class="team"><span class="team-name">间推团队</span><span class="team-detail" onclick="toast('查看间推团队明细')">查看明细</span></div>
+              <div class="team"><span class="team-name">推广团队</span><span class="team-detail" onclick="toast('查看推广团队明细')">查看明细</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= 视图三：业绩详情订单 ================= -->
+      <div class="view" id="viewPerf">
+        <div class="card">
+          <div class="crumb">
+            <a onclick="go('Detail')">会员详情</a>
+            <span class="sep">›</span>
+            <span>业绩详情订单</span>
+          </div>
+          <div class="card-head">
+            <span class="card-title">业绩详情订单</span>
+            <div class="head-actions">
+              <button class="btn btn-primary" onclick="searchPerf()">搜索</button>
+              <button class="btn btn-default" onclick="resetPerf()">重置</button>
+              <button class="btn btn-default" onclick="batchRecheck()">批量重新验收</button>
+            </div>
+          </div>
+
+          <div class="filters">
+            <select class="f-select" style="width:200px" id="pOwner">
+              <option value="">业绩归属人：用户96909 wxid_ajsdfkl</option>
+              <option>用户96909 wxid_ajsdfkl</option>
+              <option>用户96620 wxid_ajsdf88</option>
+            </select>
+            <select class="f-select" id="pMonth">
+              <option value="">monthSelf</option>
+              <option>本月自购</option>
+              <option>全部</option>
+            </select>
+            <input class="f-input" type="text" id="pOrderNo" placeholder="订单编号">
+            <input class="f-input" type="text" id="pBuyer" placeholder="下单人账号">
+            <input class="f-input inp-cal" style="width:150px" type="text" id="pStart" placeholder="开始日期">
+            <span style="color:var(--text-sub)">至</span>
+            <input class="f-input inp-cal" style="width:150px" type="text" id="pEnd" placeholder="结束日期">
+            <select class="f-select" id="pAll">
+              <option value="">全部</option>
+              <option>直推</option>
+              <option>推广</option>
+            </select>
+          </div>
+
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th class="c-chk"><input type="checkbox" id="chkPerfAll" onclick="togglePerfAll(this)"></th>
+                  <th style="width:140px">订单编号</th>
+                  <th style="width:180px">下单时间</th>
+                  <th style="width:200px">下单人员</th>
+                  <th style="width:120px">订单结算PV</th>
+                  <th style="width:160px">业绩类型</th>
+                  <th style="width:120px">结算状态</th>
+                  <th style="width:110px">是否分佣</th>
+                  <th>描述</th>
+                </tr>
+              </thead>
+              <tbody id="perfBody"></tbody>
+            </table>
+          </div>
+
+          <div class="pager">
+            <span id="perfTotal">共 10 条</span>
+            <select class="pg-size"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>
+            <button class="pg dis">‹</button>
+            <button class="pg active">1</button>
+            <button class="pg">2</button>
+            <button class="pg">›</button>
+            <div class="pg-jump"><span>前往</span><input type="text" value="1"><span>页</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast"></div>
+
+  <!-- 删除二次确认（统一 confirmAction，所有删除入口复用） -->
+  <div class="cf-mask" id="cfMask">
+    <div class="cf-box">
+      <div class="cf-title" id="cfTitle">确认删除</div>
+      <div class="cf-text" id="cfText"></div>
+      <div class="cf-actions">
+        <button class="btn btn-default" onclick="closeConfirm()">取消</button>
+        <button class="btn btn-primary" id="cfOk">确认删除</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       公共
+       ============================================================ */
+    function toggleGroup(el) {
+      el.classList.toggle('open');
+      var chips = el.nextElementSibling;
+      if (chips && chips.classList.contains('sub-chips')) { chips.classList.toggle('open'); }
+    }
+    function toast(msg) {
+      var t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(function () { t.classList.remove('show'); }, 1800);
+    }
+    function go(view) {
+      var activeTab = { List: 'tabMemberList', Detail: 'tabMemberDetail', Perf: 'tabPerf' }[view];
+      var activeChip = { List: 'chipList' }[view];
+      document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('active'); });
+      var targetView = document.getElementById('view' + view);
+      if (targetView) { targetView.classList.add('active'); }
+      ['tabMemberList', 'tabMemberDetail', 'tabPerf'].forEach(function (t) {
+        var el = document.getElementById(t); if (el) { el.classList.toggle('active', t === activeTab); }
+      });
+      ['chipList', 'chipDetail', 'chipPerf'].forEach(function (c) {
+        var el = document.getElementById(c); if (el) { el.classList.toggle('active', c === activeChip); }
+      });
+      window.scrollTo(0, 0);
+    }
+    function confirmAction(title, html, onOk) {
+      document.getElementById('cfTitle').textContent = title;
+      document.getElementById('cfText').innerHTML = html;
+      var ok = document.getElementById('cfOk');
+      ok.onclick = function () { closeConfirm(); onOk(); };
+      document.getElementById('cfMask').classList.add('show');
+    }
+    function closeConfirm() { document.getElementById('cfMask').classList.remove('show'); }
+    function toggleSw(el) { el.classList.toggle('on'); }
+
+    /* ============================================================
+       头像占位（内联 SVG，避免外链）
+       ============================================================ */
+    function avtSvg(seed) {
+      var palette = ['#FF8A93', '#5B8DEF', '#8E5BF0', '#F2994A', '#2EBD8C', '#EF5B8D'];
+      var c = palette[seed % palette.length];
+      var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">'
+        + '<rect width="40" height="40" fill="' + c + '"/>'
+        + '<circle cx="20" cy="16" r="7" fill="#fff" opacity=".92"/>'
+        + '<path d="M7 36c0-8 5.5-12 13-12s13 4 13 12z" fill="#fff" opacity=".92"/>'
+        + '</svg>';
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    }
+
+    /* ============================================================
+       样例数据（会员中心列表 · 按截图 1 单行真实数据）
+       ============================================================ */
+    var members = [
+      { id: 1553843, nick: '有幸12123', phone: '18307448442', wx: '', level: '潜力达人', tmpLevel: '潜力达人', isExec: '否', exec: '有幸官方(p00001)', ref: 'C小明1', insp: 578, tag: '审核通过', real: '审核通过', limitDividend: false, disabled: false, reg: '2025-11-25 13:53:00' }
+    ];
+    var selected = {};
+    var curMember = null;
+
+    /* ============================================================
+       列表渲染
+       ============================================================ */
+    function renderList(data) {
+      var body = document.getElementById('listBody');
+      body.innerHTML = '';
+      data.forEach(function (m, i) {
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td class="c-chk"><input type="checkbox" ' + (selected[m.id] ? 'checked' : '') + ' onclick="toggleRow(' + m.id + ',this)"></td>' +
+          '<td>' + m.id + '</td>' +
+          '<td><div class="mem"><img class="avt" src="' + avtSvg(i) + '" alt=""><div><div class="mname">' + m.nick + '</div><div class="mphone">' + m.phone + '</div></div></div></td>' +
+          '<td>' + m.wx + '</td>' +
+          '<td>' + m.level + '</td>' +
+          '<td>' + m.tmpLevel + '</td>' +
+          '<td>' + m.isExec + '</td>' +
+          '<td>' + m.exec + '</td>' +
+          '<td>' + m.ref + '</td>' +
+          '<td>' + m.insp + '</td>' +
+          '<td><span class="tag">' + m.tag + '</span></td>' +
+          '<td>' + m.real + '</td>' +
+          '<td><span class="sw' + (m.limitDividend ? ' on' : '') + '" onclick="toggleLimit(' + m.id + ',this)"></span></td>' +
+          '<td><span class="sw' + (m.disabled ? ' on' : '') + '" onclick="toggleDisabled(' + m.id + ',this)"></span></td>' +
+          '<td>' + m.reg + '</td>' +
+          '<td class="c-op"><div class="op">' +
+            '<a onclick="openDetail(' + m.id + ')">查看</a>' +
+            '<a onclick="toast(\'修改手机号：' + m.id + '\')">修改手机号</a>' +
+            '<a onclick="toast(\'修改推荐人：' + m.id + '\')">修改推荐人</a>' +
+            '<a onclick="toast(\'重置密码：' + m.id + '\')">重置密码</a>' +
+            '<a onclick="toast(\'调整等级：' + m.id + '\')">调整等级</a>' +
+            '<a onclick="toast(\'调整临时等级：' + m.id + '\')">调整临时等级</a>' +
+            '<a onclick="toast(\'设置执行委：' + m.id + '\')">设置执行委</a>' +
+            '<a onclick="askDelete(' + m.id + ')">删除</a>' +
+            '<a onclick="toast(\'调整灵感值：' + m.id + '\')">调整灵感值</a>' +
+            '<a onclick="toast(\'修改执行委：' + m.id + '\')">修改执行委</a>' +
+          '</div></td>';
+        body.appendChild(tr);
+      });
+      document.getElementById('totalCount').textContent = '共 ' + data.length + ' 条';
+      syncSel();
+    }
+    function findMember(id) {
+      for (var i = 0; i < members.length; i++) { if (members[i].id === id) { return members[i]; } }
+      return null;
+    }
+    function toggleRow(id, el) {
+      if (el.checked) { selected[id] = 1; } else { delete selected[id]; }
+      syncSel();
+    }
+    function toggleAll(el) {
+      members.forEach(function (r) { if (el.checked) { selected[r.id] = 1; } else { delete selected[r.id]; } });
+      renderList(members);
+    }
+    function syncSel() {
+      var n = Object.keys(selected).length;
+      document.getElementById('chkAll').checked = n > 0 && n === members.length;
+    }
+    function toggleLimit(id, el) {
+      var m = findMember(id); if (!m) { return; }
+      m.limitDividend = !m.limitDividend;
+      el.classList.toggle('on', m.limitDividend);
+      toast(m.limitDividend ? '已开启限制分红' : '已关闭限制分红');
+    }
+    function toggleDisabled(id, el) {
+      var m = findMember(id); if (!m) { return; }
+      m.disabled = !m.disabled;
+      el.classList.toggle('on', m.disabled);
+      toast(m.disabled ? '已禁用该会员' : '已启用该会员');
+    }
+    function searchList() {
+      var acc = document.getElementById('qAccount').value.trim();
+      var nick = document.getElementById('qNick').value.trim();
+      var wx = document.getElementById('qWx').value.trim();
+      var ref = document.getElementById('qRef').value.trim();
+      var lv = document.getElementById('qLevel').value;
+      var list = members.slice();
+      if (acc) { list = list.filter(function (r) { return ('' + r.id).indexOf(acc) > -1; }); }
+      if (nick) { list = list.filter(function (r) { return r.nick.indexOf(nick) > -1; }); }
+      if (wx) { list = list.filter(function (r) { return r.wx.indexOf(wx) > -1; }); }
+      if (ref) { list = list.filter(function (r) { return r.ref.indexOf(ref) > -1; }); }
+      if (lv) { list = list.filter(function (r) { return r.level === lv; }); }
+      renderList(list);
+      toast('查询完成，共 ' + list.length + ' 条');
+    }
+    function resetSearch() {
+      document.getElementById('qAccount').value = '';
+      document.getElementById('qNick').value = '';
+      document.getElementById('qWx').value = '';
+      document.getElementById('qRef').value = '';
+      document.getElementById('qLevel').selectedIndex = 0;
+      document.getElementById('qStart').value = '';
+      document.getElementById('qEnd').value = '';
+      renderList(members);
+    }
+    function askDelete(id) {
+      var m = findMember(id);
+      if (!m) { return; }
+      confirmAction(
+        '确认删除该会员？',
+        '昵称：<em>' + m.nick + '</em>（编号 ' + m.id + '）<br>删除后不可恢复，该会员将从列表中移除。',
+        function () {
+          members = members.filter(function (r) { return r.id !== id; });
+          delete selected[id];
+          renderList(members);
+          toast('已删除');
+        }
+      );
+    }
+
+    /* ============================================================
+       会员详情渲染
+       ============================================================ */
+    function openDetail(id) {
+      var m = findMember(id);
+      if (!m) { return; }
+      curMember = m;
+      go('Detail');
+    }
+    /* ============================================================
+       业绩详情订单
+       ============================================================ */
+    var perfOrders = [
+      { no: '605947', time: '2026-09-09 10:58:09', buyer: '木子酱123', account: '17388970728', pv: '2.00', type: '-', status: '未分佣', comm: '否', desc: '-' },
+      { no: '605947', time: '2026-09-09 10:58:09', buyer: '木子酱123', account: '17388970728', pv: '2.00', type: '-', status: '未分佣', comm: '否', desc: '-' },
+      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', type: '直推-已结算', status: '已结算', comm: '是', desc: '【产生退款】20260806TEST-商品订单编号|605856|用户|有幸12123|自购分享奖励' },
+      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', type: '推广-已结算', status: '已结算', comm: '是', desc: '【产生退款】20260806TEST-商品订单编号|605856|用户|有幸12123|自购分享奖励' },
+      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', type: '直推-已退款', status: '已结算', comm: '是', desc: '20260806TEST-商品订单编号|605856|用户|有幸12123|自购分享奖励' },
+      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', type: '推广-已退款', status: '已结算', comm: '是', desc: '【产生退款】20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴' },
+      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', type: '直推-已结算', status: '已结算', comm: '是', desc: '20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴' },
+      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', type: '推广-已退款', status: '已结算', comm: '是', desc: '【产生退款】20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴' },
+      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', type: '直推-已退款', status: '已结算', comm: '是', desc: '20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴' },
+      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', type: '推广-已退款', status: '已结算', comm: '是', desc: '20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴' }
+    ];
+    var perfSel = {};
+    function renderPerfList(data) {
+      var body = document.getElementById('perfBody');
+      body.innerHTML = '';
+      data.forEach(function (o) {
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td class="c-chk"><input type="checkbox" ' + (perfSel[o.no] ? 'checked' : '') + ' onclick="togglePerfRow(\'' + o.no + '\',this)"></td>' +
+          '<td>' + o.no + '</td>' +
+          '<td>' + o.time + '</td>' +
+          '<td>' + o.buyer + '<br>' + o.account + '</td>' +
+          '<td>' + o.pv + '</td>' +
+          '<td>' + o.type + '</td>' +
+          '<td>' + o.status + '</td>' +
+          '<td>' + o.comm + '</td>' +
+          '<td>' + o.desc + '</td>';
+        body.appendChild(tr);
+      });
+      document.getElementById('perfTotal').textContent = '共 ' + (data.length === perfOrders.length ? 162 : data.length) + ' 条';
+    }
+    function togglePerfRow(no, el) {
+      if (el.checked) { perfSel[no] = 1; } else { delete perfSel[no]; }
+    }
+    function togglePerfAll(el) {
+      perfOrders.forEach(function (o) { if (el.checked) { perfSel[o.no] = 1; } else { delete perfSel[o.no]; } });
+      renderPerfList(perfOrders);
+    }
+    function batchRecheck() {
+      var ids = Object.keys(perfSel);
+      if (!ids.length) { toast('请先勾选要重新验收的订单'); return; }
+      confirmAction('确认批量重新验收？', '已选择 <em>' + ids.length + '</em> 笔订单，将重新发起验收。', function () {
+        toast('已提交批量重新验收：' + ids.length + ' 笔');
+        perfSel = {};
+        renderPerfList(perfOrders);
+      });
+    }
+    function searchPerf() {
+      var no = document.getElementById('pOrderNo').value.trim();
+      var buyer = document.getElementById('pBuyer').value.trim();
+      var all = document.getElementById('pAll').value;
+      var list = perfOrders.slice();
+      if (no) { list = list.filter(function (r) { return ('' + r.no).indexOf(no) > -1; }); }
+      if (buyer) { list = list.filter(function (r) { return r.account.indexOf(buyer) > -1 || r.buyer.indexOf(buyer) > -1; }); }
+      if (all) { list = list.filter(function (r) { return r.type.indexOf(all) > -1; }); }
+      renderPerfList(list);
+      toast('查询完成，共 ' + list.length + ' 条');
+    }
+    function resetPerf() {
+      document.getElementById('pOrderNo').value = '';
+      document.getElementById('pBuyer').value = '';
+      document.getElementById('pAll').selectedIndex = 0;
+      document.getElementById('pStart').value = '';
+      document.getElementById('pEnd').value = '';
+      renderPerfList(perfOrders);
+    }
+
+    /* 初始化 */
+    renderList(members);
+    renderPerfList(perfOrders);
+  </script>
+</body>
+</html>
