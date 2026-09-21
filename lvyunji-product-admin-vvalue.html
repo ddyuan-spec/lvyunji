@@ -1280,6 +1280,15 @@
 
     renderList(products);
   </script>
+
+
+
+
+
+
+
+
+
 <style id="__anno_css">/* v4：角标独立浮层。layer 在视口坐标下绝对定位（inset:0 fixed），
    子角标用 JS 按目标元素 rect 算 left/top，不进宿主 DOM。
    弹窗开启时不再整层隐藏，而是逐角标按「顶层弹窗」判定（topOpenModal）：只显示顶层弹窗内字段角标，背景/下层弹窗角标隐藏防穿透。
@@ -1339,30 +1348,30 @@
 </style>
 <script id="__anno_seed" type="application/json">[
 {
-"id": "a7f65a4cabb1f",
+"id": "aVKCol0001",
 "no": 1,
 "view": "viewDetail",
 "sel": "[data-anno=\"kVCol\"]",
 "text": "可编辑\n输入限制：正整数 0~99999\n默认数据：默认为空",
-"ts": 1789973582866,
+"ts": 1763700000000,
 "valid": true
 },
 {
-"id": "a73479fcd4c29",
+"id": "aVBatch0002",
 "no": 2,
 "view": "viewDetail",
 "sel": "[data-anno=\"kVBatch\"]",
 "text": "可编辑\n输入限制：正整数 0~99999\n默认数据：默认为空\n点击批量设置后覆盖所有规格行 V值",
-"ts": 1789973582866,
+"ts": 1763700001000,
 "valid": true
 },
 {
-"id": "a699cbc865649",
+"id": "aVSingl0003",
 "no": 3,
 "view": "viewDetail",
 "sel": "[data-anno=\"kVSingle\"]",
 "text": "不可编辑\n由批量设置同步回填",
-"ts": 1789973582866,
+"ts": 1763700002000,
 "valid": true
 }
 ]</script>
@@ -1529,7 +1538,20 @@
   var layer=document.createElement('div'); layer.id='__anno_layer'; document.body.appendChild(layer);
   var flagEls = [];   /* {flag, el, pos} —— 用于滚动/resize 时重算坐标 */
   function clearFlags(){ flagEls=[]; while(layer.firstChild) layer.removeChild(layer.firstChild); }
-  function closeBubble(){ var b=document.getElementById('__anno_bubble'); if(b&&b.parentNode)b.parentNode.removeChild(b); openId=null; }
+  function closeBubble(){ var b=document.getElementById('__anno_bubble'); if(b&&b.parentNode)b.parentNode.removeChild(b); openId=null; openFlagEl=null; }
+  /* 气泡跟随角标：openBubble 后角标可能因滚动/视图切换被 positionFlags 重算坐标，
+     气泡必须同步跟随，否则出现「列表定位首次弹出位置不准」（用了滚动前的旧 rect）。 */
+  var openFlagEl = null;
+  function placeBubble(){
+    if(!openFlagEl || !openFlagEl.parentNode) return;
+    var b=document.getElementById('__anno_bubble'); if(!b) return;
+    var r=openFlagEl.getBoundingClientRect();
+    if(r.width===0 && r.height===0) return;   /* 角标暂时隐藏（滚出视口）时不动气泡 */
+    var bw=b.offsetWidth,bh=b.offsetHeight;
+    var left=r.left; if(left+bw>window.innerWidth-8)left=window.innerWidth-8-bw; if(left<8)left=8;
+    var top=r.bottom+6; if(top+bh>window.innerHeight-8)top=r.top-bh-6; if(top<8)top=8;
+    b.style.left=left+'px'; b.style.top=top+'px';
+  }
 
   /* 分类：ok=可见可标；hidden-modal=弹窗关闭内(延后不显示)；pending=因交互未激活而隐藏/未生成(待激活灰标)；lost=锚点彻底失效(红标失联) */
   /* 顶层弹窗：遍历所有弹窗容器，归并到最外层根容器（去重）后取「开着且堆叠最高」的那一个（zIndex 大者优先）。
@@ -1576,7 +1598,10 @@
   }
   function render(){
     clearFlags();
-    document.body.classList.toggle('__anno-hidden', hidden);
+    /* 防抖：值未变化时不写 class，避免触发自身 MutationObserver 造成 render 死循环 */
+    if (hidden !== document.body.classList.contains('__anno-hidden')) {
+      document.body.classList.toggle('__anno-hidden', hidden);
+    }
     if (hidden) return;
     var cv = currentView();
     var map = new Map();
@@ -1652,6 +1677,7 @@
       if (left>vw-22) left=vw-22; if (top>vh-22) top=vh-22;
       o.flag.style.left=left+'px'; o.flag.style.top=top+'px';
     });
+    placeBubble();   /* 打开中的气泡跟随其角标实时重定位 */
   }
   function modalOpen(){
     var sel='.__anno_layer,.cf-mask,.cf-modal,.wct-mask,.wct-modal,.mask,.modal,.dialog,.overlay,.popup,[class*="mask"],[class*="modal"],[class*="dialog"],[class*="overlay"],[class*="popup"]';
@@ -1669,7 +1695,7 @@
   function openBubble(id, flag){
     closeBubble();
     var a=data.filter(function(x){return x.id===id;})[0]; if(!a) return;
-    openId=id;
+    openId=id; openFlagEl=flag||null;
     var b=document.createElement('div'); b.className='__anno-bubble'; b.id='__anno_bubble';
     var head=document.createElement('div'); head.className='b-head'; head.innerHTML='<span>批注 #'+a.no+'</span><span class="x">×</span>';
     var body=document.createElement('div'); body.className='b-body'; body.textContent=a.text;
@@ -1679,7 +1705,7 @@
     head.querySelector('.x').addEventListener('click',closeBubble);
     jump.addEventListener('click',function(){ revealAnno(a); });
     del.addEventListener('click',function(){ removeAnno(a.id, null); });
-    if(flag){ var r=flag.getBoundingClientRect(); var bw=b.offsetWidth,bh=b.offsetHeight; var left=r.left; if(left+bw>window.innerWidth-8)left=window.innerWidth-8-bw; if(left<8)left=8; var top=r.bottom+6; if(top+bh>window.innerHeight-8)top=r.top-bh-6; if(top<8)top=8; b.style.left=left+'px'; b.style.top=top+'px'; }
+    if(flag){ placeBubble(); }
     else { b.style.left=Math.min(Math.max(window.innerWidth/2-142,8),window.innerWidth-300)+'px'; b.style.top='90px'; }
   }
   function openMulti(block, annos){
@@ -1763,7 +1789,18 @@
       var atxt = el ? textOf(el).slice(0,12) : '';
       var tag = c==='lost'?' 失联':(c==='pending'?' 待激活':'');
       row.innerHTML='<span class="n">'+a.no+'</span><span class="v">'+(a.view&&a.view!=='global'?'['+a.view+']':'')+'</span>'+esc(a.text)+(atxt?'<span class="a">'+esc(atxt)+'</span>':'')+'<span class="t">'+fmt(new Date(a.ts||Date.now()))+tag+'</span>';
-      row.addEventListener('click',function(){ revealAnno(a); if(hidden){hidden=false;document.body.classList.remove('__anno-hidden');bHide.textContent='隐藏';} var f=document.querySelector('.__anno-flag[data-id="'+a.id+'"]'); if(f)openBubble(a.id,f); else if(c==='lost') toast('该批注已失联，可「重定位」或删除'); });
+      row.addEventListener('click',function(){
+        revealAnno(a);
+        if(hidden){hidden=false;document.body.classList.remove('__anno-hidden');bHide.textContent='隐藏';}
+        /* 延迟开气泡：revealAnno 的 scrollIntoView 后角标重算坐标走 30ms 节流，
+           立刻读角标 rect 会拿到滚动前旧位置（「列表定位首开不准、重开才准」实测根因）；
+           且 positionFlags 现在会让气泡持续跟随角标，即使此刻略有偏差也会自动校正。 */
+        setTimeout(function(){
+          var f=document.querySelector('.__anno-flag[data-id="'+a.id+'"]');
+          if(f) openBubble(a.id,f);
+          else if(c==='lost') toast('该批注已失联，可「重定位」或删除');
+        }, 180);
+      });
       it.appendChild(row);
       var acts=document.createElement('div'); acts.className='i-acts';
       if (c==='lost'){
@@ -1864,7 +1901,7 @@
   function posThrottled(){ clearTimeout(_pt); _pt=setTimeout(positionFlags, 30); }
   window.addEventListener('scroll', posThrottled, true);
   window.addEventListener('resize', posThrottled);
-  window.addEventListener('scroll', function(){ var b=document.getElementById('__anno_bubble'); if(b&&openId&&openId!=='__multi'){ var f=document.querySelector('.__anno-flag[data-id="'+openId+'"]'); if(f){ var r=f.getBoundingClientRect(); var bw=b.offsetWidth,bh=b.offsetHeight; var left=r.left; if(left+bw>window.innerWidth-8)left=window.innerWidth-8-bw; if(left<8)left=8; var top=r.bottom+6; if(top+bh>window.innerHeight-8)top=r.top-bh-6; if(top<8)top=8; b.style.left=left+'px'; b.style.top=top+'px'; } } }, true);
+  window.addEventListener('scroll', function(){ if(openId&&openId!=='__multi') placeBubble(); }, true);
   var _vt;
   function renderThrottled(){ clearTimeout(_vt); _vt=setTimeout(render, 40); }
   document.addEventListener('anno:viewchange', renderThrottled);
@@ -1883,8 +1920,21 @@
   });
   vo.observe(document.body, {attributes:true, attributeFilter:['class'], subtree:true});
   /* 弹窗显隐（运行时点击打开/关闭）必须重新分类：重算 topOpenModal，否则「只显顶层弹窗内字段」不生效。
-     用 renderThrottled（含 positionFlags），且 body 的 __anno-hidden 切换是幂等的，不会触发死循环。 */
-  var vmodal=new MutationObserver(function(){ renderThrottled(); });
+     ⚠️ 必须过滤引擎自身 UI（角标浮层/工具栏/列表/气泡）的 style/class 变更：
+     positionFlags 写角标 left/top 会触发本观察器 → renderThrottled → render → positionFlags 再写 →
+     无限重建角标（实测每 100ms 全量重建），点击时节点被换成游离节点 → 角标点不出气泡（本次实战实锤）。 */
+  function __inEngineUI(t){
+    if(!t || t.nodeType!==1) return false;
+    return t===layer || t===tb || t===listPanel || t.id==='__anno_bubble' ||
+      layer.contains(t) || tb.contains(t) || listPanel.contains(t);
+  }
+  var vmodal=new MutationObserver(function(muts){
+    var hit=false;
+    for(var i=0;i<muts.length;i++){
+      if(!__inEngineUI(muts[i].target)){ hit=true; break; }
+    }
+    if(hit) renderThrottled();
+  });
   vmodal.observe(document.body, {attributes:true, attributeFilter:['style','class'], subtree:true});
 
   autoActivate();
