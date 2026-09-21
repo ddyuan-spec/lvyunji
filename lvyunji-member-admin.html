@@ -149,22 +149,38 @@
     .asset .a-detail { margin-left: auto; font-size: 12px; color: var(--link); cursor: pointer; white-space: nowrap; }
     .asset .a-detail:hover { text-decoration: underline; }
 
-    /* TA 的业绩（白底无框，三分类竖排 key-value，数值可点红字） */
-    .perf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 40px; }
-    .perf-col .pc-title { font-size: 13px; font-weight: 600; color: #222; margin-bottom: 12px; }
-    .perf-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 12px; }
-    .perf-row .pk { color: var(--text-sub); }
-    .perf-row .pv { margin-left: auto; color: var(--red); font-weight: 600; cursor: pointer; }
-    .perf-row .pv:hover { text-decoration: underline; }
-    .perf-row .pmore { color: var(--link); cursor: pointer; font-size: 12px; white-space: nowrap; }
-    .perf-row .pmore:hover { text-decoration: underline; }
+    /* TA 的业绩（白底无框，横向三行，每行 分类 + 多个 key-value，数值可点红字） */
+    .perf-rows { display: flex; flex-direction: column; gap: 16px; }
+    .perf-line { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 30px; font-size: 13px; padding-bottom: 14px; border-bottom: 1px dashed #EEF0F4; }
+    .perf-line:last-child { border-bottom: 0; padding-bottom: 0; }
+    .perf-line .pl-title { font-weight: 600; color: #222; min-width: 78px; }
+    .perf-line .pl-item { display: inline-flex; align-items: baseline; gap: 6px; }
+    .perf-line .pl-k { color: var(--text-sub); white-space: nowrap; }
+    .perf-line .pl-v { color: var(--red); font-weight: 600; cursor: pointer; }
+    .perf-line .pl-v:hover { text-decoration: underline; }
+    .perf-line .pl-more { color: var(--link); cursor: pointer; font-size: 12px; white-space: nowrap; }
+    .perf-line .pl-more:hover { text-decoration: underline; }
 
     /* TA 的团队 */
-    .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-    .team { display: flex; align-items: center; gap: 16px; }
-    .team-name { font-size: 13px; color: var(--text); }
-    .team-detail { color: var(--link); cursor: pointer; font-size: 12px; }
+    .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px 40px; }
+    .team { display: flex; align-items: center; gap: 12px; font-size: 13px; }
+    .team-name { color: var(--text); white-space: nowrap; }
+    .team-num { font-size: 18px; font-weight: 600; color: #222; min-width: 28px; text-align: right; }
+    .team-detail { color: var(--link); cursor: pointer; font-size: 12px; white-space: nowrap; }
     .team-detail:hover { text-decoration: underline; }
+    .team-row { display: contents; }
+    .team-label { color: var(--text-sub); font-size: 13px; white-space: nowrap; }
+    .team-val { color: var(--text); font-size: 13px; }
+    .team-val .primary { color: var(--link); }
+
+    /* 关系链 */
+    .rel-table { width: 100%; }
+    .rel-table th { white-space: nowrap; }
+    .rel-table td { vertical-align: middle; }
+    .rel-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-hint); }
+    .rel-tag::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #2EBD8C; }
+    .rel-tag.warn::before { background: #F2994A; }
+    .rel-note { font-size: 11px; color: var(--text-hint); margin-top: 2px; }
 
     /* 面包屑 */
     .crumb { display: flex; align-items: center; gap: 6px; padding: 2px 0 14px; font-size: 13px; color: var(--text-sub); }
@@ -350,36 +366,70 @@
             <div class="sec-title">TA的业绩
               <span class="tt-act"><button class="btn btn-default" onclick="go('Perf')">查看明细业绩</button></span>
             </div>
-            <div class="perf-grid">
-              <div class="perf-col">
-                <div class="pc-title">自购(PV)</div>
-                <div class="perf-row"><span class="pk">今日</span><span class="pv" onclick="go('Perf')">0</span></div>
-                <div class="perf-row"><span class="pk">本月自购</span><span class="pv" onclick="go('Perf')">0</span><span class="pmore" onclick="toast('查看往期')">查看往期</span></div>
-                <div class="perf-row"><span class="pk">待结算</span><span class="pv" onclick="go('Perf')">37.6</span></div>
-                <div class="perf-row"><span class="pk">已结算</span><span class="pv" onclick="go('Perf')">13119.3</span></div>
+            <div class="perf-rows">
+              <div class="perf-line">
+                <span class="pl-title">自购(PV)</span>
+                <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v" onclick="go('Perf')">0</span></span>
+                <span class="pl-item"><span class="pl-k">本月自购</span><span class="pl-v" onclick="go('Perf')">0</span><span class="pl-more" onclick="toast('查看往期')">查看往期</span></span>
+                <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v" onclick="go('Perf')">37.6</span></span>
+                <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v" onclick="go('Perf')">13119.3</span></span>
               </div>
-              <div class="perf-col">
-                <div class="pc-title">直推(PV)</div>
-                <div class="perf-row"><span class="pk">今日</span><span class="pv" onclick="go('Perf')">0</span></div>
-                <div class="perf-row"><span class="pk">待结算</span><span class="pv" onclick="go('Perf')">805</span></div>
-                <div class="perf-row"><span class="pk">已结算</span><span class="pv" onclick="go('Perf')">3600</span></div>
+              <div class="perf-line">
+                <span class="pl-title">直推(PV)</span>
+                <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v" onclick="go('Perf')">0</span></span>
+                <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v" onclick="go('Perf')">805</span></span>
+                <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v" onclick="go('Perf')">3600</span></span>
               </div>
-              <div class="perf-col">
-                <div class="pc-title">推广(PV)</div>
-                <div class="perf-row"><span class="pk">今日</span><span class="pv" onclick="go('Perf')">0</span></div>
-                <div class="perf-row"><span class="pk">待结算</span><span class="pv" onclick="go('Perf')">805</span></div>
-                <div class="perf-row"><span class="pk">已结算</span><span class="pv" onclick="go('Perf')">3600</span></div>
+              <div class="perf-line">
+                <span class="pl-title">推广(PV)</span>
+                <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v" onclick="go('Perf')">0</span></span>
+                <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v" onclick="go('Perf')">805</span></span>
+                <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v" onclick="go('Perf')">3600</span></span>
               </div>
             </div>
           </div>
 
           <!-- 4. TA 的团队 -->
-          <div class="dcard" style="margin-bottom:0">
+          <div class="dcard">
             <div class="sec-title">TA的团队</div>
             <div class="team-grid">
-              <div class="team"><span class="team-name">直推团队</span><span class="team-detail" onclick="toast('查看直推团队明细')">查看明细</span></div>
-              <div class="team"><span class="team-name">间推团队</span><span class="team-detail" onclick="toast('查看间推团队明细')">查看明细</span></div>
-              <div class="team"><span class="team-name">推广团队</span><span class="team-detail" onclick="toast('查看推广团队明细')">查看明细</span></div>
+              <div class="team"><span class="team-name">下线团队</span><span class="team-num">51</span><span class="team-detail" onclick="toast('查看下线团队明细')">查看明细</span></div>
+              <div class="team"><span class="team-name">直属团队</span><span class="team-num">51</span><span class="team-detail" onclick="toast('查看直属团队明细')">查看明细</span></div>
+              <div class="team"><span class="team-name">直推团队</span><span class="team-num">12</span><span class="team-detail" onclick="toast('查看直推团队明细')">查看明细</span></div>
+              <div class="team"><span class="team-label">执行委：</span><span class="team-val"><span class="primary">有幸官方(p00001)</span></span></div>
+              <div class="team"><span class="team-label">资深委：</span><span class="team-val">--</span></div>
+              <div class="team"><span class="team-label">首席：</span><span class="team-val">--</span></div>
+            </div>
+          </div>
+
+          <!-- 5. 关系链 -->
+          <div class="dcard" style="margin-bottom:0">
+            <div class="sec-title">关系链</div>
+            <div class="tbl-wrap">
+              <table class="rel-table">
+                <thead>
+                  <tr>
+                    <th>会员信息</th>
+                    <th>账号</th>
+                    <th>会员姓名</th>
+                    <th>微生态账号</th>
+                    <th>会员等级</th>
+                    <th>临时会员等级</th>
+                    <th>推荐人</th>
+                    <th>注册时间</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="relBody"></tbody>
+              </table>
+            </div>
+            <div class="pager" style="margin:10px -20px -22px;background:transparent;border-top:0;">
+              <span>共 6 条</span>
+              <select class="pg-size"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>
+              <button class="pg dis">‹</button>
+              <button class="pg active">1</button>
+              <button class="pg">›</button>
+              <div class="pg-jump"><span>前往</span><input type="text" value="1"><span>页</span></div>
             </div>
           </div>
         </div>
@@ -534,6 +584,16 @@
     var selected = {};
     var curMember = null;
 
+    /* 关系链样例数据（按截图） */
+    var relMembers = [
+      { id: 1553844, nick: '有幸12123', phone: '18307448442', wx: '', name: '宋健', level: '潜力达人', tmpLevel: '潜力达人', ref: 'C小明1', reg: '2025-11-25 13:53', status: '已认证', note: '上月保底未完成', avatar: 0 },
+      { id: 1553845, nick: 'C小明1', phone: '13574051885', wx: '', name: '成明坡', level: '成长达人', tmpLevel: '成长达人', ref: 'George Tan', reg: '2025-11-07 11:00', status: '已认证', note: '上月保底未完成', avatar: 1 },
+      { id: 1553846, nick: 'George Tan', phone: '18589589573', wx: '用户89757', name: '用户89757', level: '精英达人', tmpLevel: '精英达人', ref: '梦回一二三', reg: '2025-10-17 09:47', status: '已认证', note: '上月保底未完成', avatar: 2 },
+      { id: 1553847, nick: '梦回一二三', phone: '13786189510', wx: '用户76261', name: '用户76261', level: '领航达人', tmpLevel: '领航达人', ref: '谭先生', reg: '2025-10-29 10:02', status: '已完成', note: '上月保底完成', avatar: 3 },
+      { id: 1553848, nick: '谭先生', phone: '13907310714', wx: '用户95754', name: '用户95754', level: '潜力达人', tmpLevel: '潜力达人', ref: '有幸官方', reg: '2025-05-27 14:09', status: '已认证', note: '上月保底完成', avatar: 4 },
+      { id: 1553849, nick: '有幸官方', phone: 'p00001', wx: 'p0000', name: 'p0000', level: '至尊达人', tmpLevel: '尊荣达人', ref: '--', reg: '2025-05-21 21:36', status: '已完成', note: '上月保底完成', avatar: 5 }
+    ];
+
     /* ============================================================
        列表渲染
        ============================================================ */
@@ -650,7 +710,36 @@
       var m = findMember(id);
       if (!m) { return; }
       curMember = m;
+      renderRel();
       go('Detail');
+    }
+    function renderRel() {
+      var body = document.getElementById('relBody');
+      if (!body) { return; }
+      body.innerHTML = '';
+      relMembers.forEach(function (m, i) {
+        var tr = document.createElement('tr');
+        var statusClass = m.note.indexOf('未完成') > -1 ? 'warn' : '';
+        var infoHtml = '<div class="mem">' +
+          '<img class="avt" src="' + avtSvg(m.avatar) + '" alt="">' +
+          '<div>' +
+            '<div class="mname">' + m.nick + '</div>' +
+            '<div class="rel-tag ' + statusClass + '">' + m.status + '</div>' +
+            '<div class="rel-note">' + m.note + '</div>' +
+          '</div>' +
+        '</div>';
+        tr.innerHTML =
+          '<td>' + infoHtml + '</td>' +
+          '<td>' + m.phone + '</td>' +
+          '<td>' + m.name + '</td>' +
+          '<td>' + m.wx + '</td>' +
+          '<td>' + m.level + '</td>' +
+          '<td>' + m.tmpLevel + '</td>' +
+          '<td>' + m.ref + '</td>' +
+          '<td>' + m.reg + '</td>' +
+          '<td><div class="op"><a onclick="toast(\'查看：' + m.nick + '\')">查看</a></div></td>';
+        body.appendChild(tr);
+      });
     }
     /* ============================================================
        业绩详情订单
