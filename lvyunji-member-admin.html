@@ -90,6 +90,8 @@
     .f-select { width: 150px; }
     .f-input:focus, .f-select:focus { border-color: var(--primary); }
     .f-input::placeholder { color: #bfbfbf; }
+    .f-label { font-size: 13px; color: var(--text-sub); flex: 0 0 auto; }
+    .f-fixed { height: 32px; display: inline-flex; align-items: center; padding: 0 12px; border: 1px solid var(--border-2); border-radius: 3px; background: #F7F8FA; font-size: 12px; color: var(--text); min-width: 200px; }
     .f-expand { display: inline-flex; align-items: center; gap: 3px; height: 32px; color: var(--text-sub); font-size: 12px; cursor: pointer; }
     .f-expand:hover { color: var(--primary); }
 
@@ -453,8 +455,11 @@
           </div>
 
           <div class="filters">
-            <select class="f-select" style="width:200px" id="pOwner">
-              <option value="">全部</option>
+            <span class="f-label">业绩归属人</span>
+            <span class="f-fixed" id="pOwner">用户96909 wxid_ajsdfkl</span>
+            <span class="f-label">业绩类型</span>
+            <select class="f-select" id="pType">
+              <option>全部</option>
               <option>自购-今日</option>
               <option>自购-待结算</option>
               <option>自购-已结算</option>
@@ -467,10 +472,6 @@
               <option>推广-待结算</option>
               <option>推广-已结算</option>
               <option>推广-已退款</option>
-            </select>
-            <select class="f-select" id="pMonth">
-              <option value="">全部</option>
-              <option>本月自购</option>
             </select>
             <input class="f-input" type="text" id="pOrderNo" placeholder="订单编号">
             <input class="f-input" type="text" id="pBuyer" placeholder="下单人账号">
@@ -815,6 +816,7 @@
     function resetPerf() {
       document.getElementById('pOrderNo').value = '';
       document.getElementById('pBuyer').value = '';
+      document.getElementById('pType').selectedIndex = 0;
       document.getElementById('pAll').selectedIndex = 0;
       document.getElementById('pStart').value = '';
       document.getElementById('pEnd').value = '';
