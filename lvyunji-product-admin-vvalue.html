@@ -351,7 +351,7 @@
         <span class="chip">全部商家</span>
         <span class="chip">待审核商家</span>
         <span class="chip">待审核商品</span>
-        <span class="chip active" id="pmChipList" onclick="goProduct()">商品管理</span>
+        <span class="chip active" id="pmChipList" onclick="goProduct()" data-anno="kSideProduct">商品管理</span>
         <span class="chip">兑换码管理</span>
         <span class="chip">本地生活分类</span>
       </div>
@@ -359,7 +359,7 @@
         <svg class="ico" viewBox="0 0 14 14"><circle cx="7" cy="4.8" r="2.6"/><path d="M2.2 12.4c0-2.5 2.1-3.9 4.8-3.9s4.8 1.4 4.8 3.9"/></svg>会员中心<span class="caret">▾</span>
       </div>
       <div class="sub-chips">
-        <span class="chip" id="mmChipList" onclick="goMember('List')">会员管理</span>
+        <span class="chip" id="mmChipList" onclick="goMember('List')" data-anno="kSideMember">会员管理</span>
         <span class="chip" onclick="toast('第三方解绑')">第三方解绑</span>
         <span class="chip" onclick="toast('实名认证')">实名认证</span>
         <span class="chip" onclick="toast('黑名单')">黑名单</span>
@@ -1122,13 +1122,13 @@
                 <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v" onclick="goMember('Perf')">3600</span></span>
               </div>
               <div class="perf-line">
-                <span class="pl-title">直推（v值）</span>
+                <span class="pl-title" data-anno="kPerfVZh">直推（v值）</span>
                 <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v" onclick="goMember('Perf')">0</span></span>
                 <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v" onclick="goMember('Perf')">268.3</span></span>
                 <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v" onclick="goMember('Perf')">1200</span></span>
               </div>
               <div class="perf-line">
-                <span class="pl-title">推广（v值）</span>
+                <span class="pl-title" data-anno="kPerfVTg">推广（v值）</span>
                 <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v" onclick="goMember('Perf')">0</span></span>
                 <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v" onclick="goMember('Perf')">268.3</span></span>
                 <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v" onclick="goMember('Perf')">1200</span></span>
@@ -1236,7 +1236,7 @@
                   <th style="width:180px">下单时间</th>
                   <th style="width:200px">下单人员</th>
                   <th style="width:120px">订单结算PV</th>
-                  <th style="width:120px">订单结算v值</th>
+                  <th style="width:120px" data-anno="kPerfVV">订单结算v值</th>
                   <th style="width:160px">业绩类型</th>
                   <th style="width:120px">结算状态</th>
                   <th style="width:110px">是否分佣</th>
@@ -1696,7 +1696,7 @@
           '<td><span class="sw' + (m.disabled ? ' on' : '') + '" onclick="mmToggleDisabled(' + m.id + ',this)"></span></td>' +
           '<td>' + m.reg + '</td>' +
           '<td class="c-op"><div class="op">' +
-            '<a onclick="mmOpenDetail(' + m.id + ')">查看</a>' +
+            '<a data-anno="kMMView" onclick="mmOpenDetail(' + m.id + ')">查看</a>' +
             '<a onclick="toast(\'修改手机号：' + m.id + '\')">修改手机号</a>' +
             '<a onclick="toast(\'修改推荐人：' + m.id + '\')">修改推荐人</a>' +
             '<a onclick="toast(\'重置密码：' + m.id + '\')">重置密码</a>' +
@@ -1982,6 +1982,60 @@
 "sel": "[data-anno=\"kVSingle\"]",
 "text": "不可编辑\n由批量设置同步回填",
 "ts": 1763700002000,
+"valid": true
+},
+{
+"id": "ad965c2d98eca",
+"no": 4,
+"view": "global",
+"sel": "[data-anno=\"kSideProduct\"]",
+"text": "功能说明：点击进入商品管理列表页（本期新增可点切换）\n功能实现：本菜单本期有改动：新增 goProduct 切换逻辑，可与「会员管理」互切；开发与测试需逐项核对本原型全部改动批注，避免遗漏",
+"ts": 1790044239588,
+"valid": true
+},
+{
+"id": "a487115e7bdfd",
+"no": 5,
+"view": "global",
+"sel": "[data-anno=\"kSideMember\"]",
+"text": "功能说明：点击进入会员管理列表页（会员中心模块入口）\n功能实现：本期新增会员中心模块及 v值 相关改动；开发与测试需关注会员列表/详情/业绩各功能批注",
+"ts": 1790044239588,
+"valid": true
+},
+{
+"id": "a6b2e0e7e8fed",
+"no": 6,
+"view": "viewMemberList",
+"sel": "[data-anno=\"kMMView\"]",
+"text": "功能说明：点击进入该会员详情页\n功能实现：详情页本期新增 TA的业绩「v值」记录（直推v值、推广v值）及业绩订单「订单结算v值」列，开发与测试需关注详情页新增内容",
+"ts": 1790044239588,
+"valid": true
+},
+{
+"id": "a10b9256e9b13",
+"no": 7,
+"view": "viewMemberDetail",
+"sel": "[data-anno=\"kPerfVZh\"]",
+"text": "不可编辑\n直推（v值）：用户下单时由直接推荐人（直接上级）产生的 v值",
+"ts": 1790044239588,
+"valid": true
+},
+{
+"id": "a4cf940ffedc1",
+"no": 8,
+"view": "viewMemberDetail",
+"sel": "[data-anno=\"kPerfVTg\"]",
+"text": "不可编辑\n推广（v值）：除直推外、由非直接上级产生的 v值",
+"ts": 1790044239588,
+"valid": true
+},
+{
+"id": "a365975c1892d",
+"no": 9,
+"view": "viewMemberPerf",
+"sel": "[data-anno=\"kPerfVV\"]",
+"text": "不可编辑\n显示：业绩详情订单表「订单结算PV」右侧新增列，展示该订单结算产生的 v值",
+"ts": 1790044239588,
 "valid": true
 }
 ]</script>
