@@ -1955,6 +1955,12 @@
 .__anno-tb button:disabled{opacity:.45;cursor:not-allowed}
 .__anno-tb button.__anno-locked{opacity:.45;cursor:not-allowed}
 .__anno-tb .__anno-hint{background:#E04D4D;color:#fff;cursor:default;font-size:11px;padding:0 9px}
+/* v4.4：工具条可折叠 —— 收起后缩成一个圆形悬浮钮（不挡原型内容），点击或 Alt+B 展开；状态记忆在 localStorage。 */
+.__anno-tb .__anno-fold{width:26px;padding:0;background:#4a4a63;font-weight:700;font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.__anno-tb .__anno-fold:hover{background:#5c5c7a}
+.__anno-tb.folded{padding:5px;border-radius:50%;gap:0}
+.__anno-tb.folded button:not(.__anno-fold){display:none}
+.__anno-tb.folded .__anno-fold{width:40px;height:40px;border-radius:50%;font-size:13px}
 </style>
 <script id="__anno_seed" type="application/json">
 [
@@ -2207,7 +2213,27 @@
   var listPanel=document.createElement('div'); listPanel.className='__anno-list'; document.body.appendChild(listPanel);
   function btn(label,cls){ var b=document.createElement('button'); b.textContent=label; if(cls)b.className=cls; return b; }
   var bMode=btn('批注'), bHide=btn('隐藏'), bList=btn('列表'), bSave=btn('保存原型'), bPush=btn('保存并推送'), bClear=btn('清空');
-  tb.appendChild(bMode); tb.appendChild(bHide); tb.appendChild(bList); tb.appendChild(bSave); tb.appendChild(bPush); tb.appendChild(bClear);
+  var bFold=btn('»','__anno-fold');
+  tb.appendChild(bMode); tb.appendChild(bHide); tb.appendChild(bList); tb.appendChild(bSave); tb.appendChild(bPush); tb.appendChild(bClear); tb.appendChild(bFold);
+
+  /* v4.4：工具条折叠 —— 收起后只留一个右下角圆形悬浮钮（不挡原型内容），点击钮或按 Alt+B 展开/收起；状态跨刷新记忆。 */
+  var FOLD_KEY='__anno_tb_folded';
+  function applyFold(f){
+    tb.classList.toggle('folded', !!f);
+    bFold.textContent = f ? '批' : '»';
+    bFold.title = f ? '展开批注工具条（Alt+B）' : '收起批注工具条（Alt+B）';
+  }
+  function toggleFold(){
+    var f = !tb.classList.contains('folded');
+    applyFold(f);
+    try{ localStorage.setItem(FOLD_KEY, f ? '1' : '0'); }catch(e){}
+  }
+  bFold.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); toggleFold(); });
+  bFold.addEventListener('mousedown', function(e){ e.stopPropagation(); });
+  try{ applyFold(localStorage.getItem(FOLD_KEY) === '1'); }catch(e){ applyFold(false); }
+  document.addEventListener('keydown', function(e){
+    if(e.altKey && !e.ctrlKey && !e.metaKey && (e.key === 'b' || e.key === 'B')){ e.preventDefault(); toggleFold(); }
+  });
 
   /* ===== 角标独立浮层（z-index 低于弹窗遮罩，弹窗开启时整层隐藏，不穿透） ===== */
   var layer=document.createElement('div'); layer.id='__anno_layer'; document.body.appendChild(layer);
@@ -2501,6 +2527,7 @@
     document.body.classList.toggle('__anno-mode-on',on);
     bMode.classList.toggle('on',on);
     bMode.textContent = on ? '批注中' : '批注';
+    if(typeof bFold!=='undefined' && bFold) bFold.classList.toggle('on', on);   /* 收起态下用紫色提示「批注中」 */
     if(!on){ if(hoverEl){hoverEl.classList.remove('__anno-hover');hoverEl=null;} closeBubble(); }
     render();
   }
