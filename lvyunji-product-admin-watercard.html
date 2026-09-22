@@ -1664,7 +1664,194 @@
 
 
 
-<script id="__anno_seed" type="application/json">[{"id": "ak01x001", "no": 1, "view": "viewDetail", "sel": "[data-anno=\"ak01x001\"]", "text": "选择项（新增）：水卡\n选中『水卡』后联动：显示「水卡设置」、隐藏「发货模板设置」「售后设置」「其他设置」，并将「商品规格」锁定为单个商品规格", "ts": 1695000000000, "valid": true}, {"id": "ak02x002", "no": 2, "view": "viewDetail", "sel": "[data-anno=\"ak02x002\"]", "text": "选择项：商品类型=水卡 时锁定为「规格名1」单规格\n字段仍可填可改；其余规格结构（规格名2、添加子规格、创建新规格、第2行规格值及行尾+/-删除）全部隐藏", "ts": 1695000000000, "valid": true}, {"id": "ak03x003", "no": 3, "view": "viewDetail", "sel": "[data-anno=\"ak03x003\"]", "text": "输入项：规格名1 对应的规格值\n仅保留 1 行，可填可改", "ts": 1695000000000, "valid": true}, {"id": "ak04x004", "no": 4, "view": "viewDetail", "sel": "[data-anno=\"ak04x004\"]", "text": "选择项：该规格值的购买级别门槛\n默认「不限制」，可改", "ts": 1695000000000, "valid": true}, {"id": "ak05x005", "no": 5, "view": "viewDetail", "sel": "[data-anno=\"ak05x005\"]", "text": "功能入口：为该规格上传图片\n水卡类型下保留，点击提示「添加规格图片」", "ts": 1695000000000, "valid": true}, {"id": "ak06x006", "no": 6, "view": "viewDetail", "sel": "[data-anno=\"ak06x006\"]", "text": "选择项：引用水卡模板\n选中后自动带出 水卡有效期/每日取水上限/每月取水上限/总水量 到下方信息卡；新增模板后自动进入此下拉，无需刷新", "ts": 1695000000000, "valid": true, "activates": "watercard", "fallback": "#cardWater"}, {"id": "ak07x007", "no": 7, "view": "viewDetail", "sel": "[data-anno=\"ak07x007\"]", "text": "功能入口：打开「新增水卡模板」弹窗\n点击后打开新增水卡模板弹窗并清空表单；新增完成后模板自动进入下拉并选中", "ts": 1695000000000, "valid": true, "activates": "watercard", "fallback": "#cardWater"}, {"id": "ak08x008", "no": 8, "view": "viewDetail", "sel": "[data-anno=\"ak08x008\"]", "text": "不可编辑\n显示：水卡设置卡片内提示文案常显\n说明：引导用户选择合适的水卡模板，若无合适模板先新增", "ts": 1695000000000, "valid": true, "activates": "watercard", "fallback": "#cardWater"}, {"id": "ak09x009", "no": 9, "view": "viewDetail", "sel": "[data-anno=\"ak09x009\"]", "text": "不可编辑\n显示：选中水卡模板后展示\n引用后自动带出信息：由所选「水卡模板」带出，展示水卡有效期（天）", "ts": 1695000000000, "valid": true, "activates": "template", "fallback": "#cardTplBox"}, {"id": "ak10x010", "no": 10, "view": "viewDetail", "sel": "[data-anno=\"ak10x010\"]", "text": "不可编辑\n显示：选中水卡模板后展示\n引用后自动带出信息：由所选「水卡模板」带出，展示每日取水上限（L）", "ts": 1695000000000, "valid": true, "activates": "template", "fallback": "#cardTplBox"}, {"id": "ak11x011", "no": 11, "view": "viewDetail", "sel": "[data-anno=\"ak11x011\"]", "text": "不可编辑\n显示：选中水卡模板后展示\n引用后自动带出信息：由所选「水卡模板」带出，展示每月取水上限（L）", "ts": 1695000000000, "valid": true, "activates": "template", "fallback": "#cardTplBox"}, {"id": "ak12x012", "no": 12, "view": "viewDetail", "sel": "[data-anno=\"ak12x012\"]", "text": "不可编辑\n显示：选中水卡模板后展示\n引用后自动带出信息：由所选「水卡模板」带出，展示总水量（L）", "ts": 1695000000000, "valid": true, "activates": "template", "fallback": "#cardTplBox"}, {"id": "ak13x013", "no": 13, "view": "global", "sel": "[data-anno=\"ak13x013\"]", "text": "可编辑\n输入限制：最多 200 字（带 0/200 计数）\n水卡模板名称，提交时校验非空且唯一（重名拦截）", "ts": 1695000000000, "valid": true, "fallback": "#wctMask"}, {"id": "ak14x014", "no": 14, "view": "global", "sel": "[data-anno=\"ak14x014\"]", "text": "可编辑\n输入限制：正整数，1~3650（单位：天）\n水卡有效期：激活后 N 天有效；提交时校验非空", "ts": 1695000000000, "valid": true, "fallback": "#wctMask"}, {"id": "ak15x015", "no": 15, "view": "global", "sel": "[data-anno=\"ak15x015\"]", "text": "可编辑\n输入限制：正整数，1~9999（单位：L）\n每日取水上限；提交时校验非空", "ts": 1695000000000, "valid": true, "fallback": "#wctMask"}, {"id": "ak16x016", "no": 16, "view": "global", "sel": "[data-anno=\"ak16x016\"]", "text": "可编辑\n输入限制：正整数，1~9999（单位：L）\n每月取水上限；提交时校验非空", "ts": 1695000000000, "valid": true, "fallback": "#wctMask"}, {"id": "ak17x017", "no": 17, "view": "global", "sel": "[data-anno=\"ak17x017\"]", "text": "可编辑\n输入限制：正整数，1~99999（单位：L）\n总水量；提交时校验非空", "ts": 1695000000000, "valid": true, "fallback": "#wctMask"}, {"id": "ak18x018", "no": 18, "view": "global", "sel": "[data-anno=\"ak18x018\"]", "text": "功能说明：校验并保存水卡模板，关闭弹窗\n功能实现：校验 5 字段均非空、模板名称唯一（自动查重），写入模板列表，重新渲染模板下拉选项并自动选中、回填信息卡；模板不可修改、不可删除", "ts": 1695000000000, "valid": true, "fallback": "#wctMask"}, {"id": "ak19x019", "no": 19, "view": "global", "sel": "[data-anno=\"ak19x019\"]", "text": "功能说明：关闭弹窗，不保存\n功能实现：关闭新增水卡模板弹窗，不保存已填写内容", "ts": 1695000000000, "valid": true, "fallback": "#wctMask"}]</script>
+<script id="__anno_seed" type="application/json">[
+{
+"id": "ak01x001",
+"no": 1,
+"view": "viewDetail",
+"sel": "[data-anno=\"ak01x001\"]",
+"text": "选择项（新增）：水卡\n选中『水卡』后联动：显示「水卡设置」、隐藏「发货模板设置」「售后设置」「其他设置」，并将「商品规格」锁定为单个商品规格",
+"ts": 1695000000000,
+"valid": true
+},
+{
+"id": "ak02x002",
+"no": 2,
+"view": "viewDetail",
+"sel": "[data-anno=\"ak02x002\"]",
+"text": "选择项：商品类型=水卡 时锁定为「规格名1」单规格\n字段仍可填可改；其余规格结构（规格名2、添加子规格、创建新规格、第2行规格值及行尾+/-删除）全部隐藏",
+"ts": 1695000000000,
+"valid": true
+},
+{
+"id": "ak03x003",
+"no": 3,
+"view": "viewDetail",
+"sel": "[data-anno=\"ak03x003\"]",
+"text": "输入项：规格名1 对应的规格值\n仅保留 1 行，可填可改",
+"ts": 1695000000000,
+"valid": true
+},
+{
+"id": "ak04x004",
+"no": 4,
+"view": "viewDetail",
+"sel": "[data-anno=\"ak04x004\"]",
+"text": "选择项：该规格值的购买级别门槛\n默认「不限制」，可改",
+"ts": 1695000000000,
+"valid": true
+},
+{
+"id": "ak05x005",
+"no": 5,
+"view": "viewDetail",
+"sel": "[data-anno=\"ak05x005\"]",
+"text": "功能入口：为该规格上传图片\n水卡类型下保留，点击提示「添加规格图片」",
+"ts": 1695000000000,
+"valid": true
+},
+{
+"id": "ak06x006",
+"no": 6,
+"view": "viewDetail",
+"sel": "[data-anno=\"ak06x006\"]",
+"text": "选择项：引用水卡模板\n选中后自动带出 水卡有效期/每日取水上限/每月取水上限/总水量 到下方信息卡；新增模板后自动进入此下拉，无需刷新",
+"ts": 1695000000000,
+"valid": true,
+"activates": "watercard",
+"fallback": "#cardWater"
+},
+{
+"id": "ak07x007",
+"no": 7,
+"view": "viewDetail",
+"sel": "[data-anno=\"ak07x007\"]",
+"text": "功能入口：打开「新增水卡模板」弹窗\n点击后打开新增水卡模板弹窗并清空表单；新增完成后模板自动进入下拉并选中",
+"ts": 1695000000000,
+"valid": true,
+"activates": "watercard",
+"fallback": "#cardWater"
+},
+{
+"id": "ak08x008",
+"no": 8,
+"view": "viewDetail",
+"sel": "[data-anno=\"ak08x008\"]",
+"text": "不可编辑\n显示：水卡设置卡片内提示文案常显\n说明：引导用户选择合适的水卡模板，若无合适模板先新增",
+"ts": 1695000000000,
+"valid": true,
+"activates": "watercard",
+"fallback": "#cardWater"
+},
+{
+"id": "ak09x009",
+"no": 9,
+"view": "viewDetail",
+"sel": "[data-anno=\"ak09x009\"]",
+"text": "不可编辑\n显示：选中水卡模板后展示\n引用后自动带出信息：由所选「水卡模板」带出，展示水卡有效期（天）",
+"ts": 1695000000000,
+"valid": true,
+"activates": "template",
+"fallback": "#cardTplBox"
+},
+{
+"id": "ak10x010",
+"no": 10,
+"view": "viewDetail",
+"sel": "[data-anno=\"ak10x010\"]",
+"text": "不可编辑\n显示：选中水卡模板后展示\n引用后自动带出信息：由所选「水卡模板」带出，展示每日取水上限（L）",
+"ts": 1695000000000,
+"valid": true,
+"activates": "template",
+"fallback": "#cardTplBox"
+},
+{
+"id": "ak11x011",
+"no": 11,
+"view": "viewDetail",
+"sel": "[data-anno=\"ak11x011\"]",
+"text": "不可编辑\n显示：选中水卡模板后展示\n引用后自动带出信息：由所选「水卡模板」带出，展示每月取水上限（L）",
+"ts": 1695000000000,
+"valid": true,
+"activates": "template",
+"fallback": "#cardTplBox"
+},
+{
+"id": "ak12x012",
+"no": 12,
+"view": "viewDetail",
+"sel": "[data-anno=\"ak12x012\"]",
+"text": "不可编辑\n显示：选中水卡模板后展示\n引用后自动带出信息：由所选「水卡模板」带出，展示总水量（L）",
+"ts": 1695000000000,
+"valid": true,
+"activates": "template",
+"fallback": "#cardTplBox"
+},
+{
+"id": "ak19x019",
+"no": 19,
+"view": "global",
+"sel": "[data-anno=\"ak19x019\"]",
+"text": "功能说明：关闭弹窗，不保存\n功能实现：关闭新增水卡模板弹窗，不保存已填写内容",
+"ts": 1695000000000,
+"valid": true,
+"fallback": "#wctMask"
+},
+{
+"id": "ak13x013",
+"no": 13,
+"view": "viewDetail",
+"sel": "[data-anno=\"ak13x013\"]",
+"text": "必填\n可编辑\n输入限制：最多 200 字（带 0/200 计数）\n提交时校验非空且唯一（重名拦截）",
+"ts": 1790067333611,
+"valid": true
+},
+{
+"id": "ak14x014",
+"no": 14,
+"view": "viewDetail",
+"sel": "[data-anno=\"ak14x014\"]",
+"text": "必填\n可编辑\n输入限制：正整数，1~3650（单位：天）\n激活后 N 天有效\n提交时校验非空",
+"ts": 1790067333611,
+"valid": true
+},
+{
+"id": "ak15x015",
+"no": 15,
+"view": "viewDetail",
+"sel": "[data-anno=\"ak15x015\"]",
+"text": "选填\n可编辑\n输入限制：正整数，1~9999（单位：L）；填 0 或不填 = 不限制\n光标移出输入框时校验：每日 ≤ 每月 ≤ 总水量（仅当填写正数时参与，0/空不参与）\n提交时不强制校验非空",
+"ts": 1790067333611,
+"valid": true
+},
+{
+"id": "ak16x016",
+"no": 16,
+"view": "viewDetail",
+"sel": "[data-anno=\"ak16x016\"]",
+"text": "选填\n可编辑\n输入限制：正整数，1~9999（单位：L）；填 0 或不填 = 不限制\n光标移出输入框时校验：每月 ≥ 每日 且 每月 ≤ 总水量（仅当填写正数时参与）\n提交时不强制校验非空",
+"ts": 1790067333611,
+"valid": true
+},
+{
+"id": "ak17x017",
+"no": 17,
+"view": "viewDetail",
+"sel": "[data-anno=\"ak17x017\"]",
+"text": "必填\n可编辑\n输入限制：正整数，1~99999（单位：L）\n光标移出输入框时校验：总水量 ≥ 每月（仅当每月填写正数时参与）\n提交时校验非空",
+"ts": 1790067333611,
+"valid": true
+},
+{
+"id": "ak18x018",
+"no": 18,
+"view": "viewDetail",
+"sel": "[data-anno=\"ak18x018\"]",
+"text": "功能说明：校验并保存水卡模板，关闭弹窗\n功能实现：校验 名称/有效期/总水量 非空且模板名称唯一（自动查重）；每日/每月可空（填 0 或不填 = 不限制）；校验 每日 ≤ 每月 ≤ 总水量；通过后写入模板列表，重新渲染模板下拉选项并自动选中、回填信息卡；模板不可修改、不可删除",
+"ts": 1790067333611,
+"valid": true
+}
+]</script>
 <script>
 
 (function(){
