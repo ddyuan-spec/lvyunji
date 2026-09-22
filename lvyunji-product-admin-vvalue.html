@@ -1099,7 +1099,7 @@
 
           <div class="dcard">
             <div class="sec-title">TA的业绩
-              <span class="tt-act"><button class="btn btn-default" onclick="goMember('Perf')">查看明细业绩</button></span>
+              <span class="tt-act"><button class="btn btn-default" data-anno="kPerfEntry" onclick="goMember('Perf')">查看明细业绩</button></span>
             </div>
             <div class="perf-rows">
               <div class="perf-line">
@@ -1956,7 +1956,8 @@
 .__anno-tb button.__anno-locked{opacity:.45;cursor:not-allowed}
 .__anno-tb .__anno-hint{background:#E04D4D;color:#fff;cursor:default;font-size:11px;padding:0 9px}
 </style>
-<script id="__anno_seed" type="application/json">[
+<script id="__anno_seed" type="application/json">
+[
 {
 "id": "aVKCol0001",
 "no": 1,
@@ -1985,60 +1986,70 @@
 "valid": true
 },
 {
-"id": "ad965c2d98eca",
+"id": "a36fbcb516a89",
 "no": 4,
 "view": "global",
 "sel": "[data-anno=\"kSideProduct\"]",
 "text": "功能说明：点击进入商品管理列表页（本期新增可点切换）\n功能实现：本菜单本期有改动：新增 goProduct 切换逻辑，可与「会员管理」互切；开发与测试需逐项核对本原型全部改动批注，避免遗漏",
-"ts": 1790044239588,
+"ts": 1790044709500,
 "valid": true
 },
 {
-"id": "a487115e7bdfd",
+"id": "af30f76994e79",
 "no": 5,
 "view": "global",
 "sel": "[data-anno=\"kSideMember\"]",
 "text": "功能说明：点击进入会员管理列表页（会员中心模块入口）\n功能实现：本期新增会员中心模块及 v值 相关改动；开发与测试需关注会员列表/详情/业绩各功能批注",
-"ts": 1790044239588,
+"ts": 1790044709500,
 "valid": true
 },
 {
-"id": "a6b2e0e7e8fed",
+"id": "af97933add86f",
 "no": 6,
 "view": "viewMemberList",
 "sel": "[data-anno=\"kMMView\"]",
 "text": "功能说明：点击进入该会员详情页\n功能实现：详情页本期新增 TA的业绩「v值」记录（直推v值、推广v值）及业绩订单「订单结算v值」列，开发与测试需关注详情页新增内容",
-"ts": 1790044239588,
+"ts": 1790044709500,
 "valid": true
 },
 {
-"id": "a10b9256e9b13",
+"id": "ab464d1b7866c",
 "no": 7,
 "view": "viewMemberDetail",
 "sel": "[data-anno=\"kPerfVZh\"]",
 "text": "不可编辑\n直推（v值）：用户下单时由直接推荐人（直接上级）产生的 v值",
-"ts": 1790044239588,
+"ts": 1790044709500,
 "valid": true
 },
 {
-"id": "a4cf940ffedc1",
+"id": "abd0496e8efb6",
 "no": 8,
 "view": "viewMemberDetail",
 "sel": "[data-anno=\"kPerfVTg\"]",
 "text": "不可编辑\n推广（v值）：除直推外、由非直接上级产生的 v值",
-"ts": 1790044239588,
+"ts": 1790044709500,
 "valid": true
 },
 {
-"id": "a365975c1892d",
+"id": "a9016f8f075ee",
 "no": 9,
 "view": "viewMemberPerf",
 "sel": "[data-anno=\"kPerfVV\"]",
 "text": "不可编辑\n显示：业绩详情订单表「订单结算PV」右侧新增列，展示该订单结算产生的 v值",
-"ts": 1790044239588,
+"ts": 1790044709500,
+"valid": true
+},
+{
+"id": "ae78a447b8b91",
+"no": 10,
+"view": "viewMemberDetail",
+"sel": "[data-anno=\"kPerfEntry\"]",
+"text": "功能说明：点击进入业绩详情订单页\n功能实现：本期业绩详情订单页新增 v值 信息——订单表「订单结算PV」右侧新增「订单结算v值」列（详见该页对应批注）；开发与测试需关注该页新增 v值 列",
+"ts": 1790044709500,
 "valid": true
 }
-]</script>
+]
+</script>
 <script id="__anno_engine">
 (function(){
   "use strict";
