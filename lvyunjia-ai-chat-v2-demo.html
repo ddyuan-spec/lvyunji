@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>绿韵家 · 数智 · 帮我买/省/选 V2 demo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #f7f8fa;
+      --card: #ffffff;
+      --text: #1f2329;
+      --text-2: #4e5969;
+      --text-3: #86909c;
+      --line: #e5e6eb;
+      --buy: #ff9900;
+      --buy-bg: #fff5e6;
+      --see: #1890ff;
+      --see-bg: #e6f7ff;
+      --save: #52c41a;
+      --save-bg: #f6ffed;
+      --choose: #00b578;
+      --choose-bg: #e6fff5;
+      --assistant: #f2f3f5;
+      --user: #d6e9ff;
+    }
+    html, body { height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #e5e6eb;
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+    }
+
+    /* proto-c 复制源码标准组件 */
+    .copy-bar{position:sticky;top:0;left:0;right:0;z-index:9999;background:#1f1f2e;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 16px;box-shadow:0 2px 10px rgba(0,0,0,.2);font-family:-apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif}
+    .copy-bar__title{display:flex;flex-direction:column;gap:2px;min-width:0}
+    .copy-bar__name{font-size:13px;font-weight:700;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .copy-bar__hint{font-size:11px;color:#a6b0c8}
+    .copy-bar__actions{display:flex;gap:8px;flex-shrink:0}
+    .copy-btn{padding:7px 14px;border:none;border-radius:18px;background:linear-gradient(135deg,#07c160,#06ad56);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:transform .1s,box-shadow .2s}
+    .copy-btn--ghost{background:transparent;border:1px solid rgba(255,255,255,.4);font-weight:600}
+    .copy-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(7,193,96,.35)}
+    .copy-btn:active{transform:translateY(0)}
+    .copy-btn.copied{background:linear-gradient(135deg,#059669,#047857)}
+    .copy-toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%, 0);background:#1f1f2e;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;box-shadow:0 4px 16px #00000040;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999}
+    .copy-toast.show{opacity:1}
+    .proto-toast{position:fixed;bottom:80px;left:50%;transform:translate(-50%, 0);background:#000000bf;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;z-index:10000;pointer-events:none;}
+
+    .phone {
+      width: 100%;
+      max-width: 414px;
+      height: 100%;
+      max-height: 896px;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+    @media (min-width: 430px) {
+      .phone { border-radius: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.12); margin: 20px 0; height: calc(100% - 40px); }
+    }
+
+    /* status bar */
+    .statusbar {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      font-size: 14px;
+      font-weight: 600;
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+    .statusbar .time { font-size: 15px; font-weight: 700; }
+    .statusbar .icons { display: flex; gap: 5px; align-items: center; }
+    .signal, .wifi, .battery { width: 18px; height: 12px; background-size: contain; background-repeat: no-repeat; }
+    .signal { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 12'%3E%3Cpath fill='%231f2329' d='M0 10h2v2H0zm3-3h2v5H3zm3-3h2v8H6zm3-3h2v11H9zm3-4h2v15h-2z'/%3E%3C/svg%3E"); }
+    .wifi { width: 16px; height: 12px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 12'%3E%3Cpath fill='%231f2329' d='M8 0C4.5 0 1.5 1.5 0 3.5l8 8.5 8-8.5C14.5 1.5 11.5 0 8 0z'/%3E%3C/svg%3E"); }
+    .battery { width: 24px; height: 12px; border: 1px solid #1f2329; border-radius: 3px; position: relative; }
+    .battery::after { content: ''; position: absolute; right: -3px; top: 3px; width: 2px; height: 4px; background: #1f2329; border-radius: 0 1px 1px 0; }
+    .battery::before { content: ''; position: absolute; left: 1px; top: 1px; width: 18px; height: 8px; background: #1f2329; border-radius: 1px; }
+
+    /* header */
+    .header {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+    .header-title { font-size: 17px; font-weight: 600; }
+    .menu-btn { width: 24px; height: 24px; display: flex; flex-direction: column; justify-content: center; gap: 5px; }
+    .menu-btn span { display: block; height: 2px; background: var(--text); border-radius: 1px; }
+    .menu-btn span:nth-child(1) { width: 18px; }
+    .menu-btn span:nth-child(2) { width: 14px; }
+    .menu-btn span:nth-child(3) { width: 10px; }
+
+    /* scrollable content */
+    .chat-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 16px 16px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .chat-scroll::-webkit-scrollbar { display: none; }
+
+    /* greeting */
+    .greeting {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-top: 8px;
+      margin-bottom: 20px;
+    }
+    .avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffe8df 0%, #fff0f0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .avatar::after {
+      content: 'Hi';
+      position: absolute;
+      right: -6px;
+      top: 0;
+      background: #ff4d4f;
+      color: #fff;
+      font-size: 10px;
+      padding: 2px 5px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+    .greeting-text h1 { font-size: 22px; font-weight: 700; line-height: 1.3; }
+    .greeting-text p { font-size: 13px; color: var(--text-2); margin-top: 6px; }
+
+    /* entry cards */
+    .entries { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .entry-card {
+      border-radius: 12px;
+      padding: 14px 12px;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+      position: relative;
+    }
+    .entry-card:active { transform: scale(0.98); }
+    .entry-card.buy { background: var(--buy-bg); border: 1px solid rgba(255,153,0,0.15); }
+    .entry-card.see { background: var(--see-bg); border: 1px solid rgba(24,144,255,0.15); }
+    .entry-card.save { background: var(--save-bg); border: 1px solid rgba(82,196,26,0.15); }
+    .entry-card.choose { background: var(--choose-bg); border: 1px solid rgba(0,181,120,0.15); }
+    .entry-card.active { box-shadow: 0 0 0 2px currentColor; }
+    .entry-card.buy.active { box-shadow: 0 0 0 2px var(--buy); }
+    .entry-card.see.active { box-shadow: 0 0 0 2px var(--see); }
+    .entry-card.save.active { box-shadow: 0 0 0 2px var(--save); }
+    .entry-card.choose.active { box-shadow: 0 0 0 2px var(--choose); }
+    .entry-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .entry-icon { width: 26px; height: 26px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; }
+    .entry-card.buy .entry-icon { background: var(--buy); }
+    .entry-card.see .entry-icon { background: var(--see); }
+    .entry-card.save .entry-icon { background: var(--save); }
+    .entry-card.choose .entry-icon { background: var(--choose); }
+    .entry-title { font-size: 15px; font-weight: 700; }
+    .entry-card.buy .entry-title { color: var(--buy); }
+    .entry-card.see .entry-title { color: var(--see); }
+    .entry-card.save .entry-title { color: var(--save); }
+    .entry-card.choose .entry-title { color: var(--choose); }
+    .entry-desc { font-size: 11px; color: var(--text-2); line-height: 1.35; }
+    .entry-badge {
+      position: absolute;
+      right: 8px;
+      top: 8px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .entry-card.buy .entry-badge { color: var(--buy); }
+    .entry-card.see .entry-badge { color: var(--see); }
+    .entry-card.save .entry-badge { color: var(--save); }
+    .entry-card.choose .entry-badge { color: var(--choose); }
+
+    /* mode tag */
+    .mode-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-2);
+      margin-bottom: 12px;
+      padding: 4px 10px;
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .mode-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .mode-dot.buy { background: var(--buy); }
+    .mode-dot.save { background: var(--save); }
+    .mode-dot.choose { background: var(--choose); }
+
+    /* messages */
+    .messages { display: flex; flex-direction: column; gap: 16px; padding-bottom: 8px; }
+    .msg { display: flex; gap: 10px; max-width: 100%; }
+    .msg.user { flex-direction: row-reverse; }
+    .msg-avatar { width: 36px; height: 36px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .msg.user .msg-avatar { background: var(--user); }
+    .bubble {
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.6;
+      max-width: calc(100% - 52px);
+      word-break: break-word;
+    }
+    .msg.assistant .bubble { background: var(--assistant); color: var(--text); border-top-left-radius: 4px; }
+    .msg.user .bubble { background: var(--user); color: var(--text); border-top-right-radius: 4px; }
+
+    /* product cards */
+    .card-group { max-width: calc(100% - 52px); margin-left: 46px; }
+    .product-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      display: flex;
+      gap: 10px;
+      cursor: pointer;
+    }
+    .product-card:active { opacity: 0.9; }
+    .product-img {
+      width: 70px;
+      height: 70px;
+      border-radius: 8px;
+      background: #f2f3f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+    .product-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .product-name { font-size: 14px; font-weight: 600; color: var(--text); }
+    .product-desc { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+    .product-meta { display: flex; align-items: baseline; justify-content: space-between; margin-top: 8px; }
+    .product-price { font-size: 16px; font-weight: 700; color: #ff4d4f; }
+    .product-price small { font-size: 11px; font-weight: 400; color: var(--text-3); margin-left: 2px; }
+    .product-tag { font-size: 10px; color: var(--text-3); background: var(--bg); padding: 2px 6px; border-radius: 4px; }
+    .product-tag.save-tag { color: #fff; background: var(--save); }
+
+    /* reference / disclaimer */
+    .ref-box {
+      max-width: calc(100% - 52px);
+      margin-left: 46px;
+      margin-top: 8px;
+      padding: 10px 12px;
+      background: var(--card);
+      border-radius: 12px;
+      font-size: 11px;
+      line-height: 1.5;
+      color: var(--text-3);
+    }
+    .ref-title { color: var(--choose); font-weight: 600; margin-bottom: 4px; }
+
+    /* input area */
+    .input-area {
+      background: var(--card);
+      border-top: 1px solid var(--line);
+      padding: 8px 12px 20px;
+      flex-shrink: 0;
+    }
+    .input-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg);
+      border-radius: 22px;
+      padding: 6px 6px 6px 14px;
+    }
+    .input-box input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      outline: none;
+      color: var(--text);
+    }
+    .input-box input::placeholder { color: var(--text-3); }
+    .send-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #d9d9d9;
+      color: #fff;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .send-btn.active { background: #1890ff; }
+
+    /* empty state helper */
+    .hint { font-size: 12px; color: var(--text-3); text-align: center; margin-top: 10px; }
+
+    /* section title inside chat */
+    .section-title { font-size: 12px; color: var(--text-3); margin: 8px 0 8px 46px; }
+  </style>
+</head>
+<body>
+
+  <!-- proto-c 复制源码标准组件：顶部工具条 -->
+  <div class="copy-bar">
+    <div class="copy-bar__title">
+      <div class="copy-bar__name">📋 绿韵家·数智·帮我买/省/选 V2 demo</div>
+      <div class="copy-bar__hint">单文件原型 · 可整份或逐页复制源码</div>
+    </div>
+    <div class="copy-bar__actions">
+      <button class="copy-btn" id="copyCurrentPage" data-label="复制当前页" onclick="copyCurrentPage()">复制当前页</button>
+      <button class="copy-btn copy-btn--ghost" id="copyAllSource" data-label="复制全部源码" onclick="copyAllSource()">复制全部源码</button>
+    </div>
+  </div>
+  <div class="copy-toast" id="copyToast"></div>
+
+  <div class="phone">
+    <div class="statusbar">
+      <div class="time" id="clock">9:41</div>
+      <div class="icons"><div class="signal"></div><div class="wifi"></div><div class="battery"></div></div>
+    </div>
+
+    <div class="header">
+      <div></div>
+      <div class="header-title">数智</div>
+      <div class="menu-btn"><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="chat-scroll" id="scroll">
+      <div class="greeting">
+        <div class="avatar">👩‍⚕️</div>
+        <div class="greeting-text">
+          <h1>Hi~<br>我是你的AI助手</h1>
+          <p>试着和我聊聊这些话题吧~</p>
+        </div>
+      </div>
+
+      <div class="entries" id="entries">
+        <div class="entry-card buy" data-mode="buy">
+          <div class="entry-badge">1</div>
+          <div class="entry-header">
+            <div class="entry-icon">🛍️</div>
+            <div class="entry-title">AI帮你「买」</div>
+          </div>
+          <div class="entry-desc">想买什么，告诉我帮你找</div>
+        </div>
+        <div class="entry-card see" data-mode="see">
+          <div class="entry-badge">4</div>
+          <div class="entry-header">
+            <div class="entry-icon">👁️</div>
+            <div class="entry-title">AI帮你「看」</div>
+          </div>
+          <div class="entry-desc">看舌、报告解读、体质检测</div>
+        </div>
+        <div class="entry-card save" data-mode="save">
+          <div class="entry-badge">2</div>
+          <div class="entry-header">
+            <div class="entry-icon">¥</div>
+            <div class="entry-title">AI帮你「省」</div>
+          </div>
+          <div class="entry-desc">全站好价，帮你划算下单</div>
+        </div>
+        <div class="entry-card choose" data-mode="choose">
+          <div class="entry-badge">3</div>
+          <div class="entry-header">
+            <div class="entry-icon">🔍</div>
+            <div class="entry-title">AI帮你「选」</div>
+          </div>
+          <div class="entry-desc">一键查询，总结产品亮点</div>
+        </div>
+      </div>
+
+      <div class="messages" id="messages"></div>
+      <div class="hint" id="hint">点击上方「买/省/选」入口，输入商品或功效，查看新版推荐结果</div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-box">
+        <input type="text" id="input" placeholder="先点击上方入口选择模式，再输入你想了解的商品…">
+        <button class="send-btn" id="send">↑</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modeNames = { buy: '帮我买', save: '帮我省', choose: '帮我选', see: '帮我看' };
+    const modeColors = { buy: '#ff9900', save: '#52c41a', choose: '#00b578', see: '#1890ff' };
+    let currentMode = null;
+
+    const entries = document.querySelectorAll('.entry-card');
+    const input = document.getElementById('input');
+    const sendBtn = document.getElementById('send');
+    const messages = document.getElementById('messages');
+    const scroll = document.getElementById('scroll');
+    const hint = document.getElementById('hint');
+
+    function updateClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('clock').textContent = h + ':' + m;
+    }
+    updateClock();
+
+    function setMode(mode, silent) {
+      if (mode === 'see') {
+        addAssistantMessage('「帮我看」是独立功能占位入口，本期暂不演示，请切换买/省/选体验。');
+        return;
+      }
+      currentMode = mode;
+      entries.forEach(c => c.classList.remove('active'));
+      document.querySelector(`.entry-card.${mode}`).classList.add('active');
+      input.placeholder = mode === 'buy' ? '想买什么？告诉我症状/功效/商品名' :
+                           mode === 'save' ? '想省哪类商品？帮你按差额排序' :
+                           '想选什么？帮你综合打分推荐';
+      hint.textContent = `当前模式：${modeNames[mode]}｜输入后返回 3 个推荐商品`;
+    }
+
+    entries.forEach(card => card.addEventListener('click', () => setMode(card.dataset.mode)));
+
+    function scrollToBottom() { setTimeout(() => scroll.scrollTop = scroll.scrollHeight, 50); }
+
+    function escapeHtml(t) {
+      return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function addUserMessage(text) {
+      const div = document.createElement('div');
+      div.className = 'msg user';
+      div.innerHTML = `<div class="msg-avatar">🙂</div><div class="bubble">${escapeHtml(text)}</div>`;
+      messages.appendChild(div);
+      scrollToBottom();
+    }
+
+    function addAssistantMessage(text) {
+      const div = document.createElement('div');
+      div.className = 'msg assistant';
+      div.innerHTML = `<div class="msg-avatar">🤖</div><div class="bubble">${escapeHtml(text)}</div>`;
+      messages.appendChild(div);
+      scrollToBottom();
+    }
+
+    function addModeTag(mode) {
+      const tag = document.createElement('div');
+      tag.className = 'mode-tag';
+      tag.innerHTML = `<span class="mode-dot ${mode}"></span>进入 ${modeNames[mode]} 模式`;
+      messages.appendChild(tag);
+      scrollToBottom();
+    }
+
+    function productCard(name, desc, price, tag, emoji, tagClass) {
+      return `<div class="product-card" onclick="window.__protoShowToast('跳转商品详情：${escapeHtml(name)}')">
+        <div class="product-img">${emoji}</div>
+        <div class="product-info">
+          <div><div class="product-name">${escapeHtml(name)}</div><div class="product-desc">${escapeHtml(desc)}</div></div>
+          <div class="product-meta"><div class="product-price">¥${price}<small>起</small></div><div class="product-tag ${tagClass || ''}">${escapeHtml(tag)}</div></div>
+        </div>
+      </div>`;
+    }
+
+    function addRefBox(sourceText) {
+      const div = document.createElement('div');
+      div.className = 'ref-box';
+      div.innerHTML = `<div class="ref-title">本次回答参考来源</div><div>1、${escapeHtml(sourceText)}</div><div style="margin-top:6px;color:#999;">内容由 AI 生成，仅供健康科普参考，不构成诊断、治疗、用药或保健品食用建议。持续不适请及时就医。</div>`;
+      messages.appendChild(div);
+      scrollToBottom();
+    }
+
+    // ========== 帮我买：商品搜索 Top3（示意） ==========
+    function renderBuyResponse(query) {
+      const group = document.createElement('div');
+      group.className = 'card-group';
+      group.innerHTML = productCard('绿韵家·安神助眠精华', '睡前一滴，舒缓神经，提升深睡时长', '129', '助眠爆款', '🌙') +
+                        productCard('酸枣仁茯苓茶', '传统草本配方，养心安神', '59', '茶饮', '🍵') +
+                        productCard('褪黑素软糖', '低糖配方，快速入睡', '89', '营养补充', '🍬');
+      messages.appendChild(group);
+      addRefBox('商品搜索接口 /api/goods/search 返回的 Top3 结果');
+      scrollToBottom();
+    }
+
+    // ========== 帮我省：差额最大 → 选打分最高，返回 3 个 ==========
+    function renderSaveResponse(query) {
+      // 模拟候选商品（含 原价/优惠价/差额/打分/浏览次数/购物车/购买记录/排序值）
+      const candidates = [
+        { name: '安神助眠组合装', desc: '精华+茶饮+软糖 三件套，搭配更划算', sale: 229, original: 349, gap: 120, score: 9.8, views: 12400, cart: 3400, buy: 890, rank: 96, emoji: '📦' },
+        { name: '深睡养护月套餐', desc: '精华×2 + 茶饮×2，整月调理', sale: 358, original: 444, gap: 86, score: 9.5, views: 8200, cart: 2100, buy: 560, rank: 92, emoji: '📅' },
+        { name: '酸枣仁茯苓茶礼盒', desc: '60袋礼盒装，家庭常备', sale: 159, original: 207, gap: 48, score: 9.2, views: 15300, cart: 4100, buy: 1200, rank: 88, emoji: '🎁' }
+      ];
+      // 省：按差额从大到小排序，差额相同按打分高优先（已满足）
+      const sorted = candidates.slice().sort((a, b) => b.gap - a.gap || b.score - a.score).slice(0, 3);
+
+      const group = document.createElement('div');
+      group.className = 'card-group';
+      group.innerHTML = sorted.map(p => productCard(p.name, p.desc, p.sale, `省¥${p.gap}`, p.emoji, 'save-tag')).join('');
+      messages.appendChild(group);
+      addRefBox('省钱聚合接口：按原价-优惠价差额降序，同差额取打分最高');
+      scrollToBottom();
+    }
+
+    // ========== 帮我选：商品打分机制，返回打分最高 3 个 ==========
+    function renderChooseResponse(query) {
+      // 模拟候选商品（含 优惠价/原价/差额/打分/浏览次数/购物车/购买记录/排序值）
+      const candidates = [
+        { name: '安神助眠精华', desc: '见效快、适合短期入睡困难', sale: 129, original: 169, gap: 40, score: 9.8, views: 18600, cart: 5200, buy: 2100, rank: 98, emoji: '🌙' },
+        { name: '深睡养护月套餐', desc: '精华×2 + 茶饮×2，整月调理', sale: 358, original: 444, gap: 86, score: 9.6, views: 8200, cart: 2100, buy: 560, rank: 92, emoji: '📅' },
+        { name: '酸枣仁茯苓茶', desc: '传统草本配方，养心安神', sale: 59, original: 79, gap: 20, score: 9.4, views: 24100, cart: 6800, buy: 3100, rank: 90, emoji: '🍵' }
+      ];
+      // 选：按打分降序
+      const sorted = candidates.slice().sort((a, b) => b.score - a.score).slice(0, 3);
+
+      const group = document.createElement('div');
+      group.className = 'card-group';
+      group.innerHTML = sorted.map(p => productCard(p.name, p.desc, p.sale, `AI评分 ${p.score}`, p.emoji)).join('');
+      messages.appendChild(group);
+      addRefBox('选品推荐接口：综合浏览次数、购物车、购买记录、排序值打分后取 Top3');
+      scrollToBottom();
+    }
+
+    function buildSaveReply(query) {
+      return `根据你近7天的浏览和加购偏好，我按「原价 - 优惠价」差额从高到低筛选，再从差额最大的商品里挑打分最高的 3 款，最高能省 ¥120。价格随活动变动，以详情页为准。`;
+    }
+
+    function buildChooseReply(query) {
+      return `综合浏览次数、购物车、购买记录和排序值打分后，这 3 款助眠商品综合评分最高。它们都是近期被频繁浏览、加购和下单的商品，点开看看，不合适我再帮你换。`;
+    }
+
+    function buildBuyReply(query) {
+      return `针对「${query || '助眠'}」，为你找到以下商品：`;
+    }
+
+    function send() {
+      const text = input.value.trim();
+      if (!currentMode) { window.__protoShowToast('请先点击「买/省/选」入口'); return; }
+      if (!text) { window.__protoShowToast('请输入你想了解的商品或功效'); return; }
+
+      addUserMessage(text);
+      input.value = '';
+      sendBtn.classList.remove('active');
+
+      setTimeout(() => {
+        if (currentMode === 'buy') {
+          addAssistantMessage(buildBuyReply(text));
+          renderBuyResponse(text);
+        } else if (currentMode === 'save') {
+          addAssistantMessage(buildSaveReply(text));
+          renderSaveResponse(text);
+        } else if (currentMode === 'choose') {
+          addAssistantMessage(buildChooseReply(text));
+          renderChooseResponse(text);
+        }
+        hint.textContent = `当前模式：${modeNames[currentMode]}｜可切换模式或继续输入`;
+      }, 400);
+    }
+
+    input.addEventListener('input', () => sendBtn.classList.toggle('active', input.value.trim().length > 0));
+    sendBtn.addEventListener('click', send);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+
+    /* ========== proto-c 复制源码标准组件（函数名 __proto 前缀防撞名） ========== */
+    function __protoShowToast(msg) {
+      const t = document.createElement('div');
+      t.className = 'proto-toast';
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 1800);
+    }
+    window.__protoShowToast = __protoShowToast;
+
+    function __protoGetStyle(){ var s=document.querySelector('head style'); return s?s.innerHTML:''; }
+    function __protoActivePage(){
+      return document.querySelector('.phone .page.active, .phone .view.active')
+          || document.querySelector('.page.active, .view.active')
+          || document.querySelector('.page, .view')
+          || document.querySelector('.phone > .chat-scroll')
+          || document.querySelector('.phone > *');
+    }
+    function __protoBuildStandalone(pageEl, title){
+      var style = __protoGetStyle();
+      var phoneCls = (pageEl && pageEl.closest && pageEl.closest('.phone')) ? ' class="phone"' : '';
+      var inner = pageEl ? pageEl.outerHTML : document.body.innerHTML;
+      return '<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n<meta charset="utf-8">\n<title>'
+           + (title||'原型单页') + '</title>\n<style>\n' + style + '\n</style>\n</head>\n<body>\n<div'
+           + phoneCls + '>\n' + inner + '\n</div>\n</body>\n</html>';
+    }
+    function __protoCopy(text, btnId, okMsg){
+      function toast(msg){ var t=document.getElementById('copyToast'); if(t){ t.textContent=msg; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},1800); } }
+      function done(ok){
+        var b=document.getElementById(btnId);
+        if(ok){ if(b){ b.textContent='✓ 已复制'; b.classList.add('copied'); setTimeout(function(){ b.textContent=b.getAttribute('data-label')||'复制'; b.classList.remove('copied'); },1800); } toast(okMsg); }
+        else { toast('复制失败，请手动复制源码'); }
+      }
+      function fb(t){ try{ var ta=document.createElement('textarea'); ta.value=t; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.top='-9999px'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); var ok=document.execCommand('copy'); document.body.removeChild(ta); return ok; }catch(e){ return false; } }
+      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(function(){done(true);}).catch(function(){done(fb(text));}); }
+      else { done(fb(text)); }
+    }
+    function copyCurrentPage(){
+      var page = __protoActivePage();
+      var title = document.title || '原型单页';
+      var html = __protoBuildStandalone(page, title);
+      __protoCopy(html, 'copyCurrentPage', '已复制当前页，粘贴到墨刀即可');
+    }
+    function copyAllSource(){
+      var src = window.__PROTO_SOURCE__ || ('<!DOCTYPE html>\n' + document.documentElement.outerHTML);
+      __protoCopy(src, 'copyAllSource', '已复制整份源码，粘贴到墨刀即可运行');
+    }
+    window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
+    // 初始 demo：自动进入「帮我省」，展示新方案效果
+    setTimeout(() => {
+      setMode('save', true);
+      addModeTag('save');
+      input.value = '助眠的';
+      sendBtn.classList.add('active');
+      send();
+    }, 300);
+  </script>
+</body>
+</html>
