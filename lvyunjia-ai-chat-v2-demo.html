@@ -24,11 +24,12 @@
       --assistant: #f2f3f5;
       --user: #d6e9ff;
     }
-    html, body { height: 100%; }
+    html, body { min-height: 100%; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
       background: #e5e6eb;
       color: var(--text);
+      min-height: 100vh;
     }
 
     /* proto-c 复制源码标准组件 */
@@ -47,18 +48,19 @@
     .proto-toast{position:fixed;bottom:80px;left:50%;transform:translate(-50%, 0);background:#000000bf;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;z-index:10000;pointer-events:none;}
 
     .phone {
-      width: 100%;
-      max-width: 414px;
-      height: 100%;
+      width: 414px;
+      max-width: 100%;
+      min-height: 100vh;
       max-height: 896px;
       background: var(--bg);
       display: flex;
       flex-direction: column;
       position: relative;
       overflow: hidden;
+      margin: 0 auto;
     }
     @media (min-width: 430px) {
-      .phone { border-radius: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.12); margin: 20px 0; height: calc(100% - 40px); }
+      .phone { border-radius: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.12); margin: 20px auto; min-height: calc(100vh - 40px); }
     }
 
     /* status bar */
@@ -395,12 +397,12 @@
       </div>
 
       <div class="messages" id="messages"></div>
-      <div class="hint" id="hint">点击上方「买/省/选」入口，输入商品或功效，查看新版推荐结果</div>
+      <div class="hint" id="hint">点击上方「买/省/选」入口，直接查看新版推荐结果</div>
     </div>
 
     <div class="input-area">
       <div class="input-box">
-        <input type="text" id="input" placeholder="先点击上方入口选择模式，再输入你想了解的商品…">
+        <input type="text" id="input" placeholder="可直接点上方入口，也可输入商品/功效关键词…">
         <button class="send-btn" id="send">↑</button>
       </div>
     </div>
@@ -437,10 +439,18 @@
       input.placeholder = mode === 'buy' ? '想买什么？告诉我症状/功效/商品名' :
                            mode === 'save' ? '想省哪类商品？帮你按差额排序' :
                            '想选什么？帮你综合打分推荐';
-      hint.textContent = `当前模式：${modeNames[mode]}｜输入后返回 3 个推荐商品`;
+      hint.textContent = `当前模式：${modeNames[mode]}｜点击入口即返回，也可输入关键词继续筛选`;
     }
 
-    entries.forEach(card => card.addEventListener('click', () => setMode(card.dataset.mode)));
+    const presetQuery = { buy: '助眠好物', save: '助眠好物', choose: '助眠好物' };
+    entries.forEach(card => card.addEventListener('click', () => {
+      const mode = card.dataset.mode;
+      setMode(mode);
+      if (currentMode && currentMode !== 'see') {
+        addModeTag(currentMode);
+        triggerResponse(presetQuery[mode] || '');
+      }
+    }));
 
     function scrollToBottom() { setTimeout(() => scroll.scrollTop = scroll.scrollHeight, 50); }
 
@@ -552,6 +562,23 @@
       return `针对「${query || '助眠'}」，为你找到以下商品：`;
     }
 
+    function triggerResponse(query) {
+      if (!currentMode) return;
+      setTimeout(() => {
+        if (currentMode === 'buy') {
+          addAssistantMessage(buildBuyReply(query));
+          renderBuyResponse(query);
+        } else if (currentMode === 'save') {
+          addAssistantMessage(buildSaveReply(query));
+          renderSaveResponse(query);
+        } else if (currentMode === 'choose') {
+          addAssistantMessage(buildChooseReply(query));
+          renderChooseResponse(query);
+        }
+        hint.textContent = `当前模式：${modeNames[currentMode]}｜可切换模式或继续输入关键词`;
+      }, 400);
+    }
+
     function send() {
       const text = input.value.trim();
       if (!currentMode) { window.__protoShowToast('请先点击「买/省/选」入口'); return; }
@@ -560,20 +587,7 @@
       addUserMessage(text);
       input.value = '';
       sendBtn.classList.remove('active');
-
-      setTimeout(() => {
-        if (currentMode === 'buy') {
-          addAssistantMessage(buildBuyReply(text));
-          renderBuyResponse(text);
-        } else if (currentMode === 'save') {
-          addAssistantMessage(buildSaveReply(text));
-          renderSaveResponse(text);
-        } else if (currentMode === 'choose') {
-          addAssistantMessage(buildChooseReply(text));
-          renderChooseResponse(text);
-        }
-        hint.textContent = `当前模式：${modeNames[currentMode]}｜可切换模式或继续输入`;
-      }, 400);
+      triggerResponse(text);
     }
 
     input.addEventListener('input', () => sendBtn.classList.toggle('active', input.value.trim().length > 0));
@@ -629,13 +643,11 @@
     }
     window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
 
-    // 初始 demo：自动进入「帮我省」，展示新方案效果
+    // 初始 demo：自动进入「帮我省」并直接返回，展示新方案效果
     setTimeout(() => {
       setMode('save', true);
       addModeTag('save');
-      input.value = '助眠的';
-      sendBtn.classList.add('active');
-      send();
+      triggerResponse('助眠好物');
     }, 300);
   </script>
 </body>
