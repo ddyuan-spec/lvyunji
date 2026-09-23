@@ -197,24 +197,6 @@
     .entry-card.save .entry-badge { color: var(--save); }
     .entry-card.choose .entry-badge { color: var(--choose); }
 
-    /* mode tag */
-    .mode-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      color: var(--text-2);
-      margin-bottom: 12px;
-      padding: 4px 10px;
-      background: var(--card);
-      border-radius: 12px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-    }
-    .mode-dot { width: 6px; height: 6px; border-radius: 50%; }
-    .mode-dot.buy { background: var(--buy); }
-    .mode-dot.save { background: var(--save); }
-    .mode-dot.choose { background: var(--choose); }
-
     /* messages */
     .messages { display: flex; flex-direction: column; gap: 16px; padding-bottom: 8px; }
     .msg { display: flex; gap: 10px; max-width: 100%; }
@@ -439,7 +421,7 @@
       input.placeholder = mode === 'buy' ? '想买什么？告诉我症状/功效/商品名' :
                            mode === 'save' ? '想省哪类商品？帮你按差额排序' :
                            '想选什么？帮你综合打分推荐';
-      hint.textContent = `当前模式：${modeNames[mode]}｜点击入口即返回，也可输入关键词继续筛选`;
+      hint.textContent = '可切换入口或输入关键词继续筛选';
     }
 
     const presetQuery = { buy: '助眠好物', save: '助眠好物', choose: '助眠好物' };
@@ -447,7 +429,6 @@
       const mode = card.dataset.mode;
       setMode(mode);
       if (currentMode && currentMode !== 'see') {
-        addModeTag(currentMode);
         triggerResponse(presetQuery[mode] || '');
       }
     }));
@@ -471,14 +452,6 @@
       div.className = 'msg assistant';
       div.innerHTML = `<div class="msg-avatar">🤖</div><div class="bubble">${escapeHtml(text)}</div>`;
       messages.appendChild(div);
-      scrollToBottom();
-    }
-
-    function addModeTag(mode) {
-      const tag = document.createElement('div');
-      tag.className = 'mode-tag';
-      tag.innerHTML = `<span class="mode-dot ${mode}"></span>进入 ${modeNames[mode]} 模式`;
-      messages.appendChild(tag);
       scrollToBottom();
     }
 
@@ -575,7 +548,7 @@
           addAssistantMessage(buildChooseReply(query));
           renderChooseResponse(query);
         }
-        hint.textContent = `当前模式：${modeNames[currentMode]}｜可切换模式或继续输入关键词`;
+        hint.textContent = '可切换入口或输入关键词继续筛选';
       }, 400);
     }
 
@@ -643,10 +616,9 @@
     }
     window.__PROTO_SOURCE__ = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
 
-    // 初始 demo：自动进入「帮我省」并直接返回，展示新方案效果
+    // 初始 demo：自动触发「帮我省」并直接返回，展示新方案效果
     setTimeout(() => {
       setMode('save', true);
-      addModeTag('save');
       triggerResponse('助眠好物');
     }, 300);
   </script>
