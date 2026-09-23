@@ -300,9 +300,6 @@
     }
     .send-btn.active { background: #1890ff; }
 
-    /* empty state helper */
-    .hint { font-size: 12px; color: var(--text-3); text-align: center; margin-top: 10px; }
-
     /* section title inside chat */
     .section-title { font-size: 12px; color: var(--text-3); margin: 8px 0 8px 46px; }
   </style>
@@ -379,7 +376,6 @@
       </div>
 
       <div class="messages" id="messages"></div>
-      <div class="hint" id="hint">点击上方「买/省/选」入口，直接查看新版推荐结果</div>
     </div>
 
     <div class="input-area">
@@ -400,7 +396,6 @@
     const sendBtn = document.getElementById('send');
     const messages = document.getElementById('messages');
     const scroll = document.getElementById('scroll');
-    const hint = document.getElementById('hint');
 
     function updateClock() {
       const now = new Date();
@@ -421,7 +416,6 @@
       input.placeholder = mode === 'buy' ? '想买什么？告诉我症状/功效/商品名' :
                            mode === 'save' ? '想省哪类商品？帮你按差额排序' :
                            '想选什么？帮你综合打分推荐';
-      hint.textContent = '可切换入口或输入关键词继续筛选';
     }
 
     const presetQuery = { buy: '助眠好物', save: '助眠好物', choose: '助眠好物' };
@@ -548,7 +542,6 @@
           addAssistantMessage(buildChooseReply(query));
           renderChooseResponse(query);
         }
-        hint.textContent = '可切换入口或输入关键词继续筛选';
       }, 400);
     }
 
