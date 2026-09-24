@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>获取后端商品数据(153092) · 帮我买</title>
+<style>
+  :root{ --main:#1AAD7C; --line:#e6e8ec; --bg:#fff; --ink:#222; --mut:#888; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif; background:#f5f6f8; color:var(--ink); padding:28px; }
+  .wrap{ max-width:840px; margin:0 auto; background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:28px 32px 36px; }
+  h1{ font-size:20px; margin:0 0 4px; }
+  .sub{ color:var(--mut); font-size:13px; margin:0 0 20px; }
+  h2{ font-size:15px; margin:26px 0 10px; padding-left:9px; border-left:3px solid var(--main); }
+  pre{ background:#0f1115; color:#e8e8e8; border-radius:10px; padding:16px 18px; overflow:auto; font-size:12.5px; line-height:1.6; position:relative; }
+  pre code{ font-family:"SF Mono",Consolas,Menlo,monospace; white-space:pre; }
+  .copy{ position:absolute; top:10px; right:10px; background:var(--main); color:#fff; border:none; border-radius:6px; padding:5px 12px; font-size:12px; cursor:pointer; }
+  .copy:active{ transform:scale(.96); }
+  table{ width:100%; border-collapse:collapse; font-size:13.5px; margin-top:4px; }
+  th,td{ border:1px solid var(--line); padding:9px 12px; text-align:left; vertical-align:top; }
+  th{ background:#f0fbf7; color:#0b6b4f; font-weight:600; width:130px; }
+  td b{ color:#0b6b4f; }
+  .note{ background:#fff7e6; border:1px solid #ffe1a8; border-radius:8px; padding:10px 14px; font-size:12.5px; color:#7a5a14; margin-top:18px; line-height:1.7; }
+  code.in{ background:#eef1f5; border-radius:4px; padding:1px 6px; font-size:12.5px; }
+  .tip{ font-size:12.5px; color:#7a5a14; background:#fff7e6; border:1px solid #ffe1a8; border-radius:8px; padding:8px 12px; margin:0 0 10px; line-height:1.7; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>获取后端商品数据（节点 153092）· 帮我买</h1>
+  <p class="sub">仅此一个节点：代码 + 输入 + 输出，复制即用。type 已写死为 2（按商品名查单个）。</p>
+
+  <h2>① 代码（整段替换节点内代码）</h2>
+  <p class="tip">你面板里现在那段是旧版（<code>params['userId'] != null ? …</code>），<b>请用下面这段重新覆盖一次</b>，否则输入名叫 <code class="in">userid</code> 的会取不到值。</p>
+<pre><code id="code">async function main({ params }) {
+  const userId = String(params['userId'] || params['user_id'] || params['userid'] || '').trim();
+  const productName = String(params['productName'] || params['product_name'] || '').trim();
+  const env = String(params['env'] || 'test');
+
+  if (!userId) return { success: false, error: '缺少 user_id', product: null, card_json: '' };
+  if (!productName) return { success: false, error: '缺少 productName（商品名）', product: null, card_json: '' };
+
+  const HOST = env === 'prod'
+    ? 'https://yxm-api.juhuanvip.com'
+    : 'https://yxm-test-api.juhuanvip.com';
+  const IMG_BASE = 'https://yxm-test-api.juhuanvip.com'; // 图片域名前缀，待后端给真实值再改
+  const ACCESS_TOKEN = 'db776bc648144a819a7850df4fd7673d';
+
+  const form = new URLSearchParams();
+  form.append('type', '2');            // 帮我买 = 按商品名查单个
+  form.append('userId', userId);
+  form.append('productName', productName);
+
+  const resp = await fetch(HOST + '/api/apiWxStore/v2//coze/free/assistProduct', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'accessToken': ACCESS_TOKEN,
+      'wxName': 'lym',
+      'apiFrom': 'H5MALL'
+    },
+    body: form.toString()
+  });
+  const json = await resp.json();
+  const data = json.data;
+  const raw = Array.isArray(data) ? (data[0] || null) : data;
+  if (json.code !== 1 || !raw) return { success: false, error: (json.msg) || '未查到该商品', product: null, card_json: '' };
+
+  const img = (raw.productMainImg || '').startsWith('http')
+    ? raw.productMainImg
+    : IMG_BASE + (raw.productMainImg || '');
+
+  const product = {
+    productId: raw.productMainId,
+    name: raw.productName,
+    image: img,
+    priceText: raw.discountPrice != null ? '¥' + raw.discountPrice : '',
+    originalText: raw.originalPrice != null ? '¥' + raw.originalPrice : '',
+    saveText: raw.priceDifference ? '省¥' + raw.priceDifference : '',
+    scoreText: raw.score != null ? 'AI评分 ' + raw.score : '',
+    desc: raw.desc || ''
+  };
+  const card_json = JSON.stringify(product);
+  return { success: true, error: '', product, card_json };
+}</code><button class="copy" onclick="copyCode()">复制代码</button></pre>
+
+  <h2>② 输入配置</h2>
+  <table>
+    <tr><th>输入变量名</th><th>在面板「来源」选</th></tr>
+    <tr><td><code class="in">productName</code></td><td><b>商品识别(130516)</b> → 输出 <code class="in">output</code>（识别出来的商品名）</td></tr>
+    <tr><td><code class="in">userId</code></td><td><b>开始节点</b> → <code class="in">user_id</code>（你那行叫 <code class="in">userid</code> 也行）</td></tr>
+  </table>
+
+  <h2>③ 输出配置</h2>
+  <table>
+    <tr><th>输出变量名</th><th>类型</th><th>接到哪</th></tr>
+    <tr><td><code class="in">card_json</code></td><td>String</td><td><b>主用</b>：接给 <b>帮我买输出(112417)</b> 新增的那个变量（见 ④）</td></tr>
+    <tr><td><code class="in">success</code></td><td>Boolean</td><td>调试 / 条件判断，不用接</td></tr>
+    <tr><td><code class="in">product</code></td><td>Object</td><td>备选：App 端要「独立商品字段」时才接，现在可不接</td></tr>
+  </table>
+
+  <div class="note">
+    下拉里没有「String(JSON)」是正常的，只有 String / Integer / Number / Boolean / Time / Object / Array 七种：<b>card_json 选 String</b>、<b>product 选 Object</b>、<b>success 选 Boolean</b>。<br>
+    面板里多余的 <code class="in">key1</code> / <code class="in">key2</code> 是节点自带默认输出，<b>删掉</b>，只留上面三个。<br>
+    待后端确认：图片域名前缀（IMG_BASE）、生产环境 token 与域名。
+  </div>
+
+  <h2>④ 接线</h2>
+  <table>
+    <tr><th>连线</th><th>说明</th></tr>
+    <tr><td>商品识别(130516) → 本节点</td><td>本节点的 <code class="in">productName</code> 就是从它取的</td></tr>
+    <tr><td>本节点 → 帮我买输出(112417)</td><td>和大模型节点<b>并排</b>汇入（不能串在「生成商品推荐回复」后面）—— 这点你理解对了</td></tr>
+    <tr><td>生成商品推荐回复(181858) → 帮我买输出(112417)</td><td>保持原样，负责文案</td></tr>
+  </table>
+
+  <div class="note">
+    <b>但光接线不够：「帮我买输出」现在只有一个变量 <code class="in">output</code>，你新接进去的那条线没有变量承接。</b><br>
+    它当前「输出内容」模板是 <code class="in">{{output}}</code>，来源是 生成商品推荐回复(181858).output。改 3 步：<br>
+    1. 打开 <b>帮我买输出(112417)</b> → 输入区点 <b>＋</b> 新增变量 <code class="in">card_json</code>（类型 String）→ 来源选 <b>本节点.card_json</b>；<br>
+    2. 「输出内容」模板改成 <code class="in">{{output}}##########{{card_json}}</code>；<br>
+    3. 保存。App 端按 <code class="in">##########</code> 切分：前面是文案、后面是商品卡片 JSON。
+  </div>
+</div>
+
+<script>
+function copyCode(){
+  const t = document.getElementById('code').textContent;
+  navigator.clipboard.writeText(t).then(()=>{
+    const b = document.querySelector('.copy');
+    const old = b.textContent; b.textContent = '已复制 ✓';
+    setTimeout(()=>{ b.textContent = old; }, 1500);
+  });
+}
+</script>
+</body>
+</html>
