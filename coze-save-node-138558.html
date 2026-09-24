@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>帮我省 · 获取后端商品价格(138558) 配置</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; max-width: 860px; margin: 0 auto; padding: 28px 20px 60px; color: #1f2329; background: #fff; line-height: 1.6; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { color: #8a8f99; font-size: 13px; margin-bottom: 20px; }
+  h2 { font-size: 15px; margin: 26px 0 10px; padding-left: 9px; border-left: 3px solid #FF5E69; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 6px; }
+  th, td { border: 1px solid #e5e6eb; padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: #f7f8fa; font-weight: 600; }
+  code { background: #f2f3f5; border-radius: 4px; padding: 1px 5px; font-size: 12.5px; font-family: "SFMono-Regular", Consolas, monospace; }
+  code.in { background: #eef1f5; }
+  .wrap { position: relative; background: #f7f8fa; border: 1px solid #e5e6eb; border-radius: 8px; padding: 14px 14px 10px; }
+  pre { margin: 0; white-space: pre-wrap; word-break: break-all; font-size: 12.5px; font-family: "SFMono-Regular", Consolas, monospace; line-height: 1.5; }
+  .copy { position: absolute; top: 10px; right: 10px; background: #FF5E69; color: #fff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12.5px; cursor: pointer; }
+  .copy:active { transform: scale(.96); }
+  .note { background: #fff7f8; border: 1px solid #ffd9dd; border-radius: 8px; padding: 12px 14px; font-size: 13px; color: #6b2b30; margin-top: 14px; }
+  .ok { background: #f0fbf4; border: 1px solid #bfe9cd; color: #1c6b38; }
+  .tree { font-family: "SFMono-Regular", Consolas, monospace; font-size: 13px; background: #f7f8fa; border: 1px solid #e5e6eb; border-radius: 8px; padding: 14px; white-space: pre; line-height: 1.7; }
+  .del { color: #c0392b; text-decoration: line-through; }
+</style>
+</head>
+<body>
+  <h1>帮我省 · 获取后端商品价格(138558)</h1>
+  <div class="sub">仅针对这一个节点：代码 + 输入 + 输出 + 接线。type 写死 0（帮我省），不依赖商品识别 LLM。</div>
+
+  <h2>① 代码（整段替换节点内代码）</h2>
+  <div class="wrap">
+    <button class="copy" onclick="copy('code')">复制代码</button>
+    <pre><code id="code">async function main({ params }) {
+  // 兼容 userId / user_id / userid 三种输入名
+  const userId = String(params['userId'] != null ? params['userId']
+                : (params['user_id'] != null ? params['user_id']
+                : (params['userid'] || ''))).trim();
+  const env = String(params['env'] || 'test');
+  // 帮我省 = save → 0；帮我省选 = choose → 1（都返回数组）
+  const intent = String(params['custom_variables'] || params['intent'] || 'save').trim().toLowerCase();
+  const type = (intent === 'choose' || intent === '1') ? '1' : '0';
+
+  if (!userId) return { success: false, error: '缺少 user_id', products: [], card_json: '', summary: '', count: 0 };
+
+  const HOST = env === 'prod' ? 'https://yxm-api.juhuanvip.com' : 'https://yxm-test-api.juhuanvip.com';
+  const IMG_BASE = 'https://yxm-test-api.juhuanvip.com'; // 图片域名前缀，待后端给真实值再改
+  const ACCESS_TOKEN = 'db776bc648144a819a7850df4fd7673d';
+
+  const form = new URLSearchParams();
+  form.append('type', type);   // 0 = 帮我省（按差额排序的商品数组）
+  form.append('userId', userId);
+
+  const resp = await fetch(HOST + '/api/apiWxStore/v2//coze/free/assistProduct', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'accessToken': ACCESS_TOKEN,
+      'wxName': 'lym',
+      'apiFrom': 'H5MALL'
+    },
+    body: form.toString()
+  });
+  const json = await resp.json();
+  const list = Array.isArray(json.data) ? json.data : (json.data ? [json.data] : []);
+  if (json.code !== 1 || list.length === 0)
+    return { success: false, error: (json.msg) || '未查到省钱商品', products: [], card_json: '', summary: '', count: 0 };
+
+  const products = list.map(raw => {
+    const img = (raw.productMainImg || '').startsWith('http')
+      ? raw.productMainImg : IMG_BASE + (raw.productMainImg || '');
+    return {
+      productId: raw.productMainId,
+      name: raw.productName,
+      image: img,
+      priceText: raw.discountPrice != null ? '¥' + raw.discountPrice : '',
+      originalText: raw.originalPrice != null ? '¥' + raw.originalPrice : '',
+      saveText: raw.priceDifference ? '省¥' + raw.priceDifference : '',
+      scoreText: raw.score != null ? 'AI评分 ' + raw.score : '',
+      desc: raw.desc || ''
+    };
+  });
+  const card_json = JSON.stringify(products);                 // 多卡片：JSON 数组
+  const totalSave = list.reduce((s, r) => s + (Number(r.priceDifference) || 0), 0);
+  const summary = '为你找到 ' + products.length + ' 件可省钱的商品，预计共省¥' + totalSave;
+  return { success: true, error: '', products, card_json, summary, count: products.length };
+}</code></pre>
+  </div>
+
+  <h2>② 输入配置（粘贴代码后输入面板自动出现）</h2>
+  <table>
+    <tr><th>输入变量名</th><th>在面板里「来源」选</th></tr>
+    <tr><td><code class="in">custom_variables</code></td><td><b>开始节点</b> → <code class="in">custom_variables</code>（值是 <code class="in">save</code>，代码自动翻译成 0；也可不接，默认就是 0）</td></tr>
+    <tr><td><code class="in">userId</code></td><td><b>开始节点</b> → <code class="in">user_id</code>（你的面板里可能显示 <code class="in">userid</code>，原样保留即可，代码已兼容）</td></tr>
+  </table>
+
+  <h2>③ 输出配置（代码返回的变量，删掉默认的 key0/key1/key2）</h2>
+  <table>
+    <tr><th>输出变量名</th><th>类型</th><th>说明</th></tr>
+    <tr><td><code class="in">products</code></td><td>Array</td><td>商品对象数组（type=0 返回多个），喂给「生成商品推荐回复1」</td></tr>
+    <tr><td><code class="in">card_json</code></td><td>String</td><td>多卡片的 JSON 数组文本，并排喂给「帮我省输出」</td></tr>
+    <tr><td><code class="in">summary</code></td><td>String</td><td>一句话小结（如"为你找到 3 件，预计共省¥xxx"）</td></tr>
+    <tr><td><code class="in">count</code></td><td>Integer</td><td>商品数量</td></tr>
+    <tr><td><code class="in">success</code></td><td>Boolean</td><td>调试 / 条件判断</td></tr>
+    <tr><td><code class="in">error</code></td><td>String</td><td>失败原因（缺 userId / 查不到商品）</td></tr>
+  </table>
+
+  <h2>④ 接线（按你的目标架构改 3 处）</h2>
+  <div class="tree">帮我省选择器(188440)
+   ├─<span class="del">知识库检索2(113775) → 商品识别1(186575) → 获取后端商品卡片(147968)</span>  ← 删这整条
+   ├─ 获取后端商品价格(138558)  ← 本节点
+   │     · custom_variables ← 开始.custom_variables
+   │     · userId ← 开始.user_id
+   │     · products → 生成商品推荐回复1(132924)   （把 132924 的输入从 .key1 改成 .products）
+   │     · card_json → 帮我省输出(189864).card_json
+   └─ 知识库检索2(113775)  →  生成商品推荐回复1(132924)   （Query 仍来自 代码_1(163612).key1，不变）</div>
+  <div class="note ok">
+    <b>帮我省输出(189864) 改法：</b><br>
+    1. 输入区 ＋ 新增变量 <code class="in">card_json</code>（类型 String）← 获取后端商品价格.card_json<br>
+    2. 输出内容模板改成：<code class="in">{{output}}##########{{card_json}}</code><br>
+    3. App 端按 <code class="in">##########</code> 切分：前面是文案，后面是商品卡片 JSON 数组（多卡片）。
+  </div>
+  <div class="note">
+    待后端确认：图片域名前缀（IMG_BASE）、生产环境 token 与域名（env=prod 时切 yxm-api.juhuanvip.com）。
+  </div>
+
+  <script>
+    function copy(id) {
+      const el = document.getElementById(id);
+      navigator.clipboard.writeText(el.innerText).then(() => {
+        const b = el.parentElement.querySelector('.copy');
+        const t = b.textContent; b.textContent = '已复制';
+        setTimeout(() => b.textContent = t, 1200);
+      });
+    }
+  </script>
+</body>
+</html>
