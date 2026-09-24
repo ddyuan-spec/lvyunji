@@ -34,7 +34,12 @@
   <p class="tip">你面板里现在那段是旧版（<code>params['userId'] != null ? …</code>），<b>请用下面这段重新覆盖一次</b>，否则输入名叫 <code class="in">userid</code> 的会取不到值。</p>
 <pre><code id="code">async function main({ params }) {
   const userId = String(params['userId'] || params['user_id'] || params['userid'] || '').trim();
-  const productName = String(params['productName'] || params['product_name'] || '').trim();
+  // 商品识别 LLM 在「生成多样性=平衡」时会给商品名加句号/空格（如「惠民补贴套餐包4。」），
+  // 后端按名查是精确/模糊匹配、带标点就查不到 → 这里兜底把首尾标点空白全清掉。
+  const productName = String(params['productName'] || params['product_name'] || '')
+    .replace(/^[\s﻿.。,，、；;：:！!？?·\-_~～]+/, '')
+    .replace(/[\s﻿.。,，、；;：:！!？?·\-_~～]+$/, '')
+    .trim();
   const env = String(params['env'] || 'test');
 
   if (!userId) return { success: false, error: '缺少 user_id', product: null, card_json: '' };
@@ -102,6 +107,7 @@
   <div class="note">
     下拉里没有「String(JSON)」是正常的，只有 String / Integer / Number / Boolean / Time / Object / Array 七种：<b>card_json 选 String</b>、<b>product 选 Object</b>、<b>success 选 Boolean</b>。<br>
     面板里多余的 <code class="in">key1</code> / <code class="in">key2</code> 是节点自带默认输出，<b>删掉</b>，只留上面三个。<br>
+    <b>⚠️ 必改（这是"查不到数据"的头号原因）：商品识别(130516) 的「生成多样性」现在是 <span class="pill">balance</span>，请改成 <span class="pill">精确</span>。</b>平衡模式下 LLM 会给商品名加句号/空格（如「惠民补贴套餐包4。」），后端按名查是精确/模糊匹配，<b>带标点就查不到 → 卡片为空</b>。代码里已兜底清掉首尾标点，但设成「精确」更稳。<br>
     待后端确认：图片域名前缀（IMG_BASE）、生产环境 token 与域名。
   </div>
 
