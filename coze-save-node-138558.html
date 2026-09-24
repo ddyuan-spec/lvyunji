@@ -149,12 +149,8 @@
       <path d="M505 296 V340" fill="none" stroke="#185FA5" stroke-width="1.5" marker-end="url(#dA)"/>
       <path d="M340 196 V440" fill="none" stroke="#185FA5" stroke-width="1.5" marker-end="url(#dA)"/>
       <path d="M505 396 V418 H340" fill="none" stroke="#185FA5" stroke-width="1.5"/>
-      <path d="M175 396 V412" fill="none" stroke="#A32D2D" stroke-width="1.5"/>
-      <path d="M169 412 L181 424" fill="none" stroke="#A32D2D" stroke-width="1.5"/>
-      <path d="M181 412 L169 424" fill="none" stroke="#A32D2D" stroke-width="1.5"/>
-      <text x="163" y="419" text-anchor="end" dominant-baseline="central" font-size="12" fill="#A32D2D">输出没人接</text>
       <text x="352" y="408" font-size="12" font-family="Consolas,monospace" fill="#185FA5">outputList.output</text>
-      <text x="340" y="522" text-anchor="middle" font-size="12" fill="#A32D2D">红叉 = 132924 的文案没人接 · 红虚线 = 147968 是空模板代码</text>
+      <text x="340" y="522" text-anchor="middle" font-size="12" fill="#A32D2D">红虚线 = 147968 是空模板代码，这一整块删掉</text>
     </svg>
   </div>
 
@@ -207,10 +203,8 @@
     <li><b>帮我省输出(189864)</b>：＋ 新增变量 <code class="in">card_json</code>(String) ← <code class="in">138558.card_json</code>；输出内容模板改成 <code class="in">{{output}}##########{{card_json}}</code>（App 按 <code class="in">##########</code> 切文案与卡片）。</li>
   </ol>
 
-  <div class="note">
-    <b>另外发现一处疑似漏接：</b>帮我省输出(189864) 的 <code class="in">output</code> 现在接的是 <b>知识库检索2(113775).outputList.output</b>，而不是 <b>生成商品推荐回复1(132924).output</b> —— 等于 LLM 写好的推荐文案没被用上（见「现在长这样」图里的蓝竖线）。若确认是漏接，把来源改成 <code class="in">132924.output</code> 即可。
-  </div>
   <div class="note ok">
+    <b>已确认：</b>帮我省输出(189864) 的 <code class="in">output</code> 已接 <b>知识库检索2(113775).outputList.output</b>，保持原样即可。<br>
     <b>不用动：</b>知识库检索2(113775) 的 Query 仍来自 代码_1(163612).key1；帮我省选择器(188440) 保持原样。<br>
     <b>原则：</b>代码节点必须与 LLM 节点<b>并联</b>汇入输出节点，不能串在「生成商品推荐回复1」后面。
   </div>
