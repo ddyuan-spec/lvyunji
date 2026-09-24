@@ -23,6 +23,11 @@
   .ok { background: #f0fbf4; border: 1px solid #bfe9cd; color: #1c6b38; }
   .tree { font-family: "SFMono-Regular", Consolas, monospace; font-size: 13px; background: #f7f8fa; border: 1px solid #e5e6eb; border-radius: 8px; padding: 14px; white-space: pre; line-height: 1.7; }
   .del { color: #c0392b; text-decoration: line-through; }
+  .dia { border: 1px solid #e5e6eb; border-radius: 10px; padding: 12px 10px 6px; margin: 10px 0 14px; }
+  .dia-t { font-size: 13px; font-weight: 600; margin: 0 0 6px 6px; }
+  .dia svg { display: block; width: 100%; }
+  ol.steps { font-size: 13.5px; padding-left: 22px; margin: 8px 0 0; }
+  ol.steps li { margin: 6px 0; }
 </style>
 </head>
 <body>
@@ -106,20 +111,108 @@
     <tr><td><code class="in">error</code></td><td>String</td><td>失败原因（缺 userId / 查不到商品）</td></tr>
   </table>
 
-  <h2>④ 接线（按你的目标架构改 3 处）</h2>
-  <div class="tree">帮我省选择器(188440)
-   ├─<span class="del">知识库检索2(113775) → 商品识别1(186575) → 获取后端商品卡片(147968)</span>  ← 删这整条
-   ├─ 获取后端商品价格(138558)  ← 本节点
-   │     · custom_variables ← 开始.custom_variables
-   │     · userId ← 开始.user_id
-   │     · products → 生成商品推荐回复1(132924)   （把 132924 的输入从 .key1 改成 .products）
-   │     · card_json → 帮我省输出(189864).card_json
-   └─ 知识库检索2(113775)  →  生成商品推荐回复1(132924)   （Query 仍来自 代码_1(163612).key1，不变）</div>
+  <h2>④ 接线（看图改 4 处）</h2>
+
+  <div class="dia">
+    <div class="dia-t">现在长这样</div>
+    <svg width="100%" viewBox="0 0 680 548" role="img" xmlns="http://www.w3.org/2000/svg" style="font-family:inherit">
+      <defs>
+        <marker id="dA" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+      <g><rect x="230" y="40" width="220" height="56" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+        <text x="340" y="62" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">帮我省选择器</text>
+        <text x="340" y="81" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#185FA5">188440 · 条件分支</text></g>
+      <g><rect x="230" y="140" width="220" height="56" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+        <text x="340" y="162" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">知识库检索2</text>
+        <text x="340" y="181" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#185FA5">113775 · Query 来自 代码_1</text></g>
+      <g><rect x="60" y="240" width="230" height="56" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+        <text x="175" y="262" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">获取后端商品价格</text>
+        <text x="175" y="281" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#185FA5">节点 138558</text></g>
+      <g><rect x="390" y="240" width="230" height="56" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+        <text x="505" y="262" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">商品识别1</text>
+        <text x="505" y="281" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#185FA5">节点 186575</text></g>
+      <g><rect x="60" y="340" width="230" height="56" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+        <text x="175" y="362" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">生成商品推荐回复1</text>
+        <text x="175" y="381" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#185FA5">节点 132924</text></g>
+      <g><rect x="390" y="340" width="230" height="56" rx="8" fill="#FCEBEB" stroke="#A32D2D" stroke-width="0.5" stroke-dasharray="4 3"/>
+        <text x="505" y="362" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#791F1F">获取后端商品卡片</text>
+        <text x="505" y="381" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#A32D2D">147968 · 空模板代码</text></g>
+      <g><rect x="230" y="440" width="220" height="56" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+        <text x="340" y="462" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">帮我省输出</text>
+        <text x="340" y="481" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#185FA5">节点 189864</text></g>
+      <path d="M340 96 V140" fill="none" stroke="#185FA5" stroke-width="1.5" marker-end="url(#dA)"/>
+      <path d="M300 196 V218 H175 V240" fill="none" stroke="#185FA5" stroke-width="1.5" marker-end="url(#dA)"/>
+      <path d="M380 196 V218 H505 V240" fill="none" stroke="#185FA5" stroke-width="1.5" marker-end="url(#dA)"/>
+      <path d="M175 296 V340" fill="none" stroke="#185FA5" stroke-width="1.5" marker-end="url(#dA)"/>
+      <path d="M505 296 V340" fill="none" stroke="#185FA5" stroke-width="1.5" marker-end="url(#dA)"/>
+      <path d="M340 196 V440" fill="none" stroke="#185FA5" stroke-width="1.5" marker-end="url(#dA)"/>
+      <path d="M505 396 V418 H340" fill="none" stroke="#185FA5" stroke-width="1.5"/>
+      <path d="M175 396 V412" fill="none" stroke="#A32D2D" stroke-width="1.5"/>
+      <path d="M169 412 L181 424" fill="none" stroke="#A32D2D" stroke-width="1.5"/>
+      <path d="M181 412 L169 424" fill="none" stroke="#A32D2D" stroke-width="1.5"/>
+      <text x="163" y="419" text-anchor="end" dominant-baseline="central" font-size="12" fill="#A32D2D">输出没人接</text>
+      <text x="352" y="408" font-size="12" font-family="Consolas,monospace" fill="#185FA5">outputList.output</text>
+      <text x="340" y="522" text-anchor="middle" font-size="12" fill="#A32D2D">红叉 = 132924 的文案没人接 · 红虚线 = 147968 是空模板代码</text>
+    </svg>
+  </div>
+
+  <div class="dia">
+    <div class="dia-t">改成这样</div>
+    <svg width="100%" viewBox="0 0 680 498" role="img" xmlns="http://www.w3.org/2000/svg" style="font-family:inherit">
+      <defs>
+        <marker id="dB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+      <g><rect x="60" y="40" width="250" height="56" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+        <text x="185" y="62" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">帮我省选择器</text>
+        <text x="185" y="81" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#185FA5">节点 188440</text></g>
+      <g><rect x="60" y="140" width="250" height="56" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+        <text x="185" y="162" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">知识库检索2</text>
+        <text x="185" y="181" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#185FA5">Query ← 代码_1(163612)</text></g>
+      <g><rect x="390" y="140" width="250" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+        <text x="515" y="162" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#085041">开始节点</text>
+        <text x="515" y="181" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#0F6E56">user_id · custom_variables</text></g>
+      <g><rect x="60" y="240" width="250" height="56" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+        <text x="185" y="262" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">生成商品推荐回复1</text>
+        <text x="185" y="281" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#185FA5">节点 132924</text></g>
+      <g><rect x="390" y="240" width="250" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+        <text x="515" y="262" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#085041">获取后端商品价格</text>
+        <text x="515" y="281" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#0F6E56">节点 138558 · type=0</text></g>
+      <g><rect x="60" y="340" width="250" height="56" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+        <text x="185" y="362" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">帮我省输出</text>
+        <text x="185" y="381" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#185FA5">节点 189864</text></g>
+      <rect x="60" y="404" width="330" height="34" rx="8" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5"/>
+      <text x="225" y="422" text-anchor="middle" dominant-baseline="central" font-size="12" font-family="Consolas,monospace" fill="#444441">输出模板 {{output}}##########{{card_json}}</text>
+      <rect x="60" y="452" width="330" height="30" rx="8" fill="#FCEBEB" stroke="#A32D2D" stroke-width="0.5" stroke-dasharray="4 3"/>
+      <text x="225" y="468" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#791F1F">已删除：商品识别1 + 获取后端商品卡片</text>
+      <path d="M185 96 V140" fill="none" stroke="#185FA5" stroke-width="1.5" marker-end="url(#dB)"/>
+      <path d="M185 196 V240" fill="none" stroke="#185FA5" stroke-width="1.5" marker-end="url(#dB)"/>
+      <path d="M185 296 V340" fill="none" stroke="#185FA5" stroke-width="1.5" marker-end="url(#dB)"/>
+      <path d="M515 196 V240" fill="none" stroke="#0F6E56" stroke-width="1.5" marker-end="url(#dB)"/>
+      <path d="M390 268 H316" fill="none" stroke="#0F6E56" stroke-width="1.5" marker-end="url(#dB)"/>
+      <path d="M515 296 V368 H316" fill="none" stroke="#0F6E56" stroke-width="1.5" marker-end="url(#dB)"/>
+      <text x="352" y="258" text-anchor="middle" font-size="12" font-family="Consolas,monospace" fill="#0F6E56">products</text>
+      <text x="430" y="358" text-anchor="middle" font-size="12" font-family="Consolas,monospace" fill="#0F6E56">card_json</text>
+      <text x="560" y="222" text-anchor="middle" font-size="12" fill="#0F6E56">userId</text>
+    </svg>
+  </div>
+
+  <ol class="steps">
+    <li>删掉 <b>商品识别1(186575)</b> 和 <b>获取后端商品卡片(147968)</b> 两个节点（连同连线）。</li>
+    <li><b>获取后端商品价格(138558)</b> 粘贴 ① 的代码后，把输出名从 <code class="in">key0/key1/key2</code> 改成 <code class="in">products</code> / <code class="in">card_json</code> / <code class="in">count</code>。</li>
+    <li><b>生成商品推荐回复1(132924)</b> 的输入 <code class="in">input</code>：由 <code class="in">138558.key1</code> 改选 <code class="in">138558.products</code>。</li>
+    <li><b>帮我省输出(189864)</b>：＋ 新增变量 <code class="in">card_json</code>(String) ← <code class="in">138558.card_json</code>；输出内容模板改成 <code class="in">{{output}}##########{{card_json}}</code>（App 按 <code class="in">##########</code> 切文案与卡片）。</li>
+  </ol>
+
+  <div class="note">
+    <b>另外发现一处疑似漏接：</b>帮我省输出(189864) 的 <code class="in">output</code> 现在接的是 <b>知识库检索2(113775).outputList.output</b>，而不是 <b>生成商品推荐回复1(132924).output</b> —— 等于 LLM 写好的推荐文案没被用上（见「现在长这样」图里的蓝竖线）。若确认是漏接，把来源改成 <code class="in">132924.output</code> 即可。
+  </div>
   <div class="note ok">
-    <b>帮我省输出(189864) 改法：</b><br>
-    1. 输入区 ＋ 新增变量 <code class="in">card_json</code>（类型 String）← 获取后端商品价格.card_json<br>
-    2. 输出内容模板改成：<code class="in">{{output}}##########{{card_json}}</code><br>
-    3. App 端按 <code class="in">##########</code> 切分：前面是文案，后面是商品卡片 JSON 数组（多卡片）。
+    <b>不用动：</b>知识库检索2(113775) 的 Query 仍来自 代码_1(163612).key1；帮我省选择器(188440) 保持原样。<br>
+    <b>原则：</b>代码节点必须与 LLM 节点<b>并联</b>汇入输出节点，不能串在「生成商品推荐回复1」后面。
   </div>
   <div class="note">
     待后端确认：图片域名前缀（IMG_BASE）、生产环境 token 与域名（env=prod 时切 yxm-api.juhuanvip.com）。
