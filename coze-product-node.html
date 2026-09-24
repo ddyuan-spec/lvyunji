@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>绿韵家 App · Coze 商品信息代码节点交付</title>
+<title>绿韵家 App · Coze 商品信息代码节点交付 v2</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
@@ -15,9 +15,10 @@
     --line: #e5e6eb;
     --brand: #1aad7c;
     --save: #52c41a;
-    --choose: #00b578;
     --warn: #ff7d00;
     --warn-bg: #fff7e8;
+    --danger: #f53f3f;
+    --danger-bg: #fff1f0;
     --assistant: #f2f3f5;
   }
   body {
@@ -46,6 +47,7 @@
   .note { border-radius: 10px; padding: 12px 16px; font-size: 13px; margin: 14px 0; }
   .note.warn { background: var(--warn-bg); border-left: 3px solid var(--warn); }
   .note.info { background: #f0f7ff; border-left: 3px solid #1890ff; }
+  .note.bad { background: var(--danger-bg); border-left: 3px solid var(--danger); }
   .note b { color: var(--text); }
   .codebox { border-radius: 10px; overflow: hidden; border: 1px solid #2b2b3c; margin-top: 12px; }
   .codehead { background: #1f1f2e; color: #c9d1e3; font-size: 12px; padding: 9px 14px; display: flex; justify-content: space-between; align-items: center; }
@@ -54,7 +56,6 @@
   .cbtn:hover { background: rgba(255,255,255,.14); }
   .cbtn.done { background: var(--brand); border-color: var(--brand); }
   pre { background: #16161f; color: #d8dee9; font-family: ui-monospace, Consolas, "Courier New", monospace; font-size: 12.2px; line-height: 1.6; padding: 16px; overflow: auto; max-height: 560px; }
-  /* 卡片预览 */
   .preview { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 8px; }
   .ph { width: 350px; background: var(--bg); border-radius: 18px; padding: 14px; border: 1px solid var(--line); }
   .ph-title { font-size: 12px; font-weight: 700; color: var(--text-3); margin-bottom: 10px; letter-spacing: .5px; }
@@ -81,22 +82,102 @@
   ol.steps li { margin-bottom: 7px; }
   ol.steps b { color: var(--text); }
   .foot { text-align: center; font-size: 12px; color: var(--text-3); padding-top: 6px; }
-  .cap-target { border: 1px dashed var(--line); border-radius: 6px; padding: 2px 6px; font-family: ui-monospace, Consolas, monospace; font-size: 12px; }
+  .flow { font-family: ui-monospace, Consolas, monospace; font-size: 12px; background: #16161f; color: #d8dee9; padding: 16px; border-radius: 10px; overflow-x: auto; line-height: 1.75; white-space: pre; }
+  .flow .bad { color: #ff8080; }
+  .flow .good { color: #7ee787; }
+  .tag-bad { display:inline-block; font-size:11px; font-weight:700; color:#fff; background:var(--danger); border-radius:4px; padding:1px 6px; }
+  .tag-mid { display:inline-block; font-size:11px; font-weight:700; color:#fff; background:var(--warn); border-radius:4px; padding:1px 6px; }
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <header>
-    <div class="eyebrow">AI 助手 · Coze 工作流</div>
+    <div class="eyebrow">AI 助手 · Coze 工作流 v2</div>
     <h1>商品信息获取 · 代码节点交付</h1>
-    <p class="sub">后端接口已实测打通，代码节点可直接粘贴；输出结构与「帮我买/省/选」原型的商品卡片一一对齐。</p>
+    <p class="sub">本版按<b>你实际导出的工作流</b>（<span class="kv">lyj_app_conversation_1</span>，48 个节点）逐个核对后重写：入参变量名与「开始」节点对齐，<b>type 自动从 custom_variables 推导</b>，并修掉上一版在真实节点里会踩的签名问题。</p>
     <div class="metaline">
-      <span>接口：<span class="kv">yxm-test-api.juhuanvip.com</span>（测试环境）</span>
-      <span>实测：type=0 / 1 / 2 全部 <span class="pill ok">code=1</span></span>
-      <span>输出：<span class="pill">products</span> <span class="pill">card_json</span> <span class="pill">count</span> <span class="pill">success</span></span>
+      <span>接口：<span class="kv">yxm-test-api.juhuanvip.com</span></span>
+      <span>真机实测：8 组用例 <span class="pill ok">全通</span></span>
+      <span>输入：<span class="pill">type</span> <span class="pill">custom_variables</span> <span class="pill">user_id</span> <span class="pill">productName</span> <span class="pill">env</span></span>
+      <span>输出：<span class="pill">products</span> <span class="pill">card_json</span> <span class="pill">count</span> <span class="pill">success</span> <span class="pill">error</span> <span class="pill">summary</span></span>
     </div>
   </header>
+
+  <!-- 00 -->
+  <section>
+    <h2><span class="no">00</span>现状诊断（基于你的实际工作流导出）</h2>
+    <p class="lead">我把导出的 <span class="kv">lyj_app_conversation_1-draft-3776</span> 逐节点拆了一遍。<b>代码节点的代码已经贴进去了，但接线断了</b> —— 后端商品数据目前到不了用户面前。以下 7 条都有据可查。</p>
+
+    <h3>「帮我省」分支实际接线（现状）</h3>
+    <div class="flow">开始(100001)
+ ├─ custom_variables ─┬─→ <span class="bad">获取后端商品价格(138558).type</span>   ← 传的是 "save"/"buy"，接口要 0/1/2
+ │                    └─→ <span class="good">帮我省选择器(188440)</span>        ← 分流用，这里是对的
+ ├─ user_id ──────────→ <span class="good">获取后端商品价格(138558).userId</span> ← 已经引对了 ✓
+ └─ USER_INPUT ───────→ 大模型(160532).input
+                          ↓
+                     <span class="bad">代码_1(163612)</span>  ← 还是 Coze 默认示例代码，key1 = ["hello","world"]
+                          ↓
+                     知识库检索_2(113775).Query = ["hello","world"]   ← 检索必然无意义
+                          ↓ outputList.output
+                     <span class="mid">帮我省输出(189864)</span>   ← 只输出知识库文本，没有商品卡片
+
+  获取后端商品价格(138558) → <span class="bad">生成商品推荐回复1(132924)</span>.input = 138558.key1 （该字段不存在 → 空）
+  <span class="bad">获取后端商品卡片(147968)</span> ← 知识库检索_2.outputList.documentId（默认模板代码）
+  <span class="bad">获取后端商品数据(153092)</span> ← 开始.user_images（默认模板代码）
+  ↑ 上面这 3 个节点：<b>没有任何节点引用它们 → 全部悬空</b></div>
+
+    <h3>问题清单</h3>
+    <table>
+      <tr><th>#</th><th>位置</th><th>实测现象</th><th>后果</th></tr>
+      <tr>
+        <td><span class="tag-bad">必修</span> ①</td>
+        <td><b>代码签名不匹配</b><br><span class="kv">获取后端商品价格(138558)</span></td>
+        <td>该节点是 <code class="inline">async function main(params)</code>；而你工作流里其他代码节点（<span class="kv">意图提取代码块(167324)</span>、<span class="kv">代码(158022)</span>）都是 Coze 官方的 <code class="inline">main({ params })</code></td>
+        <td>Coze 注入的是 <code class="inline">{params:{...}}</code> 包装对象，<code class="inline">params['type']</code> 取不到值 → <b>恒走 type=0（帮我省）</b>，帮我买/帮我选也返回"省"的商品。<br><span class="tag-mid">这条是上一版代码的锅，本版已修</span></td>
+      </tr>
+      <tr>
+        <td><span class="tag-bad">必修</span> ②</td>
+        <td><b>type 直连了 custom_variables</b><br><span class="kv">获取后端商品价格(138558).type</span></td>
+        <td>接线是 <code class="inline">type ← 开始.custom_variables</code>，值为 <code class="inline">save</code> / <code class="inline">choose</code> / <code class="inline">buy</code>（该变量默认值就是 <span class="kv">buy</span>）</td>
+        <td>接口只认 <b>0 / 1 / 2</b>，传 <code class="inline">buy</code> 会请求失败 → 商品卡片永远拿不到数据</td>
+      </tr>
+      <tr>
+        <td><span class="tag-bad">必修</span> ③</td>
+        <td><b>输出变量名还是默认的</b><br><span class="kv">获取后端商品价格(138558)</span></td>
+        <td>输出仍是 <span class="pill">key0</span> <span class="pill">key1</span> <span class="pill">key2</span>（Coze 新建节点默认名），而下游 <span class="kv">生成商品推荐回复1(132924)</span> 引用的是 <code class="inline">138558.key1</code></td>
+        <td>代码实际返回 <span class="pill">products</span>/<span class="pill">card_json</span>/…，<code class="inline">key1</code> 根本不存在 → 下游拿到空值</td>
+      </tr>
+      <tr>
+        <td><span class="tag-bad">必修</span> ④</td>
+        <td><b>缺 productName 输入</b><br><span class="kv">获取后端商品价格(138558)</span></td>
+        <td>节点只有 <span class="pill">type</span> 和 <span class="pill">userId</span> 两个输入</td>
+        <td><code class="inline">type=2</code>（按商品名查）缺参数，帮我买分支用不了</td>
+      </tr>
+      <tr>
+        <td><span class="tag-bad">必修</span> ⑤</td>
+        <td><b>代码节点没接到输出</b><br><span class="kv">帮我省输出(189864)</span></td>
+        <td>输出节点只引用 <code class="inline">知识库检索_2.outputList.output</code>；<span class="kv">生成商品推荐回复1(132924)</span> 和 <span class="kv">获取后端商品卡片(147968)</span> <b>无人引用</b></td>
+        <td>后端商品数据链路是断的，用户看到的只有知识库文本，<b>商品卡片不会出现</b></td>
+      </tr>
+      <tr>
+        <td><span class="tag-mid">重要</span> ⑥</td>
+        <td><b>代码_1 还是默认模板</b><br><span class="kv">代码_1(163612)</span></td>
+        <td>代码内容就是 Coze 新建节点的示例：<code class="inline">key1: ["hello","world"]</code> 没改过</td>
+        <td>它喂给 <span class="kv">知识库检索_2(113775)</span> 的 Query 是 <code class="inline">["hello","world"]</code>，知识库检索等于没检索</td>
+      </tr>
+      <tr>
+        <td><span class="tag-mid">重要</span> ⑦</td>
+        <td><b>两个悬空占位节点</b><br><span class="kv">获取后端商品数据(153092)</span>、<span class="kv">获取后端商品卡片(147968)</span></td>
+        <td>都是默认模板代码；153092 的输入接了 <code class="inline">开始.user_images</code>，147968 接了 <code class="inline">知识库检索_2.outputList.documentId</code></td>
+        <td>无效节点，会让评审/联调误以为"已经接了商品接口"</td>
+      </tr>
+    </table>
+
+    <div class="note bad">
+      <b>一句话结论：</b>商品接口代码本身是好的，但 ①签名 ②type 没翻译 ③输出名 ④缺参数 ⑤链路没接到输出 —— 这 5 处必须一起改，否则「帮我省/买/选」三个入口都拿不到商品卡片。本版代码已把 ①②③④ 全部内置解决，⑤需要你在 Coze 里连线（见 02 的接线清单）。
+    </div>
+  </section>
 
   <!-- 01 -->
   <section>
@@ -107,19 +188,26 @@
       <tr><td>请求方式</td><td><code class="inline">POST</code> · <code class="inline">application/x-www-form-urlencoded</code></td></tr>
       <tr><td>URL</td><td><span class="kv">https://yxm-test-api.juhuanvip.com/api/apiWxStore/v2//coze/free/assistProduct</span>（注意 <b>v2//coze</b> 是双斜杠，照抄）</td></tr>
       <tr><td>请求头</td><td><span class="pill">wxName: lym</span> <span class="pill">apiFrom: H5MALL</span> <span class="pill req">accessToken: &lt;token&gt;</span></td></tr>
-      <tr><td>入参</td><td><code class="inline">type</code> 必填；<code class="inline">userId</code> 必填；<code class="inline">productName</code> 仅 type=2 用</td></tr>
+      <tr><td>入参</td><td><code class="inline">type</code> 必填（<b>0/1/2</b>）；<code class="inline">userId</code> 必填；<code class="inline">productName</code> 仅 type=2 用</td></tr>
     </table>
     <h3>type 取值与返回形态对照</h3>
     <table>
       <tr><th>type</th><th>场景</th><th>data 形态</th><th>实测条数</th><th>返回顺序</th></tr>
       <tr><td><b>0</b></td><td>帮我省</td><td>Array&lt;Object&gt;</td><td>3 条</td><td>不稳定（两次请求一次升序一次降序）</td></tr>
       <tr><td><b>1</b></td><td>帮我选</td><td>Array&lt;Object&gt;</td><td>3 条</td><td>不稳定</td></tr>
-      <tr><td><b>2</b></td><td>按商品名查单个</td><td><b>Object（不是数组）</b></td><td>1 条</td><td>—</td></tr>
+      <tr><td><b>2</b></td><td>按商品名查</td><td><b>Object（不是数组）</b></td><td>1 条</td><td>—</td></tr>
+    </table>
+    <h3>入口意图 → 接口 type（本版代码内置）</h3>
+    <table>
+      <tr><th>开始节点 custom_variables</th><th>接口 type</th><th>卡片标签口径</th><th>备注</th></tr>
+      <tr><td><span class="pill">save</span>（帮我省）</td><td>0</td><td>省¥{priceDifference}</td><td>差额降序取前 3</td></tr>
+      <tr><td><span class="pill">choose</span>（帮我选）</td><td>1</td><td>AI评分 {score}</td><td>打分降序取前 3</td></tr>
+      <tr><td><span class="pill">buy</span>（帮我买）</td><td>2</td><td>立省¥{priceDifference}</td><td><span class="tag-mid">待确认</span> 帮你买是否走"按名查"（见 06-⑧）</td></tr>
     </table>
     <div class="note warn">
       <b>三个实测发现的坑：</b><br>
       1. <b>type=2 返回对象、0/1 返回数组</b> —— 代码里用 <code class="inline">Array.isArray()</code> 统一成数组，避免下游报错。<br>
-      2. <b>后端返回顺序不能用</b> —— 同一 type 连续两次请求结果集和顺序都在变（疑似按用户行为动态推荐）。所以「省」的差额降序、「选」的打分降序<b>必须在代码节点里自己排</b>，不能信后端顺序。<br>
+      2. <b>后端返回顺序不能用</b> —— 同一 type 连续两次请求，结果集和顺序都在变（疑似按用户行为动态推荐）。所以「省」的差额降序、「选」的打分降序<b>必须在代码节点里自己排</b>，不能信后端顺序。<br>
       3. <b>只用 <code class="inline">productMainImg</code></b> —— <code class="inline">productCoverImg</code> 实测恒为 <code class="inline">null</code>。
     </div>
   </section>
@@ -127,46 +215,61 @@
   <!-- 02 -->
   <section>
     <h2><span class="no">02</span>代码节点（JavaScript 版 · 直接粘贴）</h2>
-    <p class="lead">Coze 代码节点的语言选 <b>JavaScript</b>（你的工作流里就是 JS 模板）。整段替换节点内代码即可，无需改动其他节点。</p>
+    <p class="lead">整段替换 <span class="kv">获取后端商品价格(138558)</span> 节点内的代码即可。<b>入参变量名与「开始」节点同名</b>，接线时直接选开始节点对应变量，不用改名字。</p>
     <div class="codebox">
-      <div class="codehead"><span class="fn">main.js · 获取后端商品信息</span><button class="cbtn" data-src="src-js">复制代码</button></div>
+      <div class="codehead"><span class="fn">main.js · 获取后端商品信息（v2）</span><button class="cbtn" data-src="src-js">复制代码</button></div>
       <pre id="out-js"></pre>
     </div>
 
     <h3>节点输入参数配置</h3>
     <table>
-      <tr><th>参数名</th><th>类型</th><th>必填</th><th>取值 / 来源</th></tr>
-      <tr><td><span class="pill req">type</span></td><td>String</td><td>是</td><td><b>0</b> 帮我省 / <b>1</b> 帮我选 / <b>2</b> 按商品名查单个。由上游意图识别节点给出</td></tr>
-      <tr><td><span class="pill">userId</span></td><td>String</td><td>否</td><td>当前用户 userId（App 透传）。不传时默认 <code class="inline">1553843</code>，仅便于调试，<b>上线必须传真实值</b></td></tr>
-      <tr><td><span class="pill">productName</span></td><td>String</td><td>否</td><td>仅 <code class="inline">type=2</code> 时需要，用户问到的具体商品名</td></tr>
+      <tr><th>参数名</th><th>类型</th><th>必填</th><th>接线（在 Coze 里选）</th></tr>
+      <tr><td><span class="pill">type</span></td><td>String</td><td>否</td><td>可留空由 custom_variables 推导；也可固定填 <code class="inline">0</code>/<code class="inline">1</code>/<code class="inline">2</code></td></tr>
+      <tr><td><span class="pill">custom_variables</span></td><td>String</td><td>否</td><td><b>← 开始 → custom_variables</b>（你现在就是这么接的，代码会自动把 save/choose/buy 翻译成 0/1/2）</td></tr>
+      <tr><td><span class="pill req">user_id</span></td><td>String</td><td>是</td><td><b>← 开始 → user_id</b>（App 一开始就传入的登录用户 ID；留空会直接走兜底并报"缺少 user_id"）</td></tr>
+      <tr><td><span class="pill">productName</span></td><td>String</td><td>否</td><td>type=2 时用。建议 <b>← 意图提取代码块(167324) → query</b>（帮我买分支）</td></tr>
+      <tr><td><span class="pill">env</span></td><td>String</td><td>否</td><td><b>← 开始 → env</b>。命中 <code class="inline">ENV_HOSTS</code> 才切域名，否则用测试域名（生产域名待后端给）</td></tr>
     </table>
+    <div class="note info">
+      <b>兼容性说明：</b>代码同时支持 <code class="inline">main({ params })</code>（Coze 官方模板）和 <code class="inline">main(params)</code> 两种调用形态，所以你不用纠结签名；<code class="inline">custom_variables</code> 兼容裸字符串 <code class="inline">"buy"</code> 和旧草稿的 JSON 串 <code class="inline">{"analysis_type":"buy"}</code>。
+    </div>
 
-    <h3>节点输出参数配置</h3>
+    <h3>节点输出参数配置（必须改，否则下游取不到值）</h3>
     <table>
       <tr><th>参数名</th><th>类型</th><th>用途</th></tr>
       <tr><td><span class="pill">products</span></td><td>Array&lt;Object&gt;</td><td>商品数组，给下游节点 / 卡片组件直接取用</td></tr>
       <tr><td><span class="pill">card_json</span></td><td>String</td><td><b>严格 JSON 字符串</b>，前端解析后直接渲染卡片（结构见 04）</td></tr>
       <tr><td><span class="pill">count</span></td><td>Number</td><td>商品条数</td></tr>
-      <tr><td><span class="pill">success</span></td><td>Boolean</td><td>是否成功，失败时下游走兜底话术，<b>不要让大模型编商品</b></td></tr>
-      <tr><td><span class="pill">error</span></td><td>String</td><td>失败原因（超时 / code≠1 / 无数据）</td></tr>
+      <tr><td><span class="pill">success</span></td><td>Boolean</td><td>是否成功；失败时下游走兜底话术，<b>不要让大模型编商品</b></td></tr>
+      <tr><td><span class="pill">error</span></td><td>String</td><td>失败原因（缺 user_id / 超时 / code≠1 / 无数据）</td></tr>
       <tr><td><span class="pill">summary</span></td><td>String</td><td>给大模型写推荐文案的一句话素材，如「共 3 款商品，最高可省 ¥2109」</td></tr>
+      <tr><td><span class="pill">debug</span></td><td>Object</td><td>排查用：实际发出的 type / userId / intent / host / productName</td></tr>
     </table>
+    <div class="note warn">
+      <b>改输出名的具体操作：</b>在代码节点右侧「输出」区，把 <span class="pill">key0</span>/<span class="pill">key1</span>/<span class="pill">key2</span> 三个变量<b>删掉</b>，新增上面 7 个（名字照抄）。然后到下游节点把引用从 <code class="inline">138558.key1</code> 改成 <code class="inline">138558.card_json</code>。
+    </div>
 
-    <h3>接到你的工作流里</h3>
+    <h3>接线清单（按顺序改这 5 处）</h3>
     <ol class="steps">
-      <li><b>「获取后端商品价格」节点</b> → 直接把整段代码贴进去，输入 <code class="inline">type</code> 接上游意图（帮我省=0 / 帮我选=1），输出用 <code class="inline">products</code> / <code class="inline">card_json</code>。</li>
-      <li><b>下游「生成…」节点</b> → 拿 <code class="inline">summary</code> + <code class="inline">products[*].name</code> 写推荐文案，<b>不要让它重新算价格</b>。</li>
-      <li><b>卡片落地</b> → 把 <code class="inline">card_json</code> 作为结束节点输出变量透出；App 端解析该字段渲染卡片（原型里就是这个结构）。若用 Coze 消息卡片，把 <code class="inline">products</code> 的字段映射到卡片变量即可。</li>
+      <li><b>获取后端商品价格(138558)</b> —— 贴本页代码；输入补一条 <code class="inline">productName ← 意图提取代码块(167324).query</code>；输出改成上表的 7 个名字。</li>
+      <li><b>生成商品推荐回复1(132924)</b> —— 输入 <code class="inline">input</code> 从 <code class="inline">138558.key1</code> 改接 <b><code class="inline">138558.card_json</code></b>；提示词里要求它「只写推荐文案，商品名/价格必须原样引用输入，不得自行编造」。</li>
+      <li><b>帮我省输出(189864)</b> —— 内容改成 <code class="inline">{{output1}}##########{{output2}}</code>，<code class="inline">output1 ← 132924.output</code>，<code class="inline">output2 ← 138558.card_json</code>（App 端按 <code class="inline">##########</code> 切分：前段文案、后段 JSON 渲染卡片）。</li>
+      <li><b>帮我买输出(112417)</b> —— 同样加一段卡片：<code class="inline">output2 ← 138558.card_json</code>（帮我买分支需要再放一个同样的代码节点，代码不用改，type 会自动推导成 2）。</li>
+      <li><b>获取后端商品卡片(147968) / 获取后端商品数据(153092)</b> —— 若 App 端不再需要独立卡片字段，<b>直接删掉</b>；要保留就把 147968 的输入改接 <code class="inline">138558.card_json</code>。</li>
     </ol>
-    <div class="note info">
-      若下游节点已经在引用旧输出名（截图里的 <code class="inline">key0 / key1 / key2 / key21</code>），把它改成上面这套语义化命名即可 —— 建议改名，避免后续维护时对不上含义。
+
+    <h3>附：代码_1(163612) 建议替换代码（修问题⑥）</h3>
+    <p class="lead">它现在还是 Coze 默认模板，导致知识库检索的 Query 变成了 <code class="inline">["hello","world"]</code>。换成下面这段，把大模型的输出解析成检索词。</p>
+    <div class="codebox">
+      <div class="codehead"><span class="fn">代码_1(163612) · 解析检索词</span><button class="cbtn" data-src="src-code1">复制代码</button></div>
+      <pre id="out-code1"></pre>
     </div>
   </section>
 
   <!-- 03 -->
   <section>
     <h2><span class="no">03</span>产出效果：商品卡片</h2>
-    <p class="lead">下面是用<strong>接口真实返回数据</strong>渲染的卡片，样式与线上原型 <span class="kv">lvyunjia-ai-chat-v2-demo</span> 一致。图片位实际渲染 <code class="inline">productMainImg</code>（需后缀域名前缀，见 06）。</p>
+    <p class="lead">下面是用<strong>接口真实返回数据</strong>渲染的卡片，样式与线上原型 <span class="kv">lvyunjia-ai-chat-v2-demo</span> 一致。图片位实际渲染 <code class="inline">productMainImg</code>（需补域名前缀，见 06-①）。</p>
     <div class="preview">
       <div class="ph">
         <div class="ph-title">帮我省 · type=0</div>
@@ -185,15 +288,15 @@
           <div class="product-card">
             <div class="product-img">📦</div>
             <div class="product-info">
-              <div><div class="product-name">惠民补贴套餐包4</div><div class="product-desc"></div></div>
-              <div class="product-meta"><div class="product-price">¥1515<small>起</small></div><div class="product-tag save-tag">省¥2084</div></div>
+              <div><div class="product-name">惠民补贴套餐包7</div><div class="product-desc"></div></div>
+              <div class="product-meta"><div class="product-price">¥1555<small>起</small></div><div class="product-tag save-tag">省¥1643</div></div>
             </div>
           </div>
           <div class="product-card">
             <div class="product-img">📦</div>
             <div class="product-info">
-              <div><div class="product-name">惠民补贴套餐包9</div><div class="product-desc"></div></div>
-              <div class="product-meta"><div class="product-price">¥1658<small>起</small></div><div class="product-tag save-tag">省¥1610</div></div>
+              <div><div class="product-name">全家基础健康套餐</div><div class="product-desc"></div></div>
+              <div class="product-meta"><div class="product-price">¥1199<small>起</small></div><div class="product-tag save-tag">省¥1149</div></div>
             </div>
           </div>
         </div>
@@ -210,26 +313,26 @@
           <div class="product-card">
             <div class="product-img">📦</div>
             <div class="product-info">
-              <div><div class="product-name">惠民补贴套餐包8</div><div class="product-desc"></div></div>
-              <div class="product-meta"><div class="product-price">¥1559<small>起</small></div><div class="product-tag">AI评分 100</div></div>
+              <div><div class="product-name">惠民补贴套餐包13</div><div class="product-desc"></div></div>
+              <div class="product-meta"><div class="product-price">¥5000<small>起</small></div><div class="product-tag">AI评分 100</div></div>
             </div>
           </div>
           <div class="product-card">
             <div class="product-img">📦</div>
             <div class="product-info">
-              <div><div class="product-name">惠民补贴套餐包5</div><div class="product-desc"></div></div>
-              <div class="product-meta"><div class="product-price">¥1498<small>起</small></div><div class="product-tag">AI评分 100</div></div>
+              <div><div class="product-name">彩色电视</div><div class="product-desc"></div></div>
+              <div class="product-meta"><div class="product-price">¥4000<small>起</small></div><div class="product-tag">AI评分 60</div></div>
             </div>
           </div>
           <div class="product-card">
             <div class="product-img">📦</div>
             <div class="product-info">
-              <div><div class="product-name">惠民补贴套餐包101</div><div class="product-desc"></div></div>
-              <div class="product-meta"><div class="product-price">¥1578<small>起</small></div><div class="product-tag">AI评分 150</div></div>
+              <div><div class="product-name">专门测试bug</div><div class="product-desc"></div></div>
+              <div class="product-meta"><div class="product-price">¥8.8<small>起</small></div><div class="product-tag">AI评分 60</div></div>
             </div>
           </div>
         </div>
-        <div class="cap">标签口径：选 = <span class="kv">score</span>，但分数值域有问题，见 06-③</div>
+        <div class="cap">标签口径：选 = <span class="kv">score</span>，分数值域有问题，见 06-③；这组里还混进了测试商品，见 06-④</div>
       </div>
     </div>
   </section>
@@ -262,15 +365,35 @@
     <h2><span class="no">05</span>Python 版（备选）</h2>
     <p class="lead">如果你的代码节点是 Python 运行时，用这版，逻辑与 JS 版完全一致，同样已实测跑通。</p>
     <div class="codebox">
-      <div class="codehead"><span class="fn">main.py · 获取后端商品信息</span><button class="cbtn" data-src="src-py">复制代码</button></div>
+      <div class="codehead"><span class="fn">main.py · 获取后端商品信息（v2）</span><button class="cbtn" data-src="src-py">复制代码</button></div>
       <pre id="out-py"></pre>
     </div>
   </section>
 
   <!-- 06 -->
   <section>
-    <h2><span class="no">06</span>待确认清单</h2>
-    <p class="lead">以下 7 项需要后端 / 产品侧确认，其中 ①② 不解决会直接导致卡片显示异常。</p>
+    <h2><span class="no">06</span>真机实测记录（本版代码）</h2>
+    <p class="lead">对着真实接口跑的 8 组用例，全部符合预期。命令：<span class="kv">node _coze_node_js_test.mjs</span></p>
+    <table>
+      <tr><th>用例</th><th>入参</th><th>推导 type</th><th>结果</th></tr>
+      <tr><td>A 显式 type</td><td><code class="inline">{type:'0', userId:'1553843'}</code></td><td>0</td><td><span class="pill ok">成功</span> 3 条，最高可省 ¥4820</td></tr>
+      <tr><td>B save + user_id</td><td><code class="inline">{custom_variables:'save', user_id:'1553843'}</code></td><td>0</td><td><span class="pill ok">成功</span> 3 条</td></tr>
+      <tr><td>C choose</td><td><code class="inline">{custom_variables:'choose', user_id:'1553843'}</code></td><td>1</td><td><span class="pill ok">成功</span> 3 条</td></tr>
+      <tr><td>D buy + productName</td><td><code class="inline">{custom_variables:'buy', user_id:'1553843', productName:'水卡'}</code></td><td>2</td><td><span class="pill ok">成功</span> 1 条（返回单对象已归一化）</td></tr>
+      <tr><td>E JSON 串 custom_variables</td><td><code class="inline">{"analysis_type":"save"}</code></td><td>0</td><td><span class="pill ok">成功</span> 兼容旧草稿形态</td></tr>
+      <tr><td>F 缺 user_id</td><td><code class="inline">{custom_variables:'save'}</code></td><td>0</td><td><span class="pill ok">按预期失败</span> error=缺少 user_id</td></tr>
+      <tr><td>G env=test</td><td><code class="inline">{custom_variables:'save', user_id:'1553843', env:'test'}</code></td><td>0</td><td><span class="pill ok">成功</span> 3 条</td></tr>
+      <tr><td>H 裸参数（非 {params} 包装）</td><td><code class="inline">{custom_variables:'save', user_id:'1553843'}</code></td><td>0</td><td><span class="pill ok">成功</span> 两种签名都兼容</td></tr>
+    </table>
+    <div class="note info">
+      顺带暴露两个数据问题（第 3、4 组）：<b>「帮我选」返回里混进了「专门测试bug ¥8.8」「彩色电视」</b>，分数还有 205/230 这种超出 0–100 的值 —— 上线前需后端过滤测试数据、产品定分数口径。
+    </div>
+  </section>
+
+  <!-- 07 -->
+  <section>
+    <h2><span class="no">07</span>待确认清单</h2>
+    <p class="lead">以下 10 项需要后端 / 产品侧确认，其中 ①②⑧ 不解决会直接影响卡片能否出数据。</p>
     <table>
       <tr><th>#</th><th>事项</th><th>现状（实测）</th><th>需要谁给</th></tr>
       <tr>
@@ -286,6 +409,12 @@
         <td>后端（建议随 userId 由 App 网关透传，或提供 Coze 专用长期 token）</td>
       </tr>
       <tr>
+        <td><b>⑧</b></td>
+        <td><b>「帮我买」(buy) 该走哪个 type</b></td>
+        <td>本版按 <code class="inline">buy → 2（按商品名查）</code> 实现（我的推断）。但「帮我买」的用户句式是"我最近睡不着想买安神的"，属于<b>需求推荐</b>而非精确商品名，可能用 <code class="inline">type=1</code> 打分推荐更合适</td>
+        <td>产品 + 后端定；定了改代码里 <code class="inline">INTENT_TYPE</code> 一行即可</td>
+      </tr>
+      <tr>
         <td><b>③</b></td>
         <td>score 分数量纲</td>
         <td>实测出现 <b>20 / 60 / 100 / 150 / 205 / 230</b>，<b>不是 0–100</b>，标签「AI评分 230」不符合用户直觉</td>
@@ -294,7 +423,7 @@
       <tr>
         <td><b>④</b></td>
         <td>推荐结果混入测试数据</td>
-        <td>实测结果里出现「【新人区】测试商品」「测试水卡模版 ¥9.9」，且 9.9 元商品差额为 0 却进了「帮我选」Top1</td>
+        <td>实测出现「专门测试bug ¥8.8」「彩色电视」「测试水卡模版 ¥9.9」，且 9.9 元商品差额为 0 却进「帮我选」Top1</td>
         <td>后端过滤测试商品 / 加白名单</td>
       </tr>
       <tr>
@@ -312,39 +441,97 @@
       <tr>
         <td><b>⑦</b></td>
         <td>生产域名</td>
-        <td>当前为 <span class="kv">yxm-test-api.juhuanvip.com</span> 测试环境</td>
-        <td>后端（上线切成正式域名）</td>
+        <td>当前为 <span class="kv">yxm-test-api.juhuanvip.com</span> 测试环境；<code class="inline">开始.env</code> 已存在，可用来切环境</td>
+        <td>后端（给正式域名后填进 <code class="inline">ENV_HOSTS.prod</code>，无需改逻辑）</td>
+      </tr>
+      <tr>
+        <td><b>⑨</b></td>
+        <td>卡片 JSON 的传输通道</td>
+        <td>本版设计为「输出节点用 <code class="inline">##########</code> 拼接：前段文案 + 后段 card_json」，App 端解析渲染</td>
+        <td>App 端确认是否接受此约定；若走 Coze 消息卡片则改用卡片变量映射</td>
+      </tr>
+      <tr>
+        <td><b>⑩</b></td>
+        <td>悬空节点是否删除</td>
+        <td><span class="kv">获取后端商品数据(153092)</span>、<span class="kv">获取后端商品卡片(147968)</span> 是默认模板代码且无人引用</td>
+        <td>你确认（建议删，避免误判"已接好"）</td>
       </tr>
     </table>
     <div class="note info">
-      代码里已预留两个可改常量：<code class="inline">IMG_BASE</code>（图片域名前缀）和 <code class="inline">ACCESS_TOKEN</code>（token），确认后改这两行即可，其余逻辑不用动。
+      代码里已预留三个可改常量：<code class="inline">ENV_HOSTS</code>（域名）、<code class="inline">ACCESS_TOKEN</code>（token）、<code class="inline">IMG_BASE</code>（图片前缀）、<code class="inline">INTENT_TYPE</code>（意图映射），确认后改这几行即可，其余逻辑不用动。
     </div>
   </section>
 
-  <div class="foot">绿韵家 App · 数智 · Coze 商品信息代码节点 · 2026-09-24</div>
+  <div class="foot">绿韵家 App · 数智 · Coze 商品信息代码节点 v2 · 2026-09-24</div>
 </div>
 
 <!-- ===== 代码原文（供复制，不参与渲染） ===== -->
 <script type="text/plain" id="src-js">// ============================================================
-// Coze 代码节点 · 获取后端商品信息（渲染商品卡片用）
-// 接口：POST /api/apiWxStore/v2//coze/free/assistProduct
-// type=0 帮我省 / type=1 帮我选 / type=2 按商品名查单个
-// 入参：type(必填)、userId(可选)、productName(仅 type=2)
-// 出参：products / card_json / count / success / error / summary
+// Coze 代码节点 · 获取后端商品信息（渲染商品卡片用）v2
+// 接口：POST https://<host>/api/apiWxStore/v2//coze/free/assistProduct
+// ------------------------------------------------------------
+// 入参（变量名与工作流「开始」节点对齐，直接引用即可）：
+//   type             String  可选 · 0 帮我省 / 1 帮我选 / 2 按名查；传了就用它
+//   custom_variables String  可选 · save / choose / buy；没传 type 时用它推导
+//   user_id          String  可选 · 引用「开始 → user_id」（App 透传）
+//   productName      String  可选 · type=2 用，接用户输入/意图提取代码块输出
+//   env              String  可选 · 环境标识，命中 ENV_HOSTS 才切域名
+// 出参：products / card_json / count / success / error / summary / debug
 // ============================================================
 
-const API_URL = 'https://yxm-test-api.juhuanvip.com/api/apiWxStore/v2//coze/free/assistProduct';
-const ACCESS_TOKEN = 'db776bc648144a819a7850df4fd7673d'; // 测试环境，生产环境需由后端下发
-const IMG_BASE = ''; // TODO 待后端提供图片域名前缀，如 https://xxx.juhuanvip.com
+const ENV_HOSTS = {
+  test: 'yxm-test-api.juhuanvip.com',
+  // prod: 'TODO-待后端给生产域名',
+};
+const DEFAULT_HOST = 'yxm-test-api.juhuanvip.com';
+const API_PATH = '/api/apiWxStore/v2//coze/free/assistProduct'; // v2//coze 双斜杠是接口本身的，照抄
+const ACCESS_TOKEN = 'db776bc648144a819a7850df4fd7673d'; // 测试环境 token，生产需后端下发
+const IMG_BASE = '';      // TODO 待后端给图片域名前缀，如 https://xxx.juhuanvip.com
 const TOP_N = 3;
 const TIMEOUT_MS = 10000;
+const DEBUG_USER_ID = ''; // 本地调试可临时填，线上留空
 
-async function main(params) {
-  const type = String(params['type'] != null ? params['type'] : (params['input'] != null ? params['input'] : '0')).trim();
-  const userId = String(params['userId'] != null ? params['userId'] : '1553843').trim();
-  const productName = String(params['productName'] != null ? params['productName'] : '').trim();
+// 入口意图 → 接口 type（buy→2 为推断，待产品确认；确认后改这一行）
+const INTENT_TYPE = { save: '0', choose: '1', buy: '2' };
 
-  const fail = (msg) => ({ products: [], card_json: '{}', count: 0, success: false, error: msg, summary: '' });
+function pick(p, keys) {
+  for (let i = 0; i < keys.length; i++) {
+    const v = p[keys[i]];
+    if (v !== undefined && v !== null && String(v).trim() !== '') return String(v).trim();
+  }
+  return '';
+}
+
+// custom_variables 兼容：裸字符串 "buy"，或老草稿的 JSON 串 {"analysis_type":"buy"}
+function readIntent(v) {
+  const s = String(v || '').trim();
+  if (!s) return '';
+  if (s.charAt(0) === '{') {
+    try {
+      const o = JSON.parse(s);
+      return String(o.analysis_type || o.custom_variables || o.type || o.intent || '').trim().toLowerCase();
+    } catch (e) { return ''; }
+  }
+  return s.toLowerCase();
+}
+
+async function main(args) {
+  // 兼容 Coze 官方签名 main({ params }) 与 main(params) 两种调用形态
+  const p = (args && args.params) ? args.params : (args || {});
+
+  const intent = readIntent(pick(p, ['custom_variables', 'intent']));
+  const type = pick(p, ['type']) || INTENT_TYPE[intent] || '0';
+  const userId = pick(p, ['user_id', 'userId', 'userid']) || DEBUG_USER_ID;
+  const productName = pick(p, ['productName', 'product_name', 'user_input', 'USER_INPUT']);
+  const envKey = pick(p, ['env']).toLowerCase();
+  const host = ENV_HOSTS[envKey] || DEFAULT_HOST;
+  const apiUrl = 'https://' + host + API_PATH;
+  const debug = { type: type, userId: userId, intent: intent, host: host, productName: productName };
+
+  const fail = (msg) => ({ products: [], card_json: '{}', count: 0, success: false, error: msg, summary: '', debug: debug });
+
+  if (!userId) return fail('缺少 user_id（请在代码节点入参引用「开始 → user_id」）');
+  if (type === '2' && !productName) return fail('type=2 按名查，但 productName 为空');
 
   let json;
   try {
@@ -357,7 +544,7 @@ async function main(params) {
     const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
     let resp;
     try {
-      resp = await fetch(API_URL, {
+      resp = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -381,11 +568,11 @@ async function main(params) {
   if (!json || json.code !== 1) return fail((json && json.msg) || '接口返回异常');
   if (!json.data) return fail('接口未返回商品数据');
 
-  // type=0/1 返回数组，type=2 返回单个对象 —— 统一成数组
+  // type=0/1 返回数组、type=2 返回单个对象 —— 统一成数组
   const rawList = Array.isArray(json.data) ? json.data : [json.data];
   if (rawList.length === 0) return fail('没有符合条件的商品');
 
-  // 业务口径：省=差额降序取前3；选=打分降序取前3；单查不排序
+  // 业务口径：省=差额降序取前3；选=打分降序取前3；按名查不排序
   const sorted = rawList.slice().sort((a, b) => {
     const gapDiff = (Number(b.priceDifference) || 0) - (Number(a.priceDifference) || 0);
     const scoreDiff = (Number(b.score) || 0) - (Number(a.score) || 0);
@@ -399,26 +586,26 @@ async function main(params) {
     const v = Number(n) || 0;
     return v % 1 === 0 ? String(v) : v.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
   };
-  const absImg = (p) => {
-    if (!p) return '';
-    if (/^https?:\/\//i.test(p)) return p;
-    return IMG_BASE ? IMG_BASE.replace(/\/+$/, '') + p : p;
+  const absImg = (path) => {
+    if (!path) return '';
+    if (/^https?:\/\//i.test(path)) return path;
+    return IMG_BASE ? IMG_BASE.replace(/\/+$/, '') + path : path;
   };
 
-  const products = list.map((p) => {
-    const gap = Number(p.priceDifference) || 0;
-    const score = Number(p.score) || 0;
+  const products = list.map((it) => {
+    const gap = Number(it.priceDifference) || 0;
+    const score = Number(it.score) || 0;
     const tag = type === '0' ? ('省¥' + money(gap)) : (type === '1' ? ('AI评分 ' + score) : ('立省¥' + money(gap)));
     return {
-      productId: p.productMainId,
-      name: p.productName || '',
+      productId: it.productMainId,
+      name: it.productName || '',
       desc: '',
-      image: absImg(p.productMainImg || p.productCoverImg),
-      imagePath: p.productMainImg || p.productCoverImg || '',
-      price: Number(p.discountPrice) || 0,
-      priceText: '¥' + money(p.discountPrice),
-      originalPrice: Number(p.originalPrice) || 0,
-      originalPriceText: '¥' + money(p.originalPrice),
+      image: absImg(it.productMainImg || it.productCoverImg),
+      imagePath: it.productMainImg || it.productCoverImg || '',
+      price: Number(it.discountPrice) || 0,
+      priceText: '¥' + money(it.discountPrice),
+      originalPrice: Number(it.originalPrice) || 0,
+      originalPriceText: '¥' + money(it.originalPrice),
       priceDifference: gap,
       saveText: '省¥' + money(gap),
       score: score,
@@ -430,14 +617,8 @@ async function main(params) {
   });
 
   const mode = type === '0' ? 'save' : (type === '1' ? 'choose' : 'buy');
-  const cardJson = {
-    type: 'product_cards',
-    mode: mode,
-    count: products.length,
-    products: products,
-  };
-
-  const maxSave = products.reduce((m, p) => Math.max(m, p.priceDifference), 0);
+  const cardJson = { type: 'product_cards', mode: mode, count: products.length, products: products };
+  const maxSave = products.reduce((m, it) => Math.max(m, it.priceDifference), 0);
   const summary = '共 ' + products.length + ' 款商品' + (maxSave > 0 ? '，最高可省 ¥' + money(maxSave) : '');
 
   return {
@@ -447,18 +628,69 @@ async function main(params) {
     success: true,
     error: '',
     summary: summary,
+    debug: debug,
   };
 }</script>
 
-<script type="text/plain" id="src-py">import json
+<script type="text/plain" id="src-code1">// 代码_1(163612) · 把上游大模型的输出解析成知识库检索词
+// 输入：input ← 160532(大模型).output
+// 输出：query (String)
+async function main({ params }) {
+  const text = String((params && params.input) || '').trim();
+  if (!text) return { query: '' };
+
+  // 输出是 JSON 就取关键词字段，否则原样当检索词用
+  let query = text;
+  try {
+    const o = JSON.parse(text);
+    if (o && typeof o === 'object') {
+      const kw = o.keywords || o.query || o.product_query || o.rewritten_query || '';
+      query = Array.isArray(kw) ? kw.join(' ') : String(kw || text);
+    }
+  } catch (e) { /* 非 JSON，原样使用 */ }
+
+  return { query: query.replace(/\s+/g, ' ').slice(0, 200) };
+}</script>
+
+<script type="text/plain" id="src-py"># Coze 代码节点 · 获取后端商品信息（Python 版 / 备选）v2
+# 入参变量名与工作流「开始」节点对齐：type / custom_variables / user_id / productName / env
+import json
 import urllib.parse
 import urllib.request
 
-API_URL = "https://yxm-test-api.juhuanvip.com/api/apiWxStore/v2//coze/free/assistProduct"
-ACCESS_TOKEN = "db776bc648144a819a7850df4fd7673d"  # 测试环境，生产环境需由后端下发
-IMG_BASE = ""  # TODO 待后端提供图片域名前缀，如 https://xxx.juhuanvip.com
+ENV_HOSTS = {"test": "yxm-test-api.juhuanvip.com"}  # 生产域名确认后补 prod
+DEFAULT_HOST = "yxm-test-api.juhuanvip.com"
+API_PATH = "/api/apiWxStore/v2//coze/free/assistProduct"
+ACCESS_TOKEN = "db776bc648144a819a7850df4fd7673d"  # 测试环境 token，生产需后端下发
+IMG_BASE = ""      # TODO 待后端给图片域名前缀
 TOP_N = 3
 TIMEOUT = 10
+DEBUG_USER_ID = ""
+
+# 入口意图 → 接口 type（buy→2 为推断，待产品确认；确认后改这一行）
+INTENT_TYPE = {"save": "0", "choose": "1", "buy": "2"}
+
+
+def _pick(p, keys):
+    for k in keys:
+        v = p.get(k)
+        if v is not None and str(v).strip() != "":
+            return str(v).strip()
+    return ""
+
+
+def _read_intent(v):
+    s = str(v or "").strip()
+    if not s:
+        return ""
+    if s[0] == "{":
+        try:
+            o = json.loads(s)
+            val = o.get("analysis_type") or o.get("custom_variables") or o.get("type") or o.get("intent") or ""
+            return str(val).strip().lower()
+        except Exception:
+            return ""
+    return s.lower()
 
 
 def _money(n):
@@ -477,13 +709,13 @@ def _abs_img(p):
     return (IMG_BASE.rstrip("/") + p) if IMG_BASE else p
 
 
-def _fetch(api_type, user_id, product_name):
+def _fetch(api_type, user_id, product_name, api_url):
     form = {"type": api_type, "userId": user_id}
     if api_type == "2" and product_name:
         form["productName"] = product_name
     body = urllib.parse.urlencode(form).encode("utf-8")
     req = urllib.request.Request(
-        API_URL,
+        api_url,
         data=body,
         method="POST",
         headers={
@@ -497,24 +729,37 @@ def _fetch(api_type, user_id, product_name):
         return json.loads(resp.read().decode("utf-8", "replace"))
 
 
-def _build(api_type, user_id, product_name):
-    try:
-        result = _fetch(api_type, user_id, product_name)
-    except Exception as e:
+def _build(params):
+    intent = _read_intent(_pick(params, ["custom_variables", "intent"]))
+    api_type = _pick(params, ["type"]) or INTENT_TYPE.get(intent, "0")
+    user_id = _pick(params, ["user_id", "userId", "userid"]) or DEBUG_USER_ID
+    product_name = _pick(params, ["productName", "product_name", "user_input", "USER_INPUT"])
+    host = ENV_HOSTS.get(_pick(params, ["env"]).lower(), DEFAULT_HOST)
+    api_url = "https://" + host + API_PATH
+    debug = {"type": api_type, "userId": user_id, "intent": intent, "host": host, "productName": product_name}
+
+    def fail(msg):
         return {"products": [], "card_json": "{}", "count": 0,
-                "success": False, "error": "接口请求异常：%s" % e, "summary": ""}
+                "success": False, "error": msg, "summary": "", "debug": debug}
+
+    if not user_id:
+        return fail("缺少 user_id（请在代码节点入参引用「开始 → user_id」）")
+    if api_type == "2" and not product_name:
+        return fail("type=2 按名查，但 productName 为空")
+
+    try:
+        result = _fetch(api_type, user_id, product_name, api_url)
+    except Exception as e:
+        return fail("接口请求异常：%s" % e)
 
     if not result or result.get("code") != 1:
-        return {"products": [], "card_json": "{}", "count": 0,
-                "success": False, "error": (result or {}).get("msg", "接口返回异常"), "summary": ""}
+        return fail((result or {}).get("msg") or "接口返回异常")
     if not result.get("data"):
-        return {"products": [], "card_json": "{}", "count": 0,
-                "success": False, "error": "接口未返回商品数据", "summary": ""}
+        return fail("接口未返回商品数据")
 
     raw = result["data"] if isinstance(result["data"], list) else [result["data"]]
     if not raw:
-        return {"products": [], "card_json": "{}", "count": 0,
-                "success": False, "error": "没有符合条件的商品", "summary": ""}
+        return fail("没有符合条件的商品")
 
     def key(p):
         gap = float(p.get("priceDifference") or 0)
@@ -556,15 +801,12 @@ def _build(api_type, user_id, product_name):
     max_save = max([x["priceDifference"] for x in products] or [0])
     summary = "共 %d 款商品" % len(products) + ("，最高可省 ¥" + _money(max_save) if max_save > 0 else "")
     return {"products": products, "card_json": json.dumps(card, ensure_ascii=False),
-            "count": len(products), "success": True, "error": "", "summary": summary}
+            "count": len(products), "success": True, "error": "", "summary": summary, "debug": debug}
 
 
 async def main(args):
     params = args.get("params", args) if isinstance(args, dict) else getattr(args, "params", {})
-    api_type = str(params.get("type") or params.get("input") or "0").strip()
-    user_id = str(params.get("userId") or "1553843").strip()
-    product_name = str(params.get("productName") or "").strip()
-    return _build(api_type, user_id, product_name)</script>
+    return _build(params)</script>
 
 <script type="text/plain" id="src-json">{
   "type": "product_cards",
@@ -576,6 +818,7 @@ async def main(args):
       "name": "惠民补贴套餐包8",
       "desc": "",
       "image": "https://<图片域名>/common/2026/1/27/c86c0cc0e63d4569b99ad102da76be38.jpg",
+      "imagePath": "/common/2026/1/27/c86c0cc0e63d4569b99ad102da76be38.jpg",
       "price": 1559,
       "priceText": "¥1559",
       "originalPrice": 3668,
@@ -594,7 +837,7 @@ async def main(args):
 <script>
   document.querySelectorAll('.cbtn').forEach(function (btn) {
     var key = btn.getAttribute('data-src');
-    var map = { 'src-js': 'out-js', 'src-py': 'out-py', 'src-json': 'out-json' };
+    var map = { 'src-js': 'out-js', 'src-py': 'out-py', 'src-json': 'out-json', 'src-code1': 'out-code1' };
     var src = document.getElementById(key);
     var target = document.getElementById(map[key]);
     if (src && target) target.textContent = src.textContent;
