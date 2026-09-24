@@ -215,7 +215,16 @@
   <!-- 02 -->
   <section>
     <h2><span class="no">02</span>代码节点（JavaScript 版 · 直接粘贴）</h2>
-    <p class="lead">整段替换 <span class="kv">获取后端商品价格(138558)</span> 节点内的代码即可。<b>入参变量名与「开始」节点同名</b>，接线时直接选开始节点对应变量，不用改名字。</p>
+    <p class="lead">整段替换 <span class="kv">获取后端商品价格(138558)</span> 节点内的代码即可。<b>代码已兼容你现在的入参名</b>（<code class="inline">type</code> / <code class="inline">userId</code>），接线一个都不用改名。</p>
+    <div class="note warn">
+      <b>「这个输入我没法配」怎么破：</b>代码节点的入参行不能随便乱加，<b>变量名必须和代码里读的 key 完全一致</b>。你面板里现在只有 <code class="inline">type</code> / <code class="inline">userId</code> 两行，正是因为当前那段旧代码只读了这两个 key —— 所以你不需要、也没法去"改名字"，正确做法是：
+      <ol>
+        <li><b>先把下面 v2 代码整段粘进去</b>。⚠️ 代码一旦有语法红色报错，入参区会被锁住点不动，这本身就是"配不了"的常见原因；先让代码通过校验。</li>
+        <li><code class="inline">type</code> → 保留接 <b>开始 → custom_variables</b>（原样不动；代码自动把 save/choose/buy 翻译成 0/1/2，不会再出现传字符串给接口的问题）。</li>
+        <li><code class="inline">userId</code> → 接 <b>开始 → user_id</b>（名字<b>不用改</b>，代码对 <code class="inline">userId</code> / <code class="inline">user_id</code> 两种写法都认）。</li>
+        <li>仅「帮我买」分支需要再 <b>＋</b> 新增一行 <code class="inline">productName</code> → 接 <b>意图提取代码块(167324) → query</b>。</li>
+      </ol>
+    </div>
     <div class="codebox">
       <div class="codehead"><span class="fn">main.js · 获取后端商品信息（v2）</span><button class="cbtn" data-src="src-js">复制代码</button></div>
       <pre id="out-js"></pre>
@@ -224,14 +233,14 @@
     <h3>节点输入参数配置</h3>
     <table>
       <tr><th>参数名</th><th>类型</th><th>必填</th><th>接线（在 Coze 里选）</th></tr>
-      <tr><td><span class="pill">type</span></td><td>String</td><td>否</td><td>可留空由 custom_variables 推导；也可固定填 <code class="inline">0</code>/<code class="inline">1</code>/<code class="inline">2</code></td></tr>
-      <tr><td><span class="pill">custom_variables</span></td><td>String</td><td>否</td><td><b>← 开始 → custom_variables</b>（你现在就是这么接的，代码会自动把 save/choose/buy 翻译成 0/1/2）</td></tr>
-      <tr><td><span class="pill req">user_id</span></td><td>String</td><td>是</td><td><b>← 开始 → user_id</b>（App 一开始就传入的登录用户 ID；留空会直接走兜底并报"缺少 user_id"）</td></tr>
+      <tr><td><span class="pill">type</span></td><td>String</td><td>否</td><td><b>← 开始 → custom_variables</b>（你截图里这条<b>原样保留</b>即可，代码会自己把 save/choose/buy 翻译成 0/1/2）；也可固定填 <code class="inline">0</code>/<code class="inline">1</code>/<code class="inline">2</code></td></tr>
+      <tr><td><span class="pill">custom_variables</span></td><td>String</td><td>否</td><td>可选。想按「开始」同名命名时才用，和上一行 <code class="inline">type</code> <b>二选一</b>；两个都传时以 <code class="inline">type</code> 为准</td></tr>
+      <tr><td><span class="pill req">user_id</span></td><td>String</td><td>是</td><td><b>← 开始 → user_id</b>。变量名写 <code class="inline">userId</code> 也认（就是你现在这个），<b>不用改</b>；留空会兜底并报"缺少 user_id"</td></tr>
       <tr><td><span class="pill">productName</span></td><td>String</td><td>否</td><td>type=2 时用。建议 <b>← 意图提取代码块(167324) → query</b>（帮我买分支）</td></tr>
       <tr><td><span class="pill">env</span></td><td>String</td><td>否</td><td><b>← 开始 → env</b>。命中 <code class="inline">ENV_HOSTS</code> 才切域名，否则用测试域名（生产域名待后端给）</td></tr>
     </table>
     <div class="note info">
-      <b>兼容性说明：</b>代码同时支持 <code class="inline">main({ params })</code>（Coze 官方模板）和 <code class="inline">main(params)</code> 两种调用形态，所以你不用纠结签名；<code class="inline">custom_variables</code> 兼容裸字符串 <code class="inline">"buy"</code> 和旧草稿的 JSON 串 <code class="inline">{"analysis_type":"buy"}</code>。
+      <b>兼容性说明：</b>①签名同时支持 <code class="inline">main({ params })</code>（Coze 官方模板）与 <code class="inline">main(params)</code>；②<code class="inline">type</code> 既接受数字 <code class="inline">0/1/2</code>，也接受被直接接上来的 <code class="inline">save/choose/buy</code>；③<code class="inline">custom_variables</code> 兼容裸字符串 <code class="inline">"buy"</code> 与旧草稿 JSON 串 <code class="inline">{"analysis_type":"buy"}</code>；④用户 ID 兼容 <code class="inline">user_id</code> / <code class="inline">userId</code> 两种变量名。
     </div>
 
     <h3>节点输出参数配置（必须改，否则下游取不到值）</h3>
@@ -471,7 +480,7 @@
 // 接口：POST https://<host>/api/apiWxStore/v2//coze/free/assistProduct
 // ------------------------------------------------------------
 // 入参（变量名与工作流「开始」节点对齐，直接引用即可）：
-//   type             String  可选 · 0 帮我省 / 1 帮我选 / 2 按名查；传了就用它
+//   type             String  可选 · 0/1/2；或直接接「开始 → custom_variables」(save/choose/buy)，代码自动翻译
 //   custom_variables String  可选 · save / choose / buy；没传 type 时用它推导
 //   user_id          String  可选 · 引用「开始 → user_id」（App 透传）
 //   productName      String  可选 · type=2 用，接用户输入/意图提取代码块输出
@@ -520,7 +529,9 @@ async function main(args) {
   const p = (args && args.params) ? args.params : (args || {});
 
   const intent = readIntent(pick(p, ['custom_variables', 'intent']));
-  const type = pick(p, ['type']) || INTENT_TYPE[intent] || '0';
+  const rawType = pick(p, ['type']);
+  // type 容错：既接受数字 0/1/2，也接受被直接接上来的 save/choose/buy（自动翻译成 0/1/2）
+  const type = /^[012]$/.test(rawType) ? rawType : (INTENT_TYPE[(rawType || intent || '').toLowerCase()] || '0');
   const userId = pick(p, ['user_id', 'userId', 'userid']) || DEBUG_USER_ID;
   const productName = pick(p, ['productName', 'product_name', 'user_input', 'USER_INPUT']);
   const envKey = pick(p, ['env']).toLowerCase();
@@ -731,7 +742,9 @@ def _fetch(api_type, user_id, product_name, api_url):
 
 def _build(params):
     intent = _read_intent(_pick(params, ["custom_variables", "intent"]))
-    api_type = _pick(params, ["type"]) or INTENT_TYPE.get(intent, "0")
+    raw_type = _pick(params, ["type"])
+    # type 容错：既接受 0/1/2，也接受 save/choose/buy（自动翻译成 0/1/2）
+    api_type = raw_type if raw_type in ("0", "1", "2") else INTENT_TYPE.get((raw_type or intent or "").lower(), "0")
     user_id = _pick(params, ["user_id", "userId", "userid"]) or DEBUG_USER_ID
     product_name = _pick(params, ["productName", "product_name", "user_input", "USER_INPUT"])
     host = ENV_HOSTS.get(_pick(params, ["env"]).lower(), DEFAULT_HOST)
