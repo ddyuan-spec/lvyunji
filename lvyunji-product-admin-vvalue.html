@@ -314,9 +314,9 @@
     .crumb .sep { color: #c3c3c3; }
     /* 会员详情 dcard / 区块间距 1:1 对齐源 */
     .viewMemberDetail .dcard { padding: 22px 20px; }
-    .viewMemberDetail .sec-title, .viewMemberPerf .sec-title { margin-bottom: 18px; }
+    .viewMemberDetail .sec-title { margin-bottom: 18px; }
     /* 会员中心表格不被全局 table{min-width:1900px} 撑爆 */
-    .viewMemberList table, .viewMemberDetail table, .viewMemberPerf table { min-width: 100%; }
+    .viewMemberList table, .viewMemberDetail table { min-width: 100%; }
   </style>
 <style>.Po4BvhR1CK2tJaywJ6AN path {
   fill: var(--icon-path-fill);
@@ -1258,40 +1258,44 @@
           </div>
 
           <div class="dcard">
-            <div class="sec-title">TA的业绩
-              <span class="tt-act"><button class="btn btn-default" data-anno="kPerfEntry" onclick="goMember('Perf')">查看明细业绩</button></span>
-            </div>
+            <div class="sec-title">TA的业绩</div>
             <div class="perf-rows">
               <div class="perf-line">
                 <span class="pl-title">自购(PV)</span>
-                <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v" onclick="goMember('Perf')">0</span></span>
-                <span class="pl-item"><span class="pl-k">本月自购</span><span class="pl-v" onclick="goMember('Perf')">0</span><span class="pl-more" onclick="toast('查看往期')">查看往期</span></span>
-                <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v" onclick="goMember('Perf')">37.6</span></span>
-                <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v" onclick="goMember('Perf')">13119.3</span></span>
+                <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v">0</span></span>
+                <span class="pl-item"><span class="pl-k">本月自购</span><span class="pl-v">0</span><span class="pl-more" onclick="toast('查看往期')">查看往期</span></span>
+                <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v">37.6</span></span>
+                <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v">13119.3</span></span>
               </div>
               <div class="perf-line">
                 <span class="pl-title">直推(PV)</span>
-                <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v" onclick="goMember('Perf')">0</span></span>
-                <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v" onclick="goMember('Perf')">805</span></span>
-                <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v" onclick="goMember('Perf')">3600</span></span>
+                <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v">0</span></span>
+                <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v">805</span></span>
+                <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v">3600</span></span>
               </div>
               <div class="perf-line">
                 <span class="pl-title">推广(PV)</span>
-                <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v" onclick="goMember('Perf')">0</span></span>
-                <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v" onclick="goMember('Perf')">805</span></span>
-                <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v" onclick="goMember('Perf')">3600</span></span>
+                <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v">0</span></span>
+                <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v">805</span></span>
+                <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v">3600</span></span>
               </div>
+            </div>
+          </div>
+
+          <div class="dcard">
+            <div class="sec-title">V值奖金</div>
+            <div class="perf-rows">
               <div class="perf-line">
                 <span class="pl-title" data-anno="kPerfVZh">直推（v值）</span>
-                <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v" onclick="goMember('Perf')">0</span></span>
-                <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v" onclick="goMember('Perf')">268.3</span></span>
-                <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v" onclick="goMember('Perf')">1200</span></span>
+                <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v" onclick="toast('查看V值奖金明细')">0</span></span>
+                <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v" onclick="toast('查看V值奖金明细')">268.3</span></span>
+                <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v" onclick="toast('查看V值奖金明细')">1200</span></span>
               </div>
               <div class="perf-line">
                 <span class="pl-title" data-anno="kPerfVTg">推广（v值）</span>
-                <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v" onclick="goMember('Perf')">0</span></span>
-                <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v" onclick="goMember('Perf')">268.3</span></span>
-                <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v" onclick="goMember('Perf')">1200</span></span>
+                <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v" onclick="toast('查看V值奖金明细')">0</span></span>
+                <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v" onclick="toast('查看V值奖金明细')">268.3</span></span>
+                <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v" onclick="toast('查看V值奖金明细')">1200</span></span>
               </div>
             </div>
           </div>
@@ -1336,85 +1340,6 @@
               <button class="pg">›</button>
               <div class="pg-jump"><span>前往</span><input type="text" value="1"><span>页</span></div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 视图三：业绩详情订单 -->
-      <div class="view" id="viewMemberPerf">
-        <div class="card">
-          <div class="crumb">
-            <a onclick="goMember('Detail')">会员详情</a>
-            <span class="sep">›</span>
-            <span>业绩详情订单</span>
-          </div>
-          <div class="card-head">
-            <span class="card-title">业绩详情订单</span>
-            <div class="head-actions">
-              <button class="btn btn-primary" onclick="mmSearchPerf()">搜索</button>
-              <button class="btn btn-default" onclick="mmResetPerf()">重置</button>
-              <button class="btn btn-default" onclick="mmBatchRecheck()">批量重新验收</button>
-            </div>
-          </div>
-
-          <div class="filters">
-            <span class="f-fixed" id="mmPOwner">有幸12123 (18307448442)</span>
-            <select class="f-select" id="mmPType">
-              <option>全部</option>
-              <option>自购-今日</option>
-              <option>自购-待结算</option>
-              <option>自购-已结算</option>
-              <option>自购-已退款</option>
-              <option>直推-今日</option>
-              <option>直推-待结算</option>
-              <option>直推-已结算</option>
-              <option>直推-已退款</option>
-              <option>推广-今日</option>
-              <option>推广-待结算</option>
-              <option>推广-已结算</option>
-              <option>推广-已退款</option>
-            </select>
-            <input class="f-input" type="text" id="mmPOrderNo" placeholder="订单编号">
-            <input class="f-input" type="text" id="mmPBuyer" placeholder="下单人账号">
-            <input class="f-input inp-cal" style="width:150px" type="text" id="mmPStart" placeholder="开始日期">
-            <span style="color:var(--text-sub)">至</span>
-            <input class="f-input inp-cal" style="width:150px" type="text" id="mmPEnd" placeholder="结束日期">
-            <select class="f-select" id="mmPAll">
-              <option value="">全部</option>
-              <option>待结算</option>
-              <option>已结算</option>
-              <option>未分佣</option>
-            </select>
-          </div>
-
-          <div class="tbl-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th class="c-chk"><input type="checkbox" id="mmChkPerfAll" onclick="mmTogglePerfAll(this)"></th>
-                  <th style="width:140px">订单编号</th>
-                  <th style="width:180px">下单时间</th>
-                  <th style="width:200px">下单人员</th>
-                  <th style="width:120px">订单结算PV</th>
-                  <th style="width:120px" data-anno="kPerfVV">订单结算v值</th>
-                  <th style="width:160px">业绩类型</th>
-                  <th style="width:120px">结算状态</th>
-                  <th style="width:110px">是否分佣</th>
-                  <th>描述</th>
-                </tr>
-              </thead>
-              <tbody id="mmPerfBody"><tr><td class="c-chk"><input type="checkbox" onclick="mmTogglePerfRow('605947',this)"></td><td>605947</td><td>2026-09-09 10:58:09</td><td>木子酱123<br>17388970728</td><td>2.00</td><td>1.80</td><td>-</td><td>未分佣</td><td>否</td><td>-</td></tr><tr><td class="c-chk"><input type="checkbox" onclick="mmTogglePerfRow('605947',this)"></td><td>605947</td><td>2026-09-09 10:58:09</td><td>木子酱123<br>17388970728</td><td>2.00</td><td>1.80</td><td>-</td><td>未分佣</td><td>否</td><td>-</td></tr><tr><td class="c-chk"><input type="checkbox" onclick="mmTogglePerfRow('605856',this)"></td><td>605856</td><td>2026-08-06 11:41:04</td><td>木子酱123<br>17388970728</td><td>50.00</td><td>45.00</td><td>直推-已结算</td><td>已结算</td><td>是</td><td>【产生退款】20260806TEST-商品订单编号|605856|用户|有幸12123|自购分享奖励</td></tr><tr><td class="c-chk"><input type="checkbox" onclick="mmTogglePerfRow('605856',this)"></td><td>605856</td><td>2026-08-06 11:41:04</td><td>木子酱123<br>17388970728</td><td>50.00</td><td>45.00</td><td>推广-已结算</td><td>已结算</td><td>是</td><td>【产生退款】20260806TEST-商品订单编号|605856|用户|有幸12123|自购分享奖励</td></tr><tr><td class="c-chk"><input type="checkbox" onclick="mmTogglePerfRow('605856',this)"></td><td>605856</td><td>2026-08-06 11:41:04</td><td>木子酱123<br>17388970728</td><td>50.00</td><td>45.00</td><td>直推-已退款</td><td>已结算</td><td>是</td><td>20260806TEST-商品订单编号|605856|用户|有幸12123|自购分享奖励</td></tr><tr><td class="c-chk"><input type="checkbox" onclick="mmTogglePerfRow('605856',this)"></td><td>605856</td><td>2026-08-06 11:41:04</td><td>木子酱123<br>17388970728</td><td>50.00</td><td>45.00</td><td>推广-已退款</td><td>已结算</td><td>是</td><td>【产生退款】20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴</td></tr><tr><td class="c-chk"><input type="checkbox" onclick="mmTogglePerfRow('605856',this)"></td><td>605856</td><td>2026-08-06 11:41:04</td><td>木子酱123<br>17388970728</td><td>50.00</td><td>45.00</td><td>直推-已结算</td><td>已结算</td><td>是</td><td>20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴</td></tr><tr><td class="c-chk"><input type="checkbox" onclick="mmTogglePerfRow('605856',this)"></td><td>605856</td><td>2026-08-06 11:41:04</td><td>木子酱123<br>17388970728</td><td>50.00</td><td>45.00</td><td>推广-已退款</td><td>已结算</td><td>是</td><td>20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴</td></tr><tr><td class="c-chk"><input type="checkbox" onclick="mmTogglePerfRow('605856',this)"></td><td>605856</td><td>2026-08-06 11:41:04</td><td>木子酱123<br>17388970728</td><td>50.00</td><td>45.00</td><td>直推-已退款</td><td>已结算</td><td>是</td><td>20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴</td></tr><tr><td class="c-chk"><input type="checkbox" onclick="mmTogglePerfRow('605856',this)"></td><td>605856</td><td>2026-08-06 11:41:04</td><td>木子酱123<br>17388970728</td><td>50.00</td><td>45.00</td><td>推广-已退款</td><td>已结算</td><td>是</td><td>20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴</td></tr></tbody>
-            </table>
-          </div>
-
-          <div class="pager">
-            <span id="mmPerfTotal">共 162 条</span>
-            <select class="pg-size"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>
-            <button class="pg dis">‹</button>
-            <button class="pg active">1</button>
-            <button class="pg">2</button>
-            <button class="pg">›</button>
-            <div class="pg-jump"><span>前往</span><input type="text" value="1"><span>页</span></div>
           </div>
         </div>
       </div>
@@ -1975,78 +1900,7 @@
       });
     }
 
-    var mmPerfOrders = [
-      { no: '605947', time: '2026-09-09 10:58:09', buyer: '木子酱123', account: '17388970728', pv: '2.00', vv: '1.80', type: '-', status: '未分佣', comm: '否', desc: '-' },
-      { no: '605947', time: '2026-09-09 10:58:09', buyer: '木子酱123', account: '17388970728', pv: '2.00', vv: '1.80', type: '-', status: '未分佣', comm: '否', desc: '-' },
-      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', vv: '45.00', type: '直推-已结算', status: '已结算', comm: '是', desc: '【产生退款】20260806TEST-商品订单编号|605856|用户|有幸12123|自购分享奖励' },
-      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', vv: '45.00', type: '推广-已结算', status: '已结算', comm: '是', desc: '【产生退款】20260806TEST-商品订单编号|605856|用户|有幸12123|自购分享奖励' },
-      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', vv: '45.00', type: '直推-已退款', status: '已结算', comm: '是', desc: '20260806TEST-商品订单编号|605856|用户|有幸12123|自购分享奖励' },
-      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', vv: '45.00', type: '推广-已退款', status: '已结算', comm: '是', desc: '【产生退款】20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴' },
-      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', vv: '45.00', type: '直推-已结算', status: '已结算', comm: '是', desc: '20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴' },
-      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', vv: '45.00', type: '推广-已退款', status: '已结算', comm: '是', desc: '20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴' },
-      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', vv: '45.00', type: '直推-已退款', status: '已结算', comm: '是', desc: '20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴' },
-      { no: '605856', time: '2026-08-06 11:41:04', buyer: '木子酱123', account: '17388970728', pv: '50.00', vv: '45.00', type: '推广-已退款', status: '已结算', comm: '是', desc: '20260806TEST-商品订单编号|605856|用户|有幸12123|工作站专项补贴' }
-    ];
-    var mmPerfSel = {};
-    function mmRenderPerfList(data) {
-      var body = document.getElementById('mmPerfBody');
-      body.innerHTML = '';
-      data.forEach(function (o) {
-        var tr = document.createElement('tr');
-        tr.innerHTML =
-          '<td class="c-chk"><input type="checkbox" ' + (mmPerfSel[o.no] ? 'checked' : '') + ' onclick="mmTogglePerfRow(\'' + o.no + '\',this)"></td>' +
-          '<td>' + o.no + '</td>' +
-          '<td>' + o.time + '</td>' +
-          '<td>' + o.buyer + '<br>' + o.account + '</td>' +
-          '<td>' + o.pv + '</td>' +
-          '<td>' + (o.vv ? o.vv : '-') + '</td>' +
-          '<td>' + o.type + '</td>' +
-          '<td>' + o.status + '</td>' +
-          '<td>' + o.comm + '</td>' +
-          '<td>' + o.desc + '</td>';
-        body.appendChild(tr);
-      });
-      document.getElementById('mmPerfTotal').textContent = '共 ' + (data.length === mmPerfOrders.length ? 162 : data.length) + ' 条';
-    }
-    function mmTogglePerfRow(no, el) {
-      if (el.checked) { mmPerfSel[no] = 1; } else { delete mmPerfSel[no]; }
-    }
-    function mmTogglePerfAll(el) {
-      mmPerfOrders.forEach(function (o) { if (el.checked) { mmPerfSel[o.no] = 1; } else { delete mmPerfSel[o.no]; } });
-      mmRenderPerfList(mmPerfOrders);
-    }
-    function mmBatchRecheck() {
-      var ids = Object.keys(mmPerfSel);
-      if (!ids.length) { toast('请先勾选要重新验收的订单'); return; }
-      confirmAction('确认批量重新验收？', '已选择 <em>' + ids.length + '</em> 笔订单，将重新发起验收。', function () {
-        toast('已提交批量重新验收：' + ids.length + ' 笔');
-        mmPerfSel = {};
-        mmRenderPerfList(mmPerfOrders);
-      });
-    }
-    function mmSearchPerf() {
-      var no = document.getElementById('mmPOrderNo').value.trim();
-      var buyer = document.getElementById('mmPBuyer').value.trim();
-      var all = document.getElementById('mmPAll').value;
-      var list = mmPerfOrders.slice();
-      if (no) { list = list.filter(function (r) { return ('' + r.no).indexOf(no) > -1; }); }
-      if (buyer) { list = list.filter(function (r) { return r.account.indexOf(buyer) > -1 || r.buyer.indexOf(buyer) > -1; }); }
-      if (all) { list = list.filter(function (r) { return r.type.indexOf(all) > -1; }); }
-      mmRenderPerfList(list);
-      toast('查询完成，共 ' + list.length + ' 条');
-    }
-    function mmResetPerf() {
-      document.getElementById('mmPOrderNo').value = '';
-      document.getElementById('mmPBuyer').value = '';
-      document.getElementById('mmPType').selectedIndex = 0;
-      document.getElementById('mmPAll').selectedIndex = 0;
-      document.getElementById('mmPStart').value = '';
-      document.getElementById('mmPEnd').value = '';
-      mmRenderPerfList(mmPerfOrders);
-    }
-
     mmRenderList(mmMembers);
-    mmRenderPerfList(mmPerfOrders);
 
     renderList(products);
   </script>
@@ -2122,7 +1976,7 @@
 .__anno-tb.folded button:not(.__anno-fold){display:none}
 .__anno-tb.folded .__anno-fold{width:40px;height:40px;border-radius:50%;font-size:13px}
 </style>
-<script id="__anno_seed" type="application/json">[{"id":"aVKCol0001","no":1,"view":"viewDetail","sel":"[data-anno=\"kVCol\"]","text":"可编辑\n输入限制：正整数 0~99999\n默认数据：默认为空","ts":1763700000000,"valid":false},{"id":"aVBatch0002","no":2,"view":"viewDetail","sel":"[data-anno=\"kVBatch\"]","text":"可编辑\n输入限制：正整数 0~99999\n默认数据：默认为空\n点击批量设置后覆盖所有规格行 V值","ts":1763700001000,"valid":false},{"id":"aVSingl0003","no":3,"view":"viewDetail","sel":"[data-anno=\"kVSingle\"]","text":"不可编辑\n由批量设置同步回填","ts":1763700002000,"valid":false},{"id":"a36fbcb516a89","no":4,"view":"global","sel":"[data-anno=\"kSideProduct\"]","text":"功能说明：点击进入商品管理列表页（本期新增可点切换）\n功能实现：本菜单本期有改动：新增 goProduct 切换逻辑，可与「会员管理」互切；开发与测试需逐项核对本原型全部改动批注，避免遗漏","ts":1790044709500,"valid":true},{"id":"af30f76994e79","no":5,"view":"global","sel":"[data-anno=\"kSideMember\"]","text":"功能说明：点击进入会员管理列表页（会员中心模块入口）\n功能实现：本期新增会员中心模块及 v值 相关改动；开发与测试需关注会员列表/详情/业绩各功能批注","ts":1790044709500,"valid":true},{"id":"af97933add86f","no":6,"view":"viewMemberList","sel":"[data-anno=\"kMMView\"]","text":"功能说明：点击进入该会员详情页\n功能实现：详情页本期新增 TA的业绩「v值」记录（直推v值、推广v值）及业绩订单「订单结算v值」列，开发与测试需关注详情页新增内容","ts":1790044709500,"valid":false},{"id":"ab464d1b7866c","no":7,"view":"viewMemberDetail","sel":"[data-anno=\"kPerfVZh\"]","text":"不可编辑\n直推（v值）：用户下单时由直接推荐人（直接上级）产生的 v值","ts":1790044709500,"valid":false},{"id":"abd0496e8efb6","no":8,"view":"viewMemberDetail","sel":"[data-anno=\"kPerfVTg\"]","text":"不可编辑\n推广（v值）：除直推外、由非直接上级产生的 v值","ts":1790044709500,"valid":false},{"id":"a9016f8f075ee","no":9,"view":"viewMemberPerf","sel":"[data-anno=\"kPerfVV\"]","text":"不可编辑\n显示：业绩详情订单表「订单结算PV」右侧新增列，展示该订单结算产生的 v值","ts":1790044709500,"valid":false},{"id":"ae78a447b8b91","no":10,"view":"viewMemberDetail","sel":"[data-anno=\"kPerfEntry\"]","text":"功能说明：点击进入业绩详情订单页\n功能实现：本期业绩详情订单页新增 v值 信息——订单表「订单结算PV」右侧新增「订单结算v值」列（详见该页对应批注）；开发与测试需关注该页新增 v值 列","ts":1790044709500,"valid":false},{"id":"amuccbci7dxhj","no":11,"view":"viewList","sel":"div#viewList > div.card > div.card-head:nth-of-type(1) > div.head-actions > button.btn.btn-primary:nth-of-type(2)","text":"新增商品按钮进入商品详情页面有对应V值改动","ts":1790061359120,"valid":true}]</script>
+<script id="__anno_seed" type="application/json">[{"id":"aVKCol0001","no":1,"view":"viewDetail","sel":"[data-anno=\"kVCol\"]","text":"可编辑\n输入限制：正整数 0~99999\n默认数据：默认为空","ts":1763700000000,"valid":false},{"id":"aVBatch0002","no":2,"view":"viewDetail","sel":"[data-anno=\"kVBatch\"]","text":"可编辑\n输入限制：正整数 0~99999\n默认数据：默认为空\n点击批量设置后覆盖所有规格行 V值","ts":1763700001000,"valid":false},{"id":"aVSingl0003","no":3,"view":"viewDetail","sel":"[data-anno=\"kVSingle\"]","text":"不可编辑\n由批量设置同步回填","ts":1763700002000,"valid":false},{"id":"a36fbcb516a89","no":4,"view":"global","sel":"[data-anno=\"kSideProduct\"]","text":"功能说明：点击进入商品管理列表页（本期新增可点切换）\n功能实现：本菜单本期有改动：新增 goProduct 切换逻辑，可与「会员管理」互切；开发与测试需逐项核对本原型全部改动批注，避免遗漏","ts":1790044709500,"valid":true},{"id":"af30f76994e79","no":5,"view":"global","sel":"[data-anno=\"kSideMember\"]","text":"功能说明：点击进入会员管理列表页（会员中心模块入口）\n功能实现：本期新增会员中心模块及 v值 相关改动；开发与测试需关注会员列表/详情/业绩各功能批注","ts":1790044709500,"valid":true},{"id":"af97933add86f","no":6,"view":"viewMemberList","sel":"[data-anno=\"kMMView\"]","text":"功能说明：点击进入该会员详情页\n功能实现：详情页本期新增 TA的业绩「v值」记录（直推v值、推广v值，独立「V值奖金」卡片），开发与测试需关注详情页新增内容","ts":1790044709500,"valid":false},{"id":"ab464d1b7866c","no":7,"view":"viewMemberDetail","sel":"[data-anno=\"kPerfVZh\"]","text":"不可编辑\n直推（v值）：用户下单时由直接推荐人（直接上级）产生的 v值","ts":1790044709500,"valid":false},{"id":"abd0496e8efb6","no":8,"view":"viewMemberDetail","sel":"[data-anno=\"kPerfVTg\"]","text":"不可编辑\n推广（v值）：除直推外、由非直接上级产生的 v值","ts":1790044709500,"valid":false},{"id":"amuccbci7dxhj","no":11,"view":"viewList","sel":"div#viewList > div.card > div.card-head:nth-of-type(1) > div.head-actions > button.btn.btn-primary:nth-of-type(2)","text":"新增商品按钮进入商品详情页面有对应V值改动","ts":1790061359120,"valid":true}]</script>
 <script id="__anno_engine">
 (function(){
   "use strict";
