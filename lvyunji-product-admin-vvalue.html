@@ -2151,6 +2151,9 @@
 
 
 
+
+
+
 <style id="__anno_css">/* v4：角标独立浮层。layer 在视口坐标下绝对定位（inset:0 fixed），
    子角标用 JS 按目标元素 rect 算 left/top，不进宿主 DOM。
    弹窗开启时不再整层隐藏，而是逐角标按「顶层弹窗」判定（topOpenModal）：只显示顶层弹窗内字段角标，背景/下层弹窗角标隐藏防穿透。
@@ -2245,7 +2248,7 @@
  {
   "id": "a36fbcb516a89",
   "no": 4,
-  "view": "!viewBonus",
+  "view": "global",
   "sel": "[data-anno=\"kSideProduct\"]",
   "text": "功能说明：点击进入商品管理列表页（本期新增可点切换）\n功能实现：本菜单本期有改动：新增 goProduct 切换逻辑，可与「会员管理」互切；开发与测试需逐项核对本原型全部改动批注，避免遗漏",
   "ts": 1790044709500,
@@ -2254,7 +2257,7 @@
  {
   "id": "af30f76994e79",
   "no": 5,
-  "view": "!viewBonus",
+  "view": "global",
   "sel": "[data-anno=\"kSideMember\"]",
   "text": "功能说明：点击进入会员管理列表页（会员中心模块入口）\n功能实现：本期新增会员中心模块及 v值 相关改动；开发与测试需关注会员列表/详情/业绩各功能批注",
   "ts": 1790044709500,
@@ -2527,8 +2530,10 @@
     } catch(e){ return null; }
   }
   /* 分类：ok=可见可标；hidden-modal=被别的弹窗/背景遮挡（有弹窗开着时只显示顶层弹窗内，防穿透）；
-     pending=条件未激活 / 关着的弹窗内字段（待激活灰标，不判失联）；lost=锚点彻底失效(红标失联)。
-     默认全量：无弹窗开着时，关着的弹窗内字段不隐藏、落 pending，打开即看全量 19 条。 */
+     pending=条件未激活 / 关着的弹窗内字段（待激活灰标，不判失联）；
+     hidden=锚点存在但被「非弹窗」隐藏（多为视图/侧栏切换致 display:none）—— 干净隐藏，不堆灰标、不报失联，切回可见视图自动恢复；
+     lost=锚点彻底失效(红标失联)。
+     默认全量：无弹窗开着时，关着的弹窗内字段落 pending，打开即看全量。 */
   function classify(a){
     var el = locate(a.sel, rootOf(a.view));
     if (el){
@@ -2539,9 +2544,12 @@
         if (m === top) return isVisible(el) ? 'ok' : 'pending';
         return 'hidden-modal';
       }
-      /* 无弹窗：关着的弹窗内字段不隐藏，落 pending（全量可见） */
+      /* 无弹窗：锚点可见即 ok；不可见分两类 ——
+         在弹窗容器内（关闭的弹窗未展开）→ 维持 pending，弹窗打开即恢复（原有弹窗态行为）；
+         不在弹窗内（多为视图/侧栏切换致 display:none）→ 直接 hidden，干净隐藏不堆灰标、不报失联，
+         切回可见视图自动恢复；这从引擎层通用消除「锚点随视图/侧栏隐藏」整类失联/待激活问题，无需逐条写 !view 排除。 */
       if (isVisible(el)) return 'ok';
-      return 'pending';
+      return modalOf(el) ? 'pending' : 'hidden';
     }
     var fb = a.fallback ? locate(a.fallback, rootOf(a.view)) : null;
     if (fb) return 'pending';
@@ -2559,10 +2567,12 @@
     var miss = [];
     var pending = [];
     data.forEach(function(a){
-      /* 视图过滤：a.view='viewX' 仅该视图显示；a.view='!viewX' 排除语义——除 viewX 外都显示（用于侧栏等跨视图常驻元素在个别视图被隐藏的场景，避免误判失联/待激活） */
+      /* 视图过滤：a.view='viewX' 仅该视图显示；a.view='!viewX' 为可选显式覆盖——仅 viewX 下隐藏（即使锚点可见）；
+         常规「锚点随视图/侧栏隐藏」整类问题已由 classify 的 hidden 态通用处理（无需逐条写 !view） */
       if (a.view && a.view !== 'global' && a.view !== cv) { if (a.view.charAt(0) !== '!' || a.view.slice(1) === cv) return; }
       var c = classify(a);
       if (c === 'hidden-modal') return;
+      if (c === 'hidden') return;
       if (c === 'ok'){
         var el = locate(a.sel, rootOf(a.view));
         var block = anchorOf(el);
