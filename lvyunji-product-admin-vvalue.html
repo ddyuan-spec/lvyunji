@@ -479,6 +479,61 @@
 .ZL32C_XdLL8UQRZ3zObd {
   overflow: visible !important;
 }
+
+/* ================= 结算中心→用户收益→奖金钱包（bw- 前缀，1:1 复刻真实后台截图） ================= */
+#viewBonus { padding: 16px 20px 30px; background: #EEF0F4; }
+#viewBonus table.bw-tbl { min-width: 0; width: 100%; border-collapse: collapse; table-layout: fixed; margin-top: 18px; }
+.bw-panel { background: #fff; border-radius: 4px; padding: 18px 20px 22px; }
+.bw-phead { display: flex; align-items: center; }
+.bw-phead h2 { font-size: 15px; color: #333; font-weight: bold; margin: 0; }
+.bw-btns { margin-left: auto; display: flex; gap: 10px; }
+.bw-btn { height: 30px; padding: 0 16px; border-radius: 3px; border: 1px solid transparent; font-size: 12px; cursor: pointer; }
+.bw-btn-red { background: #FF5E69; color: #fff; }
+.bw-btn-plain { background: #fff; color: #666; border-color: #DCDEE7; }
+.bw-btn-green { background: #4DBB4F; color: #fff; }
+.bw-dim-tabs { display: flex; margin-top: 16px; border-bottom: 1px solid #E8EAF1; }
+.bw-dim-tabs .bw-dt { padding: 0 4px 10px; margin-right: 38px; font-size: 13px; color: #555; cursor: pointer; position: relative; }
+.bw-dim-tabs .bw-dt.active { color: #FF5E69; }
+.bw-dim-tabs .bw-dt.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: #FF5E69; }
+.bw-filters { display: flex; align-items: center; gap: 14px; margin-top: 18px; flex-wrap: wrap; }
+.bw-filters input, .bw-filters select { height: 32px; border: 1px solid #E0E2EB; border-radius: 3px; padding: 0 10px; font-size: 12px; color: #333; background: #fff; outline: none; min-width: 150px; }
+.bw-filters input::placeholder { color: #BEC1CC; }
+.bw-expand { color: #4E46E5; font-size: 12px; cursor: pointer; white-space: nowrap; }
+.bw-tbl th { background: #ECEFFA; color: #555; font-weight: normal; font-size: 12px; text-align: left; padding: 11px 10px; white-space: nowrap; border: 0; }
+.bw-tbl td { font-size: 12px; color: #444; padding: 9px 10px; border-bottom: 1px solid #F0F1F6; vertical-align: middle; word-break: break-all; line-height: 1.55; }
+.bw-tbl tbody tr:nth-child(even) { background: #F7F9FD; }
+.bw-tbl tbody tr.hl { background: #E8F7EE; }
+.bw-tbl .col-user { width: 235px; } .bw-tbl .col-lv { width: 92px; } .bw-tbl .col-type { width: 88px; }
+.bw-tbl .col-amt { width: 66px; } .bw-tbl .col-avail { width: 82px; } .bw-tbl .col-pv { width: 76px; }
+.bw-tbl .col-src { width: 128px; } .bw-tbl .col-reward { width: 118px; } .bw-tbl .col-status { width: 68px; }
+.bw-tbl .col-desc { width: 390px; } .bw-tbl .col-time { width: 175px; }
+.bw-tbl td.col-time { white-space: nowrap; }
+.bw-ucell { display: flex; align-items: center; gap: 8px; }
+.bw-avatar { width: 36px; height: 36px; border-radius: 3px; flex-shrink: 0; overflow: hidden; }
+.bw-avatar.fail { background: #F2F3F7; color: #C2C5D0; font-size: 11px; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.3; }
+.bw-unames { font-size: 12px; color: #444; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bw-dash { color: #999; }
+.bw-pager { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 16px 8px 6px; font-size: 12px; color: #606266; }
+.bw-sizes { position: relative; }
+.bw-sizes select { appearance: none; -webkit-appearance: none; font-size: 12px; color: #606266; padding: 5px 26px 5px 10px; border: 1px solid #DCDFE6; border-radius: 3px; background: #fff; cursor: pointer; }
+.bw-sizes::after { content: ""; position: absolute; right: 9px; top: 50%; width: 6px; height: 6px; border-right: 1px solid #909399; border-bottom: 1px solid #909399; transform: translateY(-70%) rotate(45deg); pointer-events: none; }
+.bw-btnp { min-width: 28px; height: 28px; border: none; border-radius: 3px; background: #F4F4F5; color: #606266; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0 6px; }
+.bw-btnp:disabled { color: #C0C4CC; cursor: default; }
+.bw-btnp.active { background: #FF5E69; color: #fff; }
+.bw-ell { color: #909399; padding: 0 2px; }
+.bw-jump { display: flex; align-items: center; gap: 6px; }
+.bw-jump input { width: 36px; height: 28px; border: 1px solid #DCDFE6; border-radius: 3px; text-align: center; font-size: 12px; color: #606266; }
+
+/* ================= 结算中心侧栏（ss- 前缀，1:1 复刻真实后台截图） ================= */
+.ss-side { width: 200px; flex: 0 0 200px; background: #fff; border-right: 1px solid #E8EAF1; min-height: calc(100vh - 56px); }
+.ss-head { display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 16px; font-size: 13px; color: #4A4A5A; cursor: pointer; }
+.ss-head .ss-ico { font-size: 14px; width: 16px; text-align: center; }
+.ss-head .ss-arr { margin-left: auto; font-size: 10px; color: #B0B3C0; }
+.ss-head.active { background: #FF5E69; color: #fff; }
+.ss-head.active .ss-arr { color: rgba(255,255,255,.85); }
+.ss-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 14px 12px 18px; }
+.ss-mi { height: 38px; display: flex; align-items: center; justify-content: center; background: #F5F6F9; border: 1px solid transparent; border-radius: 3px; font-size: 12px; color: #6A6D7C; cursor: pointer; }
+.ss-mi.active { background: #fff; border-color: #FF5E69; color: #FF5E69; }
 </style></head>
 <body class="">
   <!-- ================= 顶栏 ================= -->
@@ -488,16 +543,16 @@
       <svg viewBox="0 0 18 18"><path d="M10 3.5h6M10 9h6M10 14.5h6"></path><path d="M6.5 5.5L3 9l3.5 3.5" fill="none"></path></svg>
     </span>
     <nav class="tb-nav">
-      <span class="active">店铺</span>
-      <span>营销中心</span>
-      <span>结算中心</span>
+      <span class="active" id="navShop" onclick="goShopNav()" style="cursor:pointer;">店铺</span>
+      <span id="navMarket" onclick="toast('营销中心')" style="cursor:pointer;">营销中心</span>
+      <span id="navSettle" onclick="goSettle()" style="cursor:pointer;">结算中心</span>
     </nav>
     <span class="tb-user">袁</span>
   </header>
 
   <main class="app-body">
-    <!-- ================= 侧栏 ================= -->
-    <aside class="sidebar">
+    <!-- ================= 侧栏（店铺域） ================= -->
+    <aside class="sidebar" id="sideShop">
       <div class="menu-item">
         <svg class="ico" viewBox="0 0 14 14"><rect x="1.5" y="2.5" width="11" height="9" rx="1.2"></rect><path d="M4 5.6l1.8 1.6L8.4 4.6l2 1.8"></path></svg>控制台<span class="caret">▾</span>
       </div>
@@ -534,6 +589,25 @@
       <div class="menu-item"><svg class="ico" viewBox="0 0 14 14"><path d="M7 1.8l1.3 3.1 3.1 1.3-3.1 1.3L7 10.6 5.7 7.5 2.6 6.2l3.1-1.3z"></path><path d="M10.6 9.8l.5 1.2 1.2.5-1.2.5-.5 1.2-.5-1.2-1.2-.5 1.2-.5z"></path></svg>AI工具管理<span class="caret">▾</span></div>
     </aside>
 
+    <!-- ================= 侧栏（结算中心域，1:1 复刻自真实后台截图） ================= -->
+    <aside class="ss-side" id="sideSettle" style="display:none;">
+      <div class="ss-head active"><span class="ss-ico">📋</span>用户收益<span class="ss-arr">︿</span></div>
+      <div class="ss-menu">
+        <div class="ss-mi active" onclick="toast('奖金钱包')">奖金钱包</div>
+        <div class="ss-mi" onclick="toast('电子钱包')">电子钱包</div>
+        <div class="ss-mi" onclick="toast('积分管理')">积分管理</div>
+        <div class="ss-mi" onclick="toast('优惠券明细')">优惠券明细</div>
+        <div class="ss-mi" onclick="toast('收益统计')">收益统计</div>
+        <div class="ss-mi" onclick="toast('积分统计')">积分统计</div>
+        <div class="ss-mi" onclick="toast('奖金统计')">奖金统计</div>
+        <div class="ss-mi" onclick="toast('会员提现管理')">会员提现管理</div>
+        <div class="ss-mi" onclick="toast('灵活用工提现')">灵活用工提现</div>
+      </div>
+      <div class="ss-head"><span class="ss-ico">🏪</span>商家收益<span class="ss-arr">﹀</span></div>
+      <div class="ss-head"><span class="ss-ico">🧾</span>对账中心<span class="ss-arr">﹀</span></div>
+      <div class="ss-head"><span class="ss-ico">💰</span>储值管理<span class="ss-arr">﹀</span></div>
+    </aside>
+
     <!-- ================= 工作区 ================= -->
     <div class="workspace">
       <div class="page-tabs">
@@ -549,6 +623,7 @@
         <span class="ptab">换购活动<span class="x">×</span></span>
         <span class="ptab">全部工作站<span class="x">×</span></span>
         <span class="ptab" id="tabDetail" style="display: none;"><i class="dot"></i><span id="tabDetailTxt">新增商品</span><span class="x" style="color: rgb(200, 200, 200);">×</span></span>
+        <span class="ptab" id="tabBonus" style="display: none;"><i class="dot"></i>奖金钱包<span class="x" style="color: rgb(255, 255, 255);">×</span></span>
       </div>
 
       <!-- ---------- 视图一：商家商品管理（列表） ---------- -->
@@ -1344,7 +1419,141 @@
         </div>
       </div>
 
+    <!-- ---------- 视图四：结算中心→用户收益→奖金钱包（1:1 复刻真实后台截图，PV值/V值） ---------- -->
+    <div class="view" id="viewBonus">
+      <div class="bw-panel">
+        <div class="bw-phead">
+          <h2>会员奖金明细</h2>
+          <div class="bw-btns">
+            <button class="bw-btn bw-btn-red" onclick="toast('搜索')">搜索</button>
+            <button class="bw-btn bw-btn-plain" onclick="toast('重置')">重置</button>
+            <button class="bw-btn bw-btn-green" onclick="toast('导出')">导出</button>
+          </div>
+        </div>
+
+        <div class="bw-dim-tabs">
+          <div class="bw-dt">按成员</div>
+          <div class="bw-dt active">按明细</div>
+        </div>
+
+        <div class="bw-filters">
+          <input type="text" placeholder="用户账号">
+          <input type="text" placeholder="用户昵称">
+          <input type="text" placeholder="余额大于">
+          <input type="text" placeholder="订单编号">
+          <select><option>变更类型</option></select>
+          <select><option>结算状态</option></select>
+          <span class="bw-expand">展开 ∨</span>
+        </div>
+
+        <table class="bw-tbl">
+          <colgroup>
+            <col class="col-user"><col class="col-lv"><col class="col-type"><col class="col-amt">
+            <col class="col-avail"><col class="col-pv"><col class="col-src"><col class="col-reward">
+            <col class="col-status"><col><col class="col-time">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>用户信息</th><th>收益会员等级</th><th>会员类型</th><th>金额</th><th>可用余额</th>
+              <th>PV值/V值</th><th>来源用户</th><th>奖励类型</th><th>结算状态</th><th>描述</th><th>记录时间</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="hl">
+              <td><div class="bw-ucell"><div class="bw-avatar fail">加载<br>失败</div><div class="bw-unames">有享猫官方(rk0001)</div></div></td>
+              <td>至尊达人</td><td>至尊达人</td><td>15</td><td class="bw-dash">—</td><td>300</td>
+              <td>测试新人权益3(15624824623)</td>
+              <td>下级的商品推荐商家奖励冻结</td><td>冻结中</td>
+              <td>20260928【新人区】测试商品订单编号[606327],用户[有享猫官方]推荐商家奖励</td>
+              <td>2026-09-28 10:20</td>
+            </tr>
+            <tr>
+              <td><div class="bw-ucell"><div class="bw-avatar" style="background:linear-gradient(145deg,#4a4a52,#26262c)"></div><div class="bw-unames">谭先生(13907310714)</div></div></td>
+              <td>潜力达人</td><td>潜力达人</td><td>50</td><td class="bw-dash">—</td><td>300</td>
+              <td>测试新人权益3(15624824623)</td>
+              <td>服务奖</td><td>冻结中</td>
+              <td>20260928【新人区】测试商品订单编号[606327]新人成长专区首席奖励V值</td>
+              <td>2026-09-28 10:20</td>
+            </tr>
+            <tr>
+              <td><div class="bw-ucell"><div class="bw-avatar" style="background:repeating-linear-gradient(0deg,#fff 0 4px,#39393f 4px 5px),repeating-linear-gradient(90deg,rgba(57,57,63,.9) 0 4px,#fff 4px 5px);background-blend-mode:multiply"></div><div class="bw-unames">有幸12123(18307448442)</div></div></td>
+              <td>潜力达人</td><td>潜力达人</td><td>50</td><td class="bw-dash">—</td><td>300</td>
+              <td>测试新人权益3(15624824623)</td>
+              <td>服务奖</td><td>冻结中</td>
+              <td>20260928【新人区】测试商品订单编号[606327]新人成长专区资深委奖励V值</td>
+              <td>2026-09-28 10:20</td>
+            </tr>
+            <tr>
+              <td><div class="bw-ucell"><div class="bw-avatar" style="background:linear-gradient(135deg,#7fd4f0 0 30%,#f7e06b 30% 55%,#5cc25c 55% 80%,#3d8fd1 80%)"></div><div class="bw-unames">成先生1(15673225969)</div></div></td>
+              <td>体验达人</td><td>体验达人</td><td>100</td><td class="bw-dash">—</td><td>300</td>
+              <td>测试新人权益3(15624824623)</td>
+              <td>服务奖</td><td>冻结中</td>
+              <td>20260928【新人区】测试商品订单编号[606327]新人成长专区执行委奖励V值</td>
+              <td>2026-09-28 10:20</td>
+            </tr>
+            <tr>
+              <td><div class="bw-ucell"><div class="bw-avatar" style="background:linear-gradient(180deg,#7db3d8 0 45%,#e8a35c 45% 62%,#4a5a70 62%)"></div><div class="bw-unames">C小明1(13574051885)</div></div></td>
+              <td>成长达人</td><td>成长达人</td><td>100</td><td class="bw-dash">—</td><td>300</td>
+              <td>测试新人权益3(15624824623)</td>
+              <td>下单的商品工作站专项补贴</td><td>冻结中</td>
+              <td>20260928【新人区】测试商品订单编号[606327]新人成长专区工作站奖励V值</td>
+              <td>2026-09-28 10:20</td>
+            </tr>
+            <tr>
+              <td><div class="bw-ucell"><div class="bw-avatar" style="background:radial-gradient(circle at 50% 42%,#fff 0 18%,#1b1b1e 19% 40%,transparent 41%),linear-gradient(180deg,#d8d8dc 0 8%,#2a2a30 8% 100%)"></div><div class="bw-unames">George Tan(18569596673)</div></div></td>
+              <td>精英达人</td><td>精英达人</td><td>200</td><td class="bw-dash">—</td><td>300</td>
+              <td>测试新人权益3(15624824623)</td>
+              <td>下单的商品自购/分享奖励冻结</td><td>冻结中</td>
+              <td>20260928【新人区】测试商品订单编号[606327]新人成长区间推奖励V值</td>
+              <td>2026-09-28 10:20</td>
+            </tr>
+            <tr>
+              <td><div class="bw-ucell"><div class="bw-avatar" style="background:linear-gradient(180deg,#7db3d8 0 45%,#e8a35c 45% 62%,#4a5a70 62%)"></div><div class="bw-unames">C小明1(13574051885)</div></div></td>
+              <td>成长达人</td><td>成长达人</td><td>500</td><td class="bw-dash">—</td><td>300</td>
+              <td>测试新人权益3(15624824623)</td>
+              <td>下单的商品自购/分享奖励冻结</td><td>冻结中</td>
+              <td>20260928【新人区】测试商品订单编号[606327]新人成长专区推荐奖励V值</td>
+              <td>2026-09-28 10:20</td>
+            </tr>
+            <tr>
+              <td><div class="bw-ucell"><div class="bw-avatar" style="background:linear-gradient(145deg,#4a4a52,#26262c)"></div><div class="bw-unames">谭先生(13907310714)</div></div></td>
+              <td>潜力达人</td><td>潜力达人</td><td>1.5</td><td class="bw-dash">—</td><td>300</td>
+              <td>测试新人权益3(15624824623)</td>
+              <td>下单的商品培育奖奖励冻结</td><td>冻结中</td>
+              <td>20260928【新人区】测试商品订单编号[606327],用户[谭先生]培育奖奖励</td>
+              <td>2026-09-28 10:20</td>
+            </tr>
+            <tr>
+              <td><div class="bw-ucell"><div class="bw-avatar" style="background:linear-gradient(180deg,#7db3d8 0 45%,#e8a35c 45% 62%,#4a5a70 62%)"></div><div class="bw-unames">C小明1(13574051885)</div></div></td>
+              <td>成长达人</td><td>成长达人</td><td>9</td><td class="bw-dash">—</td><td>300</td>
+              <td>测试新人权益3(15624824623)</td>
+              <td>下单的商品工作站专项补贴</td><td>冻结中</td>
+              <td>20260928【新人区】测试商品订单编号[606327],用户[C小明1]工作站专项补贴</td>
+              <td>2026-09-28 10:20</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="bw-pager">
+        <span class="bw-total">共 5007291 条</span>
+        <span class="bw-sizes"><select><option>10条/页</option></select></span>
+        <button class="bw-btnp" disabled>‹</button>
+        <button class="bw-btnp active">1</button>
+        <button class="bw-btnp">2</button>
+        <button class="bw-btnp">3</button>
+        <button class="bw-btnp">4</button>
+        <button class="bw-btnp">5</button>
+        <button class="bw-btnp">6</button>
+        <span class="bw-ell">…</span>
+        <button class="bw-btnp">500730</button>
+        <button class="bw-btnp">›</button>
+        <span class="bw-jump">前往 <input type="text" value="1"> 页</span>
+      </div>
     </div>
+
+    </div>
+
   </main>
 
   <div id="toast"></div>
@@ -1757,6 +1966,30 @@
       var pc = document.getElementById('pmChipList');
       if (pc) { pc.classList.remove('active'); }
       window.scrollTo(0, 0);
+    }
+
+    /* ============== 顶栏导航：店铺 / 结算中心 切换（侧栏联动） ============== */
+    function goSettle() {
+      document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('active'); });
+      document.getElementById('viewBonus').classList.add('active');
+      document.getElementById('sideShop').style.display = 'none';
+      document.getElementById('sideSettle').style.display = '';
+      document.getElementById('tabProduct').classList.remove('active');
+      document.getElementById('tabDetail').style.display = 'none';
+      var tb = document.getElementById('tabBonus');
+      tb.style.display = ''; tb.classList.add('active');
+      document.getElementById('navShop').classList.remove('active');
+      document.getElementById('navSettle').classList.add('active');
+      window.scrollTo(0, 0);
+    }
+    function goShopNav() {
+      document.getElementById('sideSettle').style.display = 'none';
+      document.getElementById('sideShop').style.display = '';
+      var tb = document.getElementById('tabBonus');
+      tb.style.display = 'none'; tb.classList.remove('active');
+      document.getElementById('navSettle').classList.remove('active');
+      document.getElementById('navShop').classList.add('active');
+      goProduct();   // 回到商家商品管理（商品后台原生导航，顶部 tab 行为不变）
     }
 
     function mmRenderList(data) {
