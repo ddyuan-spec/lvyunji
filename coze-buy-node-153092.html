@@ -31,10 +31,10 @@
   <p class="sub">仅此一个节点：代码 + 输入 + 输出，复制即用。type 已写死为 2（按商品名查单个）。</p>
 
   <h2>① 代码（整段替换节点内代码）</h2>
-  <p class="tip">你面板里现在那段是旧版（<code>params['userId'] != null ? …</code>），<b>请用下面这段重新覆盖一次</b>，否则输入名叫 <code class="in">userid</code> 的会取不到值。</p>
+  <p class="tip"><b>v2 已修：彻底去掉 userId 必填校验。</b>后端 type=2 根本不需要 userId（实测留空照样返回商品），旧版代码里 <code>if (!userId) return 失败</code> 这道校验会在调用后端<b>之前</b>就把请求挡掉 —— 试运行 userid 留空 → 直接返回 <code>product:null / success:false</code>。<b>请用下面这段覆盖一次。</b></p>
 <pre><code id="code">async function main({ params }) {
   const userId = String(params['userId'] || params['user_id'] || params['userid'] || '').trim();
-  // 商品识别 LLM 在「生成多样性=平衡」时会给商品名加句号/空格（如「惠民补贴套餐包4。」），
+  // 商品识别 LLM 在「生成多样性=平衡」时会给商品名加句号/空格（如「惠民补贴套餐包10。」），
   // 后端按名查是精确/模糊匹配、带标点就查不到 → 这里兜底把首尾标点空白全清掉。
   const productName = String(params['productName'] || params['product_name'] || '')
     .replace(/^[\s﻿.。,，、；;：:！!？?·\-_~～]+/, '')
@@ -42,7 +42,8 @@
     .trim();
   const env = String(params['env'] || 'test');
 
-  if (!userId) return { success: false, error: '缺少 user_id', product: null, card_json: '' };
+  // 注意：type=2（按名查单个）后端不校验 userId，所以这里「不」把 userId 当必填，
+  // 有就带上、没有也照常查，避免试运行/入参缺失时无谓地查不到商品。
   if (!productName) return { success: false, error: '缺少 productName（商品名）', product: null, card_json: '' };
 
   const HOST = env === 'prod'
@@ -53,7 +54,7 @@
 
   const form = new URLSearchParams();
   form.append('type', '2');            // 帮我买 = 按商品名查单个
-  form.append('userId', userId);
+  if (userId) form.append('userId', userId);
   form.append('productName', productName);
 
   const resp = await fetch(HOST + '/api/apiWxStore/v2//coze/free/assistProduct', {
@@ -93,7 +94,7 @@
   <table>
     <tr><th>输入变量名</th><th>在面板「来源」选</th></tr>
     <tr><td><code class="in">productName</code></td><td><b>商品识别(130516)</b> → 输出 <code class="in">output</code>（识别出来的商品名）</td></tr>
-    <tr><td><code class="in">userId</code></td><td><b>开始节点</b> → <code class="in">user_id</code>（你那行叫 <code class="in">userid</code> 也行）</td></tr>
+    <tr><td><code class="in">userId</code></td><td><b>开始节点</b> → <code class="in">user_id</code>（你那行叫 <code class="in">userid</code> 也行）。<b>可留空</b>：后端 type=2 不校验它，留空也照样返回商品。</td></tr>
   </table>
 
   <h2>③ 输出配置</h2>
@@ -107,9 +108,18 @@
   <div class="note">
     下拉里没有「String(JSON)」是正常的，只有 String / Integer / Number / Boolean / Time / Object / Array 七种：<b>card_json 选 String</b>、<b>product 选 Object</b>、<b>success 选 Boolean</b>。<br>
     面板里多余的 <code class="in">key1</code> / <code class="in">key2</code> 是节点自带默认输出，<b>删掉</b>，只留上面三个。<br>
-    <b>⚠️ 必改（这是"查不到数据"的头号原因）：商品识别(130516) 的「生成多样性」现在是 <span class="pill">balance</span>，请改成 <span class="pill">精确</span>。</b>平衡模式下 LLM 会给商品名加句号/空格（如「惠民补贴套餐包4。」），后端按名查是精确/模糊匹配，<b>带标点就查不到 → 卡片为空</b>。代码里已兜底清掉首尾标点，但设成「精确」更稳。<br>
+    <b>⚠️ 建议改（防商品名带标点）：商品识别(130516) 的「生成多样性」改成 <span class="pill">精确</span>。</b>平衡模式下 LLM 会给商品名加句号/空格（如「惠民补贴套餐包10。」），后端按名查是精确/模糊匹配，<b>带标点就查不到 → 卡片为空</b>。代码里已兜底清掉首尾标点。<br>
     待后端确认：图片域名前缀（IMG_BASE）、生产环境 token 与域名。
   </div>
+
+  <h2>⑤ 当前测试库商品（2026-09-28 实测，建议照此测）</h2>
+  <table>
+    <tr><th>type</th><th>商品名（直接拿来测）</th></tr>
+    <tr><td>帮我省 type=0</td><td>沃希瑞美牌硒片L硒普惠（60片）装 / 惠民补贴套餐包10 / 青少年领袖素质训练营套餐一</td></tr>
+    <tr><td>帮我选 type=1</td><td>富氢水卡 月卡 / text-测试 / TEST-商品</td></tr>
+    <tr><td>帮我买 type=2</td><td>上面 6 个名字<b>全部可查</b>；演示建议用 <b>惠民补贴套餐包10</b> 或 <b>富氢水卡 月卡</b></td></tr>
+  </table>
+  <div class="note">测试库数据后端会随时改（此前出现过的「惠民补贴套餐包2/4/9」「免疫防御金盾套餐」现已下线），测不到先复核商品名是否还在库里。</div>
 
   <h2>④ 接线</h2>
   <table>
