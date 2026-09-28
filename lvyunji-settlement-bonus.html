@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<!-- ============================================================
+  绿韵家管理系统 · 结算中心 → 用户收益 → 奖金钱包「会员奖金明细」
+  设计参考复刻页（1:1 复刻真实后台截图，2026-09-28）
+  来源截图：clipboard-2026-09-28T05-51-39-492Z（1920x920）
+  用途：本页为静态设计基线，后续「用户收益/奖金钱包」正式原型页以本页为唯一样式来源
+  样式 token：顶栏 #2E2D41 56px｜主红 #FF5E69｜表头 #ECEFFA｜隔行 #F7F9FD｜首行绿底 #E8F7EE
+  注：表格头像为照片，本页用近似色块占位（首行截图本身即「加载失败」灰占位）
+============================================================ -->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>绿韵家管理系统 - 会员奖金明细</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:"Microsoft YaHei","PingFang SC",sans-serif; font-size:13px; color:#333; background:#EEF0F4; }
+  ul { list-style:none; }
+
+  /* ===== 顶栏 ===== */
+  .topbar { height:56px; background:#2E2D41; display:flex; align-items:center; color:#fff; position:fixed; top:0; left:0; right:0; z-index:100; }
+  .topbar .logo { font-size:15px; font-weight:bold; padding:0 22px; white-space:nowrap; }
+  .topbar .burger { font-size:17px; padding:0 18px 0 4px; cursor:pointer; color:#B9B8C6; }
+  .topbar .nav { display:flex; height:56px; }
+  .topbar .nav a { color:#C9C8D4; text-decoration:none; font-size:13px; padding:0 26px; display:flex; align-items:center; position:relative; }
+  .topbar .nav a.active { color:#fff; }
+  .topbar .nav a.active::after { content:""; position:absolute; left:22px; right:22px; bottom:0; height:3px; background:#FF5E69; border-radius:2px 2px 0 0; }
+  .topbar .spacer { flex:1; }
+  .topbar .user { padding:0 26px; font-size:13px; cursor:pointer; }
+
+  /* ===== 页签条 ===== */
+  .tabstrip { position:fixed; top:56px; left:0; right:0; height:40px; background:#fff; border-bottom:1px solid #E8EAF1; display:flex; align-items:center; padding:0 14px; gap:10px; z-index:90; }
+  .tabstrip .tab { display:flex; align-items:center; gap:8px; height:26px; padding:0 10px; border:1px solid #E3E5EE; border-radius:3px; font-size:12px; color:#666; background:#fff; }
+  .tabstrip .tab .x { color:#B9BCC9; font-size:12px; cursor:pointer; }
+  .tabstrip .tab.active { background:#FF5E69; border-color:#FF5E69; color:#fff; }
+  .tabstrip .tab.active .x { color:rgba(255,255,255,.75); }
+  .tabstrip .tab .dot { width:8px; height:8px; border-radius:50%; background:#FFC53D; }
+
+  /* ===== 布局 ===== */
+  .layout { display:flex; padding-top:96px; min-height:100vh; }
+
+  /* ===== 侧栏 ===== */
+  .sidebar { width:200px; flex-shrink:0; background:#fff; border-right:1px solid #E8EAF1; min-height:calc(100vh - 96px); }
+  .side-group-head { display:flex; align-items:center; gap:10px; height:46px; padding:0 16px; font-size:13px; color:#4A4A5A; cursor:pointer; }
+  .side-group-head .ico { font-size:14px; width:16px; text-align:center; }
+  .side-group-head .arr { margin-left:auto; font-size:10px; color:#B0B3C0; }
+  .side-group-head.active { background:#FF5E69; color:#fff; }
+  .side-group-head.active .arr { color:rgba(255,255,255,.85); }
+  .side-menu { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:14px 12px 18px; }
+  .side-menu .mi { height:38px; display:flex; align-items:center; justify-content:center; background:#F5F6F9; border:1px solid transparent; border-radius:3px; font-size:12px; color:#6A6D7C; cursor:pointer; }
+  .side-menu .mi.active { background:#fff; border-color:#FF5E69; color:#FF5E69; }
+
+  /* ===== 主体 ===== */
+  .main { flex:1; padding:16px 20px 30px; min-width:0; }
+  .panel { background:#fff; border-radius:4px; padding:18px 20px 22px; }
+  .phead { display:flex; align-items:center; }
+  .phead h2 { font-size:15px; color:#333; font-weight:bold; }
+  .phead .btns { margin-left:auto; display:flex; gap:10px; }
+  .btn { height:30px; padding:0 16px; border-radius:3px; border:1px solid transparent; font-size:12px; cursor:pointer; }
+  .btn-red { background:#FF5E69; color:#fff; }
+  .btn-plain { background:#fff; color:#666; border-color:#DCDEE7; }
+  .btn-green { background:#4DBB4F; color:#fff; }
+
+  /* 维度页签 */
+  .dim-tabs { display:flex; margin-top:16px; border-bottom:1px solid #E8EAF1; }
+  .dim-tabs .dt { padding:0 4px 10px; margin-right:38px; font-size:13px; color:#555; cursor:pointer; position:relative; }
+  .dim-tabs .dt.active { color:#FF5E69; }
+  .dim-tabs .dt.active::after { content:""; position:absolute; left:0; right:0; bottom:-1px; height:2px; background:#FF5E69; }
+
+  /* 筛选区 */
+  .filters { display:flex; align-items:center; gap:14px; margin-top:18px; flex-wrap:wrap; }
+  .filters input, .filters select { height:32px; border:1px solid #E0E2EB; border-radius:3px; padding:0 10px; font-size:12px; color:#333; background:#fff; outline:none; min-width:150px; }
+  .filters input::placeholder { color:#BEC1CC; }
+  .filters .expand { color:#4E46E5; font-size:12px; cursor:pointer; white-space:nowrap; }
+
+  /* 表格 */
+  .tbl { width:100%; border-collapse:collapse; margin-top:18px; table-layout:fixed; }
+  .tbl th { background:#ECEFFA; color:#555; font-weight:normal; font-size:12px; text-align:left; padding:11px 10px; white-space:nowrap; }
+  .tbl td { font-size:12px; color:#444; padding:9px 10px; border-bottom:1px solid #F0F1F6; vertical-align:middle; word-break:break-all; line-height:1.55; }
+  .tbl tbody tr:nth-child(even) { background:#F7F9FD; }
+  .tbl tbody tr.hl { background:#E8F7EE; }
+  .tbl .col-user { width:235px; } .tbl .col-lv { width:92px; } .tbl .col-type { width:88px; }
+  .tbl .col-amt { width:66px; } .tbl .col-avail { width:82px; } .tbl .col-pv { width:66px; }
+  .tbl .col-src { width:128px; } .tbl .col-reward { width:118px; } .tbl .col-status { width:68px; }
+  .tbl .col-desc { width:390px; } .tbl .col-time { width:175px; }
+  .tbl td.col-time, .tbl .col-time { white-space:nowrap; }
+  .ucell { display:flex; align-items:center; gap:8px; }
+  .avatar { width:36px; height:36px; border-radius:3px; flex-shrink:0; overflow:hidden; }
+  .avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+  .avatar.fail { background:#F2F3F7; color:#C2C5D0; font-size:11px; display:flex; align-items:center; justify-content:center; text-align:center; line-height:1.3; }
+  .unames { font-size:12px; color:#444; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dash { color:#999; }
+</style>
+</head>
+<body>
+
+<!-- 顶栏 -->
+<div class="topbar">
+  <div class="logo">绿韵家管理系统</div>
+  <div class="burger">☰</div>
+  <div class="nav">
+    <a href="javascript:;">店铺</a>
+    <a href="javascript:;">营销中心</a>
+    <a href="javascript:;" class="active">结算中心</a>
+  </div>
+  <div class="spacer"></div>
+  <div class="user">袁 ▾</div>
+</div>
+
+<!-- 页签条 -->
+<div class="tabstrip">
+  <div class="tab">会员详情 <span class="x">×</span></div>
+  <div class="tab">余额明细 <span class="x">×</span></div>
+  <div class="tab active"><span class="dot"></span>奖金钱包 <span class="x">×</span></div>
+</div>
+
+<div class="layout">
+  <!-- 侧栏 -->
+  <div class="sidebar">
+    <div class="side-group-head active"><span class="ico">📋</span>用户收益<span class="arr">︿</span></div>
+    <div class="side-menu">
+      <div class="mi active">奖金钱包</div>
+      <div class="mi">电子钱包</div>
+      <div class="mi">积分管理</div>
+      <div class="mi">优惠券明细</div>
+      <div class="mi">收益统计</div>
+      <div class="mi">积分统计</div>
+      <div class="mi">奖金统计</div>
+      <div class="mi">会员提现管理</div>
+      <div class="mi">灵活用工提现</div>
+    </div>
+    <div class="side-group-head"><span class="ico">🏪</span>商家收益<span class="arr">﹀</span></div>
+    <div class="side-group-head"><span class="ico">🧾</span>对账中心<span class="arr">﹀</span></div>
+    <div class="side-group-head"><span class="ico">💰</span>储值管理<span class="arr">﹀</span></div>
+  </div>
+
+  <!-- 主体 -->
+  <div class="main">
+    <div class="panel">
+      <div class="phead">
+        <h2>会员奖金明细</h2>
+        <div class="btns">
+          <button class="btn btn-red">搜索</button>
+          <button class="btn btn-plain">重置</button>
+          <button class="btn btn-green">导出</button>
+        </div>
+      </div>
+
+      <div class="dim-tabs">
+        <div class="dt">按成员</div>
+        <div class="dt active">按明细</div>
+      </div>
+
+      <div class="filters">
+        <input type="text" placeholder="用户账号">
+        <input type="text" placeholder="用户昵称">
+        <input type="text" placeholder="余额大于">
+        <input type="text" placeholder="订单编号">
+        <select><option>变更类型</option></select>
+        <select><option>结算状态</option></select>
+        <span class="expand">展开 ∨</span>
+      </div>
+
+      <table class="tbl">
+        <colgroup>
+          <col class="col-user"><col class="col-lv"><col class="col-type"><col class="col-amt">
+          <col class="col-avail"><col class="col-pv"><col class="col-src"><col class="col-reward">
+          <col class="col-status"><col><col class="col-time">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>用户信息</th><th>收益会员等级</th><th>会员类型</th><th>金额</th><th>可用余额</th>
+            <th>PV值</th><th>来源用户</th><th>奖励类型</th><th>结算状态</th><th>描述</th><th>记录时间</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="hl">
+            <td><div class="ucell"><div class="avatar fail">加载<br>失败</div><div class="unames">有享猫官方(rk0001)</div></div></td>
+            <td>至尊达人</td><td>至尊达人</td><td>15</td><td class="dash">—</td><td>300</td>
+            <td>测试新人权益3(15624824623)</td>
+            <td>下级的商品推荐商家奖励冻结</td><td>冻结中</td>
+            <td>20260928【新人区】测试商品订单编号[606327],用户[有享猫官方]推荐商家奖励</td>
+            <td>2026-09-28 10:20</td>
+          </tr>
+          <tr>
+            <td><div class="ucell"><div class="avatar" style="background:linear-gradient(145deg,#4a4a52,#26262c)"></div><div class="unames">谭先生(13907310714)</div></div></td>
+            <td>潜力达人</td><td>潜力达人</td><td>50</td><td class="dash">—</td><td>300</td>
+            <td>测试新人权益3(15624824623)</td>
+            <td>服务奖</td><td>冻结中</td>
+            <td>20260928【新人区】测试商品订单编号[606327]新人成长专区首席奖励V值</td>
+            <td>2026-09-28 10:20</td>
+          </tr>
+          <tr>
+            <td><div class="ucell"><div class="avatar" style="background:repeating-linear-gradient(0deg,#fff 0 4px,#39393f 4px 5px),repeating-linear-gradient(90deg,rgba(57,57,63,.9) 0 4px,#fff 4px 5px);background-blend-mode:multiply"></div><div class="unames">有幸12123(18307448442)</div></div></td>
+            <td>潜力达人</td><td>潜力达人</td><td>50</td><td class="dash">—</td><td>300</td>
+            <td>测试新人权益3(15624824623)</td>
+            <td>服务奖</td><td>冻结中</td>
+            <td>20260928【新人区】测试商品订单编号[606327]新人成长专区资深委奖励V值</td>
+            <td>2026-09-28 10:20</td>
+          </tr>
+          <tr>
+            <td><div class="ucell"><div class="avatar" style="background:linear-gradient(135deg,#7fd4f0 0 30%,#f7e06b 30% 55%,#5cc25c 55% 80%,#3d8fd1 80%)"></div><div class="unames">成先生1(15673225969)</div></div></td>
+            <td>体验达人</td><td>体验达人</td><td>100</td><td class="dash">—</td><td>300</td>
+            <td>测试新人权益3(15624824623)</td>
+            <td>服务奖</td><td>冻结中</td>
+            <td>20260928【新人区】测试商品订单编号[606327]新人成长专区执行委奖励V值</td>
+            <td>2026-09-28 10:20</td>
+          </tr>
+          <tr>
+            <td><div class="ucell"><div class="avatar" style="background:linear-gradient(180deg,#7db3d8 0 45%,#e8a35c 45% 62%,#4a5a70 62%)"></div><div class="unames">C小明1(13574051885)</div></div></td>
+            <td>成长达人</td><td>成长达人</td><td>100</td><td class="dash">—</td><td>300</td>
+            <td>测试新人权益3(15624824623)</td>
+            <td>下单的商品工作站专项补贴</td><td>冻结中</td>
+            <td>20260928【新人区】测试商品订单编号[606327]新人成长专区工作站奖励V值</td>
+            <td>2026-09-28 10:20</td>
+          </tr>
+          <tr>
+            <td><div class="ucell"><div class="avatar" style="background:radial-gradient(circle at 50% 42%,#fff 0 18%,#1b1b1e 19% 40%,transparent 41%),linear-gradient(180deg,#d8d8dc 0 8%,#2a2a30 8% 100%);position:relative"></div><div class="unames">George Tan(18569596673)</div></div></td>
+            <td>精英达人</td><td>精英达人</td><td>200</td><td class="dash">—</td><td>300</td>
+            <td>测试新人权益3(15624824623)</td>
+            <td>下单的商品自购/分享奖励冻结</td><td>冻结中</td>
+            <td>20260928【新人区】测试商品订单编号[606327]新人成长区间推奖励V值</td>
+            <td>2026-09-28 10:20</td>
+          </tr>
+          <tr>
+            <td><div class="ucell"><div class="avatar" style="background:linear-gradient(180deg,#7db3d8 0 45%,#e8a35c 45% 62%,#4a5a70 62%)"></div><div class="unames">C小明1(13574051885)</div></div></td>
+            <td>成长达人</td><td>成长达人</td><td>500</td><td class="dash">—</td><td>300</td>
+            <td>测试新人权益3(15624824623)</td>
+            <td>下单的商品自购/分享奖励冻结</td><td>冻结中</td>
+            <td>20260928【新人区】测试商品订单编号[606327]新人成长专区推荐奖励V值</td>
+            <td>2026-09-28 10:20</td>
+          </tr>
+          <tr>
+            <td><div class="ucell"><div class="avatar" style="background:linear-gradient(145deg,#4a4a52,#26262c)"></div><div class="unames">谭先生(13907310714)</div></div></td>
+            <td>潜力达人</td><td>潜力达人</td><td>1.5</td><td class="dash">—</td><td>300</td>
+            <td>测试新人权益3(15624824623)</td>
+            <td>下单的商品培育奖奖励冻结</td><td>冻结中</td>
+            <td>20260928【新人区】测试商品订单编号[606327],用户[谭先生]培育奖奖励</td>
+            <td>2026-09-28 10:20</td>
+          </tr>
+          <tr>
+            <td><div class="ucell"><div class="avatar" style="background:linear-gradient(180deg,#7db3d8 0 45%,#e8a35c 45% 62%,#4a5a70 62%)"></div><div class="unames">C小明1(13574051885)</div></div></td>
+            <td>成长达人</td><td>成长达人</td><td>9</td><td class="dash">—</td><td>300</td>
+            <td>测试新人权益3(15624824623)</td>
+            <td>下单的商品工作站专项补贴</td><td>冻结中</td>
+            <td>20260928【新人区】测试商品订单编号[606327],用户[C小明1]工作站专项补贴</td>
+            <td>2026-09-28 10:20</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
