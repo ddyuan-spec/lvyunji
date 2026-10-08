@@ -1,0 +1,2873 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>商家商品管理 - 绿韵家管理系统</title>
+  <style>
+    /* ============================================================
+       绿韵家管理系统 · 后台演示模板
+       模块：商品中心 / 商家管理 / 商品管理
+       页面：① 商家商品管理（列表） ② 商品详情（新增 / 编辑 / 查看）
+       说明：本文件按生产后台截图 1:1 复刻，后续功能在此模板上增量修改。
+       ============================================================ */
+    :root {
+      --primary: #FF5E69;        /* 主色（按钮 / 激活态） */
+      --primary-hover: #FF8A93;
+      --topbar: #2E2D41;         /* 顶栏深紫 */
+      --text: #404142;
+      --text-sub: #666666;
+      --text-hint: #999999;
+      --border: #E8E8E8;
+      --border-2: #DFE6EB;
+      --thead: #ECEFFA;          /* 表头 / 已选择条底色 */
+      --soft: #F7F9FD;           /* 隔行 / 分页条底色 */
+      --page: #EBEDF3;           /* 工作区底色 */
+      --grid: #EDEFF5;           /* 表格网格线 */
+      --link: #3D1EF7;           /* 操作列链接 */
+      --val: #6200F7;            /* 可内联编辑的数值（库存 / 排序） */
+      --box: #F9F9F9;            /* 卡片内浅灰容器（规格 / 图片说明） */
+      --red: #FF5E69;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px; color: var(--text); background: #fff; }
+
+    /* ---------- 顶栏 ---------- */
+    .topbar { height: 56px; background: var(--topbar); display: flex; align-items: center; padding: 0 20px; gap: 24px; color: #fff; }
+    .logo { font-size: 15px; font-weight: 500; letter-spacing: .5px; }
+    .collapse { display: flex; align-items: center; color: #cfd0d8; margin-left: 2px; }
+    .collapse svg { width: 18px; height: 18px; stroke: #cfd0d8; fill: none; stroke-width: 1.6; stroke-linecap: round; }
+    .tb-nav { display: flex; gap: 24px; font-size: 13px; }
+    .tb-nav span { color: #b9bac4; }
+    .tb-nav span.active { color: #fff; font-weight: 600; }
+    .tb-user { margin-left: auto; font-size: 13px; color: #e5e6ea; }
+
+    /* ---------- 主体 ---------- */
+    .app-body { display: flex; min-height: calc(100vh - 56px); align-items: stretch; }
+
+    /* ---------- 侧栏 ---------- */
+    .sidebar { width: 208px; flex: 0 0 208px; background: #fff; border-right: 1px solid var(--border); padding: 6px 0 28px; }
+    .menu-item { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 16px; font-size: 13px; color: var(--text); }
+    .menu-item .ico { width: 16px; height: 16px; flex: 0 0 16px; stroke: #8c8c8c; fill: none; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+    .menu-item .caret { margin-left: auto; color: #c3c3c3; font-size: 9px; }
+    .menu-item.open { background: var(--primary); color: #fff; }
+    .menu-item.open .ico { stroke: #fff; }
+    .menu-item.open .caret { color: #fff; }
+    .sub-chips { display: none; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px 12px 16px; }
+    .sub-chips.open { display: grid; }
+    .chip { height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid transparent; border-radius: 4px; background: #F7F8FA; color: var(--text-sub); font-size: 12px; white-space: nowrap; }
+    .chip.active { border-color: var(--primary); color: var(--primary); background: #fff; font-weight: 500; }
+
+    /* ---------- 工作区 ---------- */
+    .workspace { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--page); }
+    .page-tabs { height: 44px; flex: 0 0 44px; display: flex; align-items: center; gap: 8px; padding: 0 16px; background: #fff; border-bottom: 1px solid var(--border); overflow: hidden; }
+    .ptab { display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border: 1px solid var(--border); border-radius: 3px; color: var(--text-sub); font-size: 12px; background: #fff; white-space: nowrap; }
+    .ptab .x { color: #c8c8c8; font-size: 12px; }
+    .ptab.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .ptab.active .x { color: #fff; }
+    .ptab .dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+
+    /* 视图容器（全部写在 <main> 内） */
+    .view { display: none; flex: 1; padding: 8px 16px 0; }
+    .view.active { display: block; }
+
+    /* ---------- 卡片 ---------- */
+    .card { background: #fff; border-radius: 6px 6px 0 0; padding: 16px; }
+    .card-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 2px 0 14px; }
+    .card-title { font-size: 16px; font-weight: 600; color: #222; }
+    .head-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn { height: 30px; padding: 0 14px; border-radius: 3px; font-size: 12px; border: 1px solid transparent; cursor: pointer; font-family: inherit; white-space: nowrap; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-default { background: #fff; color: var(--text); border-color: var(--border-2); }
+    .btn-default:hover { border-color: var(--primary); color: var(--primary); }
+    .btn-lg { height: 34px; min-width: 212px; font-size: 13px; }
+
+    /* 列表页页签（全部 / 已上架 / 已下架） */
+    .ltabs { display: flex; gap: 26px; padding-bottom: 12px; }
+    .ltab { position: relative; font-size: 13px; color: var(--text-sub); padding-bottom: 8px; cursor: pointer; white-space: nowrap; }
+    .ltab.active { color: var(--primary); }
+    .ltab.active::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--primary); border-radius: 1px; }
+
+    /* ---------- 筛选 ---------- */
+    .filters { display: flex; flex-wrap: wrap; gap: 10px 12px; padding: 6px 0 16px; }
+    .f-input, .f-select { height: 32px; border: 1px solid var(--border-2); border-radius: 3px; padding: 0 10px; font-size: 12px; color: var(--text); width: 168px; outline: none; font-family: inherit; background: #fff; }
+    .f-select { width: 150px; }
+    .f-input:focus, .f-select:focus { border-color: var(--primary); }
+    .f-input::placeholder { color: #bfbfbf; }
+
+    /* ---------- 已选择条 ---------- */
+    .selbar { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 12px; background: var(--thead); margin: 0 -16px 0; }
+    .selbar .sel-txt { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #222; }
+    .selbar .sel-txt .bang { width: 15px; height: 15px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+    .selbar .btn-clear { height: 28px; padding: 0 10px; border: 1px solid var(--border-2); background: #fff; border-radius: 3px; font-size: 12px; color: var(--text-sub); display: flex; align-items: center; gap: 5px; cursor: pointer; font-family: inherit; }
+    .selbar .right { margin-left: auto; }
+
+    /* ---------- 表格 ---------- */
+    .tbl-wrap { overflow-x: auto; margin: 0 -16px; }
+    table { border-collapse: separate; border-spacing: 0; font-size: 12px; width: 100%; min-width: 1900px; }
+    /* SKU 多规格表（重画版，沿用后台设计 token） */
+    .sku-tbl { min-width: 1080px; }
+    .sku-tbl tfoot td { border-top: 2px solid var(--grid); }
+    .sku-tbl .sku-batch td { background: var(--soft); }
+    .sku-tbl .sku-in { height: 30px; }
+    th { background: var(--thead); color: var(--text); font-weight: 500; text-align: left; padding: 12px 12px; white-space: nowrap; border-bottom: 1px solid var(--grid); border-right: 1px solid var(--grid); }
+    td { padding: 12px 12px; color: var(--text); vertical-align: middle; line-height: 1.6; border-bottom: 1px solid var(--grid); border-right: 1px solid var(--grid); }
+    tbody tr:nth-child(even) td { background: var(--soft); }
+    th:first-child, td:first-child { border-left: 0; }
+    /* 操作列固定在最右 */
+    th.c-op, td.c-op { position: sticky; right: 0; z-index: 2; background: #fff; box-shadow: -6px 0 8px -6px rgba(0,0,0,.10); }
+    tbody tr:nth-child(even) td.c-op { background: var(--soft); }
+    thead th.c-op { background: var(--thead); z-index: 3; }
+    .c-chk { width: 46px; text-align: center; }
+    .c-id { width: 96px; }
+    .c-prod { width: 296px; }
+    .c-audit { width: 108px; }
+    .c-brand { width: 196px; }
+    .c-kb { width: 104px; }
+    .c-optype { width: 104px; }
+    .c-pstatus { width: 104px; }
+    .c-stock { width: 100px; }
+    .c-shop { width: 122px; }
+    .c-shoptype { width: 96px; }
+    .c-sort { width: 96px; }
+    .c-rec { width: 92px; }
+    .c-price { width: 96px; }
+    .c-time { width: 176px; }
+    .c-op { width: 236px; min-width: 236px; }
+    .prod { display: flex; align-items: center; gap: 10px; }
+    .prod img { width: 48px; height: 48px; flex: 0 0 48px; border-radius: 4px; display: block; object-fit: cover; }
+    .prod .pname { color: var(--text); }
+    .prod .ptype { color: var(--text-hint); font-size: 12px; margin-top: 2px; }
+    .cell2 { color: var(--text); line-height: 1.6; }
+    .numval { color: var(--val); display: inline-flex; align-items: center; gap: 3px; }
+    .numval svg { width: 12px; height: 12px; stroke: var(--val); fill: none; stroke-width: 1.2; }
+    .op { display: flex; flex-wrap: wrap; gap: 6px 12px; }
+    .op a { color: var(--link); cursor: pointer; text-decoration: none; white-space: nowrap; }
+    .op a:hover { text-decoration: underline; }
+    .sw { position: relative; display: inline-block; width: 40px; height: 20px; border-radius: 10px; background: #DDE0E6; cursor: pointer; transition: background .18s; vertical-align: middle; }
+    .sw::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: left .18s; box-shadow: 0 1px 2px rgba(0,0,0,.18); }
+    .sw.on { background: var(--primary); }
+    .sw.on::after { left: 22px; }
+    .sw.dis { opacity: .5; cursor: not-allowed; }
+    .circ { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid currentColor; font-size: 10px; line-height: 1; flex: 0 0 14px; }
+    .circ.solid { background: #2E2D41; color: #fff; border-color: #2E2D41; font-weight: 600; }
+    .circ.red { background: var(--primary); color: #fff; border-color: var(--primary); font-weight: 600; }
+
+    /* ---------- 分页 ---------- */
+    .pager { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 10px 16px; background: var(--soft); font-size: 12px; color: var(--text-sub); margin: 0 -16px; }
+    .pg { min-width: 26px; height: 26px; padding: 0 5px; border: 1px solid var(--border-2); background: #fff; border-radius: 3px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-sub); font-size: 12px; font-family: inherit; }
+    .pg.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .pg.dis { color: #c8c8c8; cursor: not-allowed; }
+    .pg-jump { display: flex; align-items: center; gap: 6px; margin-left: 6px; }
+    .pg-jump input { width: 40px; height: 26px; border: 1px solid var(--border-2); border-radius: 3px; text-align: center; font-size: 12px; font-family: inherit; outline: none; }
+    .pg-size { height: 26px; border: 1px solid var(--border-2); border-radius: 3px; padding: 0 6px; font-size: 12px; color: var(--text-sub); font-family: inherit; background: #fff; }
+
+    /* ============================================================
+       商品详情（新增 / 编辑 / 查看）
+       ============================================================ */
+    .dwrap { max-width: 1500px; margin: 8px auto 0; }
+    .dcard { background: #fff; border-radius: 6px; padding: 28px 20px; margin-bottom: 12px; }
+    .dcard:first-child { border-radius: 6px 6px 6px 6px; }
+    .sec-title { font-size: 14px; font-weight: 600; color: #222; display: flex; align-items: center; gap: 6px; }
+    .sec-title .circ { color: #8c8c8c; }
+    .sec-body { padding-top: 20px; }
+    .fr { display: flex; align-items: flex-start; margin-bottom: 20px; }
+    .fr:last-child { margin-bottom: 0; }
+    .fr > label { flex: 0 0 158px; width: 158px; padding-right: 8px; text-align: right; font-size: 13px; color: var(--text-sub); line-height: 32px; }
+    .fr .ctl { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .req::before { content: '*'; color: var(--primary); margin-right: 4px; }
+    .inp { height: 32px; border: 1px solid var(--border-2); border-radius: 3px; padding: 0 10px; font-size: 12px; font-family: inherit; color: var(--text); outline: none; background: #fff; }
+    .inp:focus { border-color: var(--primary); }
+    .inp::placeholder { color: #bfbfbf; }
+    .inp-w462 { width: 462px; }
+    .inp-w296 { width: 296px; }
+    /* 关键词：带下拉箭头的标签输入框 */
+    .inp-caret { padding-right: 28px; background: #fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23b9b9b9' stroke-width='1.3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center; }
+    /* 带日历图标的日期框 */
+    .inp-cal { padding-right: 28px; background: #fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13'%3E%3Crect x='1' y='2.4' width='11' height='9.6' rx='1' fill='none' stroke='%23b9b9b9'/%3E%3Cpath d='M1 5.4h11' stroke='%23b9b9b9'/%3E%3Cpath d='M4 1v2M9 1v2' stroke='%23b9b9b9' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 9px center; }
+    .sel { height: 32px; border: 1px solid var(--border-2); border-radius: 3px; padding: 0 28px 0 10px; font-size: 12px; font-family: inherit; color: var(--text); outline: none; background: #fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23b9b9b9' stroke-width='1.3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center; width: 462px; appearance: none; -webkit-appearance: none; }
+    .sel:focus { border-color: var(--primary); }
+    .cnt { color: var(--text-hint); font-size: 12px; margin-left: -46px; pointer-events: none; }
+    .cnt-in { position: relative; display: inline-flex; align-items: center; }
+    .cnt-in .cnt { position: absolute; right: 10px; }
+    .rdo { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text); margin-right: 22px; cursor: pointer; }
+    .rdo input { width: 14px; height: 14px; accent-color: var(--primary); margin: 0; }
+    .rdo.dis { color: #b9b9b9; cursor: not-allowed; }
+    .rdo .lock { width: 14px; height: 14px; fill: #9aa0ab; }
+    .step { display: inline-flex; align-items: center; height: 32px; border: 1px solid var(--border-2); border-radius: 3px; overflow: hidden; width: 196px; background: #fff; }
+    .step .pm { width: 34px; height: 100%; border: 0; background: #fff; color: var(--text-sub); font-size: 15px; cursor: pointer; font-family: inherit; flex: 0 0 34px; }
+    .step .pm:hover { color: var(--primary); }
+    .step input { flex: 1; min-width: 0; height: 100%; border: 0; border-left: 1px solid var(--border-2); border-right: 1px solid var(--border-2); text-align: center; font-size: 13px; font-family: inherit; outline: none; color: var(--text); }
+    .tip { display: inline-flex; align-items: center; height: 26px; padding: 0 10px; background: var(--box); border-radius: 3px; font-size: 12px; color: var(--text-hint); }
+    .ta { width: 296px; height: 82px; border: 1px solid var(--border-2); border-radius: 3px; padding: 8px 10px; font-size: 12px; font-family: inherit; color: var(--text); outline: none; resize: vertical; line-height: 1.6; }
+    .ta:focus { border-color: var(--primary); }
+    .ta::placeholder { color: #bfbfbf; }
+    .box { background: var(--box); border-radius: 4px; padding: 18px 16px 16px 18px; }
+    .box .fr > label { line-height: 32px; }
+    .linkbtn { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; color: var(--primary); cursor: pointer; }
+    .linkbtn:hover { text-decoration: underline; }
+    .ghost { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border: 1px solid var(--border-2); border-radius: 3px; background: #fff; font-size: 12px; color: var(--text-sub); cursor: pointer; font-family: inherit; }
+    .ghost:hover { border-color: var(--primary); color: var(--primary); }
+    .ghost .circ { color: #8c8c8c; }
+    /* 商品规格（按截图 1:1 静态版） */
+    .spec-box { background: var(--box); border-radius: 4px; padding: 24px 20px 20px; }
+    .spec-row { display: flex; align-items: center; margin-bottom: 16px; }
+    .spec-row:last-child { margin-bottom: 0; }
+    .spec-lab { flex: 0 0 76px; text-align: right; font-size: 13px; color: var(--text-sub); line-height: 32px; }
+    .spec-bl { font-size: 13px; color: var(--text-sub); line-height: 32px; margin: 0 10px 0 14px; white-space: nowrap; }
+    .spec-thumb { position: relative; width: 52px; height: 52px; border-radius: 4px; background: #EDEFF5; display: flex; align-items: center; justify-content: center; margin-left: 14px; }
+    .spec-thumb i { font-style: normal; font-size: 10px; color: #c3c7cf; line-height: 1.2; text-align: center; }
+    .spec-thumb .del { position: absolute; top: -7px; right: -7px; width: 16px; height: 16px; border-radius: 50%; background: #2E2D41; color: #fff; font-size: 10px; line-height: 16px; text-align: center; }
+    .spec-plus { width: 52px; height: 52px; border: 1px dashed var(--border-2); border-radius: 4px; background: #fff; color: #8c8c8c; font-size: 16px; display: flex; align-items: center; justify-content: center; margin-left: 14px; }
+    .grid3 { display: grid; grid-template-columns: repeat(3, 372px); gap: 18px 0; }
+    .grid3 .fr { margin-bottom: 0; }
+    .grid3 .fr > label { flex: 0 0 96px; width: 96px; }
+    .money { display: inline-flex; align-items: stretch; height: 32px; border: 1px solid var(--border-2); border-radius: 3px; overflow: hidden; background: #fff; }
+    .money .pre { display: flex; align-items: center; justify-content: center; width: 26px; background: #F5F6F8; color: var(--text-sub); font-size: 12px; flex: 0 0 26px; }
+    .money input { width: 194px; border: 0; outline: none; padding: 0 10px; font-size: 12px; font-family: inherit; color: var(--text); }
+    .money input::placeholder { color: #bfbfbf; }
+    input:disabled { background: #f5f6f8; cursor: not-allowed; }
+    .money input:disabled { background: #f5f6f8; }
+    .up { width: 130px; height: 130px; border: 1px dashed #D6DAE3; border-radius: 4px; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .up:hover { border-color: var(--primary); }
+    .up span { font-size: 26px; color: #c9ced9; line-height: 1; font-weight: 300; }
+    .uphint { display: inline-flex; align-items: center; max-width: 480px; margin-top: 10px; padding: 8px 10px; background: var(--box); border-radius: 3px; font-size: 12px; color: var(--text-hint); line-height: 1.6; }
+    .addrbox { width: 480px; border: 1px solid var(--border-2); border-radius: 3px; padding: 12px 14px; }
+    .addrbox .ar { display: flex; gap: 12px; font-size: 13px; line-height: 2; }
+    .addrbox .ar span:first-child { flex: 0 0 62px; color: var(--text-hint); }
+    .tb-link { color: var(--link); cursor: pointer; font-size: 13px; }
+    .tb-link:hover { text-decoration: underline; }
+    .foot { position: sticky; bottom: 0; background: #fff; border-top: 1px solid var(--border); padding: 18px 0; display: flex; justify-content: center; gap: 26px; margin: 12px -16px 0; z-index: 5; }
+    .ro input, .ro select, .ro textarea { pointer-events: none; background: #FAFAFB; color: #6b6b6b; }
+    .ro .sw { pointer-events: none; }
+
+    /* ---------- Toast ---------- */
+    #toast { position: fixed; top: 78px; left: 50%; transform: translateX(-50%) scale(.96); background: rgba(0,0,0,.78); color: #fff; padding: 9px 18px; border-radius: 4px; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 4000; }
+    #toast.show { opacity: 1; transform: translateX(-50%) scale(1); }
+
+    /* ---------- 删除二次确认 ---------- */
+    .cf-mask { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; align-items: center; justify-content: center; z-index: 3900; }
+    .cf-mask.show { display: flex; }
+    .cf-box { width: 380px; background: #fff; border-radius: 4px; padding: 20px 20px 16px; box-shadow: 0 6px 22px rgba(0,0,0,.16); }
+    .cf-title { font-size: 15px; font-weight: 600; color: #222; margin-bottom: 10px; }
+    .cf-text { font-size: 13px; color: var(--text-sub); line-height: 1.8; margin-bottom: 20px; }
+    .cf-text em { font-style: normal; color: var(--text); font-weight: 500; }
+    .cf-actions { display: flex; justify-content: flex-end; gap: 8px; }
+    /* ============================================================
+       会员中心专属样式（member-admin 源 1:1 移植，仅补充目标缺失的类）
+       ============================================================ */
+    .btn-xs { height: 22px; padding: 0 8px; font-size: 12px; }
+    .f-label { font-size: 13px; color: var(--text-sub); flex: 0 0 auto; }
+    .f-fixed { height: 32px; display: inline-flex; align-items: center; padding: 0 12px; border: 1px solid var(--border-2); border-radius: 3px; background: #F7F8FA; font-size: 12px; color: var(--text); min-width: 200px; }
+    .f-expand { display: inline-flex; align-items: center; gap: 3px; height: 32px; color: var(--text-sub); font-size: 12px; cursor: pointer; }
+    .f-expand:hover { color: var(--primary); }
+    .avt { width: 40px; height: 40px; border-radius: 50%; flex: 0 0 40px; display: block; }
+    .mem { display: flex; align-items: center; gap: 10px; }
+    .mem .mname { color: var(--text); font-weight: 500; }
+    .mem .mphone { color: var(--text-hint); font-size: 12px; margin-top: 2px; }
+    .tag { display: inline-block; height: 22px; line-height: 22px; padding: 0 8px; border-radius: 3px; background: #F0F1F5; color: var(--text-sub); font-size: 12px; }
+    .addtag { display: inline-flex; align-items: center; gap: 3px; height: 22px; padding: 0 8px; border: 1px dashed #c9ced9; border-radius: 3px; color: var(--text-hint); font-size: 12px; cursor: pointer; background: #fff; }
+    .addtag:hover { border-color: var(--primary); color: var(--primary); }
+    .sec-title .tt-act { margin-left: auto; display: flex; gap: 8px; }
+    .infog { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 24px; }
+    .infog .fr { display: flex; align-items: flex-start; gap: 8px; }
+    .infog .fr > label { flex: 0 0 80px; text-align: right; font-size: 13px; color: var(--text-sub); line-height: 24px; }
+    .infog .fr .val { line-height: 24px; font-size: 13px; color: var(--text); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .asset-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 40px; padding: 4px 0; }
+    .asset { display: flex; flex-direction: column; }
+    .asset .a-label { font-size: 12px; color: var(--text-hint); }
+    .asset .a-val { display: flex; align-items: baseline; gap: 10px; margin-top: 8px; }
+    .asset .a-num { font-size: 18px; font-weight: 600; color: #222; }
+    .asset .a-detail { margin-left: auto; font-size: 12px; color: var(--link); cursor: pointer; white-space: nowrap; }
+    .asset .a-detail:hover { text-decoration: underline; }
+    .perf-rows { display: flex; flex-direction: column; gap: 16px; }
+    .perf-line { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 30px; font-size: 13px; padding-bottom: 14px; border-bottom: 1px dashed #EEF0F4; }
+    .perf-line:last-child { border-bottom: 0; padding-bottom: 0; }
+    .perf-line .pl-title { font-weight: 600; color: #222; min-width: 78px; }
+    .perf-line .pl-item { display: inline-flex; align-items: baseline; gap: 6px; }
+    .perf-line .pl-k { color: var(--text-sub); white-space: nowrap; }
+    .perf-line .pl-v { color: var(--red); font-weight: 600; cursor: pointer; }
+    .perf-line .pl-v:hover { text-decoration: underline; }
+    .perf-line .pl-more { color: var(--link); cursor: pointer; font-size: 12px; white-space: nowrap; }
+    .perf-line .pl-more:hover { text-decoration: underline; }
+    .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px 40px; }
+    .team { display: flex; align-items: center; gap: 12px; font-size: 13px; }
+    .team-name { color: var(--text); white-space: nowrap; }
+    .team-num { font-size: 18px; font-weight: 600; color: #222; min-width: 28px; text-align: right; }
+    .team-detail { color: var(--link); cursor: pointer; font-size: 12px; white-space: nowrap; }
+    .team-detail:hover { text-decoration: underline; }
+    .team-row { display: contents; }
+    .team-label { color: var(--text-sub); font-size: 13px; white-space: nowrap; }
+    .team-val { color: var(--text); font-size: 13px; }
+    .team-val .primary { color: var(--link); }
+    .rel-table { width: 100%; }
+    .rel-table th { white-space: nowrap; }
+    .rel-table td { vertical-align: middle; }
+    .rel-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-hint); }
+    .rel-tag::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #2EBD8C; }
+    .rel-tag.warn::before { background: #F2994A; }
+    .rel-note { font-size: 11px; color: var(--text-hint); margin-top: 2px; }
+    .crumb { display: flex; align-items: center; gap: 6px; padding: 2px 0 14px; font-size: 13px; color: var(--text-sub); }
+    .crumb a { color: var(--link); cursor: pointer; }
+    .crumb a:hover { text-decoration: underline; }
+    .crumb .sep { color: #c3c3c3; }
+    /* 会员详情 dcard / 区块间距 1:1 对齐源 */
+    .viewMemberDetail .dcard { padding: 22px 20px; }
+    .viewMemberDetail .sec-title { margin-bottom: 18px; }
+    /* 会员中心表格不被全局 table{min-width:1900px} 撑爆 */
+    .viewMemberList table, .viewMemberDetail table { min-width: 100%; }
+  </style>
+<style>.Po4BvhR1CK2tJaywJ6AN path {
+  fill: var(--icon-path-fill);
+}
+.Oz4yDjua3Qe6thqkZYf_ path {
+  transition: 0.2s all;
+}
+.Oz4yDjua3Qe6thqkZYf_:hover path {
+  fill: var(--icon-hover-fill);
+}
+</style><style>/* ！！！切勿直接改动该文件，该文件由 generator.ts 自动生成！！！ */
+/* !!! DONT MODIFY THIS FILE DIRECTLY, THIS FILE IS GENERATED BY generator.ts AUTOMATICALLY !!! */
+.ibW4Oa5B7s2zJKKZ4pCg {
+  user-select: none;
+}
+.AtqKyJetjrG4smuk35Np {
+  max-width: 346px;
+  width: auto;
+  height: 36px;
+  background-color: var(--quark-style-white-color, #fff);
+  padding-left: 10px;
+  padding-right: 4px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  border: 1px solid var(--quark-style-gray-20-color, rgba(6, 10, 38, 0.12));
+  box-shadow: 0 12px 32px -6px var(--quark-style-gray-30-fixed-color, rgba(6, 10, 38, 0.24));
+  border-radius: 10px;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .g6iGsZa_KHMeW2yICzQQ {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  margin-right: 6px;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .e4UXx38MPgfHdym_Lzt0 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  height: 28px;
+  padding: 0 6px;
+  margin-right: 2px;
+  border-radius: 6px;
+  column-gap: 4px;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .e4UXx38MPgfHdym_Lzt0:hover:not(.ibW4Oa5B7s2zJKKZ4pCg .kNOcXLDT_cCrcoY8LTm8) {
+  background: var(--quark-style-gray-10-color, rgba(6, 10, 38, 0.06));
+}
+.ibW4Oa5B7s2zJKKZ4pCg .kNOcXLDT_cCrcoY8LTm8 {
+  cursor: default;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .kNOcXLDT_cCrcoY8LTm8 .Va3czASiR9Zztyl_lD4M {
+  color: var(--quark-style-gray-40-color, rgba(6, 10, 38, 0.4)) !important;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .e4UXx38MPgfHdym_Lzt0 .Va3czASiR9Zztyl_lD4M {
+  font-size: 12px;
+  color: var(--quark-style-gray-color, #060A26);
+  line-height: 16px;
+  white-space: nowrap;
+  position: relative;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .llw0qsmiI_08u93bFdNg {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  overflow: visible !important;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .LEo8kpqIERehkv8AhAfG {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 6px;
+  overflow: visible !important;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .LEo8kpqIERehkv8AhAfG:hover {
+  background: var(--quark-style-gray-10-color, rgba(6, 10, 38, 0.06));
+}
+.ibW4Oa5B7s2zJKKZ4pCg .zoNmooxAnbLEJSN8m1Jg {
+  box-sizing: border-box;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 110px;
+  max-height: 136px;
+  height: auto;
+  top: 36px;
+  right: -5px;
+  padding: 4px 0;
+  background-color: var(--quark-style-white-color, #fff);
+  border: 1px solid var(--quark-style-gray-20-color, rgba(6, 10, 38, 0.12));
+  box-shadow: 0 4px 16px -6px var(--quark-style-gray-20-fixed-color, rgba(6, 10, 38, 0.12));
+  border-radius: 8px;
+  overflow: visible !important;
+  row-gap: 4px;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .O1imPofna4elG_8NcQnR {
+  top: -77px;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .mdH0IY7jS3Swn5vdX6tz {
+  width: 102px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  cursor: pointer;
+  column-gap: 8px;
+  border-radius: 6px;
+  padding: 0 6px;
+  box-sizing: border-box;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .mdH0IY7jS3Swn5vdX6tz:hover:not(.ibW4Oa5B7s2zJKKZ4pCg .dEdHLVmn_L2GAzb_cmwt) {
+  background: var(--quark-style-gray-10-color, rgba(6, 10, 38, 0.06));
+}
+.ibW4Oa5B7s2zJKKZ4pCg .dEdHLVmn_L2GAzb_cmwt {
+  cursor: default;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .dEdHLVmn_L2GAzb_cmwt .zEraruudgjR2MToGu4Kw {
+  color: var(--quark-style-gray-40-color, rgba(6, 10, 38, 0.4)) !important;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .XfCMwvO0DsqFCeyzPYP2 {
+  width: 16px;
+  height: 16px;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .zEraruudgjR2MToGu4Kw {
+  font-size: 12px;
+  color: var(--quark-style-gray-color, #060A26);
+}
+.ibW4Oa5B7s2zJKKZ4pCg .KZeoAuXbMIkWzOT4PcH5 {
+  width: 100%;
+  height: 1px;
+  background: var(--quark-style-gray-10-color, rgba(6, 10, 38, 0.06));
+}
+.ZL32C_XdLL8UQRZ3zObd {
+  display: flex;
+  align-items: center;
+}
+.u5llx7cIQZLdrjP5Vag1 {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 16px;
+  cursor: pointer;
+  margin-right: 12px;
+  background: var(--quark-style-gray-60-color, rgba(6, 10, 38, 0.6));
+}
+.ZL32C_XdLL8UQRZ3zObd .LEo8kpqIERehkv8AhAfG {
+  border-radius: 16px !important;
+  background: var(--quark-style-gray-60-color, rgba(6, 10, 38, 0.6)) !important;
+}
+.ZL32C_XdLL8UQRZ3zObd .zoNmooxAnbLEJSN8m1Jg {
+  right: 0 !important;
+}
+.ZL32C_XdLL8UQRZ3zObd {
+  overflow: visible !important;
+}
+
+/* ================= 结算中心→用户收益→奖金钱包（bw- 前缀，1:1 复刻真实后台截图） ================= */
+#viewBonus { padding: 16px 20px 30px; background: #EEF0F4; }
+#viewBonus table.bw-tbl { min-width: 0; width: 100%; border-collapse: collapse; table-layout: fixed; margin-top: 18px; }
+.bw-panel { background: #fff; border-radius: 4px; padding: 18px 20px 22px; }
+.bw-phead { display: flex; align-items: center; }
+.bw-phead h2 { font-size: 15px; color: #333; font-weight: bold; margin: 0; }
+.bw-btns { margin-left: auto; display: flex; gap: 10px; }
+.bw-btn { height: 30px; padding: 0 16px; border-radius: 3px; border: 1px solid transparent; font-size: 12px; cursor: pointer; }
+.bw-btn-red { background: #FF5E69; color: #fff; }
+.bw-btn-plain { background: #fff; color: #666; border-color: #DCDEE7; }
+.bw-btn-green { background: #4DBB4F; color: #fff; }
+.bw-dim-tabs { display: flex; margin-top: 16px; border-bottom: 1px solid #E8EAF1; }
+.bw-dim-tabs .bw-dt { padding: 0 4px 10px; margin-right: 38px; font-size: 13px; color: #555; cursor: pointer; position: relative; }
+.bw-dim-tabs .bw-dt.active { color: #FF5E69; }
+.bw-dim-tabs .bw-dt.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: #FF5E69; }
+.bw-filters { display: flex; align-items: center; gap: 14px; margin-top: 18px; flex-wrap: wrap; }
+.bw-filters input, .bw-filters select { height: 32px; border: 1px solid #E0E2EB; border-radius: 3px; padding: 0 10px; font-size: 12px; color: #333; background: #fff; outline: none; min-width: 150px; }
+.bw-filters input::placeholder { color: #BEC1CC; }
+.bw-expand { color: #4E46E5; font-size: 12px; cursor: pointer; white-space: nowrap; }
+.bw-tbl th { background: #ECEFFA; color: #555; font-weight: normal; font-size: 12px; text-align: left; padding: 11px 10px; white-space: nowrap; border: 0; }
+.bw-tbl td { font-size: 12px; color: #444; padding: 9px 10px; border-bottom: 1px solid #F0F1F6; vertical-align: middle; word-break: break-all; line-height: 1.55; }
+.bw-tbl tbody tr:nth-child(even) { background: #F7F9FD; }
+.bw-tbl tbody tr.hl { background: #E8F7EE; }
+.bw-tbl .col-user { width: 235px; } .bw-tbl .col-lv { width: 92px; } .bw-tbl .col-type { width: 88px; }
+.bw-tbl .col-amt { width: 66px; } .bw-tbl .col-avail { width: 82px; } .bw-tbl .col-pv { width: 76px; }
+.bw-tbl .col-src { width: 128px; } .bw-tbl .col-reward { width: 118px; } .bw-tbl .col-status { width: 68px; }
+.bw-tbl .col-desc { width: 390px; } .bw-tbl .col-time { width: 175px; }
+.bw-tbl td.col-time { white-space: nowrap; }
+.bw-ucell { display: flex; align-items: center; gap: 8px; }
+.bw-avatar { width: 36px; height: 36px; border-radius: 3px; flex-shrink: 0; overflow: hidden; }
+.bw-avatar.fail { background: #F2F3F7; color: #C2C5D0; font-size: 11px; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.3; }
+.bw-unames { font-size: 12px; color: #444; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bw-dash { color: #999; }
+.bw-pager { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 16px 8px 6px; font-size: 12px; color: #606266; }
+.bw-sizes { position: relative; }
+.bw-sizes select { appearance: none; -webkit-appearance: none; font-size: 12px; color: #606266; padding: 5px 26px 5px 10px; border: 1px solid #DCDFE6; border-radius: 3px; background: #fff; cursor: pointer; }
+.bw-sizes::after { content: ""; position: absolute; right: 9px; top: 50%; width: 6px; height: 6px; border-right: 1px solid #909399; border-bottom: 1px solid #909399; transform: translateY(-70%) rotate(45deg); pointer-events: none; }
+.bw-btnp { min-width: 28px; height: 28px; border: none; border-radius: 3px; background: #F4F4F5; color: #606266; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0 6px; }
+.bw-btnp:disabled { color: #C0C4CC; cursor: default; }
+.bw-btnp.active { background: #FF5E69; color: #fff; }
+.bw-ell { color: #909399; padding: 0 2px; }
+.bw-jump { display: flex; align-items: center; gap: 6px; }
+.bw-jump input { width: 36px; height: 28px; border: 1px solid #DCDFE6; border-radius: 3px; text-align: center; font-size: 12px; color: #606266; }
+
+/* ================= 结算中心侧栏（ss- 前缀，1:1 复刻真实后台截图） ================= */
+.ss-side { width: 200px; flex: 0 0 200px; background: #fff; border-right: 1px solid #E8EAF1; min-height: calc(100vh - 56px); }
+.ss-head { display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 16px; font-size: 13px; color: #4A4A5A; cursor: pointer; }
+.ss-head .ss-ico { font-size: 14px; width: 16px; text-align: center; }
+.ss-head .ss-arr { margin-left: auto; font-size: 10px; color: #B0B3C0; }
+.ss-head.active { background: #FF5E69; color: #fff; }
+.ss-head.active .ss-arr { color: rgba(255,255,255,.85); }
+.ss-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 14px 12px 18px; }
+.ss-mi { height: 38px; display: flex; align-items: center; justify-content: center; background: #F5F6F9; border: 1px solid transparent; border-radius: 3px; font-size: 12px; color: #6A6D7C; cursor: pointer; }
+.ss-mi.active { background: #fff; border-color: #FF5E69; color: #FF5E69; }
+</style></head>
+<body class="">
+  <!-- ================= 顶栏 ================= -->
+  <header class="topbar">
+    <span class="logo">绿韵家管理系统</span>
+    <span class="collapse" title="收起侧栏">
+      <svg viewBox="0 0 18 18"><path d="M10 3.5h6M10 9h6M10 14.5h6"></path><path d="M6.5 5.5L3 9l3.5 3.5" fill="none"></path></svg>
+    </span>
+    <nav class="tb-nav">
+      <span class="active" id="navShop" onclick="goShopNav()" style="cursor:pointer;">店铺</span>
+      <span id="navMarket" onclick="toast('营销中心')" style="cursor:pointer;">营销中心</span>
+      <span id="navSettle" onclick="goSettle()" style="cursor:pointer;" data-anno="kNavSettle">结算中心</span>
+    </nav>
+    <span class="tb-user">袁</span>
+  </header>
+
+  <main class="app-body">
+    <!-- ================= 侧栏（店铺域） ================= -->
+    <aside class="sidebar" id="sideShop">
+      <div class="menu-item">
+        <svg class="ico" viewBox="0 0 14 14"><rect x="1.5" y="2.5" width="11" height="9" rx="1.2"></rect><path d="M4 5.6l1.8 1.6L8.4 4.6l2 1.8"></path></svg>控制台<span class="caret">▾</span>
+      </div>
+      <div class="menu-item">
+        <svg class="ico" viewBox="0 0 14 14"><circle cx="4.7" cy="4.7" r="2.3" fill="#F2994A" stroke="none"></circle><circle cx="9.4" cy="4.7" r="2.3" fill="#8E5BF0" stroke="none"></circle><circle cx="4.7" cy="9.4" r="2.3" fill="#5B8DEF" stroke="none"></circle><circle cx="9.4" cy="9.4" r="2.3" fill="#EF5B8D" stroke="none"></circle></svg>商品中心<span class="caret">▾</span>
+      </div>
+      <div class="menu-item open" onclick="toggleGroup(this)">
+        <svg class="ico" viewBox="0 0 14 14"><path d="M2.2 6.4L7 2.6l4.8 3.8V12H2.2z"></path><path d="M5.6 12V8.8h2.8V12"></path></svg>商家管理<span class="caret">▾</span>
+      </div>
+      <div class="sub-chips open">
+        <span class="chip">全部商家</span>
+        <span class="chip">待审核商家</span>
+        <span class="chip">待审核商品</span>
+        <span class="chip active" id="pmChipList" onclick="goProduct()" data-anno="kSideProduct">商品管理</span>
+        <span class="chip">兑换码管理</span>
+        <span class="chip">本地生活分类</span>
+      </div>
+      <div class="menu-item open" onclick="toggleGroup(this)">
+        <svg class="ico" viewBox="0 0 14 14"><circle cx="7" cy="4.8" r="2.6"></circle><path d="M2.2 12.4c0-2.5 2.1-3.9 4.8-3.9s4.8 1.4 4.8 3.9"></path></svg>会员中心<span class="caret">▾</span>
+      </div>
+      <div class="sub-chips open">
+        <span class="chip" id="mmChipList" onclick="goMember('List')" data-anno="kSideMember">会员管理</span>
+        <span class="chip" onclick="toast('第三方解绑')">第三方解绑</span>
+        <span class="chip" onclick="toast('实名认证')">实名认证</span>
+        <span class="chip" onclick="toast('黑名单')">黑名单</span>
+        <span class="chip" onclick="toast('注销管理')">注销管理</span>
+        <span class="chip" onclick="toast('用户反馈')">用户反馈</span>
+        <span class="chip" onclick="toast('会员保底')">会员保底</span>
+      </div>
+      <div class="menu-item"><svg class="ico" viewBox="0 0 14 14"><rect x="2" y="2.5" width="10" height="9" rx="1"></rect><path d="M4.4 5.6h5.2M4.4 8.2h3"></path></svg>交易中心<span class="caret">▾</span></div>
+      <div class="menu-item"><svg class="ico" viewBox="0 0 14 14"><rect x="2" y="2.8" width="10" height="8.4" rx="1"></rect><path d="M4.6 6.2l1.6 1.6 2.4-2.4"></path></svg>售后中心<span class="caret">▾</span></div>
+      <div class="menu-item"><svg class="ico" viewBox="0 0 14 14"><rect x="1.8" y="2.8" width="10.4" height="8.4" rx="1"></rect><path d="M3.8 9.4l2.2-2.6 1.8 2 1.6-2 1.6 2"></path></svg>数据中心<span class="caret">▾</span></div>
+      <div class="menu-item"><svg class="ico" viewBox="0 0 14 14"><path d="M2 6.2l5-3.7 5 3.7V12H2z"></path><path d="M5.6 12V8.6h2.8V12"></path><path d="M2 9.6h10"></path></svg>运维中心<span class="caret">▾</span></div>
+      <div class="menu-item"><svg class="ico" viewBox="0 0 14 14"><path d="M7 1.8l1.3 3.1 3.1 1.3-3.1 1.3L7 10.6 5.7 7.5 2.6 6.2l3.1-1.3z"></path><path d="M10.6 9.8l.5 1.2 1.2.5-1.2.5-.5 1.2-.5-1.2-1.2-.5 1.2-.5z"></path></svg>AI工具管理<span class="caret">▾</span></div>
+    </aside>
+
+    <!-- ================= 侧栏（结算中心域，1:1 复刻自真实后台截图） ================= -->
+    <aside class="ss-side" id="sideSettle" style="display:none;">
+      <div class="ss-head active"><span class="ss-ico">📋</span>用户收益<span class="ss-arr">︿</span></div>
+      <div class="ss-menu">
+        <div class="ss-mi active" onclick="toast('奖金钱包')">奖金钱包</div>
+        <div class="ss-mi" onclick="toast('电子钱包')">电子钱包</div>
+        <div class="ss-mi" onclick="toast('积分管理')">积分管理</div>
+        <div class="ss-mi" onclick="toast('优惠券明细')">优惠券明细</div>
+        <div class="ss-mi" onclick="toast('收益统计')">收益统计</div>
+        <div class="ss-mi" onclick="toast('积分统计')">积分统计</div>
+        <div class="ss-mi" onclick="toast('奖金统计')">奖金统计</div>
+        <div class="ss-mi" onclick="toast('会员提现管理')">会员提现管理</div>
+        <div class="ss-mi" onclick="toast('灵活用工提现')">灵活用工提现</div>
+      </div>
+      <div class="ss-head"><span class="ss-ico">🏪</span>商家收益<span class="ss-arr">﹀</span></div>
+      <div class="ss-head"><span class="ss-ico">🧾</span>对账中心<span class="ss-arr">﹀</span></div>
+      <div class="ss-head"><span class="ss-ico">💰</span>储值管理<span class="ss-arr">﹀</span></div>
+    </aside>
+
+    <!-- ================= 工作区 ================= -->
+    <div class="workspace">
+      <div class="page-tabs">
+        <span class="ptab">首页报表<span class="x">×</span></span>
+        <span class="ptab">补水管理<span class="x">×</span></span>
+        <span class="ptab active" id="tabProduct"><i class="dot"></i>商家商品管理<span class="x" style="color: rgb(255, 255, 255);">×</span></span>
+        <span class="ptab">订单管理<span class="x">×</span></span>
+        <span class="ptab">权益用户<span class="x">×</span></span>
+        <span class="ptab">商家管理<span class="x">×</span></span>
+        <span class="ptab">兑换码管理<span class="x">×</span></span>
+        <span class="ptab">商家待审核商品<span class="x">×</span></span>
+        <span class="ptab">热搜管理<span class="x">×</span></span>
+        <span class="ptab">换购活动<span class="x">×</span></span>
+        <span class="ptab">全部工作站<span class="x">×</span></span>
+        <span class="ptab" id="tabDetail" style="display: none;"><i class="dot"></i><span id="tabDetailTxt">新增商品</span><span class="x" style="color: rgb(200, 200, 200);">×</span></span>
+        <span class="ptab" id="tabBonus" style="display: none;"><i class="dot"></i>奖金钱包<span class="x" style="color: rgb(255, 255, 255);">×</span></span>
+      </div>
+
+      <!-- ---------- 视图一：商家商品管理（列表） ---------- -->
+      <div class="view active" id="viewList">
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">商家商品管理</span>
+            <div class="head-actions">
+              <button class="btn btn-primary" onclick="searchList()">查询</button>
+              <button class="btn btn-primary" onclick="openDetail('add')" data-anno="kAddProduct">新增商品</button>
+              <button class="btn btn-default" onclick="resetSearch()">重置</button>
+            </div>
+          </div>
+
+          <div class="ltabs">
+            <span class="ltab active" data-tab="all" onclick="switchTab(this)">全部</span>
+            <span class="ltab" data-tab="on" onclick="switchTab(this)">已上架(275)</span>
+            <span class="ltab" data-tab="off" onclick="switchTab(this)">已下架(72)</span>
+          </div>
+
+          <div class="filters">
+            <select class="f-select" id="qShopType">
+              <option value="">商家类型</option>
+              <option>厂家</option>
+              <option>经销商</option>
+            </select>
+            <input class="f-input" type="text" id="qShop" placeholder="商家">
+            <input class="f-input" type="text" id="qName" placeholder="商品名">
+            <select class="f-select" id="qPtype">
+              <option value="">商品类型</option>
+              <option>实体商品</option>
+              <option>团购商品</option>
+            </select>
+            <select class="f-select" id="qKb">
+              <option value="">是否建立知识库</option>
+              <option value="1">是</option>
+              <option value="0">否</option>
+            </select>
+            <select class="f-select" id="qOptype">
+              <option value="">运营类型</option>
+              <option>团购</option>
+              <option>常规品</option>
+              <option>秒杀</option>
+              <option>新人特惠</option>
+              <option>惠民补贴</option>
+              <option>数字人</option>
+              <option>进阶套组</option>
+              <option>享商套餐</option>
+              <option>拼团商品</option>
+              <option>换购商品</option>
+              <option>兑换码商品</option>
+              <option>新人兑换码</option>
+            </select>
+          </div>
+
+          <div class="selbar">
+            <span class="sel-txt"><i class="bang">!</i>已选择 <span id="selCount">0</span> 项</span>
+            <button class="btn-clear" onclick="clearSelection()">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#9b9b9b" stroke-width="1.2"><path d="M2 3.5h8M4.6 3.5V2.4h2.8v1.1M3.2 3.5l.6 6.3h4.4l.6-6.3"></path></svg>
+              清空选项
+            </button>
+            <span class="right">
+              <button class="btn btn-primary" onclick="batchDelete()">批量删除</button>
+            </span>
+          </div>
+
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th class="c-chk"><input type="checkbox" id="chkAll" onclick="toggleAll(this)"></th>
+                  <th class="c-id">商品编号</th>
+                  <th class="c-prod">商品信息</th>
+                  <th class="c-audit">审核状态</th>
+                  <th class="c-brand">品牌分类</th>
+                  <th class="c-kb">是否建立知识库</th>
+                  <th class="c-optype">运营类型</th>
+                  <th class="c-pstatus">商品状态</th>
+                  <th class="c-stock">库存</th>
+                  <th class="c-shop">商家</th>
+                  <th class="c-shoptype">商家类型</th>
+                  <th class="c-sort">排序</th>
+                  <th class="c-rec">推荐 <span class="circ solid" title="推荐到首页">i</span></th>
+                  <th class="c-price">销售价</th>
+                  <th class="c-time">销售时间</th>
+                  <th class="c-op">操作</th>
+                </tr>
+              </thead>
+              <tbody id="listBody"><tr><td class="c-chk"><input type="checkbox" onclick="toggleRow(589,this)"></td><td class="">589</td><td class=""><div class="prod"><img src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2248%22%20height%3D%2248%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22%23fff%22%2F%3E%3Crect%20x%3D%22127.0%22%20y%3D%2246.0%22%20width%3D%227.9%22%20height%3D%227.9%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22111.5%22%20y%3D%2254.2%22%20width%3D%222.5%22%20height%3D%222.5%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22117.0%22%20y%3D%2258.6%22%20width%3D%227.9%22%20height%3D%227.9%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22110.1%22%20y%3D%2265.5%22%20width%3D%221.6%22%20height%3D%221.6%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2288.3%22%20y%3D%2261.4%22%20width%3D%227.9%22%20height%3D%227.9%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2295.9%22%20y%3D%2269.8%22%20width%3D%226.1%22%20height%3D%226.1%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2285.5%22%20y%3D%2269.0%22%20width%3D%227.0%22%20height%3D%227.0%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22112.9%22%20y%3D%2293.0%22%20width%3D%227.0%22%20height%3D%227.0%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22117.7%22%20y%3D%22106.6%22%20width%3D%222.5%22%20height%3D%222.5%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22105.6%22%20y%3D%22105.6%22%20width%3D%223.4%22%20height%3D%223.4%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2278.1%22%20y%3D%2283.7%22%20width%3D%221.6%22%20height%3D%221.6%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2269.4%22%20y%3D%2278.2%22%20width%3D%222.5%22%20height%3D%222.5%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2282.0%22%20y%3D%22108.4%22%20width%3D%227.9%22%20height%3D%227.9%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2275.8%22%20y%3D%22106.3%22%20width%3D%221.6%22%20height%3D%221.6%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2261.4%22%20y%3D%2288.3%22%20width%3D%227.9%22%20height%3D%227.9%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2255.8%22%20y%3D%2281.3%22%20width%3D%227.0%22%20height%3D%227.0%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2261.7%22%20y%3D%22120.1%22%20width%3D%221.6%22%20height%3D%221.6%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2254.7%22%20y%3D%22112.0%22%20width%3D%221.6%22%20height%3D%221.6%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2248.8%22%20y%3D%22102.8%22%20width%3D%222.5%22%20height%3D%222.5%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2243.7%22%20y%3D%2272.9%22%20width%3D%227.9%22%20height%3D%227.9%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2236.0%22%20y%3D%22109.0%22%20width%3D%226.1%22%20height%3D%226.1%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2238.5%22%20y%3D%2282.6%22%20width%3D%224.3%22%20height%3D%224.3%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2239.5%22%20y%3D%2274.1%22%20width%3D%222.5%22%20height%3D%222.5%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2224.1%22%20y%3D%2295.9%22%20width%3D%226.1%22%20height%3D%226.1%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2216.8%22%20y%3D%22102.9%22%20width%3D%223.4%22%20height%3D%223.4%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2232.4%22%20y%3D%2270.0%22%20width%3D%224.3%22%20height%3D%224.3%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2217.1%22%20y%3D%2280.5%22%20width%3D%227.9%22%20height%3D%227.9%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22-15.3%22%20y%3D%22111.9%22%20width%3D%223.4%22%20height%3D%223.4%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22-7.3%22%20y%3D%2294.1%22%20width%3D%224.3%22%20height%3D%224.3%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2224.8%22%20y%3D%2262.4%22%20width%3D%226.1%22%20height%3D%226.1%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22-22.3%22%20y%3D%2288.3%22%20width%3D%224.3%22%20height%3D%224.3%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22-24.7%22%20y%3D%2283.0%22%20width%3D%222.5%22%20height%3D%222.5%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%226.9%22%20y%3D%2264.6%22%20width%3D%221.6%22%20height%3D%221.6%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2222.7%22%20y%3D%2255.7%22%20width%3D%222.5%22%20height%3D%222.5%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2220.8%22%20y%3D%2252.1%22%20width%3D%225.2%22%20height%3D%225.2%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22-5.5%22%20y%3D%2253.0%22%20width%3D%223.4%22%20height%3D%223.4%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22-41.3%22%20y%3D%2248.8%22%20width%3D%222.5%22%20height%3D%222.5%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22-23.4%22%20y%3D%2242.0%22%20width%3D%223.4%22%20height%3D%223.4%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22-24.0%22%20y%3D%2234.4%22%20width%3D%226.1%22%20height%3D%226.1%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%223.9%22%20y%3D%2235.8%22%20width%3D%225.2%22%20height%3D%225.2%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22-38.5%22%20y%3D%2215.3%22%20width%3D%227.9%22%20height%3D%227.9%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%226.2%22%20y%3D%2227.9%22%20width%3D%226.1%22%20height%3D%226.1%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22-22.7%22%20y%3D%226.9%22%20width%3D%225.2%22%20height%3D%225.2%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22-4.7%22%20y%3D%2210.8%22%20width%3D%226.1%22%20height%3D%226.1%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%220.9%22%20y%3D%228.7%22%20width%3D%221.6%22%20height%3D%221.6%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22-17.1%22%20y%3D%22-17.1%22%20width%3D%227.0%22%20height%3D%227.0%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2212.2%22%20y%3D%225.6%22%20width%3D%226.1%22%20height%3D%226.1%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2218.2%22%20y%3D%225.0%22%20width%3D%221.6%22%20height%3D%221.6%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%227.8%22%20y%3D%22-21.8%22%20width%3D%223.4%22%20height%3D%223.4%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2234.0%22%20y%3D%2216.6%22%20width%3D%221.6%22%20height%3D%221.6%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2231.6%22%20y%3D%224.7%22%20width%3D%226.1%22%20height%3D%226.1%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2224.6%22%20y%3D%22-39.1%22%20width%3D%224.3%22%20height%3D%224.3%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2237.1%22%20y%3D%22-6.7%22%20width%3D%227.0%22%20height%3D%227.0%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2241.5%22%20y%3D%22-15.8%22%20width%3D%226.1%22%20height%3D%226.1%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2246.0%22%20y%3D%22-25.9%22%20width%3D%227.9%22%20height%3D%227.9%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2254.6%22%20y%3D%22-23.4%22%20width%3D%223.4%22%20height%3D%223.4%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2259.7%22%20y%3D%22-13.3%22%20width%3D%222.5%22%20height%3D%222.5%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2259.9%22%20y%3D%224.8%22%20width%3D%223.4%22%20height%3D%223.4%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2272.5%22%20y%3D%22-19.8%22%20width%3D%224.3%22%20height%3D%224.3%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2269.8%22%20y%3D%22-2.0%22%20width%3D%226.1%22%20height%3D%226.1%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2265.4%22%20y%3D%2216.2%22%20width%3D%225.2%22%20height%3D%225.2%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2273.7%22%20y%3D%2211.0%22%20width%3D%224.3%22%20height%3D%224.3%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2288.8%22%20y%3D%220.0%22%20width%3D%223.4%22%20height%3D%223.4%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2273.3%22%20y%3D%2222.4%22%20width%3D%224.3%22%20height%3D%224.3%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22109.0%22%20y%3D%22-5.1%22%20width%3D%226.1%22%20height%3D%226.1%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22107.7%22%20y%3D%227.5%22%20width%3D%222.5%22%20height%3D%222.5%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2270.8%22%20y%3D%2233.9%22%20width%3D%225.2%22%20height%3D%225.2%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22119.9%22%20y%3D%2212.3%22%20width%3D%227.0%22%20height%3D%227.0%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2273.7%22%20y%3D%2239.1%22%20width%3D%223.4%22%20height%3D%223.4%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22107.4%22%20y%3D%2230.2%22%20width%3D%227.0%22%20height%3D%227.0%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%22128.1%22%20y%3D%2234.2%22%20width%3D%223.4%22%20height%3D%223.4%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2299.8%22%20y%3D%2241.3%22%20width%3D%227.9%22%20height%3D%227.9%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2233%22%20y%3D%2233%22%20width%3D%2234%22%20height%3D%2234%22%20rx%3D%2210%22%20fill%3D%22%2300C160%22%2F%3E%3Cpath%20d%3D%22M41.5%2043l-2.4-4.4%204.4%201.6zM58.5%2043l2.4-4.4-4.4%201.6z%22%20fill%3D%22%23fff%22%2F%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2253%22%20r%3D%228.2%22%20fill%3D%22%23fff%22%2F%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2253%22%20r%3D%224%22%20fill%3D%22%2300C160%22%2F%3E%3Ccircle%20cx%3D%2278%22%20cy%3D%2278%22%20r%3D%2211%22%20fill%3D%22%23fff%22%2F%3E%3Ccircle%20cx%3D%2278%22%20cy%3D%2278%22%20r%3D%229%22%20fill%3D%22%2300C160%22%2F%3E%3Cpath%20d%3D%22M74.5%2078a2%202%200%20014%200%202%202%200%2001-4%200z%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M78%2074.5a3.5%203.5%200%20013.5%202%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.4%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E" alt=""><div><div class="pname">惠民补贴+199换水卡</div><div class="ptype">商品类型:实体商品</div></div></div></td><td class="">已通过</td><td class=""><div class="cell2">品牌:无品牌</div><div class="cell2">分类:个人护理/洗发护发/护发素</div></td><td class="">否</td><td class="">惠民补贴</td><td class="">未上架</td><td class=""><span class="numval">15752<svg viewBox="0 0 12 12"><path d="M8.2 1.6l2.2 2.2-6 6H2.2V7.6z"></path><path d="M7.2 2.6l2.2 2.2"></path></svg></span></td><td>广东一段心香文化有限公司</td><td>厂家</td><td><span class="numval">99999<svg viewBox="0 0 12 12"><path d="M8.2 1.6l2.2 2.2-6 6H2.2V7.6z"></path><path d="M7.2 2.6l2.2 2.2"></path></svg></span></td><td class=""><span class="sw" onclick="toggleRec(589,this)"></span></td><td>2250</td><td class="">2026-05-01 00:00<br>2026-06-30 00:00</td><td class="c-op"><div class="op"><a onclick="openDetail('view',589)" class="">查看</a><a onclick="openDetail('edit',589)">编辑</a><a onclick="toggleStatus(589)">上架</a><a onclick="askDelete(589)">删除</a><a onclick="toast('复制商品：589')">复制商品</a><a onclick="toast('完善知识库：589')">完善知识库</a></div></td></tr><tr><td class="c-chk"><input type="checkbox" onclick="toggleRow(584,this)"></td><td>584</td><td class=""><div class="prod"><img src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2248%22%20height%3D%2248%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22%23E8F5EA%22%2F%3E%3Crect%20x%3D%2216%22%20y%3D%2216%22%20width%3D%2226%22%20height%3D%2240%22%20rx%3D%223%22%20fill%3D%22%23fff%22%20stroke%3D%22%23D6E3D8%22%2F%3E%3Crect%20x%3D%2246%22%20y%3D%2212%22%20width%3D%2222%22%20height%3D%2244%22%20rx%3D%223%22%20fill%3D%22%23FFF7E8%22%20stroke%3D%22%23EBDCC2%22%2F%3E%3Crect%20x%3D%228%22%20y%3D%2240%22%20width%3D%2224%22%20height%3D%2226%22%20rx%3D%223%22%20fill%3D%22%23E4572E%22%2F%3E%3Crect%20x%3D%2234%22%20y%3D%2246%22%20width%3D%2252%22%20height%3D%2220%22%20rx%3D%223%22%20fill%3D%22%232E5AAC%22%2F%3E%3Crect%20x%3D%2266%22%20y%3D%2234%22%20width%3D%2222%22%20height%3D%2232%22%20rx%3D%223%22%20fill%3D%22%2312326B%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2270%22%20width%3D%22100%22%20height%3D%2230%22%20fill%3D%22%231E7F3C%22%2F%3E%3Ctext%20x%3D%227%22%20y%3D%2290%22%20font-size%3D%2217%22%20font-family%3D%22Arial%22%20font-weight%3D%22700%22%20fill%3D%22%23fff%22%3E1599%3C%2Ftext%3E%3Ccircle%20cx%3D%228%22%20cy%3D%2282%22%20r%3D%224%22%20fill%3D%22%23F5D14B%22%2F%3E%3Crect%20x%3D%2266%22%20y%3D%2279%22%20width%3D%2228%22%20height%3D%2211%22%20rx%3D%225.5%22%20fill%3D%22%23fff%22%2F%3E%3Ctext%20x%3D%2269%22%20y%3D%2288%22%20font-size%3D%228%22%20font-family%3D%22Arial%22%20fill%3D%22%231E7F3C%22%3E%E7%AB%8B%E7%9C%8118%25%3C%2Ftext%3E%3C%2Fsvg%3E" alt=""><div><div class="pname">惠民补贴套餐包13</div><div class="ptype">商品类型:实体商品</div></div></div></td><td>已通过</td><td><div class="cell2">品牌:无品牌</div><div class="cell2">分类:食品饮料/保健食品/增强免疫</div></td><td>否</td><td>惠民补贴</td><td class="">已上架</td><td><span class="numval">7930<svg viewBox="0 0 12 12"><path d="M8.2 1.6l2.2 2.2-6 6H2.2V7.6z"></path><path d="M7.2 2.6l2.2 2.2"></path></svg></span></td><td class="">绿韵家官方自营</td><td class="">厂家</td><td class=""><span class="numval">30000<svg viewBox="0 0 12 12"><path d="M8.2 1.6l2.2 2.2-6 6H2.2V7.6z"></path><path d="M7.2 2.6l2.2 2.2"></path></svg></span></td><td class=""><span class="sw" onclick="toggleRec(584,this)"></span></td><td class="">5000</td><td class="">2026-03-23 00:00<br>2032-04-30 00:00</td><td class="c-op"><div class="op"><a onclick="openDetail('view',584)">查看</a><a onclick="toggleStatus(584)">下架</a><a onclick="toast('复制商品：584')">复制商品</a><a onclick="toast('完善知识库：584')">完善知识库</a></div></td></tr><tr><td class="c-chk"><input type="checkbox" onclick="toggleRow(660,this)"></td><td class="">660</td><td class=""><div class="prod"><img src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2248%22%20height%3D%2248%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M50%2012L88%2044v48H12V44z%22%20fill%3D%22%232F80ED%22%2F%3E%3Cpath%20d%3D%22M50%2057a13%2013%200%200113%2013v22H37V70a13%2013%200%200113-13z%22%20fill%3D%22%23fff%22%2F%3E%3C%2Fsvg%3E" alt=""><div><div class="pname">TEST-商品</div><div class="ptype">商品类型:实体商品</div></div></div></td><td class="">已通过</td><td><div class="cell2">品牌:无品牌</div><div class="cell2">分类:厨具/餐厨/餐具套装</div></td><td class="">否</td><td>常规品</td><td>已上架</td><td><span class="numval">3937<svg viewBox="0 0 12 12"><path d="M8.2 1.6l2.2 2.2-6 6H2.2V7.6z"></path><path d="M7.2 2.6l2.2 2.2"></path></svg></span></td><td class="">北海康晟网络信息技术有限公司</td><td class="">厂家</td><td class=""><span class="numval">10001<svg viewBox="0 0 12 12"><path d="M8.2 1.6l2.2 2.2-6 6H2.2V7.6z"></path><path d="M7.2 2.6l2.2 2.2"></path></svg></span></td><td class=""><span class="sw" onclick="toggleRec(660,this)"></span></td><td>50</td><td>-<br>-</td><td class="c-op"><div class="op"><a onclick="openDetail('view',660)">查看</a><a onclick="toggleStatus(660)">下架</a><a onclick="toast('复制商品：660')">复制商品</a><a onclick="toast('完善知识库：660')">完善知识库</a></div></td></tr><tr><td class="c-chk"><input type="checkbox" onclick="toggleRow(657,this)"></td><td>657</td><td class=""><div class="prod"><img src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2248%22%20height%3D%2248%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M50%2012L88%2044v48H12V44z%22%20fill%3D%22%232F80ED%22%2F%3E%3Cpath%20d%3D%22M50%2057a13%2013%200%200113%2013v22H37V70a13%2013%200%200113-13z%22%20fill%3D%22%23fff%22%2F%3E%3C%2Fsvg%3E" alt="" class=""><div><div class="pname">text-测试</div><div class="ptype">商品类型:实体商品</div></div></div></td><td>已通过</td><td><div class="cell2">品牌:无品牌</div><div class="cell2">分类:美妆护肤/香水彩妆/高光</div></td><td>否</td><td>常规品</td><td>已上架</td><td><span class="numval">0<svg viewBox="0 0 12 12"><path d="M8.2 1.6l2.2 2.2-6 6H2.2V7.6z"></path><path d="M7.2 2.6l2.2 2.2"></path></svg></span></td><td>北海康晟网络信息技术有限公司</td><td class="">厂家</td><td class=""><span class="numval">10000<svg viewBox="0 0 12 12"><path d="M8.2 1.6l2.2 2.2-6 6H2.2V7.6z"></path><path d="M7.2 2.6l2.2 2.2"></path></svg></span></td><td class=""><span class="sw" onclick="toggleRec(657,this)"></span></td><td class="">5</td><td>-<br>-</td><td class="c-op"><div class="op"><a onclick="openDetail('view',657)" class="">查看</a><a onclick="toggleStatus(657)">下架</a><a onclick="toast('复制商品：657')">复制商品</a><a onclick="toast('完善知识库：657')">完善知识库</a></div></td></tr></tbody>
+            </table>
+          </div>
+
+          <div class="pager">
+            <span id="totalCount">共 347 条</span>
+            <select class="pg-size"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>
+            <button class="pg dis">‹</button>
+            <button class="pg active">1</button>
+            <button class="pg">2</button>
+            <button class="pg">3</button>
+            <button class="pg">4</button>
+            <button class="pg">5</button>
+            <button class="pg">6</button>
+            <button class="pg">···</button>
+            <button class="pg">35</button>
+            <button class="pg">›</button>
+            <div class="pg-jump"><span>前往</span><input type="text" value="1"><span>页</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---------- 视图二：商品详情（新增 / 编辑 / 查看） ---------- -->
+      <div class="view" id="viewDetail">
+        <div class="dwrap" id="detailForm">
+
+          <!-- 1. 基础信息 -->
+          <div class="dcard">
+            <div class="sec-title">基础信息</div>
+            <div class="sec-body">
+              <div class="fr">
+                <label for="dCategory">分类</label>
+                <div class="ctl">
+                  <select class="sel" id="dCategory">
+                    <option>生活服务 / 餐饮 / 餐饮优惠 / 兑换券</option>
+                    <option>生活服务</option>
+                    <option>餐饮</option>
+                    <option>餐饮优惠</option>
+                    <option>兑换券</option>
+                  </select>
+                </div>
+              </div>
+              <div class="fr">
+                <label for="dBrand">品牌</label>
+                <div class="ctl">
+                  <select class="sel" id="dBrand">
+                    <option value="">请选择品牌</option>
+                    <option>无品牌</option>
+                    <option>绿韵家</option>
+                  </select>
+                </div>
+              </div>
+              <div class="fr">
+                <label class="req" for="dName">商品名</label>
+                <div class="ctl">
+                  <span class="cnt-in">
+                    <input class="inp inp-w296" type="text" id="dName" maxlength="60" placeholder="请输入商品名" oninput="cntSync(this,'dNameCnt')">
+                    <span class="cnt" id="dNameCnt">0/60</span>
+                  </span>
+                </div>
+              </div>
+              <div class="fr">
+                <label class="req" for="dShop">商家</label>
+                <div class="ctl">
+                  <select class="sel" id="dShop">
+                    <option value="">请选择商家</option>
+                    <option>广东一段心香文化有限公司</option>
+                    <option>绿韵家官方自营</option>
+                    <option>北海康晟网络信息技术有限公司</option>
+                  </select>
+                </div>
+              </div>
+              <div class="fr">
+                <label>商品类型</label>
+                <div class="ctl">
+                  <label class="rdo"><input type="radio" name="dPtype" value="实体商品" checked="">实体商品</label>
+                  <label class="rdo"><input type="radio" name="dPtype" value="团购商品">团购商品</label>
+                  <label class="rdo dis" title="暂未开放"><input type="radio" name="dPtype" value="海淘" disabled="">海淘
+                    <svg class="lock" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6.4"></circle><path d="M7 3.6a2.1 2.1 0 012.1 2.1v1.1H4.9V5.7A2.1 2.1 0 017 3.6z" fill="#fff"></path><rect x="4.4" y="6.2" width="5.2" height="4.2" rx=".7" fill="#fff"></rect></svg>
+                  </label>
+                  <label class="rdo dis" title="暂未开放"><input type="radio" name="dPtype" value="跨境" disabled="">跨境
+                    <svg class="lock" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6.4"></circle><path d="M7 3.6a2.1 2.1 0 012.1 2.1v1.1H4.9V5.7A2.1 2.1 0 017 3.6z" fill="#fff"></path><rect x="4.4" y="6.2" width="5.2" height="4.2" rx=".7" fill="#fff"></rect></svg>
+                  </label>
+                </div>
+              </div>
+              <div class="fr">
+                <label>运营类型</label>
+                <div class="ctl" id="dOptype">
+                  <label class="rdo"><input type="radio" name="dOptype" value="团购" checked="">团购</label>
+                  <label class="rdo"><input type="radio" name="dOptype" value="常规品">常规品</label>
+                  <label class="rdo"><input type="radio" name="dOptype" value="秒杀">秒杀</label>
+                  <label class="rdo"><input type="radio" name="dOptype" value="新人特惠">新人特惠</label>
+                  <label class="rdo"><input type="radio" name="dOptype" value="惠民补贴">惠民补贴</label>
+                  <label class="rdo"><input type="radio" name="dOptype" value="数字人">数字人</label>
+                  <label class="rdo"><input type="radio" name="dOptype" value="进阶套组">进阶套组</label>
+                  <label class="rdo"><input type="radio" name="dOptype" value="享商套餐">享商套餐</label>
+                  <label class="rdo"><input type="radio" name="dOptype" value="拼团商品">拼团商品</label>
+                  <label class="rdo"><input type="radio" name="dOptype" value="换购商品">换购商品</label>
+                  <label class="rdo"><input type="radio" name="dOptype" value="兑换码商品">兑换码商品</label>
+                  <label class="rdo"><input type="radio" name="dOptype" value="新人兑换码">新人兑换码</label>
+                </div>
+              </div>
+              <div class="fr">
+                <label>是否使用优惠券</label>
+                <div class="ctl">
+                  <label class="rdo"><input type="radio" name="dCoupon" value="是">是</label>
+                  <label class="rdo"><input type="radio" name="dCoupon" value="否" checked="">否</label>
+                </div>
+              </div>
+              <div class="fr">
+                <label>销售时间</label>
+                <div class="ctl">
+                  <input class="inp inp-cal" style="width:186px" type="text" id="dSaleStart" placeholder="开始日期">
+                  <span style="color:var(--text-sub)">至</span>
+                  <input class="inp inp-cal" style="width:186px" type="text" id="dSaleEnd" placeholder="结束日期">
+                </div>
+              </div>
+              <div class="fr">
+                <label for="dNo">商品货号</label>
+                <div class="ctl">
+                  <span class="cnt-in">
+                    <input class="inp inp-w296" type="text" id="dNo" maxlength="60" placeholder="请输入商品货号" oninput="cntSync(this,'dNoCnt')">
+                    <span class="cnt" id="dNoCnt">0/60</span>
+                  </span>
+                </div>
+              </div>
+              <div class="fr">
+                <label class="req" for="dMinBuy">起购数量</label>
+                <div class="ctl">
+                  <div class="step" data-min="1">
+                    <button class="pm" onclick="stepBy('dMinBuy',-1)">－</button>
+                    <input type="text" id="dMinBuy" value="1">
+                    <button class="pm" onclick="stepBy('dMinBuy',1)">＋</button>
+                  </div>
+                </div>
+              </div>
+              <div class="fr">
+                <label class="req" for="dMaxBuy">限购数量</label>
+                <div class="ctl">
+                  <div class="step" style="margin-right:26px">
+                    <button class="pm" onclick="stepBy('dMaxBuy',-1)">－</button>
+                    <input type="text" id="dMaxBuy" value="0">
+                    <button class="pm" onclick="stepBy('dMaxBuy',1)">＋</button>
+                  </div>
+                  <span class="tip">0为不限购</span>
+                  <label class="req" style="flex:0 0 auto;line-height:32px;padding-left:26px" for="dSort">商品排序</label>
+                  <div class="step">
+                    <button class="pm" onclick="stepBy('dSort',-1)">－</button>
+                    <input type="text" id="dSort" value="0">
+                    <button class="pm" onclick="stepBy('dSort',1)">＋</button>
+                  </div>
+                  <span class="tip">排序值越大越靠前</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. 商品标签 -->
+          <div class="dcard">
+            <div class="sec-title">商品标签 <span class="circ">i</span></div>
+            <div class="sec-body">
+              <div class="fr">
+                <label for="dKeywords">关键词</label>
+                <div class="ctl">
+                  <input class="inp inp-w462 inp-caret" type="text" id="dKeywords" placeholder="请输入关键词，确认输入完请按 &quot;Enter&quot; 键">
+                </div>
+              </div>
+              <div class="fr">
+                <label for="dSellPoint">卖点</label>
+                <div class="ctl">
+                  <span class="cnt-in" style="align-items:flex-end">
+                    <textarea class="ta" id="dSellPoint" maxlength="60" placeholder="突出产品亮点，60字以内" oninput="cntSync(this,'dSellCnt')"></textarea>
+                    <span class="cnt" id="dSellCnt" style="bottom:8px;right:auto"></span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. 商品规格 -->
+          <div class="dcard">
+            <div class="sec-title">商品规格</div>
+            <div class="sec-body">
+              <div class="spec-box">
+                <div class="spec-row">
+                  <label class="spec-lab req" for="dSpecName">规格名1</label>
+                  <select class="sel" style="width:300px;margin-left:12px" id="dSpecName">
+                    <option selected="">自定义规格名</option>
+                    <option>颜色</option>
+                    <option>规格</option>
+                    <option>容量</option>
+                  </select>
+                  <input class="inp" style="width:270px" type="text" value="1213">
+                  <span class="linkbtn" style="margin-left:14px"><span class="circ red">+</span>添加规格图片</span>
+                </div>
+                <div class="spec-row">
+                  <input class="inp" style="width:300px;margin-left:88px" type="text" value="12321">
+                  <span class="spec-bl">购买级别 (z)</span>
+                  <select class="sel" style="width:230px"><option>不限制</option><option>1</option><option>2</option><option>3</option></select>
+                  <span class="spec-thumb"><i>上传图片</i><span class="del">×</span></span>
+                </div>
+                <div class="spec-row">
+                  <input class="inp" style="width:300px;margin-left:88px" type="text" value="+199换购水卡">
+                  <span class="spec-bl">购买级别 (z)</span>
+                  <select class="sel" style="width:230px"><option>不限制</option><option>1</option><option>2</option><option>3</option></select>
+                  <span class="spec-plus">+</span>
+                </div>
+                <div class="spec-row">
+                  <input class="inp" style="width:300px;margin-left:88px" type="text" value="+299换购水卡">
+                  <span class="spec-bl">购买级别 (z)</span>
+                  <select class="sel" style="width:230px"><option>不限制</option><option>1</option><option>2</option><option>3</option></select>
+                  <span class="spec-plus">+</span>
+                </div>
+                <div class="spec-row">
+                  <input class="inp" style="width:300px;margin-left:88px" type="text" value="+599换购水卡">
+                  <span class="spec-bl">购买级别 (z)</span>
+                  <select class="sel" style="width:230px"><option>不限制</option><option>1</option><option>2</option><option>3</option></select>
+                  <span class="spec-plus">+</span>
+                </div>
+                <div class="spec-row" style="margin-top:20px">
+                  <button class="ghost" style="margin-left:88px"><span class="circ">+</span>添加子规格</button>
+                </div>
+              </div>
+              <div style="padding-top:16px">
+                <button class="ghost"><span class="circ">+</span>创建新规格</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. 规格售价与库存 -->
+          <div class="dcard">
+            <div class="sec-title">规格售价与库存</div>
+            <div class="sec-body">
+              <!-- 多规格 SKU 表 -->
+              <div class="tbl-wrap" style="margin-bottom:14px">
+                <table class="sku-tbl">
+                  <thead>
+                    <tr>
+                      <th class="c-chk"><input type="checkbox" id="skuAll" onchange="skuCheckAll(this)"></th>
+                      <th>规格</th>
+                      <th>市场价</th>
+                      <th>销售价</th>
+                      <th>积分</th>
+                      <th>PV值</th>
+                      <th data-anno="kVCol">V值</th>
+                      <th data-anno="kNewPvCol">新人pv</th>
+                      <th>供应商价</th>
+                      <th>库存</th>
+                      <th>商品编码</th>
+                    </tr>
+                  </thead>
+                  <tbody id="skuBody">
+                    <tr>
+                      <td class="c-chk"><input type="checkbox" class="sku-chk"></td>
+                      <td><input class="inp" style="width:120px" value="12321"></td>
+                      <td><input class="inp sp-market" style="width:84px" value="8000"></td>
+                      <td><input class="inp sp-sale" style="width:84px" value="4500"></td>
+                      <td><input class="inp sp-points" style="width:72px" value="0"></td>
+                      <td><input class="inp sp-pv" style="width:84px" value="4500"></td>
+                      <td><input class="inp sp-vv" style="width:84px" value="" oninput="filterV(this)"></td>
+                      <td><input class="inp sp-newpv" style="width:84px" value="" oninput="filterNewPv(this)"></td>
+                      <td><input class="inp sp-supply" style="width:84px" value="1"></td>
+                      <td><input class="inp sp-stock" style="width:84px" value="7832"></td>
+                      <td><input class="inp" style="width:110px" value=""></td>
+                    </tr>
+                    <tr>
+                      <td class="c-chk"><input type="checkbox" class="sku-chk"></td>
+                      <td><input class="inp" style="width:120px" value="+199换购水卡"></td>
+                      <td><input class="inp sp-market" style="width:84px" value="10000"></td>
+                      <td><input class="inp sp-sale" style="width:84px" value="9000"></td>
+                      <td><input class="inp sp-points" style="width:72px" value="0"></td>
+                      <td><input class="inp sp-pv" style="width:84px" value="9000"></td>
+                      <td><input class="inp sp-vv" style="width:84px" value="" oninput="filterV(this)"></td>
+                      <td><input class="inp sp-newpv" style="width:84px" value="" oninput="filterNewPv(this)"></td>
+                      <td><input class="inp sp-supply" style="width:84px" value="1"></td>
+                      <td><input class="inp sp-stock" style="width:84px" value="7960"></td>
+                      <td><input class="inp" style="width:110px" value=""></td>
+                    </tr>
+                    <tr>
+                      <td class="c-chk"><input type="checkbox" class="sku-chk"></td>
+                      <td><input class="inp" style="width:120px" value="+299换购水卡"></td>
+                      <td><input class="inp sp-market" style="width:84px" value="3000"></td>
+                      <td><input class="inp sp-sale" style="width:84px" value="2250"></td>
+                      <td><input class="inp sp-points" style="width:72px" value="0"></td>
+                      <td><input class="inp sp-pv" style="width:84px" value="2250"></td>
+                      <td><input class="inp sp-vv" style="width:84px" value="" oninput="filterV(this)"></td>
+                      <td><input class="inp sp-newpv" style="width:84px" value="" oninput="filterNewPv(this)"></td>
+                      <td><input class="inp sp-supply" style="width:84px" value="1"></td>
+                      <td><input class="inp sp-stock" style="width:84px" value="7952"></td>
+                      <td><input class="inp" style="width:110px" value=""></td>
+                    </tr>
+                    <tr>
+                      <td class="c-chk"><input type="checkbox" class="sku-chk"></td>
+                      <td><input class="inp" style="width:120px" value="+599换购水卡"></td>
+                      <td><input class="inp sp-market" style="width:84px" value="5000"></td>
+                      <td><input class="inp sp-sale" style="width:84px" value="3250"></td>
+                      <td><input class="inp sp-points" style="width:72px" value="0"></td>
+                      <td><input class="inp sp-pv" style="width:84px" value="3250"></td>
+                      <td><input class="inp sp-vv" style="width:84px" value="" oninput="filterV(this)"></td>
+                      <td><input class="inp sp-newpv" style="width:84px" value="" oninput="filterNewPv(this)"></td>
+                      <td><input class="inp sp-supply" style="width:84px" value="10"></td>
+                      <td><input class="inp sp-stock" style="width:84px" value="3976"></td>
+                      <td><input class="inp" style="width:110px" value=""></td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr class="sku-batch">
+                      <td class="c-chk"></td>
+                      <td style="color:var(--text-sub);font-weight:500">批量设置</td>
+                      <td><input class="inp sku-in" style="width:84px" id="b_market" placeholder="市场价"></td>
+                      <td><input class="inp sku-in" style="width:84px" id="b_sale" placeholder="销售价"></td>
+                      <td><input class="inp sku-in" style="width:72px" id="b_points" placeholder="积分"></td>
+                      <td><input class="inp sku-in" style="width:84px" id="b_pv" placeholder="PV值"></td>
+                      <td><input class="inp sku-in" style="width:84px" id="b_vv" placeholder="V值" data-anno="kVBatch" oninput="filterV(this)"></td>
+                      <td><input class="inp sku-in" style="width:84px" id="b_newpv" placeholder="新人pv" data-anno="kNewPvBatch" oninput="filterNewPv(this)"></td>
+                      <td><input class="inp sku-in" style="width:84px" id="b_supply" placeholder="供应商价"></td>
+                      <td><input class="inp sku-in" style="width:84px" id="b_stock" placeholder="库存"></td>
+                      <td><button class="btn btn-primary" onclick="batchSet()">批量设置</button></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+              <!-- 单规格字段区（默认单规格时使用） -->
+              <div class="grid3">
+                <div class="fr">
+                  <label for="dMarketPrice">市场价：</label>
+                  <div class="ctl">
+                    <span class="money"><span class="pre">¥</span><input type="text" id="dMarketPrice" placeholder="请输入市场价" disabled=""></span>
+                  </div>
+                </div>
+                <div class="fr">
+                  <label for="dSalePrice">销售价：</label>
+                  <div class="ctl">
+                    <span class="money"><span class="pre">¥</span><input type="text" id="dSalePrice" placeholder="请输入销售价" disabled=""></span>
+                  </div>
+                </div>
+                <div class="fr">
+                  <label for="dPoints">积分：</label>
+                  <div class="ctl">
+                    <input class="inp" style="width:220px" type="text" id="dPoints" placeholder="请输入积分" disabled="">
+                  </div>
+                </div>
+                <div class="fr">
+                  <label for="dPvi">PV值：</label>
+                  <div class="ctl">
+                    <span class="money"><span class="pre">¥</span><input type="text" id="dPvi" placeholder="请输入PV值" disabled=""></span>
+                  </div>
+                </div>
+                <div class="fr">
+                  <label for="dVvalue">V值：</label>
+                  <div class="ctl">
+                    <input class="inp" style="width:220px" type="text" id="dVvalue" placeholder="请输入V值（0~99999正整数）" data-anno="kVSingle" disabled="">
+                  </div>
+                </div>
+                <div class="fr">
+                  <label for="dNewPv">新人pv：</label>
+                  <div class="ctl">
+                    <input class="inp" style="width:220px" type="text" id="dNewPv" placeholder="请输入新人pv（0~9999正整数）" data-anno="kNewPvSingle" disabled="">
+                  </div>
+                </div>
+                <div class="fr">
+                  <label for="dSupplyPrice">供应商价：</label>
+                  <div class="ctl">
+                    <span class="money"><span class="pre">¥</span><input type="text" id="dSupplyPrice" placeholder="请输入供应商价" disabled=""></span>
+                  </div>
+                </div>
+                <div class="fr">
+                  <label for="dStock">库存：</label>
+                  <div class="ctl">
+                    <input class="inp" style="width:220px" type="text" id="dStock" placeholder="请输入可提供库存" disabled="">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. 商品参数 -->
+          <div class="dcard">
+            <div class="sec-title">商品参数</div>
+            <div class="sec-body">
+              <button class="ghost" onclick="toast('添加新参数')"><span class="circ">+</span>添加新参数</button>
+            </div>
+          </div>
+
+          <!-- 6. 商品详情 -->
+          <div class="dcard">
+            <div class="sec-title">商品详情</div>
+            <div class="sec-body">
+              <div class="fr">
+                <label class="req">商品主图：</label>
+                <div class="ctl" style="display:block">
+                  <div class="up" onclick="toast('上传商品主图')"><span>+</span></div>
+                  <div class="uphint">最多上传1张，单张图片需限制在800kb以内，建议尺寸：750*750 像素。</div>
+                </div>
+              </div>
+              <div class="fr">
+                <label>宽幅封面图：</label>
+                <div class="ctl" style="display:block">
+                  <div class="up" onclick="toast('上传宽幅封面图')"><span>+</span></div>
+                  <div class="uphint">最多上传1张，单张图片需限制在800kb以内，建议尺寸：780*465 像素。</div>
+                </div>
+              </div>
+              <div class="fr">
+                <label class="req">商品轮播图：</label>
+                <div class="ctl" style="display:block">
+                  <div class="up" onclick="toast('上传商品轮播图')"><span>+</span></div>
+                  <div class="uphint">最多上传9张，单张图片需限制在800kb以内，建议尺寸：640*640 像素。</div>
+                </div>
+              </div>
+              <div class="fr">
+                <label>分享图：</label>
+                <div class="ctl" style="display:block">
+                  <div class="up" onclick="toast('上传分享图')"><span>+</span></div>
+                  <div class="uphint">最多上传1张，单张图片需限制在800kb以内，建议尺寸：500 x 400 像素。</div>
+                </div>
+              </div>
+              <div class="fr" style="margin-bottom:0">
+                <label class="req">详情图：</label>
+                <div class="ctl" style="display:block">
+                  <button class="ghost" style="margin-bottom:12px" onclick="toast('预览详情图')">预览详情图</button>
+                  <div class="up" onclick="toast('上传详情图')"><span>+</span></div>
+                  <div class="uphint">1-20张，宽度500-1000，高度不能大于4000</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 7. 发货模板设置 -->
+          <div class="dcard">
+            <div class="sec-title">发货模板设置</div>
+            <div class="sec-body">
+              <div class="fr" style="margin-bottom:10px">
+                <label></label>
+                <div class="ctl">
+                  <select class="sel" style="width:320px" id="dShipTpl">
+                    <option value="">请选择发货模板</option>
+                    <option>默认模板</option>
+                    <option>包邮模板</option>
+                  </select>
+                  <span class="tb-link" onclick="toast('新增发货模板')">新增</span>
+                  <span class="tb-link" onclick="toast('已刷新发货模板')">刷新</span>
+                  <span class="tb-link" onclick="toast('修改发货信息')">修改发货信息</span>
+                </div>
+              </div>
+              <div class="fr" style="margin-bottom:0">
+                <label></label>
+                <div class="ctl">
+                  <div class="uphint" style="margin-top:0;max-width:720px">请选择合适的发货模板，该商品将以您选中的模板进行运费的运算，若无合适的发货模板，请先新增，新增完成后点击刷新即可加载新的模板</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 8. 售后设置 -->
+          <div class="dcard">
+            <div class="sec-title">售后设置</div>
+            <div class="sec-body">
+              <div style="font-size:13px;font-weight:600;color:#222;margin-bottom:14px">售后信息</div>
+              <div class="fr" style="margin-bottom:6px">
+                <label>寄回地址</label>
+                <div class="ctl">
+                  <select class="sel" style="width:320px" id="dReturnAddr">
+                    <option>辣朵医生·玖度瘦</option>
+                  </select>
+                  <span class="tb-link" onclick="toast('新增寄回地址')">新增</span>
+                  <span class="tb-link" onclick="toast('已刷新寄回地址')">刷新</span>
+                  <span class="tb-link" onclick="toast('修改寄回地址')">修改寄回地址</span>
+                </div>
+              </div>
+              <div class="fr" style="margin-bottom:14px">
+                <label></label>
+                <div class="ctl">
+                  <div class="uphint" style="margin-top:0;max-width:660px">请选择合适的地址，该商品的售后会默认使用当前地址，若无合适的地址，请先新增，新增完成后点击刷新即可加载新的地址</div>
+                </div>
+              </div>
+              <div class="fr" style="margin-bottom:16px">
+                <label></label>
+                <div class="ctl">
+                  <div class="addrbox">
+                    <div class="ar"><span>收货人</span><span>芳芳</span></div>
+                    <div class="ar"><span>联系电话</span><span>18953627845</span></div>
+                    <div class="ar"><span>详细地址</span><span>湖南省长沙市雨花区长沙市雨花区韶山中路495号万博汇云谷19楼</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="fr" style="margin-bottom:0">
+                <label>支持七天无理由</label>
+                <div class="ctl">
+                  <span class="sw on" id="dSeven" onclick="toggleSw(this)"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 9. 其他设置 -->
+          <div class="dcard" style="margin-bottom:0">
+            <div class="sec-title">其他设置</div>
+            <div class="sec-body">
+              <div class="fr" style="margin-bottom:14px">
+                <label>是否预售</label>
+                <div class="ctl">
+                  <label class="rdo"><input type="radio" name="dPresale" value="全款预售" checked="">全款预售</label>
+                  <label class="rdo"><input type="radio" name="dPresale" value="时段预售">时段预售</label>
+                </div>
+              </div>
+              <div class="fr" style="margin-bottom:0">
+                <label></label>
+                <div class="ctl">
+                  <div class="uphint" style="margin-top:0;max-width:660px">可设置在消费者支付成功后N天内发货，如支付成功后5天内发货，可选3-10天，选择后显示支付成功天数</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="foot">
+            <button class="btn btn-default btn-lg" onclick="go('list')">取消</button>
+            <button class="btn btn-primary btn-lg" id="btnSave" onclick="saveDetail()">保存</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============== 会员中心（member-admin 源 1:1 移植） ============== -->
+
+      <!-- 视图一：会员管理（列表） -->
+      <div class="view" id="viewMemberList">
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">会员中心</span>
+            <div class="head-actions">
+              <button class="btn btn-primary" onclick="mmSearchList()">搜索</button>
+              <button class="btn btn-default" onclick="mmResetSearch()">重置</button>
+              <button class="btn btn-default" onclick="toast('导出会员列表')">导出</button>
+            </div>
+          </div>
+
+          <div class="filters">
+            <input class="f-input" type="text" id="mmQAccount" placeholder="用户账号">
+            <input class="f-input" type="text" id="mmQNick" placeholder="用户昵称">
+            <input class="f-input" type="text" id="mmQWx" placeholder="微生态账号">
+            <input class="f-input" type="text" id="mmQRef" placeholder="推荐人">
+            <select class="f-select" id="mmQLevel">
+              <option value="">会员等级</option>
+              <option>普通用户</option>
+              <option>VIP会员</option>
+              <option>高级会员</option>
+            </select>
+            <input class="f-input inp-cal" style="width:150px" type="text" id="mmQStart" placeholder="开始时间">
+            <span style="color:var(--text-sub)">至</span>
+            <input class="f-input inp-cal" style="width:150px" type="text" id="mmQEnd" placeholder="结束时间">
+            <span class="f-expand" onclick="toast('展开更多筛选条件')">展开 ▾</span>
+          </div>
+
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th class="c-chk"><input type="checkbox" id="mmChkAll" onclick="mmToggleAll(this)"></th>
+                  <th>会员编号</th>
+                  <th>会员信息</th>
+                  <th>微生态账号</th>
+                  <th>会员等级</th>
+                  <th>临时会员等级</th>
+                  <th>是否执行委</th>
+                  <th>执行委</th>
+                  <th>推荐人</th>
+                  <th>灵感值</th>
+                  <th>标签</th>
+                  <th>实名认证状态</th>
+                  <th>限制分红</th>
+                  <th>是否禁用</th>
+                  <th>注册时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="mmListBody"><tr><td class="c-chk"><input type="checkbox" onclick="mmToggleRow(1553843,this)"></td><td>1553843</td><td><div class="mem"><img class="avt" src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%220%200%2040%2040%22%3E%3Crect%20width%3D%2240%22%20height%3D%2240%22%20fill%3D%22%23FF8A93%22%2F%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2216%22%20r%3D%227%22%20fill%3D%22%23fff%22%20opacity%3D%22.92%22%2F%3E%3Cpath%20d%3D%22M7%2036c0-8%205.5-12%2013-12s13%204%2013%2012z%22%20fill%3D%22%23fff%22%20opacity%3D%22.92%22%2F%3E%3C%2Fsvg%3E" alt=""><div><div class="mname">有幸12123</div><div class="mphone">18307448442</div></div></div></td><td></td><td>潜力达人</td><td>潜力达人</td><td>否</td><td>有幸官方(p00001)</td><td>C小明1</td><td>578</td><td><span class="tag">审核通过</span></td><td>审核通过</td><td><span class="sw" onclick="mmToggleLimit(1553843,this)"></span></td><td><span class="sw" onclick="mmToggleDisabled(1553843,this)"></span></td><td>2025-11-25 13:53:00</td><td class="c-op"><div class="op"><a data-anno="kMMView" onclick="mmOpenDetail(1553843)">查看</a><a onclick="toast('修改手机号：1553843')">修改手机号</a><a onclick="toast('修改推荐人：1553843')">修改推荐人</a><a onclick="toast('重置密码：1553843')">重置密码</a><a onclick="toast('调整等级：1553843')">调整等级</a><a onclick="toast('调整临时等级：1553843')">调整临时等级</a><a onclick="toast('设置执行委：1553843')">设置执行委</a><a onclick="mmAskDelete(1553843)">删除</a><a onclick="toast('调整灵感值：1553843')">调整灵感值</a><a onclick="toast('修改执行委：1553843')">修改执行委</a></div></td></tr></tbody>
+            </table>
+          </div>
+
+          <div class="pager">
+            <span id="mmTotalCount">共 1 条</span>
+            <select class="pg-size"><option>10条/页</option><option>20条/页</option><option>50条/页</option><option>100条/页</option></select>
+            <button class="pg dis">‹</button>
+            <button class="pg active">1</button>
+            <button class="pg">2</button>
+            <button class="pg">3</button>
+            <button class="pg">4</button>
+            <button class="pg">5</button>
+            <button class="pg">6</button>
+            <button class="pg">···</button>
+            <button class="pg">17</button>
+            <button class="pg">›</button>
+            <div class="pg-jump"><span>前往</span><input type="text" value="1"><span>页</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 视图二：会员详情 -->
+      <div class="view" id="viewMemberDetail">
+        <div class="dwrap">
+          <div class="dcard">
+            <div class="sec-title">基础信息</div>
+            <div class="infog">
+              <div class="fr"><label>昵称</label><div class="val">有幸12123</div></div>
+              <div class="fr"><label>手机号</label><div class="val">18307448442 <button class="btn btn-default btn-xs" onclick="toast('修改手机号')">修改手机号</button></div></div>
+              <div class="fr"><label>会员等级</label><div class="val">潜力达人 <button class="btn btn-default btn-xs" onclick="toast('调整等级')">调整</button><button class="btn btn-default btn-xs" onclick="toast('升级日志')">升级日志</button></div></div>
+              <div class="fr"><label>用户生日</label><div class="val">2025-11-25</div></div>
+              <div class="fr"><label>用户性别</label><div class="val">其他</div></div>
+              <div class="fr"><label>会员临时等级</label><div class="val">潜力达人 <button class="btn btn-default btn-xs" onclick="toast('调整临时等级')">调整</button><button class="btn btn-default btn-xs" onclick="toast('临时等级升级日志')">临时等级升级日志</button></div></div>
+              <div class="fr"><label>注册时间</label><div class="val">2025-11-25 13:53</div></div>
+              <div class="fr"><label>姓名</label><div class="val">宋健</div></div>
+              <div class="fr"><label>证件号码</label><div class="val">362202199612073015</div></div>
+              <div class="fr"><label>实名认证状态</label><div class="val">审核通过</div></div>
+              <div class="fr"><label>标签</label><div class="val"><span class="addtag" onclick="toast('添加标签')">+ 新增标签</span></div></div>
+              <div class="fr"></div>
+            </div>
+          </div>
+
+          <div class="dcard">
+            <div class="sec-title">TA的资产</div>
+            <div class="asset-grid">
+              <div class="asset"><div class="a-label">奖金累计收入</div><div class="a-val"><span class="a-num">1058.75</span></div></div>
+              <div class="asset"><div class="a-label">奖金钱包</div><div class="a-val"><span class="a-num">9641</span><span class="a-detail" onclick="toast('查看明细：奖金钱包')">查看明细</span></div></div>
+              <div class="asset"><div class="a-label">待释放金额</div><div class="a-val"><span class="a-num">117.75</span><span class="a-detail" onclick="toast('查看明细：待释放金额')">查看明细</span></div></div>
+              <div class="asset"><div class="a-label">已提现</div><div class="a-val"><span class="a-num">0</span><span class="a-detail" onclick="toast('查看明细：已提现')">查看明细</span></div></div>
+              <div class="asset"><div class="a-label">提现申请中</div><div class="a-val"><span class="a-num">0</span><span class="a-detail" onclick="toast('查看明细：提现申请中')">查看明细</span></div></div>
+              <div class="asset"><div class="a-label">优惠券余额</div><div class="a-val"><span class="a-num">0</span><span class="a-detail" onclick="toast('查看明细：优惠券余额')">查看明细</span></div></div>
+              <div class="asset"><div class="a-label">电子币钱包</div><div class="a-val"><span class="a-num">99936.14</span><span class="a-detail" onclick="toast('查看明细：电子币钱包')">查看明细</span></div></div>
+              <div class="asset"><div class="a-label">可用积分</div><div class="a-val"><span class="a-num">672754.54</span><span class="a-detail" onclick="toast('查看明细：可用积分')">查看明细</span></div></div>
+              <div class="asset"><div class="a-label">待释放积分</div><div class="a-val"><span class="a-num">100</span><span class="a-detail" onclick="toast('查看明细：待释放积分')">查看明细</span></div></div>
+            </div>
+          </div>
+
+          <div class="dcard">
+            <div class="sec-title">TA的业绩</div>
+            <div class="perf-rows">
+              <div class="perf-line">
+                <span class="pl-title">自购(PV)</span>
+                <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v">0</span></span>
+                <span class="pl-item"><span class="pl-k">本月自购</span><span class="pl-v">0</span><span class="pl-more" onclick="toast('查看往期')">查看往期</span></span>
+                <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v">37.6</span></span>
+                <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v">13119.3</span></span>
+              </div>
+              <div class="perf-line">
+                <span class="pl-title">直推(PV)</span>
+                <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v">0</span></span>
+                <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v">805</span></span>
+                <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v">3600</span></span>
+              </div>
+              <div class="perf-line">
+                <span class="pl-title">推广(PV)</span>
+                <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v">0</span></span>
+                <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v">805</span></span>
+                <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v">3600</span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="dcard">
+            <div class="sec-title">V值奖金</div>
+            <div class="perf-rows">
+              <div class="perf-line">
+                <span class="pl-title" data-anno="kPerfVZh">直推（v值）</span>
+                <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v" onclick="toast('查看V值奖金明细')">0</span></span>
+                <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v" onclick="toast('查看V值奖金明细')">268.3</span></span>
+                <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v" onclick="toast('查看V值奖金明细')">1200</span></span>
+              </div>
+              <div class="perf-line">
+                <span class="pl-title" data-anno="kPerfVTg">推广（v值）</span>
+                <span class="pl-item"><span class="pl-k">今日</span><span class="pl-v" onclick="toast('查看V值奖金明细')">0</span></span>
+                <span class="pl-item"><span class="pl-k">待结算</span><span class="pl-v" onclick="toast('查看V值奖金明细')">268.3</span></span>
+                <span class="pl-item"><span class="pl-k">已结算</span><span class="pl-v" onclick="toast('查看V值奖金明细')">1200</span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="dcard">
+            <div class="sec-title">TA的团队</div>
+            <div class="team-grid">
+              <div class="team"><span class="team-name">下线团队</span><span class="team-num">51</span><span class="team-detail" onclick="toast('查看下线团队明细')">查看明细</span></div>
+              <div class="team"><span class="team-name">直属团队</span><span class="team-num">51</span><span class="team-detail" onclick="toast('查看直属团队明细')">查看明细</span></div>
+              <div class="team"><span class="team-name">直推团队</span><span class="team-num">12</span><span class="team-detail" onclick="toast('查看直推团队明细')">查看明细</span></div>
+              <div class="team"><span class="team-label">执行委：</span><span class="team-val"><span class="primary">有幸官方(p00001)</span></span></div>
+              <div class="team"><span class="team-label">资深委：</span><span class="team-val">--</span></div>
+              <div class="team"><span class="team-label">首席：</span><span class="team-val">--</span></div>
+            </div>
+          </div>
+
+          <div class="dcard" style="margin-bottom:0">
+            <div class="sec-title">关系链</div>
+            <div class="tbl-wrap">
+              <table class="rel-table">
+                <thead>
+                  <tr>
+                    <th>会员信息</th>
+                    <th>账号</th>
+                    <th>会员姓名</th>
+                    <th>微生态账号</th>
+                    <th>会员等级</th>
+                    <th>临时会员等级</th>
+                    <th>推荐人</th>
+                    <th>注册时间</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="mmRelBody"></tbody>
+              </table>
+            </div>
+            <div class="pager" style="margin:10px -20px -22px;background:transparent;border-top:0;">
+              <span>共 6 条</span>
+              <select class="pg-size"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>
+              <button class="pg dis">‹</button>
+              <button class="pg active">1</button>
+              <button class="pg">›</button>
+              <div class="pg-jump"><span>前往</span><input type="text" value="1"><span>页</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <!-- ---------- 视图四：结算中心→用户收益→奖金钱包（1:1 复刻真实后台截图，PV值/V值） ---------- -->
+    <div class="view" id="viewBonus">
+      <div class="bw-panel">
+        <div class="bw-phead">
+          <h2>会员奖金明细</h2>
+          <div class="bw-btns">
+            <button class="bw-btn bw-btn-red" onclick="toast('搜索')">搜索</button>
+            <button class="bw-btn bw-btn-plain" onclick="toast('重置')">重置</button>
+            <button class="bw-btn bw-btn-green" onclick="toast('导出')">导出</button>
+          </div>
+        </div>
+
+        <div class="bw-dim-tabs">
+          <div class="bw-dt">按成员</div>
+          <div class="bw-dt active">按明细</div>
+        </div>
+
+        <div class="bw-filters">
+          <input type="text" placeholder="用户账号">
+          <input type="text" placeholder="用户昵称">
+          <input type="text" placeholder="余额大于">
+          <input type="text" placeholder="订单编号">
+          <select><option>变更类型</option></select>
+          <select><option>结算状态</option></select>
+          <span class="bw-expand">展开 ∨</span>
+        </div>
+
+        <table class="bw-tbl">
+          <colgroup>
+            <col class="col-user"><col class="col-lv"><col class="col-type"><col class="col-amt">
+            <col class="col-avail"><col class="col-pv"><col class="col-src"><col class="col-reward">
+            <col class="col-status"><col><col class="col-time">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>用户信息</th><th>收益会员等级</th><th>会员类型</th><th>金额</th><th>可用余额</th>
+              <th>PV值/V值</th><th>来源用户</th><th>奖励类型</th><th>结算状态</th><th>描述</th><th>记录时间</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="hl">
+              <td><div class="bw-ucell"><div class="bw-avatar fail">加载<br>失败</div><div class="bw-unames">有享猫官方(rk0001)</div></div></td>
+              <td>至尊达人</td><td>至尊达人</td><td>15</td><td class="bw-dash">—</td><td>300</td>
+              <td>测试新人权益3(15624824623)</td>
+              <td>下级的商品推荐商家奖励冻结</td><td>冻结中</td>
+              <td>20260928【新人区】测试商品订单编号[606327],用户[有享猫官方]推荐商家奖励</td>
+              <td>2026-09-28 10:20</td>
+            </tr>
+            <tr>
+              <td><div class="bw-ucell"><div class="bw-avatar" style="background:linear-gradient(145deg,#4a4a52,#26262c)"></div><div class="bw-unames">谭先生(13907310714)</div></div></td>
+              <td>潜力达人</td><td>潜力达人</td><td>50</td><td class="bw-dash">—</td><td>300</td>
+              <td>测试新人权益3(15624824623)</td>
+              <td>服务奖</td><td>冻结中</td>
+              <td>20260928【新人区】测试商品订单编号[606327]新人成长专区首席奖励V值</td>
+              <td>2026-09-28 10:20</td>
+            </tr>
+            <tr>
+              <td><div class="bw-ucell"><div class="bw-avatar" style="background:repeating-linear-gradient(0deg,#fff 0 4px,#39393f 4px 5px),repeating-linear-gradient(90deg,rgba(57,57,63,.9) 0 4px,#fff 4px 5px);background-blend-mode:multiply"></div><div class="bw-unames">有幸12123(18307448442)</div></div></td>
+              <td>潜力达人</td><td>潜力达人</td><td>50</td><td class="bw-dash">—</td><td>300</td>
+              <td>测试新人权益3(15624824623)</td>
+              <td>服务奖</td><td>冻结中</td>
+              <td>20260928【新人区】测试商品订单编号[606327]新人成长专区资深委奖励V值</td>
+              <td>2026-09-28 10:20</td>
+            </tr>
+            <tr>
+              <td><div class="bw-ucell"><div class="bw-avatar" style="background:linear-gradient(135deg,#7fd4f0 0 30%,#f7e06b 30% 55%,#5cc25c 55% 80%,#3d8fd1 80%)"></div><div class="bw-unames">成先生1(15673225969)</div></div></td>
+              <td>体验达人</td><td>体验达人</td><td>100</td><td class="bw-dash">—</td><td>300</td>
+              <td>测试新人权益3(15624824623)</td>
+              <td>服务奖</td><td>冻结中</td>
+              <td>20260928【新人区】测试商品订单编号[606327]新人成长专区执行委奖励V值</td>
+              <td>2026-09-28 10:20</td>
+            </tr>
+            <tr>
+              <td><div class="bw-ucell"><div class="bw-avatar" style="background:linear-gradient(180deg,#7db3d8 0 45%,#e8a35c 45% 62%,#4a5a70 62%)"></div><div class="bw-unames">C小明1(13574051885)</div></div></td>
+              <td>成长达人</td><td>成长达人</td><td>100</td><td class="bw-dash">—</td><td>300</td>
+              <td>测试新人权益3(15624824623)</td>
+              <td>下单的商品工作站专项补贴</td><td>冻结中</td>
+              <td>20260928【新人区】测试商品订单编号[606327]新人成长专区工作站奖励V值</td>
+              <td>2026-09-28 10:20</td>
+            </tr>
+            <tr>
+              <td><div class="bw-ucell"><div class="bw-avatar" style="background:radial-gradient(circle at 50% 42%,#fff 0 18%,#1b1b1e 19% 40%,transparent 41%),linear-gradient(180deg,#d8d8dc 0 8%,#2a2a30 8% 100%)"></div><div class="bw-unames">George Tan(18569596673)</div></div></td>
+              <td>精英达人</td><td>精英达人</td><td>200</td><td class="bw-dash">—</td><td>300</td>
+              <td>测试新人权益3(15624824623)</td>
+              <td>下单的商品自购/分享奖励冻结</td><td>冻结中</td>
+              <td>20260928【新人区】测试商品订单编号[606327]新人成长区间推奖励V值</td>
+              <td>2026-09-28 10:20</td>
+            </tr>
+            <tr>
+              <td><div class="bw-ucell"><div class="bw-avatar" style="background:linear-gradient(180deg,#7db3d8 0 45%,#e8a35c 45% 62%,#4a5a70 62%)"></div><div class="bw-unames">C小明1(13574051885)</div></div></td>
+              <td>成长达人</td><td>成长达人</td><td>500</td><td class="bw-dash">—</td><td>300</td>
+              <td>测试新人权益3(15624824623)</td>
+              <td>下单的商品自购/分享奖励冻结</td><td>冻结中</td>
+              <td>20260928【新人区】测试商品订单编号[606327]新人成长专区推荐奖励V值</td>
+              <td>2026-09-28 10:20</td>
+            </tr>
+            <tr>
+              <td><div class="bw-ucell"><div class="bw-avatar" style="background:linear-gradient(145deg,#4a4a52,#26262c)"></div><div class="bw-unames">谭先生(13907310714)</div></div></td>
+              <td>潜力达人</td><td>潜力达人</td><td>1.5</td><td class="bw-dash">—</td><td>300</td>
+              <td>测试新人权益3(15624824623)</td>
+              <td>下单的商品培育奖奖励冻结</td><td>冻结中</td>
+              <td>20260928【新人区】测试商品订单编号[606327],用户[谭先生]培育奖奖励</td>
+              <td>2026-09-28 10:20</td>
+            </tr>
+            <tr>
+              <td><div class="bw-ucell"><div class="bw-avatar" style="background:linear-gradient(180deg,#7db3d8 0 45%,#e8a35c 45% 62%,#4a5a70 62%)"></div><div class="bw-unames">C小明1(13574051885)</div></div></td>
+              <td>成长达人</td><td>成长达人</td><td>9</td><td class="bw-dash">—</td><td>300</td>
+              <td>测试新人权益3(15624824623)</td>
+              <td>下单的商品工作站专项补贴</td><td>冻结中</td>
+              <td>20260928【新人区】测试商品订单编号[606327],用户[C小明1]工作站专项补贴</td>
+              <td>2026-09-28 10:20</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="bw-pager">
+        <span class="bw-total">共 5007291 条</span>
+        <span class="bw-sizes"><select><option>10条/页</option></select></span>
+        <button class="bw-btnp" disabled>‹</button>
+        <button class="bw-btnp active">1</button>
+        <button class="bw-btnp">2</button>
+        <button class="bw-btnp">3</button>
+        <button class="bw-btnp">4</button>
+        <button class="bw-btnp">5</button>
+        <button class="bw-btnp">6</button>
+        <span class="bw-ell">…</span>
+        <button class="bw-btnp">500730</button>
+        <button class="bw-btnp">›</button>
+        <span class="bw-jump">前往 <input type="text" value="1"> 页</span>
+      </div>
+    </div>
+
+    </div>
+
+  </main>
+
+  <div id="toast"></div>
+
+  <!-- 删除二次确认（统一 confirmAction，所有删除入口复用） -->
+  <div class="cf-mask" id="cfMask">
+    <div class="cf-box">
+      <div class="cf-title" id="cfTitle">确认删除</div>
+      <div class="cf-text" id="cfText"></div>
+      <div class="cf-actions">
+        <button class="btn btn-default" onclick="closeConfirm()">取消</button>
+        <button class="btn btn-primary" id="cfOk">确认删除</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       样例数据（复刻截图 4 行）
+       ============================================================ */
+    var products = [
+      { id: 589, img: 'qr',   name: '惠民补贴+199换水卡', ptype: '实体商品', audit: '已通过', brand: '品牌:无品牌', category: '分类:个人护理/洗发护发/护发素', kb: '否', optype: '惠民补贴', status: '未上架', stock: 15752, shop: '广东一段心香文化有限公司', shopType: '厂家', sort: 99999, rec: false, price: 2250, saleStart: '2026-05-01 00:00', saleEnd: '2026-06-30 00:00' },
+      { id: 584, img: 'kit',  name: '惠民补贴套餐包13', ptype: '实体商品', audit: '已通过', brand: '品牌:无品牌', category: '分类:食品饮料/保健食品/增强免疫', kb: '否', optype: '惠民补贴', status: '已上架', stock: 7930, shop: '绿韵家官方自营', shopType: '厂家', sort: 30000, rec: false, price: 5000, saleStart: '2026-03-23 00:00', saleEnd: '2032-04-30 00:00' },
+      { id: 660, img: 'house', name: 'TEST-商品', ptype: '实体商品', audit: '已通过', brand: '品牌:无品牌', category: '分类:厨具/餐厨/餐具套装', kb: '否', optype: '常规品', status: '已上架', stock: 3937, shop: '北海康晟网络信息技术有限公司', shopType: '厂家', sort: 10001, rec: false, price: 50, saleStart: '', saleEnd: '' },
+      { id: 657, img: 'house', name: 'text-测试', ptype: '实体商品', audit: '已通过', brand: '品牌:无品牌', category: '分类:美妆护肤/香水彩妆/高光', kb: '否', optype: '常规品', status: '已上架', stock: 0, shop: '北海康晟网络信息技术有限公司', shopType: '厂家', sort: 10000, rec: false, price: 5, saleStart: '', saleEnd: '' }
+    ];
+    var selected = {};
+    var curMode = 'add';      // add / edit / view
+    var curId = null;
+
+    /* ============================================================
+       商品图占位（内联 SVG，避免外链）
+       ============================================================ */
+    function prodImg(kind) {
+      var svg;
+      if (kind === 'qr') {
+        /* 小程序太阳码：环形点阵 + 中心绿色猫头 */
+        var h = 7, dots = '';
+        function rnd() { h = (h * 1103515245 + 12345) >>> 0; return (h >>> 17) & 7; }
+        for (var a = 0; a < 360; a += 5) {
+          var rad = a * Math.PI / 180, rr = 27 + rnd() * 9;
+          var cx = 50 + rr * Math.cos(rad), cy = 50 + rr * Math.sin(rad), L = 1.6 + rnd() * 0.9;
+          dots += '<rect x="' + (cx - L / 2).toFixed(1) + '" y="' + (cy - L / 2).toFixed(1) + '" width="' + L.toFixed(1) + '" height="' + L.toFixed(1) + '" fill="#111"/>';
+        }
+        svg = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 100 100">'
+            + '<rect width="100" height="100" fill="#fff"/>' + dots
+            + '<rect x="33" y="33" width="34" height="34" rx="10" fill="#00C160"/>'
+            + '<path d="M41.5 43l-2.4-4.4 4.4 1.6zM58.5 43l2.4-4.4-4.4 1.6z" fill="#fff"/>'
+            + '<circle cx="50" cy="53" r="8.2" fill="#fff"/><circle cx="50" cy="53" r="4" fill="#00C160"/>'
+            + '<circle cx="78" cy="78" r="11" fill="#fff"/><circle cx="78" cy="78" r="9" fill="#00C160"/>'
+            + '<path d="M74.5 78a2 2 0 014 0 2 2 0 01-4 0z" fill="#fff"/><path d="M78 74.5a3.5 3.5 0 013.5 2" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round"/>'
+            + '</svg>';
+      } else if (kind === 'kit') {
+        /* 套餐包图：绿色背景 + 产品 + 价格条 */
+        svg = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 100 100">'
+            + '<rect width="100" height="100" fill="#E8F5EA"/>'
+            + '<rect x="16" y="16" width="26" height="40" rx="3" fill="#fff" stroke="#D6E3D8"/>'
+            + '<rect x="46" y="12" width="22" height="44" rx="3" fill="#FFF7E8" stroke="#EBDCC2"/>'
+            + '<rect x="8" y="40" width="24" height="26" rx="3" fill="#E4572E"/>'
+            + '<rect x="34" y="46" width="52" height="20" rx="3" fill="#2E5AAC"/>'
+            + '<rect x="66" y="34" width="22" height="32" rx="3" fill="#12326B"/>'
+            + '<rect x="0" y="70" width="100" height="30" fill="#1E7F3C"/>'
+            + '<text x="7" y="90" font-size="17" font-family="Arial" font-weight="700" fill="#fff">1599</text>'
+            + '<circle cx="8" cy="82" r="4" fill="#F5D14B"/><rect x="66" y="79" width="28" height="11" rx="5.5" fill="#fff"/>'
+            + '<text x="69" y="88" font-size="8" font-family="Arial" fill="#1E7F3C">立省18%</text>'
+            + '</svg>';
+      } else {
+        /* 默认图标：蓝色房子 */
+        svg = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 100 100">'
+            + '<rect width="100" height="100" fill="#fff"/>'
+            + '<path d="M50 12L88 44v48H12V44z" fill="#2F80ED"/>'
+            + '<path d="M50 57a13 13 0 0113 13v22H37V70a13 13 0 0113-13z" fill="#fff"/>'
+            + '</svg>';
+      }
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    }
+
+    /* ============================================================
+       公共
+       ============================================================ */
+    function toggleGroup(el) {
+      el.classList.toggle('open');
+      var chips = el.nextElementSibling;
+      if (chips && chips.classList.contains('sub-chips')) { chips.classList.toggle('open'); }
+    }
+    function toast(msg) {
+      var t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(function () { t.classList.remove('show'); }, 1800);
+    }
+    function go(view) {
+      var views = document.querySelectorAll('.view');
+      for (var i = 0; i < views.length; i++) { views[i].classList.remove('active'); }
+      document.getElementById('view' + view.charAt(0).toUpperCase() + view.slice(1)).classList.add('active');
+      var isDetail = view === 'detail';
+      document.getElementById('tabProduct').classList.toggle('active', !isDetail);
+      document.getElementById('tabDetail').style.display = isDetail ? '' : 'none';
+      document.getElementById('tabDetail').classList.toggle('active', isDetail);
+      document.getElementById('tabDetail').querySelector('span.x') && (document.getElementById('tabDetail').querySelector('span.x').style.color = isDetail ? '#fff' : '#c8c8c8');
+      document.getElementById('tabProduct').querySelector('.x').style.color = isDetail ? '#c8c8c8' : '#fff';
+      window.scrollTo(0, 0);
+    }
+    /* 删除类操作统一二次确认 */
+    function confirmAction(title, html, onOk) {
+      document.getElementById('cfTitle').textContent = title;
+      document.getElementById('cfText').innerHTML = html;
+      var ok = document.getElementById('cfOk');
+      ok.onclick = function () { closeConfirm(); onOk(); };
+      document.getElementById('cfMask').classList.add('show');
+    }
+    function closeConfirm() { document.getElementById('cfMask').classList.remove('show'); }
+    function cntSync(el, id) {
+      var box = document.getElementById(id);
+      if (box) { box.textContent = el.value.length + '/' + el.maxLength; }
+    }
+    function stepBy(id, d) {
+      var el = document.getElementById(id);
+      var v = parseInt(el.value, 10); if (isNaN(v)) { v = 0; }
+      v += d; if (v < 0) { v = 0; }
+      el.value = v;
+    }
+    function toggleSw(el) { el.classList.toggle('on'); }
+
+    /* ============== 规格售价与库存：V值 + 多规格联动 ============== */
+    // V值：仅允许正整数 0~99999
+    function filterV(el) {
+      var v = (el.value || '').replace(/[^0-9]/g, '');
+      if (v !== '') { var n = parseInt(v, 10); if (n > 99999) { n = 99999; } v = String(n); }
+      el.value = v;
+    }
+    // 新人pv：仅允许正整数 0~9999
+    function filterNewPv(el) {
+      var v = (el.value || '').replace(/[^0-9]/g, '');
+      if (v !== '') { var n = parseInt(v, 10); if (n > 9999) { n = 9999; } v = String(n); }
+      el.value = v;
+    }
+    // 批量设置：把非空字段覆盖到所有规格行，并同步到下方单规格字段区（禁用展示）
+    function batchSet() {
+      var map = [
+        ['b_market', 'sp-market', 'dMarketPrice'], ['b_sale', 'sp-sale', 'dSalePrice'],
+        ['b_points', 'sp-points', 'dPoints'], ['b_pv', 'sp-pv', 'dPvi'],
+        ['b_supply', 'sp-supply', 'dSupplyPrice'], ['b_stock', 'sp-stock', 'dStock'],
+        ['b_vv', 'sp-vv', 'dVvalue'],
+        ['b_newpv', 'sp-newpv', 'dNewPv']
+      ];
+      var done = 0;
+      for (var i = 0; i < map.length; i++) {
+        var v = document.getElementById(map[i][0]).value;
+        if (v !== '') {
+          var cells = document.querySelectorAll('#skuBody .' + map[i][1]);
+          for (var j = 0; j < cells.length; j++) { cells[j].value = v; }
+          var sync = document.getElementById(map[i][2]);
+          if (sync) { sync.value = v; }
+          done++;
+        }
+      }
+      toast(done ? ('已批量填充 ' + done + ' 项') : '请先填写要批量设置的字段');
+    }
+    function skuCheckAll(el) {
+      var chks = document.querySelectorAll('#skuBody .sku-chk');
+      for (var i = 0; i < chks.length; i++) { chks[i].checked = el.checked; }
+    }
+
+    /* ============================================================
+       列表
+       ============================================================ */
+    function numCell(v) {
+      return '<span class="numval">' + v + '<svg viewBox="0 0 12 12"><path d="M8.2 1.6l2.2 2.2-6 6H2.2V7.6z"/><path d="M7.2 2.6l2.2 2.2"/></svg></span>';
+    }
+    function opsHtml(row) {
+      var list = row.status === '未上架'
+        ? ['查看', '编辑', '上架', '删除', '复制商品']
+        : ['查看', '下架', '复制商品'];
+      var html = list.map(function (name) {
+        if (name === '查看') { return '<a onclick="openDetail(\'view\',' + row.id + ')">' + name + '</a>'; }
+        if (name === '编辑') { return '<a onclick="openDetail(\'edit\',' + row.id + ')">' + name + '</a>'; }
+        if (name === '删除') { return '<a onclick="askDelete(' + row.id + ')">' + name + '</a>'; }
+        if (name === '上架' || name === '下架') { return '<a onclick="toggleStatus(' + row.id + ')">' + name + '</a>'; }
+        return '<a onclick="toast(\'' + name + '：' + row.id + '\')">' + name + '</a>';
+      }).join('');
+      html += '<a onclick="toast(\'完善知识库：' + row.id + '\')">完善知识库</a>';
+      return '<div class="op">' + html + '</div>';
+    }
+    function renderList(data) {
+      var body = document.getElementById('listBody');
+      body.innerHTML = '';
+      data.forEach(function (row) {
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td class="c-chk"><input type="checkbox" ' + (selected[row.id] ? 'checked' : '') + ' onclick="toggleRow(' + row.id + ',this)"></td>' +
+          '<td>' + row.id + '</td>' +
+          '<td><div class="prod"><img src="' + prodImg(row.img) + '" alt=""><div><div class="pname">' + row.name + '</div><div class="ptype">商品类型:' + row.ptype + '</div></div></div></td>' +
+          '<td>' + row.audit + '</td>' +
+          '<td><div class="cell2">' + row.brand + '</div><div class="cell2">' + row.category + '</div></td>' +
+          '<td>' + row.kb + '</td>' +
+          '<td>' + row.optype + '</td>' +
+          '<td>' + row.status + '</td>' +
+          '<td>' + numCell(row.stock) + '</td>' +
+          '<td>' + row.shop + '</td>' +
+          '<td>' + row.shopType + '</td>' +
+          '<td>' + numCell(row.sort) + '</td>' +
+          '<td><span class="sw' + (row.rec ? ' on' : '') + '" onclick="toggleRec(' + row.id + ',this)"></span></td>' +
+          '<td>' + row.price + '</td>' +
+          '<td>' + (row.saleStart ? row.saleStart + '<br>' + row.saleEnd : '-<br>-') + '</td>' +
+          '<td class="c-op">' + opsHtml(row) + '</td>';
+        body.appendChild(tr);
+      });
+      document.getElementById('totalCount').textContent = '共 ' + (data.length === products.length ? 347 : data.length) + ' 条';
+      syncSel();
+    }
+    function findProduct(id) {
+      for (var i = 0; i < products.length; i++) { if (products[i].id === id) { return products[i]; } }
+      return null;
+    }
+    function toggleRow(id, el) {
+      if (el.checked) { selected[id] = 1; } else { delete selected[id]; }
+      syncSel();
+    }
+    function toggleAll(el) {
+      products.forEach(function (r) { if (el.checked) { selected[r.id] = 1; } else { delete selected[r.id]; } });
+      renderList(products);
+    }
+    function clearSelection() { selected = {}; renderList(products); }
+    function syncSel() {
+      var n = Object.keys(selected).length;
+      document.getElementById('selCount').textContent = n;
+      document.getElementById('chkAll').checked = n > 0 && n === products.length;
+    }
+    function toggleRec(id, el) {
+      var p = findProduct(id);
+      if (!p) { return; }
+      p.rec = !p.rec;
+      el.classList.toggle('on', p.rec);
+      toast(p.rec ? '已设为推荐' : '已取消推荐');
+    }
+    function toggleStatus(id) {
+      var p = findProduct(id);
+      if (!p) { return; }
+      p.status = p.status === '已上架' ? '未上架' : '已上架';
+      renderList(products);
+      toast(p.status === '已上架' ? '已上架' : '已下架');
+    }
+    function askDelete(id) {
+      var p = findProduct(id);
+      if (!p) { return; }
+      confirmAction(
+        '确认删除该商品？',
+        '商品名：<em>' + p.name + '</em>（编号 ' + p.id + '）<br>删除后不可恢复，该商品将从列表中移除。',
+        function () {
+          products = products.filter(function (r) { return r.id !== id; });
+          delete selected[id];
+          renderList(products);
+          toast('已删除');
+        }
+      );
+    }
+    function batchDelete() {
+      var ids = Object.keys(selected);
+      if (!ids.length) { toast('请先勾选要删除的商品'); return; }
+      confirmAction(
+        '确认批量删除？',
+        '已选择 <em>' + ids.length + '</em> 个商品，删除后不可恢复。',
+        function () {
+          products = products.filter(function (r) { return !selected[r.id]; });
+          selected = {};
+          renderList(products);
+          toast('已批量删除 ' + ids.length + ' 个商品');
+        }
+      );
+    }
+    function switchTab(el) {
+      var tabs = document.querySelectorAll('.ltab');
+      for (var i = 0; i < tabs.length; i++) { tabs[i].classList.remove('active'); }
+      el.classList.add('active');
+      var t = el.getAttribute('data-tab');
+      var list = products.slice();
+      if (t === 'on') { list = list.filter(function (r) { return r.status === '已上架'; }); }
+      if (t === 'off') { list = list.filter(function (r) { return r.status === '未上架'; }); }
+      renderList(list);
+    }
+    function searchList() {
+      var name = document.getElementById('qName').value.trim();
+      var shop = document.getElementById('qShop').value.trim();
+      var st = document.getElementById('qShopType').value;
+      var kb = document.getElementById('qKb').value;
+      var op = document.getElementById('qOptype').value;
+      var list = products.slice();
+      if (name) { list = list.filter(function (r) { return r.name.indexOf(name) > -1; }); }
+      if (shop) { list = list.filter(function (r) { return r.shop.indexOf(shop) > -1; }); }
+      if (st) { list = list.filter(function (r) { return r.shopType === st; }); }
+      if (kb !== '') { list = list.filter(function (r) { return r.kb === (kb === '1' ? '是' : '否'); }); }
+      if (op) { list = list.filter(function (r) { return r.optype === op; }); }
+      renderList(list);
+      toast('查询完成，共 ' + list.length + ' 条');
+    }
+    function resetSearch() {
+      document.getElementById('qName').value = '';
+      document.getElementById('qShop').value = '';
+      document.getElementById('qShopType').selectedIndex = 0;
+      document.getElementById('qPtype').selectedIndex = 0;
+      document.getElementById('qKb').selectedIndex = 0;
+      document.getElementById('qOptype').selectedIndex = 0;
+      renderList(products);
+    }
+
+    /* ============================================================
+       详情页（新增 / 编辑 / 查看）
+       ============================================================ */
+    function setRadio(name, val) {
+      var list = document.getElementsByName(name);
+      for (var i = 0; i < list.length; i++) { list[i].checked = (list[i].value === val); }
+    }
+    function getRadio(name) {
+      var list = document.getElementsByName(name);
+      for (var i = 0; i < list.length; i++) { if (list[i].checked) { return list[i].value; } }
+      return '';
+    }
+    function setVal(id, v) { var el = document.getElementById(id); if (el) { el.value = v == null ? '' : v; } }
+
+    function openDetail(mode, id) {
+      curMode = mode; curId = id || null;
+      var p = (mode === 'add') ? null : findProduct(id);
+      /* 标题 */
+      var t = mode === 'add' ? '新增商品' : (mode === 'edit' ? '编辑商品' : '查看商品');
+      document.getElementById('tabDetailTxt').textContent = t;
+      /* 只读态 */
+      document.getElementById('detailForm').classList.toggle('ro', mode === 'view');
+      document.getElementById('btnSave').style.display = (mode === 'view') ? 'none' : '';
+      var cancel = document.querySelector('.foot .btn-default');
+      cancel.textContent = (mode === 'view') ? '返回' : '取消';
+      /* 回填 */
+      if (p) {
+        document.getElementById('dCategory').selectedIndex = 0;
+        document.getElementById('dBrand').selectedIndex = 0;
+        setVal('dName', p.name); cntSync(document.getElementById('dName'), 'dNameCnt');
+        document.getElementById('dShop').value = p.shop;
+        setRadio('dPtype', p.ptype);
+        setRadio('dOptype', p.optype);
+        setRadio('dCoupon', '否');
+        setVal('dSaleStart', p.saleStart ? p.saleStart.slice(0, 10) : '');
+        setVal('dSaleEnd', p.saleEnd ? p.saleEnd.slice(0, 10) : '');
+        setVal('dNo', ''); cntSync(document.getElementById('dNo'), 'dNoCnt');
+        setVal('dMinBuy', 1); setVal('dMaxBuy', 0); setVal('dSort', p.sort);
+        setVal('dMarketPrice', ''); setVal('dSalePrice', p.price); setVal('dPoints', '');
+        setVal('dPvi', ''); setVal('dSupplyPrice', ''); setVal('dStock', p.stock);
+        document.getElementById('dSeven').classList.toggle('on', true);
+        setRadio('dPresale', '全款预售');
+      } else {
+        document.getElementById('dCategory').selectedIndex = 0;
+        document.getElementById('dBrand').selectedIndex = 0;
+        setVal('dName', ''); cntSync(document.getElementById('dName'), 'dNameCnt');
+        document.getElementById('dShop').selectedIndex = 0;
+        setRadio('dPtype', '实体商品');
+        setRadio('dOptype', '团购');
+        setRadio('dCoupon', '否');
+        setVal('dSaleStart', ''); setVal('dSaleEnd', '');
+        setVal('dNo', ''); cntSync(document.getElementById('dNo'), 'dNoCnt');
+        setVal('dMinBuy', 1); setVal('dMaxBuy', 0); setVal('dSort', 0);
+        setVal('dMarketPrice', ''); setVal('dSalePrice', ''); setVal('dPoints', '');
+        setVal('dPvi', ''); setVal('dSupplyPrice', ''); setVal('dStock', '');
+        document.getElementById('dSeven').classList.add('on');
+        setRadio('dPresale', '全款预售');
+      }
+      go('detail');
+    }
+    function saveDetail() {
+      var name = document.getElementById('dName').value.trim();
+      if (!name) { toast('请输入商品名'); return; }
+      toast(curMode === 'add' ? '已保存，商品创建成功' : '已保存');
+      go('list');
+    }
+
+    /* ============================================================
+       会员中心（member-admin 源 1:1 移植，mm 前缀避免与商品后台同名冲突）
+       ============================================================ */
+    function mmAvtSvg(seed) {
+      var palette = ['#FF8A93', '#5B8DEF', '#8E5BF0', '#F2994A', '#2EBD8C', '#EF5B8D'];
+      var c = palette[seed % palette.length];
+      var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">'
+        + '<rect width="40" height="40" fill="' + c + '"/>'
+        + '<circle cx="20" cy="16" r="7" fill="#fff" opacity=".92"/>'
+        + '<path d="M7 36c0-8 5.5-12 13-12s13 4 13 12z" fill="#fff" opacity=".92"/>'
+        + '</svg>';
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    }
+
+    var mmMembers = [
+      { id: 1553843, nick: '有幸12123', phone: '18307448442', wx: '', level: '潜力达人', tmpLevel: '潜力达人', isExec: '否', exec: '有幸官方(p00001)', ref: 'C小明1', insp: 578, tag: '审核通过', real: '审核通过', limitDividend: false, disabled: false, reg: '2025-11-25 13:53:00' }
+    ];
+    var mmSelected = {};
+    var mmCurMember = null;
+
+    var mmRelMembers = [
+      { id: 1553844, nick: '有幸12123', phone: '18307448442', wx: '', name: '宋健', level: '潜力达人', tmpLevel: '潜力达人', ref: 'C小明1', reg: '2025-11-25 13:53', status: '已认证', note: '上月保底未完成', avatar: 0 },
+      { id: 1553845, nick: 'C小明1', phone: '13574051885', wx: '', name: '成明坡', level: '成长达人', tmpLevel: '成长达人', ref: 'George Tan', reg: '2025-11-07 11:00', status: '已认证', note: '上月保底未完成', avatar: 1 },
+      { id: 1553846, nick: 'George Tan', phone: '18589589573', wx: '用户89757', name: '用户89757', level: '精英达人', tmpLevel: '精英达人', ref: '梦回一二三', reg: '2025-10-17 09:47', status: '已认证', note: '上月保底未完成', avatar: 2 },
+      { id: 1553847, nick: '梦回一二三', phone: '13786189510', wx: '用户76261', name: '用户76261', level: '领航达人', tmpLevel: '领航达人', ref: '谭先生', reg: '2025-10-29 10:02', status: '已完成', note: '上月保底完成', avatar: 3 },
+      { id: 1553848, nick: '谭先生', phone: '13907310714', wx: '用户95754', name: '用户95754', level: '潜力达人', tmpLevel: '潜力达人', ref: '有幸官方', reg: '2025-05-27 14:09', status: '已认证', note: '上月保底完成', avatar: 4 },
+      { id: 1553849, nick: '有幸官方', phone: 'p00001', wx: 'p0000', name: 'p0000', level: '至尊达人', tmpLevel: '尊荣达人', ref: '--', reg: '2025-05-21 21:36', status: '已完成', note: '上月保底完成', avatar: 5 }
+    ];
+
+    /* 会员中心导航：只切会员视图，顶部 page-tabs 不动 */
+    function goProduct() {
+      go('list');                       // 走商品后台原生导航（顶部 tab 行为不变）
+      var pc = document.getElementById('pmChipList');
+      var mc = document.getElementById('mmChipList');
+      if (pc) { pc.classList.add('active'); }
+      if (mc) { mc.classList.remove('active'); }
+    }
+    function goMember(view) {
+      document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('active'); });
+      var tv = document.getElementById('viewMember' + view);
+      if (tv) { tv.classList.add('active'); }
+      var mc = document.getElementById('mmChipList');
+      if (mc) { mc.classList.add('active'); }
+      var pc = document.getElementById('pmChipList');
+      if (pc) { pc.classList.remove('active'); }
+      window.scrollTo(0, 0);
+    }
+
+    /* ============== 顶栏导航：店铺 / 结算中心 切换（侧栏联动） ============== */
+    function goSettle() {
+      document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('active'); });
+      document.getElementById('viewBonus').classList.add('active');
+      document.getElementById('sideShop').style.display = 'none';
+      document.getElementById('sideSettle').style.display = '';
+      document.getElementById('tabProduct').classList.remove('active');
+      document.getElementById('tabDetail').style.display = 'none';
+      var tb = document.getElementById('tabBonus');
+      tb.style.display = ''; tb.classList.add('active');
+      document.getElementById('navShop').classList.remove('active');
+      document.getElementById('navSettle').classList.add('active');
+      window.scrollTo(0, 0);
+    }
+    function goShopNav() {
+      document.getElementById('sideSettle').style.display = 'none';
+      document.getElementById('sideShop').style.display = '';
+      var tb = document.getElementById('tabBonus');
+      tb.style.display = 'none'; tb.classList.remove('active');
+      document.getElementById('navSettle').classList.remove('active');
+      document.getElementById('navShop').classList.add('active');
+      goProduct();   // 回到商家商品管理（商品后台原生导航，顶部 tab 行为不变）
+    }
+
+    function mmRenderList(data) {
+      var body = document.getElementById('mmListBody');
+      body.innerHTML = '';
+      data.forEach(function (m, i) {
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td class="c-chk"><input type="checkbox" ' + (mmSelected[m.id] ? 'checked' : '') + ' onclick="mmToggleRow(' + m.id + ',this)"></td>' +
+          '<td>' + m.id + '</td>' +
+          '<td><div class="mem"><img class="avt" src="' + mmAvtSvg(i) + '" alt=""><div><div class="mname">' + m.nick + '</div><div class="mphone">' + m.phone + '</div></div></div></td>' +
+          '<td>' + m.wx + '</td>' +
+          '<td>' + m.level + '</td>' +
+          '<td>' + m.tmpLevel + '</td>' +
+          '<td>' + m.isExec + '</td>' +
+          '<td>' + m.exec + '</td>' +
+          '<td>' + m.ref + '</td>' +
+          '<td>' + m.insp + '</td>' +
+          '<td><span class="tag">' + m.tag + '</span></td>' +
+          '<td>' + m.real + '</td>' +
+          '<td><span class="sw' + (m.limitDividend ? ' on' : '') + '" onclick="mmToggleLimit(' + m.id + ',this)"></span></td>' +
+          '<td><span class="sw' + (m.disabled ? ' on' : '') + '" onclick="mmToggleDisabled(' + m.id + ',this)"></span></td>' +
+          '<td>' + m.reg + '</td>' +
+          '<td class="c-op"><div class="op">' +
+            '<a data-anno="kMMView" onclick="mmOpenDetail(' + m.id + ')">查看</a>' +
+            '<a onclick="toast(\'修改手机号：' + m.id + '\')">修改手机号</a>' +
+            '<a onclick="toast(\'修改推荐人：' + m.id + '\')">修改推荐人</a>' +
+            '<a onclick="toast(\'重置密码：' + m.id + '\')">重置密码</a>' +
+            '<a onclick="toast(\'调整等级：' + m.id + '\')">调整等级</a>' +
+            '<a onclick="toast(\'调整临时等级：' + m.id + '\')">调整临时等级</a>' +
+            '<a onclick="toast(\'设置执行委：' + m.id + '\')">设置执行委</a>' +
+            '<a onclick="mmAskDelete(' + m.id + ')">删除</a>' +
+            '<a onclick="toast(\'调整灵感值：' + m.id + '\')">调整灵感值</a>' +
+            '<a onclick="toast(\'修改执行委：' + m.id + '\')">修改执行委</a>' +
+          '</div></td>';
+        body.appendChild(tr);
+      });
+      document.getElementById('mmTotalCount').textContent = '共 ' + data.length + ' 条';
+      mmSyncSel();
+    }
+    function mmFindMember(id) {
+      for (var i = 0; i < mmMembers.length; i++) { if (mmMembers[i].id === id) { return mmMembers[i]; } }
+      return null;
+    }
+    function mmToggleRow(id, el) {
+      if (el.checked) { mmSelected[id] = 1; } else { delete mmSelected[id]; }
+      mmSyncSel();
+    }
+    function mmToggleAll(el) {
+      mmMembers.forEach(function (r) { if (el.checked) { mmSelected[r.id] = 1; } else { delete mmSelected[r.id]; } });
+      mmRenderList(mmMembers);
+    }
+    function mmSyncSel() {
+      var n = Object.keys(mmSelected).length;
+      document.getElementById('mmChkAll').checked = n > 0 && n === mmMembers.length;
+    }
+    function mmToggleLimit(id, el) {
+      var m = mmFindMember(id); if (!m) { return; }
+      m.limitDividend = !m.limitDividend;
+      el.classList.toggle('on', m.limitDividend);
+      toast(m.limitDividend ? '已开启限制分红' : '已关闭限制分红');
+    }
+    function mmToggleDisabled(id, el) {
+      var m = mmFindMember(id); if (!m) { return; }
+      m.disabled = !m.disabled;
+      el.classList.toggle('on', m.disabled);
+      toast(m.disabled ? '已禁用该会员' : '已启用该会员');
+    }
+    function mmSearchList() {
+      var acc = document.getElementById('mmQAccount').value.trim();
+      var nick = document.getElementById('mmQNick').value.trim();
+      var wx = document.getElementById('mmQWx').value.trim();
+      var ref = document.getElementById('mmQRef').value.trim();
+      var lv = document.getElementById('mmQLevel').value;
+      var list = mmMembers.slice();
+      if (acc) { list = list.filter(function (r) { return ('' + r.id).indexOf(acc) > -1; }); }
+      if (nick) { list = list.filter(function (r) { return r.nick.indexOf(nick) > -1; }); }
+      if (wx) { list = list.filter(function (r) { return r.wx.indexOf(wx) > -1; }); }
+      if (ref) { list = list.filter(function (r) { return r.ref.indexOf(ref) > -1; }); }
+      if (lv) { list = list.filter(function (r) { return r.level === lv; }); }
+      mmRenderList(list);
+      toast('查询完成，共 ' + list.length + ' 条');
+    }
+    function mmResetSearch() {
+      document.getElementById('mmQAccount').value = '';
+      document.getElementById('mmQNick').value = '';
+      document.getElementById('mmQWx').value = '';
+      document.getElementById('mmQRef').value = '';
+      document.getElementById('mmQLevel').selectedIndex = 0;
+      document.getElementById('mmQStart').value = '';
+      document.getElementById('mmQEnd').value = '';
+      mmRenderList(mmMembers);
+    }
+    function mmAskDelete(id) {
+      var m = mmFindMember(id);
+      if (!m) { return; }
+      confirmAction(
+        '确认删除该会员？',
+        '昵称：<em>' + m.nick + '</em>（编号 ' + m.id + '）<br>删除后不可恢复，该会员将从列表中移除。',
+        function () {
+          mmMembers = mmMembers.filter(function (r) { return r.id !== id; });
+          delete mmSelected[id];
+          mmRenderList(mmMembers);
+          toast('已删除');
+        }
+      );
+    }
+    function mmOpenDetail(id) {
+      var m = mmFindMember(id);
+      if (!m) { return; }
+      mmCurMember = m;
+      mmRenderRel();
+      goMember('Detail');
+    }
+    function mmRenderRel() {
+      var body = document.getElementById('mmRelBody');
+      if (!body) { return; }
+      body.innerHTML = '';
+      mmRelMembers.forEach(function (m, i) {
+        var tr = document.createElement('tr');
+        var statusClass = m.note.indexOf('未完成') > -1 ? 'warn' : '';
+        var infoHtml = '<div class="mem">' +
+          '<img class="avt" src="' + mmAvtSvg(m.avatar) + '" alt="">' +
+          '<div>' +
+            '<div class="mname">' + m.nick + '</div>' +
+            '<div class="rel-tag ' + statusClass + '">' + m.status + '</div>' +
+            '<div class="rel-note">' + m.note + '</div>' +
+          '</div>' +
+        '</div>';
+        tr.innerHTML =
+          '<td>' + infoHtml + '</td>' +
+          '<td>' + m.phone + '</td>' +
+          '<td>' + m.name + '</td>' +
+          '<td>' + m.wx + '</td>' +
+          '<td>' + m.level + '</td>' +
+          '<td>' + m.tmpLevel + '</td>' +
+          '<td>' + m.ref + '</td>' +
+          '<td>' + m.reg + '</td>' +
+          '<td><div class="op"><a onclick="toast(\'查看：' + m.nick + '\')">查看</a></div></td>';
+        body.appendChild(tr);
+      });
+    }
+
+    mmRenderList(mmMembers);
+
+    renderList(products);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style id="__anno_css">/* v4：角标独立浮层。layer 在视口坐标下绝对定位（inset:0 fixed），
+   子角标用 JS 按目标元素 rect 算 left/top，不进宿主 DOM。
+   弹窗开启时不再整层隐藏，而是逐角标按「顶层弹窗」判定（topOpenModal）：只显示顶层弹窗内字段角标，背景/下层弹窗角标隐藏防穿透。
+   z-index 回落 4000（JS 运行时动态设为「顶层弹窗 zIndex+1」，无弹窗回落 4000；4000 高于遮罩 3950，并动态跟随未来更高弹窗）。工具栏/气泡/列表面板保持超高 z-index 仍可操作。 */
+#__anno_layer{position:fixed;inset:0;pointer-events:none;z-index:4000;overflow:hidden}
+.__anno-flag{position:absolute;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#FFC53D;color:#5A3D00;font-size:11px;line-height:18px;text-align:center;cursor:pointer;z-index:1000;box-shadow:0 1px 4px rgba(0,0,0,.25);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;user-select:none;border:1.5px solid #fff;pointer-events:auto}
+.__anno-flag[data-missing="1"]{background:#E04D4D;color:#fff;border-color:#fff}
+.__anno-flag.__anno-pending{background:#8C8C99;color:#fff;border-color:#fff}
+.__anno-flag[data-multi="1"]{background:#FF8F1F;color:#fff}
+.__anno-bubble{position:fixed;z-index:99995;max-width:284px;background:#fff;border:1px solid #FF8F1F;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:12px;color:#333;line-height:1.6;overflow:hidden;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.__anno-bubble .b-head{display:flex;align-items:center;justify-content:space-between;padding:7px 11px;background:#FF8F1F;color:#fff;font-size:11px}
+.__anno-bubble .b-head .x{cursor:pointer;opacity:.9;font-size:15px;line-height:1}
+.__anno-bubble .b-body{padding:10px 12px;white-space:pre-wrap;word-break:break-word}
+.__anno-bubble .b-body .m-item{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid #f2e9d8}
+.__anno-bubble .b-body .m-item:last-child{border-bottom:none}
+.__anno-bubble .b-body .m-txt{flex:1;white-space:pre-wrap;word-break:break-word;cursor:pointer;min-width:0}
+.__anno-bubble .b-body .m-txt:hover{color:#B26A00}
+.__anno-bubble .b-body .m-del{flex:0 0 auto;height:20px;padding:0 9px;border:1px solid #e8d5b0;border-radius:10px;background:#fff;color:#B26A00;font-size:11px;cursor:pointer;font-family:inherit;line-height:1;white-space:nowrap}
+.__anno-bubble .b-body .m-del:hover{background:#FFF3E0;border-color:#FF8F1F;color:#8A4B00}
+.__anno-bubble .b-actions{display:flex;gap:8px;padding:0 12px 11px}
+.__anno-bubble textarea{width:256px;height:62px;border:1px solid #ddd;border-radius:6px;padding:8px;font-size:12px;font-family:inherit;resize:none;outline:none;display:block}
+.__anno-bubble textarea:focus{border-color:#FF8F1F}
+.__anno-bubble button{height:28px;padding:0 12px;border:none;border-radius:14px;background:#FF8F1F;color:#fff;font-size:12px;cursor:pointer;font-family:inherit}
+.__anno-bubble button.ghost{background:#eee;color:#555}
+.__anno-tb{position:fixed;right:16px;bottom:16px;z-index:99999;display:flex;align-items:center;gap:6px;background:#1f1f2e;padding:7px 9px;border-radius:26px;box-shadow:0 6px 20px rgba(0,0,0,.35);font-family:inherit}
+.__anno-tb button{height:30px;padding:0 11px;border:none;border-radius:15px;background:#33334a;color:#fff;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.__anno-tb button.on{background:#7C5CFC}
+.__anno-list{position:fixed;left:16px;top:16px;z-index:99998;width:320px;max-height:78vh;overflow:auto;background:#fff;border:1px solid #e3e3ec;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.18);font-family:inherit}
+.__anno-list .l-head{position:sticky;top:0;background:#1f1f2e;color:#fff;padding:9px 12px;font-size:13px;font-weight:600;display:flex;justify-content:space-between;align-items:center;z-index:1}
+.__anno-list .l-head .x{cursor:pointer}
+.__anno-list .l-bar{position:sticky;top:38px;background:#fff;padding:8px 12px;border-bottom:1px solid #f0f0f4;z-index:1}
+.__anno-list .l-bar .l-clean{height:26px;padding:0 10px;border:1px solid #E04D4D;background:#fff;color:#E04D4D;border-radius:13px;font-size:11px;cursor:pointer;font-family:inherit}
+.__anno-list .l-bar .l-clean:hover{background:#E04D4D;color:#fff}
+.__anno-list .empty{padding:16px;color:#999;font-size:12px}
+.__anno-list .item{padding:7px 12px 8px;border-bottom:1px solid #f0f0f4;cursor:pointer;font-size:12px;color:#333}
+.__anno-list .item:hover{background:#fff7e6}
+.__anno-list .item.miss{background:#FFF5F5}
+.__anno-list .item.miss:hover{background:#FFECEC}
+.__anno-list .item .i-main{display:flex;align-items:flex-start;gap:4px;flex-wrap:wrap}
+.__anno-list .item .n{display:inline-block;min-width:16px;height:16px;line-height:16px;text-align:center;background:#FFC53D;color:#5A3D00;border-radius:8px;font-size:10px;margin-right:6px;font-weight:600;flex:0 0 auto}
+.__anno-list .item.miss .n{background:#E04D4D;color:#fff}
+.__anno-list .item .t{color:#aaa;font-size:11px;margin-left:auto}
+.__anno-list .item .v{color:#bbb;font-size:10px;margin-left:6px}
+.__anno-list .item .a{color:#7C5CFC;font-size:10px;margin-left:5px;background:#F3F0FF;border-radius:6px;padding:0 5px;white-space:nowrap}
+.__anno-list .item .i-acts{display:flex;gap:6px;margin-top:6px;padding-left:22px}
+.__anno-list .item .i-acts .mini{height:22px;padding:0 9px;border:1px solid #e3e3ec;background:#fff;color:#555;border-radius:11px;font-size:11px;cursor:pointer;font-family:inherit;line-height:1}
+.__anno-list .item .i-acts .mini:hover{background:#f3f3f7}
+.__anno-list .item .i-acts .mini.danger{color:#E04D4D;border-color:#f0c4c4}
+.__anno-list .item .i-acts .mini.danger:hover{background:#E04D4D;color:#fff;border-color:#E04D4D}
+.__anno-mode-on,.__anno-mode-on *{cursor:crosshair!important}
+.__anno-relocating,.__anno-relocating *{cursor:crosshair!important}
+.__anno-hover{outline:2px dashed #7C5CFC!important;outline-offset:1px}
+.__anno-hidden .__anno-layer,.__anno-hidden #__anno_layer{display:none!important}
+.__anno-tb button:disabled{opacity:.45;cursor:not-allowed}
+.__anno-tb button.__anno-locked{opacity:.45;cursor:not-allowed}
+.__anno-tb .__anno-hint{background:#E04D4D;color:#fff;cursor:default;font-size:11px;padding:0 9px}
+/* v4.4：工具条可折叠 —— 收起后缩成一个圆形悬浮钮（不挡原型内容），点击或 Alt+B 展开；状态记忆在 localStorage。 */
+.__anno-tb .__anno-fold{width:26px;padding:0;background:#4a4a63;font-weight:700;font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.__anno-tb .__anno-fold:hover{background:#5c5c7a}
+.__anno-tb.folded{padding:5px;border-radius:50%;gap:0}
+.__anno-tb.folded button:not(.__anno-fold){display:none}
+.__anno-tb.folded .__anno-fold{width:40px;height:40px;border-radius:50%;font-size:13px}
+</style>
+<script id="__anno_seed" type="application/json">[
+ {
+  "id": "aAddProd0001",
+  "no": 1,
+  "view": "viewList",
+  "sel": "[data-anno=\"kAddProduct\"]",
+  "text": "点击新增商品进入商品详情页",
+  "ts": 1763700000000,
+  "valid": true
+ },
+ {
+  "id": "aNewPvCol0002",
+  "no": 2,
+  "view": "viewDetail",
+  "sel": "[data-anno=\"kNewPvCol\"]",
+  "text": "可编辑\n输入限制：正整数 0~9999\n默认数据：默认为空",
+  "ts": 1763700000000,
+  "valid": true
+ },
+ {
+  "id": "aNewPvBat0003",
+  "no": 3,
+  "view": "viewDetail",
+  "sel": "[data-anno=\"kNewPvBatch\"]",
+  "text": "可编辑\n输入限制：正整数 0~9999\n默认数据：默认为空\n点击批量设置后覆盖所有规格行新人pv",
+  "ts": 1763700000000,
+  "valid": true
+ },
+ {
+  "id": "aNewPvSin0004",
+  "no": 4,
+  "view": "viewDetail",
+  "sel": "[data-anno=\"kNewPvSingle\"]",
+  "text": "不可编辑\n由批量设置同步回填",
+  "ts": 1763700000000,
+  "valid": true
+ }
+]</script>
+<script id="__anno_engine">
+(function(){
+  "use strict";
+  /* v4：本地优先 —— 去掉 github.io/?anno=1 门禁，本地 file:// 直接可批注/同步。
+     角标改为独立浮层 #__anno_layer（z-index 低于弹窗遮罩），不再 appendChild 进宿主，
+     一次性消灭「select/input 宿主 0 尺寸不可见」「弹窗穿透」「飘到左上角」这一整类问题。 */
+  var canAnnotate = true;
+  var fileKey = location.pathname.split('/').pop() || 'proto';
+  var LS_KEY = '__anno__' + fileKey;
+  var seed = [];
+  try { seed = JSON.parse((document.getElementById('__anno_seed')||{}).textContent || '[]'); } catch(e){ seed = []; }
+  var _cached;
+  try { _cached = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch(e){ _cached = null; }
+  /* 文件 seed 优先：仅当缓存是数组且与文件 seed 的 id+sel+text 完全一致（合法编辑）时才用缓存；
+     否则用文件 seed 并重写缓存 —— 避免旧缓存覆盖修复后的 seed 导致「打开即失联 / 旧文案不刷新」。
+     text 必须参与比对：seed 文案更新后，同 id+sel 的旧缓存不应继续生效。 */
+  var _sameData = Array.isArray(_cached) && _cached.length === seed.length &&
+    seed.every(function(s){ return _cached.some(function(c){ return c.id === s.id && c.sel === s.sel && c.text === s.text; }); });
+  var data = (_cached && _sameData) ? _cached.slice() : seed.slice();
+  if (!_sameData) { try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch(e){} }
+  data.forEach(function(a,i){ if (typeof a.no !== 'number') a.no = i+1; if (typeof a.view !== 'string') a.view = 'global'; });
+  var mode = false, hidden = false, openId = null, hoverEl = null, relocating = null;
+  function nextNo(){ var m=0; data.forEach(function(a){ if(a.no>m)m=a.no; }); return m+1; }
+  function uid(){ return 'a' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+  function save(){ try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch(e){} }
+  function toast(msg){ var t=document.createElement('div'); t.textContent=msg; t.style.cssText='position:fixed;left:50%;bottom:72px;transform:translateX(-50%);background:#1f1f2e;color:#fff;padding:9px 16px;border-radius:20px;font-size:12px;z-index:99999;box-shadow:0 4px 16px rgba(0,0,0,.3);font-family:inherit;max-width:80%;text-align:center'; document.body.appendChild(t); setTimeout(function(){ t.style.transition='opacity .3s'; t.style.opacity='0'; },2200); setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); },2600); }
+  function download(name, text, mime){ var blob=new Blob([text],{type:mime||'application/json'}); var url=URL.createObjectURL(blob); var a=document.createElement('a'); a.href=url; a.download=name; a.click(); setTimeout(function(){URL.revokeObjectURL(url);},1000); }
+
+  /* 定位：修正同标签序号 bug + 视图隔离 */
+  function cssPath(el){
+    if (!el || el === document.body) return 'body';
+    var parts = []; var cur = el; var anchored = false;
+    while (cur && cur !== document.body){
+      var tag = cur.tagName.toLowerCase();
+      if (cur.id){ parts.unshift(tag + '#' + cur.id); anchored = true; break; }
+      var cls = '';
+      if (cur.className && typeof cur.className === 'string'){
+        var cs = cur.className.trim().split(/\s+/).filter(function(c){ return c && c.indexOf('__anno')!==0; });
+        if (cs.length) cls = '.' + cs.join('.');
+      }
+      var parent = cur.parentNode;
+      if (parent){
+        var sameTag = Array.prototype.filter.call(parent.children, function(ch){ return ch.tagName === cur.tagName; });
+        var idx = sameTag.indexOf(cur) + 1;
+        var suffix = (cls && sameTag.length > 1) ? cls + ':nth-of-type(' + idx + ')' : (cls || ':nth-of-type(' + idx + ')');
+        parts.unshift(tag + suffix);
+      } else { parts.unshift(tag + cls); }
+      cur = parent;
+    }
+    /* 停在 id 锚点时不能再拼 body 前缀：真实页面里 .view 嵌在 main>div.workspace 下，锚点不是 body 直接子级 */
+    return (anchored ? '' : 'body > ') + parts.join(' > ');
+  }
+  function currentView(){ var act = document.querySelector('.view.active, .page.active'); return act ? (act.id || 'global') : 'global'; }
+  function rootOf(view){ if (!view || view === 'global') return document; var n = document.getElementById(view); return n || document; }
+  function isVisible(el){ if(!el) return false; var p=el; while(p){ if(p.style&&p.style.display==='none')return false; if(getComputedStyle(p).display==='none')return false; p=p.parentElement; } return true; }
+  /* 弹窗感知：判定元素所属弹窗容器、弹窗是否打开（用于「关闭的弹窗内字段不显示角标、打开时仅显示该弹窗内字段角标」） */
+  var MODAL_SEL = '.cf-mask,.cf-modal,.wct-mask,.wct-modal,.mask,.modal,.dialog,.overlay,.popup';
+  function modalOf(el){ if(!el || !el.closest) return null; try { var m = el.closest(MODAL_SEL); if(!m) return null; /* 归并到最外层弹窗根容器：穿透内容框(.wct-modal/.cf-modal)到遮罩层(.wct-mask/.cf-mask)，否则 modalOf 返回内容框而 topOpenModal 取遮罩层，两者不同对象 → 误判 hidden-modal（本次实战 bug） */ while (m.parentNode && m.parentNode.closest && m.parentNode.closest(MODAL_SEL)) m = m.parentNode.closest(MODAL_SEL); return m; } catch(e){ return null; } }
+  function isModalOpen(m){ if(!m) return false; if(getComputedStyle(m).display==='none') return false; var r=m.getBoundingClientRect(); return (r.width>0 && r.height>0); }
+  function textOf(el){ var t=''; try{ t=(el.innerText||el.textContent||'').replace(/\s+/g,' ').trim().slice(0,40); }catch(e){} return t; }
+  /* 定位时优先返回「可见」的那个；全不可见才返回 null（交给失联/重定位处理），避免命中隐藏重复节点被误判 */
+  function locate(sel, root){
+    if (!sel) return null;
+    var base = String(sel);
+    while (/^\s*body\s*>\s*/.test(base)) base = base.replace(/^\s*body\s*>\s*/, ''); /* 兼容老版本错前缀 */
+    var cands = [base];
+    var sans = base.replace(/:nth-of-type\(\d+\)/g, '').replace(/:nth-child\(\d+\)/g, '');
+    if (sans !== base) cands.push(sans);
+    for (var i=0;i<cands.length;i++){
+      var hits;
+      try { hits = document.querySelectorAll(cands[i]); } catch(e){ hits = []; }
+      if (!hits || hits.length === 0) continue;
+      if (hits.length === 1) return hits[0];
+      /* 多命中：优先可见的；都没有可见则返回 null（失联） */
+      for (var j=0;j<hits.length;j++){ if (isVisible(hits[j])) return hits[j]; }
+      return null;
+    }
+    return null;
+  }
+  function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+  function fmt(d){ function p(n){return (n<10?'0':'')+n;} return p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()); }
+  function flash(el){ if(!el)return; var pv=el.style.outline; el.style.outline='3px solid #7C5CFC'; setTimeout(function(){ el.style.outline=pv; },1200); }
+  /* 角标挂载点：粒度从精到粗「三级降级」。v4 角标在独立浮层，宿主能否容纳子节点已无关紧要，
+     这里只决定「角标贴在哪个元素的角上」与「小元素右侧外挂」两种位置策略。 */
+  var ATOM_RE = /^(label|button|a|input|select|textarea|img|svg|i|em|strong|code|span|td|th|dt|dd|li|p|h[1-6])$/;
+  var CONTAINER_SEL = '.fr,.ctl,.form-item,.el-form-item,.row,.item,.cell,.field,.col,tr,li,td,th,.box,.card,section,article,form';
+  function isAtom(el){
+    if (!el || !el.tagName || !el.getBoundingClientRect) return false;
+    if (!ATOM_RE.test(el.tagName.toLowerCase())) return false;
+    var r = el.getBoundingClientRect();
+    return r.height > 0 && r.height <= 44;   /* 限单行 */
+  }
+  function anchorOf(el){
+    if (!el || !el.closest) return el;
+    var k = el.closest('[data-anno]'); if (k) return k;
+    var core = el;
+    if (/^input$/i.test(el.tagName) && /^(radio|checkbox)$/i.test(el.type || '')) core = el.closest('label') || el;
+    if (isAtom(core)) return core;
+    var p = core.parentElement;
+    while (p && p !== document.body){
+      if (p.matches && p.matches(CONTAINER_SEL)){
+        var r = p.getBoundingClientRect();
+        if (r.height > 0 && r.height <= 220) return p;
+        break;
+      }
+      p = p.parentElement;
+    }
+    return core;
+  }
+  function viewOf(el){ if(!el) return 'global'; var v = el.closest && el.closest('[data-view]'); if(v) return v.getAttribute('data-view'); v = el.closest && el.closest('.view,.page'); return v ? (v.id || 'global') : 'global'; }
+  /* 通用激活钩子：a.activates 是字符串 —— 若为全局函数名(window[code] 是函数)则直接调用，否则当 JS 片段执行。
+     用于「条件字段需先触发某交互才出现」的原型（如选水卡才显示水卡设置）。原型在 seed 里写 activates:'syncWaterCards' 等，
+     引擎不耦合任何具体业务（本次去硬编码 watercard 分支，做成通用）。 */
+  function runActivate(code){
+    if (!code) return;
+    try {
+      if (typeof code === 'string'){
+        if (typeof window[code] === 'function'){ window[code](); return; }
+        (new Function(code))();
+      }
+    } catch(e){ /* 静默：原型未实现该钩子时不报错 */ }
+  }
+  /* 初始化时跑各批注的 activates，让「条件字段」（需先触发某交互才出现的字段）在 init 时就渲染出来，
+     以便角标能定位；默认不打开弹窗（保持默认全量显示）。若某条批注希望在 init 就展开弹窗，
+     把它对应的 open 函数写进 activates 即可（如 activates:'openCardTpl'）。引擎不耦合任何具体业务。 */
+  function autoActivate(){
+    try { data.forEach(function(a){ if (a.activates) runActivate(a.activates); }); } catch(e){}
+  }
+  /* 列表/气泡「定位」：弹窗内字段批注先跑通用激活钩子让字段出现，再尝试打开对应弹窗聚焦（data-open 钩子） */
+  function revealAnno(a){
+    var el=locate(a.sel, rootOf(a.view));
+    var m = el ? modalOf(el) : null;
+    if ((!el) || (m && !isModalOpen(m))){
+      /* 待激活：先跑通用激活钩子（如选水卡/选模板），再尝试打开对应弹窗聚焦 */
+      runActivate(a.activates);
+      var targetM = m || (a.view==='global' ? document.querySelector(MODAL_SEL.split(',')[0]) : null);
+      if(targetM && !isModalOpen(targetM)){ var of=targetM.getAttribute('data-open'); if(of){ try{ (new Function(of))(); }catch(e){} } }
+      renderThrottled();
+      setTimeout(function(){
+        var el2=locate(a.sel, rootOf(a.view));
+        if(!el2){ toast('定位失败：原型可能已改版，请「重定位」或删除'); return; }
+        var m2=modalOf(el2);
+        function go(){ el2.scrollIntoView({block:'center'}); flash(el2); }
+        if(m2 && !isModalOpen(m2)){ var of2=m2.getAttribute('data-open'); if(of2){ try{ (new Function(of2))(); }catch(e){} } setTimeout(function(){ renderThrottled(); setTimeout(go,40); },40); return; }
+        go();
+      }, 180);
+      return;
+    }
+    function go(){ el.scrollIntoView({block:'center'}); flash(el); }
+    go();
+  }
+
+  /* ===== 工具栏 / 列表面板（这些保持在超高 z-index，弹窗开启时仍可操作） ===== */
+  var tb=document.createElement('div'); tb.className='__anno-tb'; document.body.appendChild(tb);
+  var listPanel=document.createElement('div'); listPanel.className='__anno-list'; document.body.appendChild(listPanel);
+  function btn(label,cls){ var b=document.createElement('button'); b.textContent=label; if(cls)b.className=cls; return b; }
+  var bMode=btn('批注'), bHide=btn('隐藏'), bList=btn('列表'), bSave=btn('保存原型'), bPush=btn('保存并推送'), bClear=btn('清空');
+  var bFold=btn('»','__anno-fold');
+  tb.appendChild(bMode); tb.appendChild(bHide); tb.appendChild(bList); tb.appendChild(bSave); tb.appendChild(bPush); tb.appendChild(bClear); tb.appendChild(bFold);
+
+  /* v4.4：工具条折叠 —— 收起后只留一个右下角圆形悬浮钮（不挡原型内容），点击钮或按 Alt+B 展开/收起；状态跨刷新记忆。 */
+  var FOLD_KEY='__anno_tb_folded';
+  function applyFold(f){
+    tb.classList.toggle('folded', !!f);
+    bFold.textContent = f ? '批' : '»';
+    bFold.title = f ? '展开批注工具条（Alt+B）' : '收起批注工具条（Alt+B）';
+  }
+  function toggleFold(){
+    var f = !tb.classList.contains('folded');
+    applyFold(f);
+    try{ localStorage.setItem(FOLD_KEY, f ? '1' : '0'); }catch(e){}
+  }
+  bFold.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); toggleFold(); });
+  bFold.addEventListener('mousedown', function(e){ e.stopPropagation(); });
+  try{ applyFold(localStorage.getItem(FOLD_KEY) === '1'); }catch(e){ applyFold(false); }
+  document.addEventListener('keydown', function(e){
+    if(e.altKey && !e.ctrlKey && !e.metaKey && (e.key === 'b' || e.key === 'B')){ e.preventDefault(); toggleFold(); }
+  });
+
+  /* ===== 角标独立浮层（z-index 低于弹窗遮罩，弹窗开启时整层隐藏，不穿透） ===== */
+  var layer=document.createElement('div'); layer.id='__anno_layer'; document.body.appendChild(layer);
+  var flagEls = [];   /* {flag, el, pos} —— 用于滚动/resize 时重算坐标 */
+  function clearFlags(){ flagEls=[]; while(layer.firstChild) layer.removeChild(layer.firstChild); }
+  function closeBubble(){ var b=document.getElementById('__anno_bubble'); if(b&&b.parentNode)b.parentNode.removeChild(b); openId=null; openFlagEl=null; }
+  /* 气泡跟随角标：openBubble 后角标可能因滚动/视图切换被 positionFlags 重算坐标，
+     气泡必须同步跟随，否则出现「列表定位首次弹出位置不准」（用了滚动前的旧 rect）。 */
+  var openFlagEl = null;
+  function placeBubble(){
+    if(!openFlagEl || !openFlagEl.parentNode) return;
+    var b=document.getElementById('__anno_bubble'); if(!b) return;
+    var r=openFlagEl.getBoundingClientRect();
+    if(r.width===0 && r.height===0) return;   /* 角标暂时隐藏（滚出视口）时不动气泡 */
+    var bw=b.offsetWidth,bh=b.offsetHeight;
+    var left=r.left; if(left+bw>window.innerWidth-8)left=window.innerWidth-8-bw; if(left<8)left=8;
+    var top=r.bottom+6; if(top+bh>window.innerHeight-8)top=r.top-bh-6; if(top<8)top=8;
+    b.style.left=left+'px'; b.style.top=top+'px';
+  }
+
+  /* 分类：ok=可见可标；hidden-modal=弹窗关闭内(延后不显示)；pending=因交互未激活而隐藏/未生成(待激活灰标)；lost=锚点彻底失效(红标失联) */
+  /* 顶层弹窗：遍历所有弹窗容器，归并到最外层根容器（去重）后取「开着且堆叠最高」的那一个（zIndex 大者优先）。
+     无弹窗开着装 null。必须与 modalOf 同层级（都归并到根），否则 m===top 不成立误判 hidden-modal。（本次实战沉淀） */
+  function topOpenModal(){
+    try {
+      var ms = document.querySelectorAll(MODAL_SEL);
+      var roots = [];
+      for (var i=0;i<ms.length;i++){
+        var m = ms[i];
+        while (m.parentNode && m.parentNode.closest && m.parentNode.closest(MODAL_SEL)) m = m.parentNode.closest(MODAL_SEL);
+        if (roots.indexOf(m) === -1) roots.push(m);
+      }
+      var best = null, bestZ = -1;
+      for (var j=0;j<roots.length;j++){
+        var r = roots[j];
+        if (!isModalOpen(r)) continue;
+        var z = parseInt(getComputedStyle(r).zIndex || '0', 10) || 0;
+        if (z > bestZ){ best = r; bestZ = z; }
+      }
+      return best;
+    } catch(e){ return null; }
+  }
+  /* 分类：ok=可见可标；hidden-modal=被别的弹窗/背景遮挡（有弹窗开着时只显示顶层弹窗内，防穿透）；
+     pending=条件未激活 / 关着的弹窗内字段（待激活灰标，不判失联）；
+     hidden=锚点存在但被「非弹窗」隐藏（多为视图/侧栏切换致 display:none）—— 干净隐藏，不堆灰标、不报失联，切回可见视图自动恢复；
+     lost=锚点彻底失效(红标失联)。
+     默认全量：无弹窗开着时，关着的弹窗内字段落 pending，打开即看全量。 */
+  function classify(a){
+    var el = locate(a.sel, rootOf(a.view));
+    if (el){
+      var m = modalOf(el);
+      var top = topOpenModal();
+      if (top){
+        /* 有弹窗开着：只显示顶层弹窗内的角标；背景与下层被盖弹窗的字段一律隐藏防穿透 */
+        if (m === top) return isVisible(el) ? 'ok' : 'pending';
+        return 'hidden-modal';
+      }
+      /* 无弹窗：锚点可见即 ok；不可见分两类 ——
+         在弹窗容器内（关闭的弹窗未展开）→ 维持 pending，弹窗打开即恢复（原有弹窗态行为）；
+         不在弹窗内（多为视图/侧栏切换致 display:none）→ 直接 hidden，干净隐藏不堆灰标、不报失联，
+         切回可见视图自动恢复；这从引擎层通用消除「锚点随视图/侧栏隐藏」整类失联/待激活问题，无需逐条写 !view 排除。 */
+      if (isVisible(el)) return 'ok';
+      return modalOf(el) ? 'pending' : 'hidden';
+    }
+    var fb = a.fallback ? locate(a.fallback, rootOf(a.view)) : null;
+    if (fb) return 'pending';
+    return 'lost';
+  }
+  function render(){
+    clearFlags();
+    /* 防抖：值未变化时不写 class，避免触发自身 MutationObserver 造成 render 死循环 */
+    if (hidden !== document.body.classList.contains('__anno-hidden')) {
+      document.body.classList.toggle('__anno-hidden', hidden);
+    }
+    if (hidden) return;
+    var cv = currentView();
+    var map = new Map();
+    var miss = [];
+    var pending = [];
+    data.forEach(function(a){
+      /* 视图过滤：a.view='viewX' 仅该视图显示；a.view='!viewX' 为可选显式覆盖——仅 viewX 下隐藏（即使锚点可见）；
+         常规「锚点随视图/侧栏隐藏」整类问题已由 classify 的 hidden 态通用处理（无需逐条写 !view） */
+      if (a.view && a.view !== 'global' && a.view !== cv) { if (a.view.charAt(0) !== '!' || a.view.slice(1) === cv) return; }
+      var c = classify(a);
+      if (c === 'hidden-modal') return;
+      if (c === 'hidden') return;
+      if (c === 'ok'){
+        var el = locate(a.sel, rootOf(a.view));
+        var block = anchorOf(el);
+        if (!map.has(block)) map.set(block, []);
+        map.get(block).push(a);
+        return;
+      }
+      if (c === 'pending'){ pending.push(a); return; }
+      if (c === 'lost'){ miss.push(a); return; }
+    });
+    map.forEach(function(annos, block){
+      var multi = annos.length > 1;
+      var flag=document.createElement('div'); flag.className='__anno-flag';
+      var br = block.getBoundingClientRect ? block.getBoundingClientRect() : null;
+      var pos = (br && br.height > 0 && (br.height < 22 || br.width < 22)) ? 'side' : 'corner';
+      if (multi) flag.setAttribute('data-multi','1');
+      flag.textContent = multi ? annos.length : annos[0].no;
+      if (multi){
+        flag.addEventListener('click', function(ev){ ev.stopPropagation(); openMulti(block, annos); });
+      } else {
+        flag.setAttribute('data-id', annos[0].id);
+        flag.addEventListener('click', function(ev){ ev.stopPropagation(); openBubble(annos[0].id, flag); });
+      }
+      layer.appendChild(flag);
+      flagEls.push({flag:flag, el:block, pos:pos});
+    });
+    /* 待激活角标（灰标）：因交互未激活而隐藏/未生成，点击自动展开对应交互后定位 */
+    pending.forEach(function(a,i){
+      var flag=document.createElement('div'); flag.className='__anno-flag __anno-pending'; flag.setAttribute('data-pending','1');
+      flag.textContent = a.no;
+      flag.style.left='auto'; flag.style.right='16px'; flag.style.top=(60+i*22)+'px';
+      flag.addEventListener('click', function(ev){ ev.stopPropagation(); openBubble(a.id, null); });
+      layer.appendChild(flag);
+    });
+    /* 失联角标：固定堆在右上角（红底），仅锚点彻底失效才出现 */
+    miss.forEach(function(a,i){
+      var flag=document.createElement('div'); flag.className='__anno-flag'; flag.setAttribute('data-missing','1');
+      flag.textContent = a.no;
+      flag.style.left='auto'; flag.style.right='16px'; flag.style.top=(60+pending.length+i*22)+'px';
+      flag.addEventListener('click', function(ev){ ev.stopPropagation(); openBubble(a.id, null); });
+      layer.appendChild(flag);
+    });
+    positionFlags();
+  }
+  /* 按元素实时 rect 计算角标坐标；元素不可见/0尺寸则隐藏。
+     弹窗感知：打开某弹窗时，仅显示「该弹窗内」字段的角标，弹窗外（被遮住）的角标隐藏；
+     关闭的弹窗内字段角标不显示、也不算失联。 */
+  function positionFlags(){
+    layer.style.display='';
+    var anyOpen = modalOpen();
+    var vw=window.innerWidth, vh=window.innerHeight;
+    flagEls.forEach(function(o){
+      var el=o.el;
+      if(!el || !el.getBoundingClientRect){ o.flag.style.display='none'; return; }
+      var r=el.getBoundingClientRect();
+      if ((r.width===0 && r.height===0) || !isVisible(el)){ o.flag.style.display='none'; return; }
+      /* 方案A：元素完全滚出视口则隐藏角标，滚回再出现；避免 v4 的 clamp 把角标吸附钉在屏幕边缘 */
+      if (r.bottom < 0 || r.top > vh || r.right < 0 || r.left > vw){ o.flag.style.display='none'; return; }
+      o.flag.style.display='';
+      var left, top;
+      if (o.pos==='side'){ left=r.right+3; top=r.top+r.height/2-9; }
+      else { left=r.right-9; top=r.top-9; }
+      if (left<4) left=4; if (top<4) top=4;
+      if (left>vw-22) left=vw-22; if (top>vh-22) top=vh-22;
+      o.flag.style.left=left+'px'; o.flag.style.top=top+'px';
+    });
+    placeBubble();   /* 打开中的气泡跟随其角标实时重定位 */
+  }
+  function modalOpen(){
+    var sel='.__anno_layer,.cf-mask,.cf-modal,.wct-mask,.wct-modal,.mask,.modal,.dialog,.overlay,.popup,[class*="mask"],[class*="modal"],[class*="dialog"],[class*="overlay"],[class*="popup"]';
+    var ms=document.querySelectorAll(sel);
+    for (var i=0;i<ms.length;i++){
+      var m=ms[i];
+      if(m.id==='__anno_layer')continue;
+      if(getComputedStyle(m).display==='none') continue;
+      var r=m.getBoundingClientRect();
+      if(r.width>0 && r.height>0) return true;   /* fixed 定位模态 offsetParent 为 null，改用尺寸判定可见 */
+    }
+    return false;
+  }
+
+  function openBubble(id, flag){
+    closeBubble();
+    var a=data.filter(function(x){return x.id===id;})[0]; if(!a) return;
+    openId=id; openFlagEl=flag||null;
+    var b=document.createElement('div'); b.className='__anno-bubble'; b.id='__anno_bubble';
+    var head=document.createElement('div'); head.className='b-head'; head.innerHTML='<span>批注 #'+a.no+'</span><span class="x">×</span>';
+    var body=document.createElement('div'); body.className='b-body'; body.textContent=a.text;
+    var actions=document.createElement('div'); actions.className='b-actions';
+    var jump=btn('定位','ghost'), del=btn('删除','ghost'); actions.appendChild(jump); actions.appendChild(del);
+    b.appendChild(head); b.appendChild(body); b.appendChild(actions); document.body.appendChild(b);
+    head.querySelector('.x').addEventListener('click',closeBubble);
+    jump.addEventListener('click',function(){ revealAnno(a); });
+    del.addEventListener('click',function(){ removeAnno(a.id, null); });
+    if(flag){ placeBubble(); }
+    else { b.style.left=Math.min(Math.max(window.innerWidth/2-142,8),window.innerWidth-300)+'px'; b.style.top='90px'; }
+  }
+  function openMulti(block, annos){
+    closeBubble(); openId='__multi';
+    var b=document.createElement('div'); b.className='__anno-bubble'; b.id='__anno_bubble';
+    var head=document.createElement('div'); head.className='b-head'; head.innerHTML='<span>该位置 '+annos.length+' 条批注</span><span class="x">×</span>';
+    var body=document.createElement('div'); body.className='b-body';
+    annos.slice().sort(function(x,y){return x.no-y.no;}).forEach(function(a){
+      var row=document.createElement('div'); row.className='m-item';
+      var txt=document.createElement('div'); txt.className='m-txt'; txt.textContent='#'+a.no+' '+a.text;
+      txt.addEventListener('click', function(){ openBubble(a.id, null); });
+      var del=document.createElement('button'); del.className='m-del'; del.textContent='删除';
+      del.title='删除这条批注';
+      del.addEventListener('click', function(ev){ ev.stopPropagation(); ev.preventDefault(); removeAnno(a.id, null); });
+      row.appendChild(txt); row.appendChild(del); body.appendChild(row);
+    });
+    var foot=document.createElement('div'); foot.className='b-actions';
+    var delAll=btn('删除全部 '+annos.length+' 条','ghost');
+    delAll.addEventListener('click', function(ev){
+      ev.stopPropagation();
+      if (!confirm('删除这 '+annos.length+' 条批注？')) return;
+      var ids=annos.map(function(x){ return x.id; });
+      data=data.filter(function(x){ return ids.indexOf(x.id)===-1; });
+      save(); closeBubble(); render(); toast('已删除 '+ids.length+' 条批注');
+    });
+    foot.appendChild(delAll);
+    b.appendChild(head); b.appendChild(body); b.appendChild(foot); document.body.appendChild(b);
+    head.querySelector('.x').addEventListener('click',closeBubble);
+    var r=block.getBoundingClientRect(); b.style.left=Math.min(Math.max(r.left,8),window.innerWidth-300)+'px'; b.style.top=Math.min(r.bottom+6,window.innerHeight-200)+'px';
+  }
+  /* 删一条 */
+  function removeAnno(id, anchorEl){
+    var a=data.filter(function(x){return x.id===id;})[0]; if(!a) return;
+    if(!confirm('删除批注 #'+a.no+'？')) return;
+    data=data.filter(function(x){return x.id!==id;});
+    save(); render(); toast('已删除批注 #'+a.no);
+    closeBubble();
+  }
+  /* 重定位：进入拾取模式，下一步点击原型元素即把该批注锚点换到新位置（编号/文字不变） */
+  function startRelocate(id){
+    relocating=id; mode=false; document.body.classList.remove('__anno-mode-on'); bMode.classList.remove('on'); bMode.textContent='批注';
+    document.body.classList.add('__anno-relocating');
+    var a=data.filter(function(x){return x.id===id;})[0];
+    toast('点击正确的元素，把批注 #'+(a?a.no:'?')+' 重新定位到这里');
+  }
+  document.addEventListener('click', function(e){
+    if(!relocating) return;
+    var t=e.target;
+    if(t.closest && t.closest('.__anno-tb,.__anno-list,.__anno-bubble')) return;
+    e.preventDefault(); e.stopPropagation();
+    var a=data.filter(function(x){return x.id===relocating;})[0];
+    if(a){ a.sel=cssPath(t); a.view=viewOf(t); a.valid=true; save(); }
+    relocating=null; document.body.classList.remove('__anno-relocating');
+    closeBubble(); render(); toast('已重新定位');
+  }, true);
+
+  function renderList(){
+    listPanel.innerHTML='';
+    var lost = data.filter(function(a){ return classify(a)==='lost'; });
+    var head=document.createElement('div'); head.className='l-head';
+    head.innerHTML='<span>批注列表 ('+data.length+(lost.length?' · 失联 '+lost.length:'')+')</span><span class="x">×</span>';
+    listPanel.appendChild(head);
+    if (lost.length){
+      var bar=document.createElement('div'); bar.className='l-bar';
+      var cleanBtn=btn('清理失联 ('+lost.length+')','l-clean');
+      cleanBtn.addEventListener('click', function(){
+        if(!confirm('删除这 '+lost.length+' 条失联批注？')) return;
+        var ids=lost.map(function(x){return x.id;});
+        data=data.filter(function(x){return ids.indexOf(x.id)===-1;});
+        save(); renderList(); render(); toast('已清理 '+ids.length+' 条失联批注');
+      });
+      bar.appendChild(cleanBtn);
+      listPanel.appendChild(bar);
+    }
+    if(!data.length){ var e=document.createElement('div'); e.className='empty'; e.textContent='暂无批注。开启「批注」模式后点击原型元素即可添加。'; listPanel.appendChild(e); }
+    data.slice().sort(function(x,y){return x.no-y.no;}).forEach(function(a){
+      var c=classify(a);
+      var it=document.createElement('div'); it.className='item'+(c==='lost'?' miss':(c==='pending'?' pending':''));
+      var row=document.createElement('div'); row.className='i-main';
+      var el = locate(a.sel, rootOf(a.view));
+      var atxt = el ? textOf(el).slice(0,12) : '';
+      var tag = c==='lost'?' 失联':(c==='pending'?' 待激活':'');
+      row.innerHTML='<span class="n">'+a.no+'</span><span class="v">'+(a.view&&a.view!=='global'?'['+a.view+']':'')+'</span>'+esc(a.text)+(atxt?'<span class="a">'+esc(atxt)+'</span>':'')+'<span class="t">'+fmt(new Date(a.ts||Date.now()))+tag+'</span>';
+      row.addEventListener('click',function(){
+        revealAnno(a);
+        if(hidden){hidden=false;document.body.classList.remove('__anno-hidden');bHide.textContent='隐藏';}
+        /* 延迟开气泡：revealAnno 的 scrollIntoView 后角标重算坐标走 30ms 节流，
+           立刻读角标 rect 会拿到滚动前旧位置（「列表定位首开不准、重开才准」实测根因）；
+           且 positionFlags 现在会让气泡持续跟随角标，即使此刻略有偏差也会自动校正。 */
+        setTimeout(function(){
+          var f=document.querySelector('.__anno-flag[data-id="'+a.id+'"]');
+          if(f) openBubble(a.id,f);
+          else if(c==='lost') toast('该批注已失联，可「重定位」或删除');
+        }, 180);
+      });
+      it.appendChild(row);
+      var acts=document.createElement('div'); acts.className='i-acts';
+      if (c==='lost'){
+        var reBtn=btn('重定位','mini'); reBtn.addEventListener('click', function(ev){ ev.stopPropagation(); startRelocate(a.id); });
+        acts.appendChild(reBtn);
+      } else if (c==='pending'){
+        var loBtn=btn('定位','mini'); loBtn.addEventListener('click', function(ev){ ev.stopPropagation(); revealAnno(a); });
+        acts.appendChild(loBtn);
+      } else {
+        var jBtn=btn('定位','mini'); jBtn.addEventListener('click', function(ev){ ev.stopPropagation(); var e2=locate(a.sel, rootOf(a.view)); if(e2){e2.scrollIntoView({block:'center'});flash(e2);} });
+        acts.appendChild(jBtn);
+      }
+      var dBtn=btn('删除','mini danger'); dBtn.addEventListener('click', function(ev){ ev.stopPropagation(); removeAnno(a.id, null); });
+      acts.appendChild(dBtn);
+      it.appendChild(acts);
+      listPanel.appendChild(it);
+    });
+    head.querySelector('.x').addEventListener('click',function(){ listPanel.style.display='none'; });
+    listPanel.style.display='block';
+  }
+  function setMode(on){
+    mode=on; relocating=null; document.body.classList.remove('__anno-relocating');
+    document.body.classList.toggle('__anno-mode-on',on);
+    bMode.classList.toggle('on',on);
+    bMode.textContent = on ? '批注中' : '批注';
+    if(typeof bFold!=='undefined' && bFold) bFold.classList.toggle('on', on);   /* 收起态下用紫色提示「批注中」 */
+    if(!on){ if(hoverEl){hoverEl.classList.remove('__anno-hover');hoverEl=null;} closeBubble(); }
+    render();
+  }
+  function clearHover(){ if(hoverEl){ hoverEl.classList.remove('__anno-hover'); hoverEl=null; } }
+  document.addEventListener('mouseover',function(e){ if(!mode)return; var el=e.target; if(el.closest&&el.closest('.__anno-tb,.__anno-list,.__anno-bubble'))return; if(hoverEl&&hoverEl!==el)hoverEl.classList.remove('__anno-hover'); hoverEl=el; el.classList.add('__anno-hover'); });
+  document.addEventListener('mouseout',function(e){ if(!mode)return; if(hoverEl&&e.target===hoverEl)hoverEl.classList.remove('__anno-hover'); });
+  document.addEventListener('click',function(e){
+    if(!mode)return;
+    var t=e.target;
+    if(t.closest&&t.closest('.__anno-tb,.__anno-list,.__anno-bubble,.__anno-flag'))return;
+    e.preventDefault(); e.stopPropagation(); clearHover(); openEditor(t);
+  }, true);
+  function openEditor(el){
+    closeBubble();
+    var b=document.createElement('div'); b.className='__anno-bubble'; b.id='__anno_bubble';
+    var head=document.createElement('div'); head.className='b-head'; head.innerHTML='<span>新增批注 · '+(viewOf(el))+'</span><span class="x">×</span>';
+    var ta=document.createElement('textarea'); ta.placeholder='写下你的批注…（Enter 换行，保存即生效）';
+    var actions=document.createElement('div'); actions.className='b-actions';
+    var saveBtn=btn('保存'), cancelBtn=btn('取消','ghost'); actions.appendChild(saveBtn); actions.appendChild(cancelBtn);
+    b.appendChild(head); b.appendChild(ta); b.appendChild(actions); document.body.appendChild(b);
+    head.querySelector('.x').addEventListener('click',closeBubble);
+    cancelBtn.addEventListener('click',closeBubble);
+    saveBtn.addEventListener('click',function(){ var txt=ta.value.trim(); if(!txt){closeBubble();return;} data.push({id:uid(),no:nextNo(),view:viewOf(el),sel:cssPath(el),text:txt,ts:Date.now(),valid:true}); save(); closeBubble(); render(); toast('已添加批注 #'+data[data.length-1].no); });
+    var r=el.getBoundingClientRect();
+    b.style.left=Math.min(Math.max(r.left,8),window.innerWidth-264)+'px';
+    b.style.top=Math.min(r.bottom+6,window.innerHeight-150)+'px';
+    setTimeout(function(){ ta.focus(); },30);
+  }
+  bMode.addEventListener('click',function(){ setMode(!mode); });
+  bHide.addEventListener('click',function(){ hidden=!hidden; document.body.classList.toggle('__anno-hidden',hidden); bHide.textContent=hidden?'显示':'隐藏'; render(); });
+  bList.addEventListener('click',function(){ if(listPanel.style.display==='block')listPanel.style.display='none'; else renderList(); });
+  /* 保存为带批注的完整 HTML：把当前批注写回 __anno_seed，导出整页（剔除运行时 UI）。
+     用户覆盖回本地原型文件，WorkBuddy 直接把该 HTML 推 GitHub，无需 JSON 中转。 */
+  /* 构造带批注的完整 HTML（写回 __anno_seed + 剥离运行时 UI）。保存原型 / 保存并推送 共用 */
+  function buildAnnotatedHtml(){
+    var out=data.map(function(a){ var el=locate(a.sel, rootOf(a.view)); return {id:a.id,no:a.no,view:a.view,sel:a.sel,text:a.text,ts:a.ts,valid:!!el&&isVisible(el)}; });
+    var seedEl=document.getElementById('__anno_seed');
+    if(!seedEl){ seedEl=document.createElement('script'); seedEl.type='application/json'; seedEl.id='__anno_seed'; document.head.appendChild(seedEl); }
+    seedEl.textContent=JSON.stringify(out);
+    var detached=[];
+    [layer, tb, listPanel, document.getElementById('__anno_bubble')].forEach(function(n){ if(n&&n.parentNode){ n.parentNode.removeChild(n); detached.push(n); } });
+    document.querySelectorAll('[data-__pactive]').forEach(function(n){ n.removeAttribute('data-__pactive'); });
+    var html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+    detached.forEach(function(n){ document.body.appendChild(n); });
+    return html;
+  }
+  bSave.addEventListener('click',function(){
+    var html=buildAnnotatedHtml();
+    var dlName=/\.html?$/i.test(fileKey)?fileKey:fileKey+'.html';
+    download(dlName, html, 'text/html');
+    if(navigator.clipboard){ navigator.clipboard.writeText(dlName).catch(function(){}); }
+    toast('已保存带批注的原型：'+dlName+'（覆盖回本地原型文件，然后告诉我，我直接推 GitHub）');
+  });
+  /* 保存并推送：把带批注 HTML POST 给本地后台服务（anno_push_server.py），由其用 gh CLI 推 GitHub。
+     需先双击运行 anno_push_server；服务只在 127.0.0.1 监听，不外网暴露。 */
+  bPush.addEventListener('click',function(){
+    var old=bPush.textContent; bPush.disabled=true; bPush.textContent='推送中…';
+    var html=buildAnnotatedHtml();
+    var payload=JSON.stringify({file:fileKey, html:html, message:'批注保存并推送 ' + new Date().toLocaleString('zh-CN')});
+    fetch('http://127.0.0.1:8765/push', {method:'POST', headers:{'Content-Type':'application/json'}, body:payload})
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        bPush.disabled=false; bPush.textContent=old;
+        if(j && j.ok) toast('已推送到 GitHub ✓（本地原型也同步更新）');
+        else toast('推送失败：' + ((j&&(j.error||j.stderr))||'未知错误'));
+      })
+      .catch(function(){ bPush.disabled=false; bPush.textContent=old; toast('连不上本地服务，请先双击运行 anno_push_server'); });
+  });
+  bClear.addEventListener('click',function(){ if(confirm('清空全部批注？本地操作不可撤销（GitHub 上的种子需同步清理）。')){ data=[]; save(); closeBubble(); render(); toast('已清空'); } });
+
+  /* 滚动/resize/视图切换 → 角标重算坐标；弹窗开启 → 浮层隐藏 */
+  var _pt;
+  function posThrottled(){ clearTimeout(_pt); _pt=setTimeout(positionFlags, 30); }
+  window.addEventListener('scroll', posThrottled, true);
+  window.addEventListener('resize', posThrottled);
+  window.addEventListener('scroll', function(){ if(openId&&openId!=='__multi') placeBubble(); }, true);
+  var _vt;
+  function renderThrottled(){ clearTimeout(_vt); _vt=setTimeout(render, 40); }
+  document.addEventListener('anno:viewchange', renderThrottled);
+  document.querySelectorAll('.view,.page').forEach(function(v){ v.setAttribute('data-__pactive', v.classList.contains('active')?'1':'0'); });
+  var vo=new MutationObserver(function(muts){
+    var hit=false;
+    for(var i=0;i<muts.length;i++){
+      var t=muts[i].target;
+      if(t&&t.classList&&(t.classList.contains('view')||t.classList.contains('page'))){
+        var now=t.classList.contains('active')?'1':'0';
+        if(t.getAttribute('data-__pactive')!==now){ t.setAttribute('data-__pactive',now); hit=true; }
+      }
+    }
+    if(hit) renderThrottled();
+    posThrottled();
+  });
+  vo.observe(document.body, {attributes:true, attributeFilter:['class'], subtree:true});
+  /* 弹窗显隐（运行时点击打开/关闭）必须重新分类：重算 topOpenModal，否则「只显顶层弹窗内字段」不生效。
+     ⚠️ 必须过滤引擎自身 UI（角标浮层/工具栏/列表/气泡）的 style/class 变更：
+     positionFlags 写角标 left/top 会触发本观察器 → renderThrottled → render → positionFlags 再写 →
+     无限重建角标（实测每 100ms 全量重建），点击时节点被换成游离节点 → 角标点不出气泡（本次实战实锤）。 */
+  function __inEngineUI(t){
+    if(!t || t.nodeType!==1) return false;
+    return t===layer || t===tb || t===listPanel || t.id==='__anno_bubble' ||
+      layer.contains(t) || tb.contains(t) || listPanel.contains(t);
+  }
+  var vmodal=new MutationObserver(function(muts){
+    var hit=false;
+    for(var i=0;i<muts.length;i++){
+      if(!__inEngineUI(muts[i].target)){ hit=true; break; }
+    }
+    if(hit) renderThrottled();
+  });
+  vmodal.observe(document.body, {attributes:true, attributeFilter:['style','class'], subtree:true});
+
+  autoActivate();
+  render();
+  bHide.textContent = '隐藏';
+})();
+</script>
+</body></html>
