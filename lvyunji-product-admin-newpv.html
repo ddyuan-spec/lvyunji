@@ -1980,12 +1980,14 @@
       renderActSpecRows();
       var m = document.getElementById('actModal');
       if (m) { m.style.display = 'flex'; }
+      if (window.__anno_engine && window.__anno_engine.renderThrottled) { window.__anno_engine.renderThrottled(); }
     }
 
     function closeActModal() {
       var m = document.getElementById('actModal');
       if (m) { m.style.display = 'none'; }
       actEditIdx = -1;
+      if (window.__anno_engine && window.__anno_engine.renderThrottled) { window.__anno_engine.renderThrottled(); }
     }
 
     // 判断两个日期区间是否交叉重叠（含边界相接）
@@ -2063,7 +2065,7 @@
     function showRecalcConfirm(pid, rows, single) {
       var total = rows.reduce(function (s, r) { return s + r.est; }, 0);
       var totalPv = rows.reduce(function (s, r) { return s + r.totalPv; }, 0);
-      var html = '<div class="modal" style="position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:10000;display:flex;align-items:center;justify-content:center" id="rcMask">' +
+      var html = '<div class="modal" data-modal-id="recalcConfirm" style="position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:10000;display:flex;align-items:center;justify-content:center" id="rcMask">' +
         '<div style="background:#fff;width:460px;max-width:92vw;border-radius:10px;padding:20px;box-shadow:0 10px 40px rgba(0,0,0,.25)">' +
         '<div data-anno="kRecalcTitle" style="font-size:15px;font-weight:700;margin-bottom:6px">确认重算业绩？</div>' +
         '<div data-anno="kRecalcInfo" style="font-size:13px;color:#666;margin-bottom:12px">商品 ' + pid + ' · ' + (single ? '按以下单条活动' : '将按以下活动') + '重算（仅重算时段内业绩），预计影响 <b style="color:#E04D4D">' + total + '</b> 条业绩记录：</div>' +
@@ -2076,8 +2078,9 @@
         '</div></div></div>';
       var old = document.getElementById('rcMask'); if (old) old.remove();
       document.body.insertAdjacentHTML('beforeend', html);
+      if (window.__anno_engine && window.__anno_engine.renderThrottled) { window.__anno_engine.renderThrottled(); }
     }
-    function closeRecalc() { var m = document.getElementById('rcMask'); if (m) m.remove(); }
+    function closeRecalc() { var m = document.getElementById('rcMask'); if (m) m.remove(); if (window.__anno_engine && window.__anno_engine.renderThrottled) { window.__anno_engine.renderThrottled(); } }
     function doRecalc(pid) {
       var acts = productActs[pid] || [];
       recalcLog.push({ time: new Date().toLocaleString(), pid: pid, ranges: acts.slice(), count: acts.length });
@@ -2538,7 +2541,7 @@
 
 
           <!-- 活动pv设置：商品列表触发的大弹窗（内含活动列表） -->
-          <div id="actSettingModal" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;align-items:center;justify-content:center">
+          <div id="actSettingModal" class="modal" data-modal-id="actSetting" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;align-items:center;justify-content:center">
             <div style="background:#fff;width:680px;max-width:96vw;max-height:88vh;overflow:auto;border-radius:10px;padding:20px;box-shadow:0 10px 40px rgba(0,0,0,.25)">
               <div style="font-size:15px;font-weight:700;margin-bottom:14px">活动pv设置 · 商品 <span id="actSettingPid"></span></div>
               <div style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
@@ -2564,7 +2567,7 @@
             </div>
           </div>
           <!-- 活动 新增/编辑 弹窗（位于活动pv设置弹窗之上） -->
-          <div id="actModal" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9999;align-items:center;justify-content:center">
+          <div id="actModal" class="modal" data-modal-id="actEdit" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9999;align-items:center;justify-content:center">
             <div style="background:#fff;width:560px;max-width:96vw;max-height:90vh;overflow:auto;border-radius:10px;padding:20px;box-shadow:0 10px 40px rgba(0,0,0,.25)">
               <div style="font-size:15px;font-weight:700;margin-bottom:16px" id="actModalTitle">新增活动</div>
               <div class="fr" style="margin-bottom:12px">
@@ -2619,7 +2622,7 @@
 
 
 
-<div id="rcMask" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:10000;align-items:center;justify-content:center">
+<div id="rcMask" class="modal" data-modal-id="recalcConfirm" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:10000;align-items:center;justify-content:center">
   <div style="background:#fff;width:460px;max-width:92vw;border-radius:10px;padding:20px;box-shadow:0 10px 40px rgba(0,0,0,.25)">
     <div data-anno="kRecalcTitle" style="font-size:15px;font-weight:700;margin-bottom:6px">确认重算业绩？</div>
     <div data-anno="kRecalcInfo" style="font-size:13px;color:#666;margin-bottom:12px">商品 589 · 将按以下活动重算（仅重算时段内业绩），预计影响 <b style="color:#E04D4D">728</b> 条业绩记录：</div>
@@ -3446,7 +3449,12 @@
   /* 弹窗显隐（运行时点击打开/关闭）必须重新分类：重算 topOpenModal，否则「只显顶层弹窗内字段」不生效。
      ⚠️ 必须过滤引擎自身 UI（角标浮层/工具栏/列表/气泡）的 style/class 变更：
      positionFlags 写角标 left/top 会触发本观察器 → renderThrottled → render → positionFlags 再写 →
-     无限重建角标（实测每 100ms 全量重建），点击时节点被换成游离节点 → 角标点不出气泡（本次实战实锤）。 */
+     无限重建角标（实测每 100ms 全量重建），点击时节点被换成游离节点 → 角标点不出气泡（本次实战实锤）。
+     ⚠️ v4.4 多弹窗加固：除 style/class 外，必须同时监听 childList —— 动态插入/移除的弹窗
+     （如用 innerHTML/insertAdjacentHTML 注入的 rcMask 确认弹窗）不是 style/class 变更，旧版只监听 attributes
+     会漏掉，导致「动态弹窗盖在最上层时背景批注不隔离、动态弹窗自身批注不显示」。多弹窗场景的通用兜底：
+     任何弹窗显隐（无论静态 display 切换 or 动态插入/移除）都重分类。__inEngineUI 已把 layer/tb/listPanel
+     及其子节点（含角标）过滤掉，所以引擎自身重建角标不会触发本观察器（不会死循环）。 */
   function __inEngineUI(t){
     if(!t || t.nodeType!==1) return false;
     return t===layer || t===tb || t===listPanel || t.id==='__anno_bubble' ||
@@ -3459,11 +3467,14 @@
     }
     if(hit) renderThrottled();
   });
-  vmodal.observe(document.body, {attributes:true, attributeFilter:['style','class'], subtree:true});
+  vmodal.observe(document.body, {attributes:true, attributeFilter:['style','class'], childList:true, subtree:true});
 
   autoActivate();
   render();
   bHide.textContent = '隐藏';
+  /* 暴露引擎 API：让原型业务代码（openXxxModal 等）能主动触发 renderThrottled 重新分类。
+     此前未暴露 → 这些钩子全是死代码（多弹窗/动态弹窗场景漏重算）；v4.4 多弹窗加固补上。 */
+  window.__anno_engine = { render: render, renderThrottled: renderThrottled };
 })();
 </script>
 </body></html>
