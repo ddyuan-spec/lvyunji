@@ -2109,11 +2109,16 @@
         '<button class="btn" style="margin-right:8px" onclick="closeRecalc()">取消</button>' +
         '<button class="btn btn-primary" onclick="doRecalc(\'' + pid + '\')">确认重算</button>' +
         '</div></div></div>';
+      /* 只删除运行时动态弹窗 rcMask；保留 rcMaskPlaceholder 占位，否则关闭后 #16/17/18 锚点彻底丢失 → 堆右上角红标 */
       var old = document.getElementById('rcMask'); if (old) old.remove();
       document.body.insertAdjacentHTML('beforeend', html);
       if (window.__anno_engine && window.__anno_engine.renderThrottled) { window.__anno_engine.renderThrottled(); }
     }
-    function closeRecalc() { var m = document.getElementById('rcMask'); if (m) m.remove(); if (window.__anno_engine && window.__anno_engine.renderThrottled) { window.__anno_engine.renderThrottled(); } }
+    function closeRecalc() {
+      /* 仅 remove 运行时动态弹窗；rcMaskPlaceholder 保持 display:none，确保 #16/17/18 关闭态不落 lost */
+      var m = document.getElementById('rcMask'); if (m) m.remove();
+      if (window.__anno_engine && window.__anno_engine.renderThrottled) { window.__anno_engine.renderThrottled(); }
+    }
     function doRecalc(pid) {
       var acts = productActs[pid] || [];
       var totalOrders = acts.reduce(function (s, a) { return s + countOrders(pid, a.start, a.end); }, 0);
@@ -2656,12 +2661,13 @@
 
 
 
-<div id="rcMask" class="modal" data-modal-id="recalcConfirm" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:10000;align-items:center;justify-content:center">
+<!-- 重算弹窗占位：供引擎 init 定位锚点；display:none 且 id 与运行时动态弹窗不同，避免被 showRecalcConfirm 误删后关闭态锚点丢失 -->
+<div id="rcMaskPlaceholder" class="modal" data-modal-id="recalcConfirm" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:10000;align-items:center;justify-content:center">
   <div style="background:#fff;width:460px;max-width:92vw;border-radius:10px;padding:20px;box-shadow:0 10px 40px rgba(0,0,0,.25)">
     <div data-anno="kRecalcTitle" style="font-size:15px;font-weight:700;margin-bottom:6px">确认重算业绩？</div>
-    <div data-anno="kRecalcInfo" style="font-size:13px;color:#666;margin-bottom:12px">商品 589 · 将按以下活动重算（仅重算时段内业绩），预计影响 <b style="color:#E04D4D">728</b> 条业绩记录：</div>
+    <div data-anno="kRecalcInfo" style="font-size:13px;color:#666;margin-bottom:12px">商品 589 · 将按以下活动重算（仅重算时段内业绩），实际涉及订单 <b style="color:#E04D4D">33</b> 笔：</div>
     <div data-anno="kRecalcList" style="max-height:200px;overflow:auto;border:1px solid #eee;border-radius:6px">
-      <div data-anno="kRecalcRow" style="display:flex;justify-content:space-between;padding:8px 12px;font-size:13px;border-bottom:1px solid #f2f2f2"><span>2024-03-01 ~ 2024-03-31</span><span style="color:#888">覆盖 31 天 · 约 240 条</span></div>
+      <div data-anno="kRecalcRow" style="display:flex;justify-content:space-between;padding:8px 12px;font-size:13px;border-bottom:1px solid #f2f2f2"><span>2024-03-01 ~ 2024-03-31</span><span style="color:#888">覆盖 31 天 · 实际订单 10 笔</span></div>
     </div>
     <div style="margin-top:16px;text-align:right">
       <button class="btn" style="margin-right:8px">取消</button>
