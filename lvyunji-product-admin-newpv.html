@@ -1914,13 +1914,15 @@
     function renderActSpecRows() {
       var tb = document.getElementById('actSpecBody');
       if (!tb) return;
-      tb.innerHTML = modalSpecs.map(function (s) {
-        return '<tr>' +
-          '<td data-anno="kActSpecName" style="padding:8px 10px;border-bottom:1px solid #eef;' + (s.orphan ? 'color:#999' : '') + '">' + escapeHtml(s.name) + (s.orphan ? ' <span style="color:#E04D4D;font-size:11px">（已失效）</span>' : '') + '</td>' +
+      tb.innerHTML = modalSpecs.map(function (s, idx) {
+        var nameCell = '<td data-anno="kActSpecName" style="padding:8px 10px;border-bottom:1px solid #eef;' + (s.orphan ? 'color:#999' : '') + '">' +
+          escapeHtml(s.name) + (s.orphan ? ' <span style="color:#E04D4D;font-size:11px">（已失效）</span>' : '') +
+          (s.orphan ? ' <a data-anno="kActOrphanRemove" onclick="removeModalSpec(\'' + s.id + '\')" style="margin-left:8px;color:#3D1EF7;font-size:12px">清除过期规格</a>' : '') +
+          '</td>';
+        return '<tr>' + nameCell +
           '<td style="padding:8px 10px;border-bottom:1px solid #eef">' +
             '<input data-anno="kActSpecPv" class="inp sp-actpv" style="width:100%;box-sizing:border-box" type="text" value="' + (s.pv || '') + '" placeholder="0~999999" data-sid="' + s.id + '" oninput="filterActPv(this)">' +
           '</td>' +
-          (s.orphan ? '<td style="padding:8px 10px;border-bottom:1px solid #eef"><a data-anno="kActOrphanRemove" onclick="removeModalSpec(\'' + s.id + '\')">移除</a></td>' : '<td></td>') +
           '</tr>';
       }).join('');
     }
@@ -2040,12 +2042,12 @@
     function showRecalcConfirm(pid, rows, single) {
       var total = rows.reduce(function (s, r) { return s + r.est; }, 0);
       var totalPv = rows.reduce(function (s, r) { return s + r.totalPv; }, 0);
-      var html = '<div style="position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:10000;display:flex;align-items:center;justify-content:center" id="rcMask">' +
+      var html = '<div class="modal" style="position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:10000;display:flex;align-items:center;justify-content:center" id="rcMask">' +
         '<div style="background:#fff;width:460px;max-width:92vw;border-radius:10px;padding:20px;box-shadow:0 10px 40px rgba(0,0,0,.25)">' +
-        '<div style="font-size:15px;font-weight:700;margin-bottom:6px">确认重算业绩？</div>' +
-        '<div style="font-size:13px;color:#666;margin-bottom:12px">商品 ' + pid + ' · ' + (single ? '按以下单条活动' : '将按以下活动') + '重算（仅重算时段内业绩），预计影响 <b style="color:#E04D4D">' + total + '</b> 条业绩记录：</div>' +
-        '<div style="max-height:200px;overflow:auto;border:1px solid #eee;border-radius:6px">' +
-        rows.map(function (r) { return '<div style="display:flex;justify-content:space-between;padding:8px 12px;font-size:13px;border-bottom:1px solid #f2f2f2"><span>' + r.start + ' ~ ' + r.end + '</span><span style="color:#888">覆盖 ' + r.days + ' 天 · 约 ' + r.est + ' 条</span></div>'; }).join('') +
+        '<div data-anno="kRecalcTitle" style="font-size:15px;font-weight:700;margin-bottom:6px">确认重算业绩？</div>' +
+        '<div data-anno="kRecalcInfo" style="font-size:13px;color:#666;margin-bottom:12px">商品 ' + pid + ' · ' + (single ? '按以下单条活动' : '将按以下活动') + '重算（仅重算时段内业绩），预计影响 <b style="color:#E04D4D">' + total + '</b> 条业绩记录：</div>' +
+        '<div data-anno="kRecalcList" style="max-height:200px;overflow:auto;border:1px solid #eee;border-radius:6px">' +
+        rows.map(function (r, idx) { return '<div data-anno="' + (idx === 0 ? 'kRecalcRow' : '') + '" style="display:flex;justify-content:space-between;padding:8px 12px;font-size:13px;border-bottom:1px solid #f2f2f2"><span>' + r.start + ' ~ ' + r.end + '</span><span style="color:#888">覆盖 ' + r.days + ' 天 · 约 ' + r.est + ' 条</span></div>'; }).join('') +
         '</div>' +
         '<div style="margin-top:16px;text-align:right">' +
         '<button class="btn" style="margin-right:8px" onclick="closeRecalc()">取消</button>' +
@@ -2563,7 +2565,6 @@
                     <tr style="background:#ECEFFA">
                       <th style="text-align:left;padding:8px 10px;font-weight:600;border-bottom:1px solid #eef">规格名称</th>
                       <th style="text-align:left;padding:8px 10px;font-weight:600;border-bottom:1px solid #eef;width:160px">活动pv</th>
-                      <th style="text-align:left;padding:8px 10px;font-weight:600;border-bottom:1px solid #eef;width:60px">操作</th>
                     </tr>
                   </thead>
                   <tbody id="actSpecBody"></tbody>
@@ -2578,7 +2579,7 @@
 <script>
   // 预渲染活动弹窗规格表，确保批注锚点在引擎 init 前已存在；弹窗实际打开时会按当前商品规格重刷
   if (typeof renderActSpecRows === 'function') {
-    modalSpecs = [{ id: 'demo-s1', name: '示例规格A', pv: '', orphan: false }, { id: 'demo-s2', name: '示例规格B（已失效）', pv: '150', orphan: true }];
+    modalSpecs = [{ id: 'demo-s2', name: '示例规格B（已失效）', pv: '150', orphan: true }, { id: 'demo-s1', name: '示例规格A', pv: '', orphan: false }];
     renderActSpecRows();
   }
   // 预渲染活动列表（含子行规格表头），确保操作按钮/子行字段锚点在引擎 init 前已存在
@@ -2594,6 +2595,22 @@
 
 
 
+
+
+
+<div id="rcMask" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:10000;align-items:center;justify-content:center">
+  <div style="background:#fff;width:460px;max-width:92vw;border-radius:10px;padding:20px;box-shadow:0 10px 40px rgba(0,0,0,.25)">
+    <div data-anno="kRecalcTitle" style="font-size:15px;font-weight:700;margin-bottom:6px">确认重算业绩？</div>
+    <div data-anno="kRecalcInfo" style="font-size:13px;color:#666;margin-bottom:12px">商品 589 · 将按以下活动重算（仅重算时段内业绩），预计影响 <b style="color:#E04D4D">728</b> 条业绩记录：</div>
+    <div data-anno="kRecalcList" style="max-height:200px;overflow:auto;border:1px solid #eee;border-radius:6px">
+      <div data-anno="kRecalcRow" style="display:flex;justify-content:space-between;padding:8px 12px;font-size:13px;border-bottom:1px solid #f2f2f2"><span>2024-03-01 ~ 2024-03-31</span><span style="color:#888">覆盖 31 天 · 约 240 条</span></div>
+    </div>
+    <div style="margin-top:16px;text-align:right">
+      <button class="btn" style="margin-right:8px">取消</button>
+      <button class="btn btn-primary">确认重算</button>
+    </div>
+  </div>
+</div>
 <style id="__anno_css">/* v4：角标独立浮层。layer 在视口坐标下绝对定位（inset:0 fixed），
    子角标用 JS 按目标元素 rect 算 left/top，不进宿主 DOM。
    弹窗开启时不再整层隐藏，而是逐角标按「顶层弹窗」判定（topOpenModal）：只显示顶层弹窗内字段角标，背景/下层弹窗角标隐藏防穿透。
@@ -2659,138 +2676,165 @@
 </style>
 <script id="__anno_seed" type="application/json">[
 {
-"id": "a87dd40c16c57",
+"id": "a368d744fe3e3",
 "no": 1,
 "view": "viewList",
 "sel": "[data-anno=\"kActOpen\"]",
 "text": "功能说明：打开「活动pv设置」弹窗\n功能实现：按当前商品读取已配置的活动列表并渲染；无活动时列表为空；弹窗内可新增活动、展开查看各规格的活动pv\n前置条件：仅针对已存在商品；新增未提交的商品无活动数据",
-"ts": 1791800637836,
+"ts": 1791855726100,
 "valid": true
 },
 {
-"id": "a30db680b5bd7",
+"id": "aa80b66b012a9",
 "no": 2,
 "view": "viewList",
 "sel": "[data-anno=\"kRecalc\"]",
-"text": "功能说明：重算当前商品的活动业绩\n功能实现：弹出二次确认框，展示商品编号、活动时间段、覆盖天数、预估影响记录数，确认后写入操作日志；无活动则提示先设置",
-"ts": 1791800637836,
+"text": "功能说明：重算当前商品的活动业绩\n功能实现：弹出二次确认框，展示商品编号、活动时间段、覆盖天数、预估影响记录数；确认后写入操作日志；无活动则提示先设置",
+"ts": 1791855726100,
 "valid": true
 },
 {
-"id": "a55cb4cb09167",
+"id": "a7dded75fb428",
 "no": 3,
 "view": "global",
 "sel": "[data-anno=\"kActAdd\"]",
 "text": "功能说明：新增一条活动\n功能实现：打开「新增活动」弹窗，清空起止日期，按当前商品规格列出规格活动pv表（可填）\n前置条件：需先选择商品；未选商品时点击无效",
-"ts": 1791800637836,
+"ts": 1791855726100,
 "valid": true
 },
 {
-"id": "abf4d7d0c08a7",
+"id": "a56f6223c3f1c",
 "no": 4,
 "view": "global",
 "sel": "[data-anno=\"kActExpandAll\"]",
 "text": "功能说明：一键展开或收起所有活动的规格明细\n功能实现：点击在「展开全部」与「收起全部」之间切换；默认每条活动的规格明细收起",
-"ts": 1791800637836,
+"ts": 1791855726100,
 "valid": true
 },
 {
-"id": "aff7e62834866",
+"id": "a7a28eb6320d6",
 "no": 5,
 "view": "global",
 "sel": "[data-anno=\"kActTable\"]",
 "text": "不可编辑\n显示：活动pv设置弹窗内的活动列表，每行展示开始日期、结束日期与操作按钮；操作列含编辑、删除、展开规格；展开后显示该活动各规格的活动pv（只读）",
-"ts": 1791800637836,
+"ts": 1791855726100,
 "valid": true
 },
 {
-"id": "acd189a4ab89a",
+"id": "a8977691b7565",
 "no": 6,
 "view": "global",
 "sel": "[data-anno=\"kActStart\"]",
 "text": "可编辑\n必填\n数据来源：编辑活动时回填该活动的开始日期；新增活动时为空\n输入限制：日期，不早于 2024-01-01（系统最早追溯日，可配置）\n字段间关系：开始日期 ≤ 结束日期；与已有活动时间段不能交叉重叠\n校验时机与失败反馈：保存时校验；为空、早于追溯日、晚于结束日期或与其它活动重叠，提示并阻断保存",
-"ts": 1791800637836,
+"ts": 1791855726100,
 "valid": true
 },
 {
-"id": "a3644bc611a50",
+"id": "a20b1b8e9df4a",
 "no": 7,
 "view": "global",
 "sel": "[data-anno=\"kActEnd\"]",
 "text": "可编辑\n必填\n数据来源：编辑活动时回填该活动的结束日期；新增活动时为空\n输入限制：日期，不早于开始日期\n字段间关系：结束日期 ≥ 开始日期\n校验时机与失败反馈：保存时校验；为空或早于开始日期，提示并阻断保存",
-"ts": 1791800637836,
+"ts": 1791855726100,
 "valid": true
 },
 {
-"id": "ae6ecd59330e1",
+"id": "ae57e9ce5d954",
 "no": 8,
 "view": "global",
 "sel": "[data-anno=\"kActSpecPv\"]",
 "text": "可编辑\n选填\n数据来源：编辑活动时回填该规格在当前活动中的活动pv；新增活动时为空\n输入限制：0~999999 整数；输入时自动截断非数字与超上限部分\n字段间关系：按规格编码关联，规格增删或重排时不丢失已填活动pv\n校验时机与失败反馈：保存时校验；非空则须为 0~999999 整数，否则提示并阻断保存",
-"ts": 1791800637836,
+"ts": 1791855726100,
 "valid": true
 },
 {
-"id": "a91260bcbcdab",
+"id": "a66d2f09561d6",
 "no": 9,
 "view": "global",
 "sel": "[data-anno=\"kActSpecName\"]",
-"text": "不可编辑\n数据来源：从商品规格（SKU）实时同步带出规格名称；已不在商品规格中的历史规格灰显并标注「已失效」",
-"ts": 1791800637836,
+"text": "不可编辑\n数据来源：从商品规格（SKU）实时同步带出规格名称；已失效规格整行置灰并标注「已失效」，同行显示「清除过期规格」按钮，仅可移除已失效规格",
+"ts": 1791855726100,
 "valid": true
 },
 {
-"id": "a5091cd7dd45f",
+"id": "a7a03d40021fc",
 "no": 10,
 "view": "global",
 "sel": "[data-anno=\"kActOrphanRemove\"]",
-"text": "功能说明：移除当前活动中的已失效规格\n功能实现：从弹窗编辑列表中移除该规格行；仅影响本次编辑，最终是否保存取决于是否点击「确定」",
-"ts": 1791800637836,
+"text": "功能说明：清除已失效规格\n功能实现：仅出现在已失效规格行，点击后从当前编辑列表中移除该过期规格；仅影响本次编辑，最终是否保存取决于是否点击「确定」",
+"ts": 1791855726100,
 "valid": true
 },
 {
-"id": "abc3f92c2a019",
+"id": "ae1746ddea7d7",
 "no": 11,
 "view": "global",
 "sel": "[data-anno=\"kActEdit\"]",
 "text": "功能说明：编辑当前活动\n功能实现：打开「编辑活动」弹窗，回填该活动的开始日期、结束日期与各规格的活动pv",
-"ts": 1791800637836,
+"ts": 1791855726100,
 "valid": true
 },
 {
-"id": "a3b2b2f30eefc",
+"id": "a47c7022cf923",
 "no": 12,
 "view": "global",
 "sel": "[data-anno=\"kActDelete\"]",
 "text": "功能说明：删除当前活动\n功能实现：点击后二次确认是否删除；确认则从该商品活动列表中移除该活动并刷新列表，取消则无任何操作",
-"ts": 1791800637836,
+"ts": 1791855726100,
 "valid": true
 },
 {
-"id": "a8639774fc8f4",
+"id": "ac8bc8b710cc4",
 "no": 13,
 "view": "global",
 "sel": "[data-anno=\"kActExpand\"]",
 "text": "功能说明：展开或收起当前活动的规格明细子行\n功能实现：点击后切换当前活动子行展开状态，显示该活动下各规格的活动pv（只读）",
-"ts": 1791800637836,
+"ts": 1791855726100,
 "valid": true
 },
 {
-"id": "aadc9cc859acf",
+"id": "a9313ae813020",
 "no": 14,
 "view": "global",
 "sel": "[data-anno=\"kActSubSpecName\"]",
 "text": "不可编辑\n数据来源：从商品规格（SKU）实时同步带出规格名称；已失效规格灰显并标注「已失效」",
-"ts": 1791800637836,
+"ts": 1791855726100,
 "valid": true
 },
 {
-"id": "a4305fa83e216",
+"id": "ad09535e5b749",
 "no": 15,
 "view": "global",
 "sel": "[data-anno=\"kActSubSpecPv\"]",
 "text": "不可编辑\n数据来源：从该商品对应活动记录的规格活动pv中读取；未设置时显示「未设置」",
-"ts": 1791800637836,
+"ts": 1791855726100,
+"valid": true
+},
+{
+"id": "a3697ba35861d",
+"no": 16,
+"view": "global",
+"sel": "[data-anno=\"kRecalcTitle\"]",
+"text": "功能说明：重算业绩二次确认弹窗\n功能实现：确认后触发后台重算任务，按活动时段重新统计该商品业绩；取消则关闭弹窗无任何操作",
+"ts": 1791855726100,
+"valid": true
+},
+{
+"id": "abaf75d2eca2f",
+"no": 17,
+"view": "global",
+"sel": "[data-anno=\"kRecalcInfo\"]",
+"text": "不可编辑\n数据来源：商品编号取自当前选中商品；影响记录数为各活动「覆盖天数 × 每日预估8条」的合计，仅作为预估参考\n计算示例：覆盖31天 × 8条/天 ≈ 240条；多条活动合计即预计影响总条数",
+"ts": 1791855726100,
+"valid": true
+},
+{
+"id": "aa6950f5773b5",
+"no": 18,
+"view": "global",
+"sel": "[data-anno=\"kRecalcRow\"]",
+"text": "不可编辑\n数据来源：活动开始日期与结束日期取自该商品活动记录\n计算说明：覆盖天数 = 结束日期 − 开始日期 + 1；约N条 = 覆盖天数 × 8条/天（系统预设单日估算值，可配置）",
+"ts": 1791855726100,
 "valid": true
 }
 ]</script>
