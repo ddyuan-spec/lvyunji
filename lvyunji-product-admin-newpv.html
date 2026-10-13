@@ -317,6 +317,9 @@
     .viewMemberDetail .sec-title { margin-bottom: 18px; }
     /* 会员中心表格不被全局 table{min-width:1900px} 撑爆 */
     .viewMemberList table, .viewMemberDetail table { min-width: 100%; }
+    /* 活动规格子行：收起时隐藏内部批注锚点，展开后覆盖在表头文字上保持真实尺寸，避免角标漂移/堆灰标 */
+    .act-spec-wrap:not(.open) .act-anno-dot { display: none !important; }
+    .act-spec-wrap.open .act-anno-dot { display: block !important; visibility: hidden; position: absolute; left: 0; right: 0; top: 0; bottom: 0; width: auto; height: auto; }
   </style>
 <style>.Po4BvhR1CK2tJaywJ6AN path {
   fill: var(--icon-path-fill);
@@ -1777,6 +1780,10 @@
       renderActRows();
       var m = document.getElementById('actSettingModal');
       if (m) { m.style.display = 'flex'; }
+      // 弹窗显示后重算批注角标位置
+      if (window.__anno_engine && window.__anno_engine.renderThrottled) {
+        setTimeout(function () { window.__anno_engine.renderThrottled(); }, 60);
+      }
     }
     function closeActSetting() {
       var m = document.getElementById('actSettingModal');
@@ -1805,6 +1812,10 @@
         if (link) link.textContent = '收起规格';
       }
       updateToggleAll();
+      // 子行展开/收起动画结束后重算批注角标位置，避免漂移
+      if (window.__anno_engine && window.__anno_engine.renderThrottled) {
+        setTimeout(function () { window.__anno_engine.renderThrottled(); }, 350);
+      }
     }
     // 全局 展开全部 / 收起全部
     function toggleAllSpec() {
@@ -1834,6 +1845,10 @@
         }
       }
       updateToggleAll();
+      // 全部展开/收起动画结束后重算批注角标位置
+      if (window.__anno_engine && window.__anno_engine.renderThrottled) {
+        setTimeout(function () { window.__anno_engine.renderThrottled(); }, 350);
+      }
     }
     function updateToggleAll() {
       var tb = document.getElementById('actBody');
@@ -1874,9 +1889,11 @@
           });
         }
         // 规格明细表头（展开后可见，避免看不懂列含义）
+        // 批注锚点默认由 CSS 隐藏，展开后覆盖在表头文字上（visibility:hidden 保持尺寸），
+        // 让引擎按表头真实 rect 定位角标，避免漂移/堆灰标
         var headerHtml = '<div style="display:flex;padding:7px 10px;background:#ECEFFA;font-weight:600;font-size:12px;color:#333;border-top:1px solid #eee">' +
-          '<span data-anno="kActSubSpecName" style="flex:0 0 60%">规格名称</span>' +
-          '<span data-anno="kActSubSpecPv" style="flex:0 0 40%">活动pv</span>' +
+          '<span style="flex:0 0 60%;position:relative">规格名称<i class="act-anno-dot" data-anno="kActSubSpecName"></i></span>' +
+          '<span style="flex:0 0 40%;position:relative">活动pv<i class="act-anno-dot" data-anno="kActSubSpecPv"></i></span>' +
           '</div>';
         if (!specBlock && !orphanHtml) {
           specBlock = '<div style="font-size:12px;color:#bbb;padding:6px 10px">该商品暂无规格活动pv</div>';
@@ -1908,6 +1925,10 @@
       var md = document.getElementById('actMinDate');
       if (md) md.textContent = ACT_MIN_DATE;
       updateToggleAll();
+      // 活动列表重绘后（含默认收起的子行）重新定位批注角标
+      if (window.__anno_engine && window.__anno_engine.renderThrottled) {
+        window.__anno_engine.renderThrottled();
+      }
     }
 
     // 新增/编辑弹窗：渲染规格活动pv（含孤儿，可移除）
@@ -2611,6 +2632,9 @@
     </div>
   </div>
 </div>
+
+
+
 <style id="__anno_css">/* v4：角标独立浮层。layer 在视口坐标下绝对定位（inset:0 fixed），
    子角标用 JS 按目标元素 rect 算 left/top，不进宿主 DOM。
    弹窗开启时不再整层隐藏，而是逐角标按「顶层弹窗」判定（topOpenModal）：只显示顶层弹窗内字段角标，背景/下层弹窗角标隐藏防穿透。
@@ -3072,8 +3096,10 @@
       var m = modalOf(el);
       var top = topOpenModal();
       if (top){
-        /* 有弹窗开着：只显示顶层弹窗内的角标；背景与下层被盖弹窗的字段一律隐藏防穿透 */
-        if (m === top) return isVisible(el) ? 'ok' : 'pending';
+        /* 有弹窗开着：只显示顶层弹窗内的角标；背景与下层被盖弹窗的字段一律隐藏防穿透。
+           顶层弹窗内暂时不可见的字段（如默认收起的子行）直接隐藏，不堆 pending 灰标，
+           待交互展开后由业务代码触发 renderThrottled 重新显示，避免角标漂移。 */
+        if (m === top) return isVisible(el) ? 'ok' : 'hidden-modal';
         return 'hidden-modal';
       }
       /* 无弹窗：锚点可见即 ok；不可见分两类 ——
