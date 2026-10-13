@@ -317,9 +317,10 @@
     .viewMemberDetail .sec-title { margin-bottom: 18px; }
     /* 会员中心表格不被全局 table{min-width:1900px} 撑爆 */
     .viewMemberList table, .viewMemberDetail table { min-width: 100%; }
-    /* 活动规格子行：收起时隐藏内部批注锚点，展开后覆盖在表头文字上保持真实尺寸，避免角标漂移/堆灰标 */
+    /* 活动规格子行：收起时隐藏内部批注锚点；展开后锚点紧跟表头文字右侧（inline 占位），
+       角标定位在文字右侧而非单元格右侧，避免读串列（绿韵家实战 2026-10-13）。 */
     .act-spec-wrap:not(.open) .act-anno-dot { display: none !important; }
-    .act-spec-wrap.open .act-anno-dot { display: block !important; visibility: hidden; position: absolute; left: 0; right: 0; top: 0; bottom: 0; width: auto; height: auto; }
+    .act-spec-wrap.open .act-anno-dot { display: inline-block !important; visibility: hidden; width: 2px; height: 1em; vertical-align: middle; }
   </style>
 <style>.Po4BvhR1CK2tJaywJ6AN path {
   fill: var(--icon-path-fill);
